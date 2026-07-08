@@ -113,15 +113,21 @@ const reopenButtonStyle: React.CSSProperties = {
  * Edits made before closing are preserved (state lives here, not in the
  * modal), so reopening shows the table exactly as it was left.
  */
-// Staffbase's config dialog is a Radix `Popover`. Radix dismisses popovers
-// on any `pointerdown` that bubbles up to `document` without having been
-// seen by the popover's own React tree first (see `DismissableLayer`'s
-// `usePointerDownOutside`). Our editor is portaled to `document.body` but
-// lives in a *separate* React root injected via `MutationObserver`, so it
-// never participates in Staffbase's React tree and Radix always treats our
-// clicks as "outside", closing the popover.
+// Staffbase's config dialog is a Radix `Popover`. Radix's `DismissableLayer`
+// dismisses popovers via *two independent* document-level listeners:
+//  - `usePointerDownOutside`: a bubble-phase `pointerdown` listener on
+//    `document`, skipped only if a capture-phase `onPointerDownCapture` on
+//    the popover's own content div already saw the event.
+//  - `useFocusOutside`: a bubble-phase `focusin` listener on `document`,
+//    skipped only if a capture-phase `onFocusCapture` on the popover's own
+//    content div already saw the event.
+// Our editor is portaled to `document.body` but lives in a *separate* React
+// root injected via `MutationObserver`, so it never participates in
+// Staffbase's React tree and neither capture handler ever fires for it -
+// every pointerdown AND every focus move inside our modal used to reach
+// `document` and dismiss the popover.
 //
-// The fix must stop that event from ever reaching `document`, but only
+// The fix must stop these events from ever reaching `document`, but only
 // *after* React's own delegated handlers (e.g. the "Fertig" button's
 // onClick) have run. React attaches its synthetic-event listeners for
 // portaled content directly on the portal's container - `document.body`
@@ -132,7 +138,15 @@ const reopenButtonStyle: React.CSSProperties = {
 // then stops the event before it can bubble past `document.body` up to
 // `document`, where Radix listens. Stopping any earlier (e.g. on the
 // modal's own root) would block React's own event delegation too.
-const OUTSIDE_INTERACTION_EVENTS = ["pointerdown", "mousedown", "mouseup", "click", "touchstart", "touchend"] as const;
+const OUTSIDE_INTERACTION_EVENTS = [
+  "pointerdown",
+  "mousedown",
+  "mouseup",
+  "click",
+  "touchstart",
+  "touchend",
+  "focusin",
+] as const;
 
 function useStopOutsideDismissPropagation(isActive: boolean): React.RefObject<HTMLDivElement | null> {
   const modalRootRef = React.useRef<HTMLDivElement | null>(null);

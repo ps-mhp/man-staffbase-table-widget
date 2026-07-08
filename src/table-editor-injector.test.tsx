@@ -250,6 +250,63 @@ describe("startTableEditorInjector", () => {
     popoverStandIn.remove();
   });
 
+  it("does not let focusing an input inside the portaled modal bubble to a document-level focusin outside-dismiss handler", async () => {
+    // Regression test for Radix `DismissableLayer`'s *second*, independent
+    // dismiss mechanism: `useFocusOutside`. Separately from the
+    // `pointerdown`-based outside-click detection, Radix also listens for
+    // `focusin` bubbling to `document` and dismisses unless that focus
+    // move was already seen by the popover's own capture-phase
+    // `onFocusCapture` handler on its content div. Focusing one of our
+    // portaled editor's `<input>` cells (e.g. via a click) moves focus but
+    // never passes through that capture handler, so this path can dismiss
+    // the popover even when the pointerdown path above is fully handled.
+    let capturedInsidePopoverDom = false;
+    const popoverStandIn = document.createElement("div");
+    popoverStandIn.setAttribute("data-testid", "popover-stand-in");
+    // Mirrors Radix's `onFocusCapture` prop on the popover's own content div.
+    popoverStandIn.addEventListener(
+      "focusin",
+      () => {
+        capturedInsidePopoverDom = true;
+      },
+      true,
+    );
+    document.body.appendChild(popoverStandIn);
+
+    const onDismiss = jest.fn();
+    // Mirrors Radix's own document-level `useFocusOutside` listener.
+    document.addEventListener("focusin", () => {
+      if (!capturedInsidePopoverDom) {
+        onDismiss();
+      }
+      capturedInsidePopoverDom = false;
+    });
+
+    const { container } = render(
+      <Form schema={configurationSchema} uiSchema={uiSchema} validator={validator} onSubmit={jest.fn()} />,
+    );
+    popoverStandIn.appendChild(container);
+
+    let stop = () => {};
+    await act(async () => {
+      stop = startTableEditorInjector(container);
+    });
+
+    const cell = document.body.querySelector<HTMLInputElement>(
+      'input[aria-label="Zeile 1, Spalte 1"]',
+    )!;
+    await act(async () => {
+      cell.focus();
+    });
+
+    expect(onDismiss).not.toHaveBeenCalled();
+
+    await act(async () => {
+      stop();
+    });
+    popoverStandIn.remove();
+  });
+
   it("closes the modal and shows a placeholder button when Fertig is clicked", async () => {
     const { container } = render(
       <Form schema={configurationSchema} uiSchema={uiSchema} validator={validator} onSubmit={jest.fn()} />,
