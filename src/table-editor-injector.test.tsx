@@ -190,6 +190,66 @@ describe("startTableEditorInjector", () => {
     expect(document.body.querySelector('[data-testid="table-editor-modal"]')).toBeNull();
   });
 
+  it("does not let clicks inside the portaled modal bubble to a document-level outside-click dismiss handler", async () => {
+    // Regression test for: Staffbase's Radix Popover determines "outside
+    // clicks" via a real DOM-level, bubble-phase `pointerdown` listener on
+    // `document`. It skips dismissal only when that pointerdown's *capture*
+    // phase already passed through the popover's own DOM node (Radix wires
+    // a capture-phase `onPointerDownCapture` handler directly on the
+    // popover content div for this). Because our modal is portaled
+    // directly onto `document.body` -- a DOM sibling of the popover, not a
+    // descendant -- clicks inside it never pass through that capture
+    // handler, so Radix's document listener used to see them as "outside"
+    // and dismiss the whole popover, taking our injected editor down with
+    // it.
+    let capturedInsidePopoverDom = false;
+    const popoverStandIn = document.createElement("div");
+    popoverStandIn.setAttribute("data-testid", "popover-stand-in");
+    // Mirrors Radix's `onPointerDownCapture` prop on the popover's own
+    // content div: a capture-phase listener on that specific DOM node.
+    popoverStandIn.addEventListener(
+      "pointerdown",
+      () => {
+        capturedInsidePopoverDom = true;
+      },
+      true,
+    );
+    document.body.appendChild(popoverStandIn);
+
+    const onDismiss = jest.fn();
+    // Mirrors Radix's own document-level, bubble-phase dismiss listener.
+    document.addEventListener("pointerdown", () => {
+      if (!capturedInsidePopoverDom) {
+        onDismiss();
+      }
+      capturedInsidePopoverDom = false;
+    });
+
+    const { container } = render(
+      <Form schema={configurationSchema} uiSchema={uiSchema} validator={validator} onSubmit={jest.fn()} />,
+    );
+    popoverStandIn.appendChild(container);
+
+    let stop = () => {};
+    await act(async () => {
+      stop = startTableEditorInjector(container);
+    });
+
+    const cell = document.body.querySelector<HTMLInputElement>(
+      'input[aria-label="Zeile 1, Spalte 1"]',
+    )!;
+    await act(async () => {
+      cell.dispatchEvent(new Event("pointerdown", { bubbles: true, cancelable: true }));
+    });
+
+    expect(onDismiss).not.toHaveBeenCalled();
+
+    await act(async () => {
+      stop();
+    });
+    popoverStandIn.remove();
+  });
+
   it("closes the modal and shows a placeholder button when Fertig is clicked", async () => {
     const { container } = render(
       <Form schema={configurationSchema} uiSchema={uiSchema} validator={validator} onSubmit={jest.fn()} />,

@@ -113,9 +113,53 @@ const reopenButtonStyle: React.CSSProperties = {
  * Edits made before closing are preserved (state lives here, not in the
  * modal), so reopening shows the table exactly as it was left.
  */
+// Staffbase's config dialog is a Radix `Popover`. Radix dismisses popovers
+// on any `pointerdown` that bubbles up to `document` without having been
+// seen by the popover's own React tree first (see `DismissableLayer`'s
+// `usePointerDownOutside`). Our editor is portaled to `document.body` but
+// lives in a *separate* React root injected via `MutationObserver`, so it
+// never participates in Staffbase's React tree and Radix always treats our
+// clicks as "outside", closing the popover.
+//
+// The fix must stop that event from ever reaching `document`, but only
+// *after* React's own delegated handlers (e.g. the "Fertig" button's
+// onClick) have run. React attaches its synthetic-event listeners for
+// portaled content directly on the portal's container - `document.body`
+// here - during commit, which happens before this effect (a passive
+// effect always runs after commit, including after any ref/layout work).
+// So adding our own native listener on `document.body`, scoped to events
+// whose target is inside our modal, lets React's handlers fire first and
+// then stops the event before it can bubble past `document.body` up to
+// `document`, where Radix listens. Stopping any earlier (e.g. on the
+// modal's own root) would block React's own event delegation too.
+const OUTSIDE_INTERACTION_EVENTS = ["pointerdown", "mousedown", "mouseup", "click", "touchstart", "touchend"] as const;
+
+function useStopOutsideDismissPropagation(isActive: boolean): React.RefObject<HTMLDivElement | null> {
+  const modalRootRef = React.useRef<HTMLDivElement | null>(null);
+
+  React.useEffect(() => {
+    if (!isActive) {
+      return;
+    }
+
+    const stopIfInsideModal = (event: Event): void => {
+      if (event.target instanceof Node && modalRootRef.current?.contains(event.target)) {
+        event.stopPropagation();
+      }
+    };
+    OUTSIDE_INTERACTION_EVENTS.forEach((eventName) => document.body.addEventListener(eventName, stopIfInsideModal));
+    return () => {
+      OUTSIDE_INTERACTION_EVENTS.forEach((eventName) => document.body.removeEventListener(eventName, stopIfInsideModal));
+    };
+  }, [isActive]);
+
+  return modalRootRef;
+}
+
 function InjectedEditor({ textarea }: InjectedEditorProps): React.ReactElement {
   const [value, setValue] = React.useState<TableData>(() => parseTableData(textarea.value));
   const [isOpen, setIsOpen] = React.useState(true);
+  const modalRef = useStopOutsideDismissPropagation(isOpen);
 
   const handleChange = (data: TableData): void => {
     setValue(data);
@@ -148,7 +192,7 @@ function InjectedEditor({ textarea }: InjectedEditorProps): React.ReactElement {
   return createPortal(
     React.createElement(
       "div",
-      { "data-testid": "table-editor-modal", style: overlayStyle },
+      { "data-testid": "table-editor-modal", style: overlayStyle, ref: modalRef },
       React.createElement(
         "div",
         { style: panelStyle },
