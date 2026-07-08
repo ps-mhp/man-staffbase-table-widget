@@ -13,6 +13,7 @@
 
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
+import { createPortal } from "react-dom";
 import { TableEditor } from "./table-editor";
 import { TableData, parseTableData, serializeTableData } from "./table-json";
 
@@ -134,27 +135,40 @@ function InjectedEditor({ textarea }: InjectedEditorProps): React.ReactElement {
     );
   }
 
-  return React.createElement(
-    "div",
-    { "data-testid": "table-editor-modal", style: overlayStyle },
+  // Rendered via a portal straight onto `document.body` instead of inline
+  // in the component tree. Staffbase wraps the config dialog in a Radix
+  // popover that sets a `transform` on one of its ancestors; per the CSS
+  // spec that makes the transformed ancestor the containing block for any
+  // `position: fixed` descendant, so an inline modal gets clipped to the
+  // popover's small box (and its `overflow-y: hidden`) instead of covering
+  // the viewport, showing up as a blank area. Portaling to `document.body`
+  // escapes that ancestor chain entirely, so `position: fixed` reliably
+  // targets the real viewport regardless of where this component is
+  // mounted in the form.
+  return createPortal(
     React.createElement(
       "div",
-      { style: panelStyle },
+      { "data-testid": "table-editor-modal", style: overlayStyle },
       React.createElement(
         "div",
-        { style: panelBodyStyle },
-        React.createElement(TableEditor, { value, onChange: handleChange }),
-      ),
-      React.createElement(
-        "div",
-        { style: footerStyle },
+        { style: panelStyle },
         React.createElement(
-          "button",
-          { type: "button", style: doneButtonStyle, onClick: () => setIsOpen(false) },
-          "Fertig",
+          "div",
+          { style: panelBodyStyle },
+          React.createElement(TableEditor, { value, onChange: handleChange }),
+        ),
+        React.createElement(
+          "div",
+          { style: footerStyle },
+          React.createElement(
+            "button",
+            { type: "button", style: doneButtonStyle, onClick: () => setIsOpen(false) },
+            "Fertig",
+          ),
         ),
       ),
     ),
+    document.body,
   );
 }
 
