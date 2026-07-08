@@ -55,6 +55,7 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
         style={{
           borderCollapse: "collapse",
           tableLayout: "auto",
+          width: "100%",
         }}
       >
         <thead>

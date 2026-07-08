@@ -1,5 +1,5 @@
 import React from "react";
-import { render, act, waitFor } from "@testing-library/react";
+import { render, act, waitFor, within } from "@testing-library/react";
 import Form from "@rjsf/mui";
 import validator from "@rjsf/validator-ajv8";
 
@@ -133,5 +133,92 @@ describe("startTableEditorInjector", () => {
     });
 
     expect(container.querySelector('[data-testid="table-editor"]')).toBeNull();
+  });
+
+  it("opens the table editor in a large modal as soon as it is injected", async () => {
+    const { container } = render(
+      <Form schema={configurationSchema} uiSchema={uiSchema} validator={validator} onSubmit={jest.fn()} />,
+    );
+
+    let stop = () => {};
+    await act(async () => {
+      stop = startTableEditorInjector(container);
+    });
+
+    const modal = container.querySelector('[data-testid="table-editor-modal"]');
+    expect(modal).not.toBeNull();
+    expect(within(modal as HTMLElement).getByTestId("table-editor")).toBeInTheDocument();
+    expect(within(modal as HTMLElement).getByText("Fertig")).toBeInTheDocument();
+
+    await act(async () => {
+      stop();
+    });
+  });
+
+  it("closes the modal and shows a placeholder button when Fertig is clicked", async () => {
+    const { container } = render(
+      <Form schema={configurationSchema} uiSchema={uiSchema} validator={validator} onSubmit={jest.fn()} />,
+    );
+
+    let stop = () => {};
+    await act(async () => {
+      stop = startTableEditorInjector(container);
+    });
+
+    await act(async () => {
+      within(container.querySelector('[data-testid="table-editor-modal"]') as HTMLElement)
+        .getByText("Fertig")
+        .click();
+    });
+
+    expect(container.querySelector('[data-testid="table-editor-modal"]')).toBeNull();
+    const reopenButton = container.querySelector('[data-testid="table-editor-reopen"]');
+    expect(reopenButton).not.toBeNull();
+    expect(reopenButton?.textContent).toContain("Tabelle bearbeiten");
+
+    await act(async () => {
+      stop();
+    });
+  });
+
+  it("reopens the modal, keeping prior edits, when the placeholder button is clicked", async () => {
+    const { container } = render(
+      <Form schema={configurationSchema} uiSchema={uiSchema} validator={validator} onSubmit={jest.fn()} />,
+    );
+
+    let stop = () => {};
+    await act(async () => {
+      stop = startTableEditorInjector(container);
+    });
+
+    const cell = container.querySelector<HTMLInputElement>('input[aria-label="Zeile 2, Spalte 1"]')!;
+    await act(async () => {
+      const nativeSetter = Object.getOwnPropertyDescriptor(
+        window.HTMLInputElement.prototype,
+        "value",
+      )!.set!;
+      nativeSetter.call(cell, "Bearbeitete Zeile");
+      cell.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+
+    await act(async () => {
+      within(container.querySelector('[data-testid="table-editor-modal"]') as HTMLElement)
+        .getByText("Fertig")
+        .click();
+    });
+
+    await act(async () => {
+      (container.querySelector('[data-testid="table-editor-reopen"]') as HTMLButtonElement).click();
+    });
+
+    const modal = container.querySelector('[data-testid="table-editor-modal"]');
+    expect(modal).not.toBeNull();
+    expect(
+      within(modal as HTMLElement).getByLabelText<HTMLInputElement>("Zeile 2, Spalte 1"),
+    ).toHaveValue("Bearbeitete Zeile");
+
+    await act(async () => {
+      stop();
+    });
   });
 });

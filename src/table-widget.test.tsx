@@ -56,4 +56,10 @@ describe("TableWidget", () => {
 
     expect(screen.getByText("Spalte 1")).toBeInTheDocument();
   });
+
+  it("renders the table at full width of its container", () => {
+    render(<TableWidget contentLanguage="de_DE" />);
+
+    expect(screen.getByRole("table")).toHaveStyle({ width: "100%" });
+  });
 });
