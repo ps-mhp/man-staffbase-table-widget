@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-import React, { ReactElement } from "react";
+import React, { ReactElement, useMemo, useState } from "react";
 import { BlockAttributes } from "widget-sdk";
 import { parseTableData } from "./table-json";
 
@@ -22,38 +22,55 @@ export type TableWidgetProps = BlockAttributes & {
   tabledata?: string;
 };
 
-const cellStyle: React.CSSProperties = {
-  border: "1px solid #d5d9dd",
+const baseCellStyle: React.CSSProperties = {
   padding: "8px 12px",
-  textAlign: "left",
   whiteSpace: "nowrap",
-  background: "#fff",
+  borderBottom: "1px solid #3e3b3b",
 };
 
 const headerCellStyle: React.CSSProperties = {
-  ...cellStyle,
-  fontWeight: 600,
-  background: "#f5f6f7",
+  ...baseCellStyle,
+  fontWeight: "bold",
+  cursor: "pointer",
+  userSelect: "none",
+  borderBottom: "2px solid #233848",
 };
+
+const alignFor = (colIndex: number): React.CSSProperties["textAlign"] =>
+  colIndex === 0 ? "left" : "center";
 
 export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
   const data = parseTableData(tabledata);
   const [headerRow, ...bodyRows] = data;
 
+  const [sort, setSort] = useState<{ col: number; asc: boolean } | null>(null);
+
+  const sortedBodyRows = useMemo(() => {
+    if (sort === null) {
+      return bodyRows;
+    }
+    const { col, asc } = sort;
+    return [...bodyRows].sort((a, b) => {
+      const x = (a[col] ?? "").trim();
+      const y = (b[col] ?? "").trim();
+      return asc
+        ? x.localeCompare(y, "de", { numeric: true })
+        : y.localeCompare(x, "de", { numeric: true });
+    });
+  }, [bodyRows, sort]);
+
+  const toggleSort = (col: number): void => {
+    setSort((prev) =>
+      prev && prev.col === col ? { col, asc: !prev.asc } : { col, asc: true },
+    );
+  };
+
   return (
-    <div
-      className="table-widget-scroll"
-      style={{
-        overflow: "auto",
-        maxWidth: "100%",
-        maxHeight: "70vh",
-        border: "1px solid #d5d9dd",
-        borderRadius: "4px",
-      }}
-    >
+    <div style={{ overflow: "auto", maxWidth: "100%" }}>
       <table
         style={{
-          borderCollapse: "collapse",
+          borderCollapse: "separate",
+          borderSpacing: "3px 0",
           tableLayout: "auto",
           width: "100%",
         }}
@@ -64,13 +81,8 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
               <th
                 key={colIndex}
                 scope="col"
-                style={{
-                  ...headerCellStyle,
-                  position: "sticky",
-                  top: 0,
-                  zIndex: colIndex === 0 ? 3 : 2,
-                  ...(colIndex === 0 ? { left: 0 } : {}),
-                }}
+                onClick={() => toggleSort(colIndex)}
+                style={{ ...headerCellStyle, textAlign: alignFor(colIndex) }}
               >
                 {cell}
               </th>
@@ -78,30 +90,41 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
           </tr>
         </thead>
         <tbody>
-          {bodyRows.map((row, rowIndex) => (
-            <tr key={rowIndex}>
-              {row.map((cell, colIndex) =>
-                colIndex === 0 ? (
-                  <th
-                    key={colIndex}
-                    scope="row"
-                    style={{
-                      ...headerCellStyle,
-                      position: "sticky",
-                      left: 0,
-                      zIndex: 1,
-                    }}
-                  >
-                    {cell}
-                  </th>
-                ) : (
-                  <td key={colIndex} style={cellStyle}>
-                    {cell}
-                  </td>
-                ),
-              )}
-            </tr>
-          ))}
+          {sortedBodyRows.map((row, rowIndex) => {
+            const gapStyle: React.CSSProperties =
+              rowIndex === 0 ? { paddingTop: "16px" } : {};
+            return (
+              <tr key={rowIndex}>
+                {row.map((cell, colIndex) =>
+                  colIndex === 0 ? (
+                    <th
+                      key={colIndex}
+                      scope="row"
+                      style={{
+                        ...baseCellStyle,
+                        textAlign: alignFor(colIndex),
+                        fontWeight: "bold",
+                        ...gapStyle,
+                      }}
+                    >
+                      {cell}
+                    </th>
+                  ) : (
+                    <td
+                      key={colIndex}
+                      style={{
+                        ...baseCellStyle,
+                        textAlign: alignFor(colIndex),
+                        ...gapStyle,
+                      }}
+                    >
+                      {cell}
+                    </td>
+                  ),
+                )}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
