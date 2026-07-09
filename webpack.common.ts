@@ -45,6 +45,15 @@ const config: webpack.Configuration = {
     filename: "[name].js",
     path: __dirname + "/dist",
   },
+  optimization: {
+    // Ship a single self-contained bundle: no split chunks and no separate
+    // runtime file. The widget is loaded by the hosting app (often by id, not
+    // by path), so lazily loaded chunks can't be resolved reliably — keeping
+    // everything (incl. exceljs used for .xlsx import) in one file avoids any
+    // "Loading chunk failed" errors.
+    splitChunks: false,
+    runtimeChunk: false,
+  },
 };
 
 export default config;
