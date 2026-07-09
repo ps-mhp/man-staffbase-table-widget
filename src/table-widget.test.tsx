@@ -62,4 +62,83 @@ describe("TableWidget", () => {
 
     expect(screen.getByRole("table")).toHaveStyle({ width: "100%" });
   });
+
+  it("renders merged cells with colSpan and skips covered cells", () => {
+    const tabledata = JSON.stringify({
+      data: [
+        ["", "A", "B"],
+        ["OBD", "x", "y"],
+      ],
+      merges: [{ row: 1, col: 1, rowSpan: 1, colSpan: 2 }],
+    });
+
+    render(<TableWidget contentLanguage="de_DE" tabledata={tabledata} />);
+
+    const merged = screen.getByText("x").closest("td")!;
+    expect(merged).toHaveAttribute("colspan", "2");
+    // The covered cell's value must not be rendered.
+    expect(screen.queryByText("y")).not.toBeInTheDocument();
+  });
+
+  it("applies per-cell formatting", () => {
+    const tabledata = JSON.stringify({
+      data: [
+        ["", "A"],
+        ["R", "1"],
+      ],
+      formats: { "1,1": { bold: true, color: "#ff0000" } },
+    });
+
+    render(<TableWidget contentLanguage="de_DE" tabledata={tabledata} />);
+
+    expect(screen.getByText("1").closest("td")).toHaveStyle({
+      fontWeight: "bold",
+      color: "#ff0000",
+    });
+  });
+
+  it("renders super/subscript markup in cells", () => {
+    const tabledata = JSON.stringify({
+      data: [
+        ["", "A"],
+        ["Fläche", "12 m<sup>2</sup>"],
+      ],
+    });
+
+    const { container } = render(
+      <TableWidget contentLanguage="de_DE" tabledata={tabledata} />,
+    );
+
+    expect(container.querySelector("sup")).toHaveTextContent("2");
+  });
+
+  it("applies a background color to a cell", () => {
+    const tabledata = JSON.stringify({
+      data: [
+        ["", "A"],
+        ["R", "1"],
+      ],
+      formats: { "1,1": { background: "#ffff00" } },
+    });
+
+    render(<TableWidget contentLanguage="de_DE" tabledata={tabledata} />);
+
+    expect(screen.getByText("1").closest("td")).toHaveStyle({ background: "#ffff00" });
+  });
+
+  it("applies a preset sort on initial render", () => {
+    const tabledata = JSON.stringify({
+      data: [
+        ["", "A"],
+        ["B", "1"],
+        ["A", "1"],
+      ],
+      sort: { col: 0, dir: "asc" },
+    });
+
+    render(<TableWidget contentLanguage="de_DE" tabledata={tabledata} />);
+
+    const rowHeaders = screen.getAllByRole("rowheader").map((el) => el.textContent);
+    expect(rowHeaders).toEqual(["A", "B"]);
+  });
 });

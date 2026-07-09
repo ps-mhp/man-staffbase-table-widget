@@ -42,8 +42,8 @@ describe("startTableEditorInjector", () => {
       stop = startTableEditorInjector(container);
     });
 
-    expect(document.body.querySelector('input[aria-label="Zeile 1, Spalte 2"]')).toHaveValue("X");
-    expect(document.body.querySelector('input[aria-label="Zeile 2, Spalte 1"]')).toHaveValue("Y");
+    expect(document.body.querySelector('[aria-label="Zeile 1, Spalte 2"]')).toHaveTextContent("X");
+    expect(document.body.querySelector('[aria-label="Zeile 2, Spalte 1"]')).toHaveTextContent("Y");
 
     await act(async () => {
       stop();
@@ -61,13 +61,9 @@ describe("startTableEditorInjector", () => {
       stop = startTableEditorInjector(container);
     });
 
-    const cell = document.body.querySelector<HTMLInputElement>('input[aria-label="Zeile 2, Spalte 1"]')!;
+    const cell = document.body.querySelector<HTMLDivElement>('[aria-label="Zeile 2, Spalte 1"]')!;
     await act(async () => {
-      const nativeSetter = Object.getOwnPropertyDescriptor(
-        window.HTMLInputElement.prototype,
-        "value",
-      )!.set!;
-      nativeSetter.call(cell, "Geänderte Zeile");
+      cell.innerHTML = "Geänderte Zeile";
       cell.dispatchEvent(new Event("input", { bubbles: true }));
     });
 
@@ -148,7 +144,7 @@ describe("startTableEditorInjector", () => {
     const modal = document.body.querySelector('[data-testid="table-editor-modal"]');
     expect(modal).not.toBeNull();
     expect(within(modal as HTMLElement).getByTestId("table-editor")).toBeInTheDocument();
-    expect(within(modal as HTMLElement).getByText("Fertig")).toBeInTheDocument();
+    expect(within(modal as HTMLElement).getByTestId("toolbar-done")).toBeInTheDocument();
 
     await act(async () => {
       stop();
@@ -235,8 +231,8 @@ describe("startTableEditorInjector", () => {
       stop = startTableEditorInjector(container);
     });
 
-    const cell = document.body.querySelector<HTMLInputElement>(
-      'input[aria-label="Zeile 1, Spalte 1"]',
+    const cell = document.body.querySelector<HTMLDivElement>(
+      '[aria-label="Zeile 1, Spalte 1"]',
     )!;
     await act(async () => {
       cell.dispatchEvent(new Event("pointerdown", { bubbles: true, cancelable: true }));
@@ -292,8 +288,8 @@ describe("startTableEditorInjector", () => {
       stop = startTableEditorInjector(container);
     });
 
-    const cell = document.body.querySelector<HTMLInputElement>(
-      'input[aria-label="Zeile 1, Spalte 1"]',
+    const cell = document.body.querySelector<HTMLDivElement>(
+      '[aria-label="Zeile 1, Spalte 1"]',
     )!;
     await act(async () => {
       cell.focus();
@@ -319,7 +315,7 @@ describe("startTableEditorInjector", () => {
 
     await act(async () => {
       within(document.body.querySelector('[data-testid="table-editor-modal"]') as HTMLElement)
-        .getByText("Fertig")
+        .getByTestId("toolbar-done")
         .click();
     });
 
@@ -343,19 +339,15 @@ describe("startTableEditorInjector", () => {
       stop = startTableEditorInjector(container);
     });
 
-    const cell = document.body.querySelector<HTMLInputElement>('input[aria-label="Zeile 2, Spalte 1"]')!;
+    const cell = document.body.querySelector<HTMLDivElement>('[aria-label="Zeile 2, Spalte 1"]')!;
     await act(async () => {
-      const nativeSetter = Object.getOwnPropertyDescriptor(
-        window.HTMLInputElement.prototype,
-        "value",
-      )!.set!;
-      nativeSetter.call(cell, "Bearbeitete Zeile");
+      cell.innerHTML = "Bearbeitete Zeile";
       cell.dispatchEvent(new Event("input", { bubbles: true }));
     });
 
     await act(async () => {
       within(document.body.querySelector('[data-testid="table-editor-modal"]') as HTMLElement)
-        .getByText("Fertig")
+        .getByTestId("toolbar-done")
         .click();
     });
 
@@ -366,8 +358,8 @@ describe("startTableEditorInjector", () => {
     const modal = document.body.querySelector('[data-testid="table-editor-modal"]');
     expect(modal).not.toBeNull();
     expect(
-      within(modal as HTMLElement).getByLabelText<HTMLInputElement>("Zeile 2, Spalte 1"),
-    ).toHaveValue("Bearbeitete Zeile");
+      within(modal as HTMLElement).getByLabelText("Zeile 2, Spalte 1"),
+    ).toHaveTextContent("Bearbeitete Zeile");
 
     await act(async () => {
       stop();

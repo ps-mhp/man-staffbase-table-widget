@@ -4,6 +4,7 @@
   "description": "",
   "scripts": {
     "start": "webpack serve --open --config webpack.dev.ts",
+    "dev": "webpack serve --open --config webpack.dev.ts",
     "build": "webpack --config webpack.prod.ts",
     "build:watch": "webpack --config webpack.prod.ts --watch",
     "test": "jest",
@@ -17,7 +18,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@radix-ui/react-context-menu": "^2.3.3",
     "@staffbase/widget-sdk": "^3.18.0",
+    "exceljs": "^4.4.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "regenerator-runtime": "0.14.1"
@@ -33,8 +36,8 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@eslint/js": "^10.0.1",
-    "@mui/material": "^9.0.0",
     "@mui/icons-material": "^9.0.0",
+    "@mui/material": "^9.0.0",
     "@rjsf/core": "^6.5.1",
     "@rjsf/mui": "^6.5.1",
     "@rjsf/utils": "^6.5.1",
@@ -68,5 +71,8 @@
     "webpack-dev-server": "^5.2.2",
     "webpack-merge": "^6.0.1"
   },
-  "browserslist": [">0.2%", "not ie < 11"]
+  "browserslist": [
+    ">0.2%",
+    "not ie < 11"
+  ]
 }

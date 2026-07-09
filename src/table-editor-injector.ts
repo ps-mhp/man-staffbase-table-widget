@@ -15,7 +15,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import { createPortal } from "react-dom";
 import { TableEditor } from "./table-editor";
-import { TableData, parseTableData, serializeTableData } from "./table-json";
+import { TableModel, parseTableModel, serializeTableModel } from "./table-model";
 
 /**
  * The DOM id RJSF/MUI renders for the `tabledata` schema property when
@@ -70,22 +70,6 @@ const panelStyle: React.CSSProperties = {
 const panelBodyStyle: React.CSSProperties = {
   flex: 1,
   overflow: "auto",
-};
-
-const footerStyle: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "flex-end",
-  marginTop: "16px",
-};
-
-const doneButtonStyle: React.CSSProperties = {
-  border: "none",
-  background: "#0074d9",
-  color: "#fff",
-  cursor: "pointer",
-  padding: "10px 20px",
-  borderRadius: "4px",
-  fontSize: "14px",
 };
 
 const reopenButtonStyle: React.CSSProperties = {
@@ -171,13 +155,13 @@ function useStopOutsideDismissPropagation(isActive: boolean): React.RefObject<HT
 }
 
 function InjectedEditor({ textarea }: InjectedEditorProps): React.ReactElement {
-  const [value, setValue] = React.useState<TableData>(() => parseTableData(textarea.value));
+  const [value, setValue] = React.useState<TableModel>(() => parseTableModel(textarea.value));
   const [isOpen, setIsOpen] = React.useState(true);
   const modalRef = useStopOutsideDismissPropagation(isOpen);
 
-  const handleChange = (data: TableData): void => {
-    setValue(data);
-    setNativeTextareaValue(textarea, serializeTableData(data));
+  const handleChange = (model: TableModel): void => {
+    setValue(model);
+    setNativeTextareaValue(textarea, serializeTableModel(model));
   };
 
   if (!isOpen) {
@@ -213,16 +197,11 @@ function InjectedEditor({ textarea }: InjectedEditorProps): React.ReactElement {
         React.createElement(
           "div",
           { style: panelBodyStyle },
-          React.createElement(TableEditor, { value, onChange: handleChange }),
-        ),
-        React.createElement(
-          "div",
-          { style: footerStyle },
-          React.createElement(
-            "button",
-            { type: "button", style: doneButtonStyle, onClick: () => setIsOpen(false) },
-            "Fertig",
-          ),
+          React.createElement(TableEditor, {
+            value,
+            onChange: handleChange,
+            onDone: () => setIsOpen(false),
+          }),
         ),
       ),
     ),

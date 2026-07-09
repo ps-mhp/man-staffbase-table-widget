@@ -17,6 +17,28 @@
         border: 2px dashed gray;
         padding: 40px;
       }
+      /* Resizable preview container: drag the bottom-right corner to test
+         the widget's visibility / sticky / scroll behaviour at any size. */
+      #preview {
+        resize: both;
+        overflow: hidden;
+        width: 600px;
+        height: 400px;
+        min-width: 200px;
+        min-height: 150px;
+        border: 1px solid #b7bcc3;
+        box-sizing: border-box;
+      }
+      /* Make the widget fill the resizable box so scrolling (and therefore
+         the sticky first row/column) happens inside the widget itself. */
+      #preview table-widget {
+        display: block;
+        height: 100%;
+      }
+      #preview .table-widget-scroll {
+        height: 100% !important;
+        max-height: 100% !important;
+      }
     </style>
   </head>
   <body style="display: flex">
@@ -25,7 +47,7 @@
       <br />
       <br />
       <section id="preview">
-            <table-widget tabledata='[["","Spalte 1","Spalte 2"],["Zeile 1","Wert","Wert"],["Zeile 2","Wert","Wert"]]'></table-widget>
+            <table-widget tabledata='[["","Spalte 1","Spalte 2","Spalte 3","Spalte 4","Spalte 5","Spalte 6"],["Zeile 1","a","b","c","d","e","f"],["Zeile 2","a","b","c","d","e","f"],["Zeile 3","a","b","c","d","e","f"],["Zeile 4","a","b","c","d","e","f"],["Zeile 5","a","b","c","d","e","f"],["Zeile 6","a","b","c","d","e","f"],["Zeile 7","a","b","c","d","e","f"],["Zeile 8","a","b","c","d","e","f"],["Zeile 9","a","b","c","d","e","f"],["Zeile 10","a","b","c","d","e","f"]]'></table-widget>
         </section>
     </div>
     <div id="config" style="flex: 1"></div>

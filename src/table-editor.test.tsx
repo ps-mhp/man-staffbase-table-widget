@@ -1,102 +1,223 @@
 import React from "react";
-import { screen, render, fireEvent } from "@testing-library/react";
+import { screen, render, fireEvent, waitFor } from "@testing-library/react";
 
 import { TableEditor } from "./table-editor";
-import { TableData } from "./table-json";
+import { TableModel } from "./table-model";
+import * as tableImport from "./table-import";
 
-describe("TableEditor", () => {
-  const sample: TableData = [
+const model = (data: string[][], overrides: Partial<TableModel> = {}): TableModel => ({
+  data,
+  merges: [],
+  formats: {},
+  sort: null,
+  ...overrides,
+});
+
+const sample = (): TableModel =>
+  model([
     ["", "Q1", "Q2"],
     ["Umsatz", "100", "200"],
-  ];
+    ["Kosten", "50", "60"],
+  ]);
 
-  it("renders an input for every cell", () => {
-    render(<TableEditor value={sample} onChange={jest.fn()} />);
+const cellDiv = (label: string): HTMLElement => screen.getByLabelText(label);
+const cellTd = (label: string): HTMLElement => cellDiv(label).closest("td")!;
 
-    expect(screen.getByLabelText("Zeile 1, Spalte 2")).toHaveValue("Q1");
-    expect(screen.getByLabelText("Zeile 2, Spalte 1")).toHaveValue("Umsatz");
+/** Right-clicks a cell (after selecting it) and returns the context menu. */
+const openMenuOnCell = (label: string): HTMLElement => {
+  const td = cellTd(label);
+  fireEvent.mouseDown(td);
+  fireEvent.contextMenu(td);
+  return screen.getByTestId("table-editor-menu");
+};
+
+describe("TableEditor", () => {
+  it("renders an editable cell for every value", () => {
+    render(<TableEditor value={sample()} onChange={jest.fn()} />);
+    expect(cellDiv("Zeile 1, Spalte 2")).toHaveTextContent("Q1");
+    expect(cellDiv("Zeile 2, Spalte 1")).toHaveTextContent("Umsatz");
   });
 
-  it("calls onChange with an updated cell value when typing", () => {
+  it("calls onChange when a cell's content changes", () => {
     const onChange = jest.fn();
-    render(<TableEditor value={sample} onChange={onChange} />);
+    render(<TableEditor value={sample()} onChange={onChange} />);
+    const div = cellDiv("Zeile 2, Spalte 2");
+    div.innerHTML = "150";
+    fireEvent.input(div);
+    const arg = onChange.mock.calls[0][0] as TableModel;
+    expect(arg.data[1][1]).toBe("150");
+  });
 
-    fireEvent.change(screen.getByLabelText("Zeile 2, Spalte 2"), {
-      target: { value: "150" },
+  it("selects a cell on mousedown", () => {
+    render(<TableEditor value={sample()} onChange={jest.fn()} />);
+    const td = cellTd("Zeile 2, Spalte 2");
+    fireEvent.mouseDown(td);
+    expect(td).toHaveStyle({ background: "#eaf4ff" });
+  });
+
+  it("selects a whole column via the column handle", () => {
+    render(<TableEditor value={sample()} onChange={jest.fn()} />);
+    fireEvent.click(screen.getByTestId("col-handle-1"));
+    expect(cellTd("Zeile 1, Spalte 2")).toHaveStyle({ background: "#eaf4ff" });
+    expect(cellTd("Zeile 2, Spalte 2")).toHaveStyle({ background: "#eaf4ff" });
+  });
+
+  it("inserts a row below via the context menu", () => {
+    const onChange = jest.fn();
+    render(<TableEditor value={sample()} onChange={onChange} />);
+    openMenuOnCell("Zeile 2, Spalte 1");
+    fireEvent.click(screen.getByTestId("insert-row-below"));
+    const arg = onChange.mock.calls[0][0] as TableModel;
+    expect(arg.data.length).toBe(4);
+  });
+
+  it("deletes the selected column via the context menu", () => {
+    const onChange = jest.fn();
+    render(<TableEditor value={sample()} onChange={onChange} />);
+    fireEvent.click(screen.getByTestId("col-handle-2"));
+    fireEvent.contextMenu(cellTd("Zeile 1, Spalte 3"));
+    fireEvent.click(screen.getByTestId("delete-cols"));
+    const arg = onChange.mock.calls[0][0] as TableModel;
+    expect(arg.data[0]).toEqual(["", "Q1"]);
+  });
+
+  it("merges the selected range via the context menu", () => {
+    const onChange = jest.fn();
+    render(<TableEditor value={sample()} onChange={onChange} />);
+    fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
+    fireEvent.mouseDown(cellTd("Zeile 2, Spalte 3"), { shiftKey: true });
+    fireEvent.contextMenu(cellTd("Zeile 2, Spalte 3"));
+    fireEvent.click(screen.getByTestId("merge-cells"));
+    const arg = onChange.mock.calls[0][0] as TableModel;
+    expect(arg.merges).toEqual([{ row: 1, col: 1, rowSpan: 1, colSpan: 2 }]);
+  });
+
+  it("does not render the covered cell of a merge", () => {
+    const merged = model([["", "Q1", "Q2"], ["Umsatz", "100", "200"]], {
+      merges: [{ row: 1, col: 1, rowSpan: 1, colSpan: 2 }],
     });
-
-    expect(onChange).toHaveBeenCalledWith([
-      ["", "Q1", "Q2"],
-      ["Umsatz", "150", "200"],
-    ]);
+    render(<TableEditor value={merged} onChange={jest.fn()} />);
+    expect(screen.queryByLabelText("Zeile 2, Spalte 3")).not.toBeInTheDocument();
+    expect(cellTd("Zeile 2, Spalte 2")).toHaveAttribute("colspan", "2");
   });
 
-  it("adds a row when clicking '+ Zeile'", () => {
+  // --- Toolbar ---
+
+  it("toolbar controls are disabled until a cell is selected", () => {
+    render(<TableEditor value={sample()} onChange={jest.fn()} />);
+    expect(screen.getByTestId("toolbar-bold")).toBeDisabled();
+    fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
+    expect(screen.getByTestId("toolbar-bold")).not.toBeDisabled();
+  });
+
+  it("enables 'unmerge' only when the selection overlaps a merge", () => {
+    const merged = model([["", "Q1", "Q2"], ["Umsatz", "100", "200"]], {
+      merges: [{ row: 1, col: 1, rowSpan: 1, colSpan: 2 }],
+    });
+    render(<TableEditor value={merged} onChange={jest.fn()} />);
+
+    // A plain header cell without a merge -> unmerge disabled.
+    fireEvent.mouseDown(cellTd("Zeile 1, Spalte 2"));
+    expect(screen.getByTestId("toolbar-unmerge")).toBeDisabled();
+
+    // The merged cell -> unmerge enabled.
+    fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
+    expect(screen.getByTestId("toolbar-unmerge")).not.toBeDisabled();
+  });
+
+  it("applies bold via the toolbar to the selection", () => {
     const onChange = jest.fn();
-    render(<TableEditor value={sample} onChange={onChange} />);
-
-    fireEvent.click(screen.getByText("+ Zeile"));
-
-    expect(onChange).toHaveBeenCalledWith([
-      ["", "Q1", "Q2"],
-      ["Umsatz", "100", "200"],
-      ["", "", ""],
-    ]);
+    render(<TableEditor value={sample()} onChange={onChange} />);
+    fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
+    fireEvent.click(screen.getByTestId("toolbar-bold"));
+    const arg = onChange.mock.calls[0][0] as TableModel;
+    expect(arg.formats["1,1"]).toEqual({ bold: true });
   });
 
-  it("adds a column when clicking '+ Spalte'", () => {
+  it("applies a background colour via the toolbar", () => {
     const onChange = jest.fn();
-    render(<TableEditor value={sample} onChange={onChange} />);
-
-    fireEvent.click(screen.getByText("+ Spalte"));
-
-    expect(onChange).toHaveBeenCalledWith([
-      ["", "Q1", "Q2", ""],
-      ["Umsatz", "100", "200", ""],
-    ]);
+    render(<TableEditor value={sample()} onChange={onChange} />);
+    fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
+    fireEvent.change(screen.getByTestId("toolbar-bg"), { target: { value: "#ffff00" } });
+    const arg = onChange.mock.calls[0][0] as TableModel;
+    expect(arg.formats["1,1"]).toEqual({ background: "#ffff00" });
   });
 
-  it("removes a non-header row via its remove button", () => {
+  it("applies a font size via the toolbar", () => {
     const onChange = jest.fn();
-    render(<TableEditor value={sample} onChange={onChange} />);
-
-    fireEvent.click(screen.getByLabelText("Zeile 2 entfernen"));
-
-    expect(onChange).toHaveBeenCalledWith([["", "Q1", "Q2"]]);
+    render(<TableEditor value={sample()} onChange={onChange} />);
+    fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
+    fireEvent.change(screen.getByTestId("toolbar-fontsize"), { target: { value: "20" } });
+    const arg = onChange.mock.calls[0][0] as TableModel;
+    expect(arg.formats["1,1"]).toEqual({ fontSize: 20 });
   });
 
-  it("removes a non-header column via its remove button", () => {
+  it("shows contextual insert (only column) when a full column is selected", () => {
+    render(<TableEditor value={sample()} onChange={jest.fn()} />);
+    fireEvent.click(screen.getByTestId("col-handle-1"));
+    fireEvent.click(screen.getByTestId("toolbar-insert"));
+    expect(screen.getByTestId("toolbar-insert-col-left")).toBeInTheDocument();
+    expect(screen.queryByTestId("toolbar-insert-row-above")).not.toBeInTheDocument();
+  });
+
+  it("shows both insert options when nothing is selected", () => {
+    render(<TableEditor value={sample()} onChange={jest.fn()} />);
+    fireEvent.click(screen.getByTestId("toolbar-insert"));
+    expect(screen.getByTestId("toolbar-insert-row-above")).toBeInTheDocument();
+    expect(screen.getByTestId("toolbar-insert-col-left")).toBeInTheDocument();
+  });
+
+  it("closes a toolbar dropdown when clicking outside it", () => {
+    render(<TableEditor value={sample()} onChange={jest.fn()} />);
+    fireEvent.click(screen.getByTestId("toolbar-insert"));
+    expect(screen.getByTestId("toolbar-insert-menu")).toBeInTheDocument();
+
+    // A mousedown anywhere outside the dropdown closes it.
+    fireEvent.mouseDown(document.body);
+    expect(screen.queryByTestId("toolbar-insert-menu")).not.toBeInTheDocument();
+  });
+
+  it("copies a format with the painter and applies it to the next selection", () => {
     const onChange = jest.fn();
-    render(<TableEditor value={sample} onChange={onChange} />);
-
-    fireEvent.click(screen.getByLabelText("Spalte 2 entfernen"));
-
-    expect(onChange).toHaveBeenCalledWith([
-      ["", "Q2"],
-      ["Umsatz", "200"],
-    ]);
+    const withFormat = model(
+      [["", "Q1", "Q2"], ["Umsatz", "100", "200"]],
+      { formats: { "1,1": { bold: true, color: "#ff0000" } } },
+    );
+    render(<TableEditor value={withFormat} onChange={onChange} />);
+    // Select the formatted source cell, arm the painter.
+    fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
+    fireEvent.click(screen.getByTestId("toolbar-painter"));
+    // Select a target cell and release -> format is applied.
+    const target = cellTd("Zeile 2, Spalte 3");
+    fireEvent.mouseDown(target);
+    fireEvent.mouseUp(target);
+    const arg = onChange.mock.calls.at(-1)![0] as TableModel;
+    expect(arg.formats["1,2"]).toMatchObject({ bold: true, color: "#ff0000" });
   });
 
-  it("does not render a remove button for the header row/column corner cell", () => {
-    render(<TableEditor value={sample} onChange={jest.fn()} />);
-
-    expect(screen.queryByLabelText("Zeile 1 entfernen")).not.toBeInTheDocument();
-    expect(screen.queryByLabelText("Spalte 1 entfernen")).not.toBeInTheDocument();
-  });
-
-  it("parses a multi-cell paste and writes it via onChange", () => {
+  it("imports an uploaded CSV file and replaces the model", async () => {
     const onChange = jest.fn();
-    render(<TableEditor value={sample} onChange={onChange} />);
+    const spy = jest
+      .spyOn(tableImport, "importTableFile")
+      .mockResolvedValue(model([["", "X"], ["Y", "1"]]));
+    render(<TableEditor value={sample()} onChange={onChange} />);
 
-    const target = screen.getByLabelText("Zeile 2, Spalte 2");
-    const clipboardData = {
-      getData: () => "150\t250",
-    };
-    fireEvent.paste(target, { clipboardData });
+    const file = new File(["a,b\n1,2"], "table.csv", { type: "text/csv" });
+    fireEvent.change(screen.getByTestId("toolbar-upload"), { target: { files: [file] } });
 
-    expect(onChange).toHaveBeenCalledWith([
-      ["", "Q1", "Q2"],
-      ["Umsatz", "150", "250"],
-    ]);
+    await waitFor(() => expect(onChange).toHaveBeenCalled());
+    const arg = onChange.mock.calls.at(-1)![0] as TableModel;
+    expect(arg.data[0]).toEqual(["", "X"]);
+    spy.mockRestore();
+  });
+
+  it("sets a preset sort via the context menu", () => {
+    const onChange = jest.fn();
+    render(<TableEditor value={sample()} onChange={onChange} />);
+    openMenuOnCell("Zeile 1, Spalte 2");
+    fireEvent.click(screen.getByTestId("sort-options"));
+    fireEvent.click(screen.getByTestId("sort-asc"));
+    const arg = onChange.mock.calls.at(-1)![0] as TableModel;
+    expect(arg.sort).toEqual({ col: 1, dir: "asc" });
   });
 });
