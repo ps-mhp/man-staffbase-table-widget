@@ -34,6 +34,7 @@ import {
 } from "./table-model";
 import { updateCell, parsePastedText, pasteBlock } from "./grid-operations";
 import { sanitizeRichText } from "./rich-text";
+import { formatToStyle } from "./cell-style";
 import { TableToolbar } from "./table-toolbar";
 import { importTableFile } from "./table-import";
 
@@ -128,6 +129,7 @@ function EditableCell({
   html,
   ariaLabel,
   editing,
+  format,
   onInput,
   onPaste,
   onStopEdit,
@@ -135,6 +137,7 @@ function EditableCell({
   html: string;
   ariaLabel: string;
   editing: boolean;
+  format: React.CSSProperties;
   onInput: (value: string) => void;
   onPaste: (event: React.ClipboardEvent<HTMLDivElement>) => void;
   onStopEdit: () => void;
@@ -169,7 +172,7 @@ function EditableCell({
       contentEditable={editing}
       suppressContentEditableWarning
       aria-label={ariaLabel}
-      style={{ ...editableStyle, cursor: editing ? "text" : "default" }}
+      style={{ ...editableStyle, ...format, cursor: editing ? "text" : "default" }}
       onPaste={onPaste}
       onBlur={onStopEdit}
       onInput={() => onInput(sanitizeRichText(ref.current?.innerHTML ?? ""))}
@@ -575,6 +578,7 @@ export const TableEditor = ({ value, onChange, onDone }: TableEditorProps): Reac
                           html={sanitizeRichText(cell)}
                           ariaLabel={`Zeile ${rowIndex + 1}, Spalte ${colIndex + 1}`}
                           editing={isEditing(rowIndex, colIndex)}
+                          format={formatToStyle(cellFormat(value, rowIndex, colIndex))}
                           onInput={(next) => handleInput(rowIndex, colIndex, next)}
                           onPaste={(e) => handlePaste(e, rowIndex, colIndex)}
                           onStopEdit={() => setEditing((cur) => (cur && cur[0] === rowIndex && cur[1] === colIndex ? null : cur))}

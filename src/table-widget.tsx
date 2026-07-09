@@ -18,8 +18,8 @@ import {
   isCovered,
   mergeAt,
   cellFormat,
-  CellFormat,
 } from "./table-model";
+import { formatToStyle } from "./cell-style";
 import { sanitizeRichText, richTextToPlain } from "./rich-text";
 
 /**
@@ -47,26 +47,19 @@ const alignFor = (colIndex: number): React.CSSProperties["textAlign"] =>
   colIndex === 0 ? "left" : "center";
 
 /**
- * Translates a {@link CellFormat} into inline styles. Only properties the
- * author actually set are emitted, so cells without formatting keep the
- * widget's default look (and legacy tables render unchanged).
+ * The first column carries the (often long) row labels. Cap it so it can
+ * never take more than 75% of the *visible* container width (via the `cqw`
+ * container-query unit — see the `container-type` on the scroll wrapper),
+ * otherwise a very long label could push the data columns out of view and
+ * make horizontal scrolling useless. When capped, the label wraps at word
+ * boundaries. `break-word` (not `anywhere`) is deliberate: it only breaks a
+ * word that is itself too long, so normal labels don't shatter into single
+ * characters as auto table-layout squeezes the column.
  */
-const formatToStyle = (format: CellFormat): React.CSSProperties => {
-  const style: React.CSSProperties = {};
-  if (format.bold) style.fontWeight = "bold";
-  if (format.italic) style.fontStyle = "italic";
-  const decorations = [
-    format.underline ? "underline" : "",
-    format.strikethrough ? "line-through" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
-  if (decorations) style.textDecoration = decorations;
-  if (format.align) style.textAlign = format.align;
-  if (format.color) style.color = format.color;
-  if (format.background) style.background = format.background;
-  if (typeof format.fontSize === "number") style.fontSize = `${format.fontSize}px`;
-  return style;
+const firstColumnStyle: React.CSSProperties = {
+  maxWidth: "75cqw",
+  whiteSpace: "normal",
+  overflowWrap: "break-word",
 };
 
 /** Renders a cell's (possibly super-/sub-scripted) content as safe markup. */
@@ -121,7 +114,7 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
   return (
     <div
       className="table-widget-scroll"
-      style={{ overflow: "auto", maxWidth: "100%", maxHeight: "70vh" }}
+      style={{ overflow: "auto", maxWidth: "100%", maxHeight: "70vh", containerType: "inline-size" }}
     >
       <table
         style={{
@@ -144,6 +137,7 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
                   style={{
                     ...headerCellStyle,
                     textAlign: alignFor(colIndex),
+                    ...(colIndex === 0 ? firstColumnStyle : {}),
                     ...formatToStyle(cellFormat(model, 0, colIndex)),
                     background: "#fff",
                     position: "sticky",
@@ -176,6 +170,7 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
                       style={{
                         ...baseCellStyle,
                         textAlign: alignFor(colIndex),
+                        ...firstColumnStyle,
                         fontWeight: "bold",
                         background: "#fff",
                         position: "sticky",

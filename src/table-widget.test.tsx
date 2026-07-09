@@ -51,6 +51,20 @@ describe("TableWidget", () => {
     expect(columnHeader).toBeInTheDocument();
   });
 
+  it("caps the first column to 75% width and wraps its text", () => {
+    const data = [
+      ["", "Q1"],
+      ["Ein sehr langer Zeilentitel der umbrechen muss", "100"],
+    ];
+
+    render(<TableWidget contentLanguage="de_DE" tabledata={serializeTableData(data)} />);
+
+    const rowHeader = screen.getByRole("rowheader", {
+      name: "Ein sehr langer Zeilentitel der umbrechen muss",
+    });
+    expect(rowHeader).toHaveStyle({ maxWidth: "75cqw", whiteSpace: "normal" });
+  });
+
   it("falls back to the default table for malformed JSON", () => {
     render(<TableWidget contentLanguage="de_DE" tabledata="not json" />);
 
@@ -110,6 +124,21 @@ describe("TableWidget", () => {
     );
 
     expect(container.querySelector("sup")).toHaveTextContent("2");
+  });
+
+  it("renders line breaks within a cell", () => {
+    const tabledata = JSON.stringify({
+      data: [
+        ["", "A"],
+        ["Zeile", "oben<br>unten"],
+      ],
+    });
+
+    const { container } = render(
+      <TableWidget contentLanguage="de_DE" tabledata={tabledata} />,
+    );
+
+    expect(container.querySelector("br")).toBeInTheDocument();
   });
 
   it("applies a background color to a cell", () => {

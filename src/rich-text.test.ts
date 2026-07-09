@@ -27,6 +27,17 @@ describe("sanitizeRichText", () => {
     expect(sanitizeRichText("H<sub>2</sub>O")).toBe("H<sub>2</sub>O");
   });
 
+  it("keeps <br> line breaks", () => {
+    expect(sanitizeRichText("line1<br>line2")).toBe("line1<br>line2");
+    expect(sanitizeRichText("line1<br/>line2")).toBe("line1<br>line2");
+  });
+
+  it("converts browser-inserted block elements into <br> breaks", () => {
+    expect(sanitizeRichText("line1<div>line2</div>")).toBe("line1<br>line2");
+    expect(sanitizeRichText("<p>line1</p><p>line2</p>")).toBe("line1<br>line2");
+    expect(sanitizeRichText("a<div>b</div><div>c</div>")).toBe("a<br>b<br>c");
+  });
+
   it("strips disallowed tags but keeps their text", () => {
     expect(sanitizeRichText('<script>alert(1)</script>')).toBe("alert(1)");
     expect(sanitizeRichText('<b onclick="x">bold</b>')).toBe("bold");

@@ -22,6 +22,14 @@
  */
 
 const ALLOWED_TAGS = new Set(["SUP", "SUB"]);
+/** Void/inline tags that map directly to a line break. */
+const BREAK_TAGS = new Set(["BR"]);
+/**
+ * Block-level tags that browsers insert into a contenteditable when the user
+ * presses Enter. Each begins a new visual line, so we emit a `<br>` before
+ * their content (except when nothing has been emitted yet).
+ */
+const BLOCK_TAGS = new Set(["DIV", "P"]);
 
 const escapeText = (text: string): string =>
   text
@@ -36,9 +44,16 @@ const serializeChildren = (node: Node): string => {
       out += escapeText(child.textContent ?? "");
     } else if (child.nodeType === 1 /* ELEMENT_NODE */) {
       const el = child as HTMLElement;
-      if (ALLOWED_TAGS.has(el.tagName)) {
+      if (BREAK_TAGS.has(el.tagName)) {
+        out += "<br>";
+      } else if (ALLOWED_TAGS.has(el.tagName)) {
         const tag = el.tagName.toLowerCase();
         out += `<${tag}>${serializeChildren(el)}</${tag}>`;
+      } else if (BLOCK_TAGS.has(el.tagName)) {
+        // A block element starts a new line: emit a break before its content
+        // unless it's the very first thing (leading blank line is dropped).
+        if (out !== "" && !out.endsWith("<br>")) out += "<br>";
+        out += serializeChildren(el);
       } else {
         // Disallowed tag: drop the tag itself but keep its (sanitized) text.
         out += serializeChildren(el);

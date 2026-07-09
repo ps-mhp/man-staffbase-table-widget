@@ -110,6 +110,16 @@ describe("TableEditor", () => {
     expect(screen.getByTestId("toolbar-bold")).not.toBeDisabled();
   });
 
+  it("reflects a cell's formatting visually in the editor", () => {
+    const formatted = model([["", "Q1"], ["Umsatz", "100"]], {
+      formats: { "1,1": { bold: true, align: "right", color: "#ff0000" } },
+    });
+    render(<TableEditor value={formatted} onChange={jest.fn()} />);
+
+    const cell = cellDiv("Zeile 2, Spalte 2");
+    expect(cell).toHaveStyle({ fontWeight: "bold", textAlign: "right", color: "#ff0000" });
+  });
+
   it("enables 'unmerge' only when the selection overlaps a merge", () => {
     const merged = model([["", "Q1", "Q2"], ["Umsatz", "100", "200"]], {
       merges: [{ row: 1, col: 1, rowSpan: 1, colSpan: 2 }],
