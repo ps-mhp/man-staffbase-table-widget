@@ -52,7 +52,10 @@ const overlayStyle: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  zIndex: 1000,
+  // Max 32-bit z-index so the editor always sits above the hosting app's own
+  // config dialog / modals (Staffbase renders the widget's settings dialog on
+  // top of the page; without this the editor would be hidden behind it).
+  zIndex: 2147483647,
 };
 
 const panelStyle: React.CSSProperties = {
