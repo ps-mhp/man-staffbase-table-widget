@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-import { SEARCH_BAR_PLACEHOLDER, findPlaceholder, startSearchBarRelocator } from "./search-bar-relocator";
+import { startSearchBarRelocator } from "./search-bar-relocator";
 
 /** Flushes the microtask queue (MutationObserver callbacks) plus a macrotask. */
 const flush = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0));
@@ -23,22 +23,6 @@ const makeContainer = (html: string): HTMLElement => {
   return container;
 };
 
-describe("findPlaceholder", () => {
-  afterEach(() => {
-    document.body.innerHTML = "";
-  });
-
-  it("returns the leaf element that renders the marker text", () => {
-    const container = makeContainer(`<div id="wrap"><span id="marker">${SEARCH_BAR_PLACEHOLDER}</span></div>`);
-    expect(findPlaceholder(container)?.id).toBe("marker");
-  });
-
-  it("returns null when the marker is absent", () => {
-    const container = makeContainer(`<div>nothing to see here</div>`);
-    expect(findPlaceholder(container)).toBeNull();
-  });
-});
-
 describe("startSearchBarRelocator", () => {
   let stop: () => void = () => {};
 
@@ -48,41 +32,41 @@ describe("startSearchBarRelocator", () => {
     document.body.innerHTML = "";
   });
 
-  it("moves the search bar to the marker and removes the marker when both are present", () => {
+  it("moves the search bar to the block and removes the block when both are present", () => {
     const container = makeContainer(`
       <header><input id="search-input" /></header>
-      <section id="target"><span id="marker">${SEARCH_BAR_PLACEHOLDER}</span></section>
+      <section id="target"><search-bar-widget id="w">[[SEARCH_BAR_PLACEMENT]]</search-bar-widget></section>
     `);
 
     stop = startSearchBarRelocator(container);
 
-    expect(document.getElementById("marker")).toBeNull();
+    expect(container.querySelector("search-bar-widget")).toBeNull();
     const searchBar = container.querySelector<HTMLElement>("#search-input");
     expect(searchBar).not.toBeNull();
     expect(searchBar?.parentElement?.id).toBe("target");
   });
 
   it("waits until the search bar appears, then relocates", async () => {
-    const container = makeContainer(`<section id="target"><span id="marker">${SEARCH_BAR_PLACEHOLDER}</span></section>`);
+    const container = makeContainer(`<section id="target"><search-bar-widget>[[SEARCH_BAR_PLACEMENT]]</search-bar-widget></section>`);
 
     stop = startSearchBarRelocator(container);
 
-    // No search bar yet: the marker is left untouched.
-    expect(findPlaceholder(container)).not.toBeNull();
+    // No search bar yet: the block is left untouched.
+    expect(container.querySelector("search-bar-widget")).not.toBeNull();
 
     const input = document.createElement("input");
     input.id = "search-input";
     container.appendChild(input);
     await flush();
 
-    expect(document.getElementById("marker")).toBeNull();
+    expect(container.querySelector("search-bar-widget")).toBeNull();
     expect(container.querySelector<HTMLElement>("#search-input")?.parentElement?.id).toBe("target");
   });
 
   it("uses moveBefore when the parent supports it", () => {
     const container = makeContainer(`
       <header><input id="search-input" /></header>
-      <section id="target"><span id="marker">${SEARCH_BAR_PLACEHOLDER}</span></section>
+      <section id="target"><search-bar-widget>[[SEARCH_BAR_PLACEMENT]]</search-bar-widget></section>
     `);
     const target = container.querySelector<HTMLElement>("#target")!;
     const moveBefore = jest.fn(function (this: Node, node: Node, ref: Node | null): void {
@@ -95,14 +79,14 @@ describe("startSearchBarRelocator", () => {
     expect(moveBefore).toHaveBeenCalledTimes(1);
     const [movedNode, refNode] = moveBefore.mock.calls[0];
     expect((movedNode as HTMLElement).id).toBe("search-input");
-    expect((refNode as HTMLElement).id).toBe("marker");
-    expect(document.getElementById("marker")).toBeNull();
+    expect((refNode as HTMLElement).tagName.toLowerCase()).toBe("search-bar-widget");
+    expect(container.querySelector("search-bar-widget")).toBeNull();
   });
 
   it("falls back to insertBefore when moveBefore throws", () => {
     const container = makeContainer(`
       <header><input id="search-input" /></header>
-      <section id="target"><span id="marker">${SEARCH_BAR_PLACEHOLDER}</span></section>
+      <section id="target"><search-bar-widget>[[SEARCH_BAR_PLACEMENT]]</search-bar-widget></section>
     `);
     const target = container.querySelector<HTMLElement>("#target")!;
     const moveBefore = jest.fn(() => {
@@ -113,13 +97,13 @@ describe("startSearchBarRelocator", () => {
     stop = startSearchBarRelocator(container);
 
     expect(moveBefore).toHaveBeenCalledTimes(1);
-    // The insertBefore fallback still relocated the search bar and removed the marker.
-    expect(document.getElementById("marker")).toBeNull();
+    // The insertBefore fallback still relocated the search bar and removed the block.
+    expect(container.querySelector("search-bar-widget")).toBeNull();
     expect(container.querySelector<HTMLElement>("#search-input")?.parentElement?.id).toBe("target");
   });
 
   it("stops relocating after the cleanup function is called", async () => {
-    const container = makeContainer(`<section id="target"><span id="marker">${SEARCH_BAR_PLACEHOLDER}</span></section>`);
+    const container = makeContainer(`<section id="target"><search-bar-widget>[[SEARCH_BAR_PLACEMENT]]</search-bar-widget></section>`);
 
     stop = startSearchBarRelocator(container);
     stop();
@@ -130,7 +114,7 @@ describe("startSearchBarRelocator", () => {
     await flush();
 
     // Observer was disconnected, so nothing was moved or removed.
-    expect(findPlaceholder(container)).not.toBeNull();
+    expect(container.querySelector("search-bar-widget")).not.toBeNull();
     expect(container.querySelector("#search-input")).not.toBeNull();
   });
 });

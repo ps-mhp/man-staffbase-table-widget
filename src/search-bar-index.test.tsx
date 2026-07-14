@@ -11,6 +11,7 @@
  * limitations under the License.
  */
 
+import { screen } from "@testing-library/dom";
 import { SEARCH_BAR_PLACEHOLDER } from "./search-bar-relocator";
 
 describe("search-bar widget block", () => {
@@ -24,6 +25,19 @@ describe("search-bar widget block", () => {
       }
       connectedCallback(): void {
         this.renderBlock(this);
+      }
+      attributeChangedCallback(): void {
+        this.renderBlock(this);
+      }
+      public parseAttributes<T extends Record<string, unknown>>(): T {
+        const attrs: Record<string, string> = {};
+        for (const attr of Array.from(this.attributes)) {
+          attrs[attr.name] = attr.value;
+        }
+        return attrs as T;
+      }
+      get contentLanguage(): string {
+        return "en_US";
       }
     }
 
@@ -40,29 +54,44 @@ describe("search-bar widget block", () => {
     ({ stopSearchBarRelocator } = await import("./search-bar-index"));
   });
 
+  afterEach(() => {
+    document.body.innerHTML = "";
+  });
+
   afterAll(() => {
     stopSearchBarRelocator();
   });
 
-  it("registers the block and renders the placeholder marker", () => {
+  it("renders the default placeholder marker", async () => {
     const widget = document.createElement("search-bar-widget");
     document.body.appendChild(widget);
 
-    expect(widget.textContent).toBe(SEARCH_BAR_PLACEHOLDER);
+    expect(await screen.findByText(SEARCH_BAR_PLACEHOLDER)).toBeInTheDocument();
+  });
+
+  it("renders a custom placeholder from the attribute", async () => {
+    const widget = document.createElement("search-bar-widget");
+    widget.setAttribute("placeholder", "MARKER-XYZ");
+    document.body.appendChild(widget);
+
+    expect(await screen.findByText("MARKER-XYZ")).toBeInTheDocument();
   });
 
   // Staffbase rejects a bundle as "Not a valid widget bundle" unless the
-  // definition carries a well-formed configuration schema (with a `properties`
-  // object) and a uiSchema. Guard that shape so it can never regress to `{}`.
-  it("exposes a well-formed configurationSchema and uiSchema for Staffbase", () => {
+  // definition mirrors a real widget: at least one configurable attribute with
+  // a matching configurationSchema property and a uiSchema entry (the working
+  // table widget has exactly this shape). Guard it so it can never regress.
+  it("exposes a Staffbase-valid definition (attribute + schema + uiSchema)", () => {
     const definition = capturedDefinition;
     expect(definition).not.toBeNull();
 
-    const schema = definition!.blockDefinition.configurationSchema;
-    expect(schema).toBeDefined();
-    expect(typeof schema.properties).toBe("object");
-    expect(schema.properties).not.toBeNull();
+    const bd = definition!.blockDefinition;
+    expect(bd.attributes).toContain("placeholder");
 
-    expect(definition!.blockDefinition.uiSchema).toBeDefined();
+    expect(bd.configurationSchema.properties).toBeDefined();
+    expect(bd.configurationSchema.properties).toHaveProperty("placeholder");
+
+    expect(bd.uiSchema).toBeDefined();
+    expect(bd.uiSchema).toHaveProperty("placeholder");
   });
 });
