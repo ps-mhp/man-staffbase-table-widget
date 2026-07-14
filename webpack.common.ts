@@ -16,6 +16,7 @@ import * as webpack from "webpack";
 const config: webpack.Configuration = {
   entry: {
     "man.table-widget": "./src/index.tsx",
+    "man.search-bar-widget": "./src/search-bar-index.tsx",
   },
   module: {
     rules: [
