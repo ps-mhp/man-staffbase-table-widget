@@ -15,6 +15,7 @@ import { SEARCH_BAR_PLACEHOLDER } from "./search-bar-relocator";
 
 describe("search-bar widget block", () => {
   let stopSearchBarRelocator: () => void;
+  let capturedDefinition: Parameters<typeof window.defineBlock>[0] | null = null;
 
   beforeAll(async () => {
     class FakeBaseClass extends window.HTMLElement {
@@ -27,6 +28,7 @@ describe("search-bar widget block", () => {
     }
 
     window.defineBlock = (definition): void => {
+      capturedDefinition = definition;
       const factory = definition.blockDefinition.factory;
       const CustomElementClass = factory(
         FakeBaseClass as unknown as Parameters<typeof factory>[0],
@@ -47,5 +49,20 @@ describe("search-bar widget block", () => {
     document.body.appendChild(widget);
 
     expect(widget.textContent).toBe(SEARCH_BAR_PLACEHOLDER);
+  });
+
+  // Staffbase rejects a bundle as "Not a valid widget bundle" unless the
+  // definition carries a well-formed configuration schema (with a `properties`
+  // object) and a uiSchema. Guard that shape so it can never regress to `{}`.
+  it("exposes a well-formed configurationSchema and uiSchema for Staffbase", () => {
+    const definition = capturedDefinition;
+    expect(definition).not.toBeNull();
+
+    const schema = definition!.blockDefinition.configurationSchema;
+    expect(schema).toBeDefined();
+    expect(typeof schema.properties).toBe("object");
+    expect(schema.properties).not.toBeNull();
+
+    expect(definition!.blockDefinition.uiSchema).toBeDefined();
   });
 });

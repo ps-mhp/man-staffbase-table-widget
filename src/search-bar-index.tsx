@@ -59,12 +59,22 @@ const factory: BlockFactory = (BaseBlockClass, _widgetApi) => {
  * The definition of the block, to let it successfully register to the hosting
  * application. It has no configurable attributes.
  */
+/**
+ * This widget has no user-configurable options, but Staffbase still validates
+ * the definition when the bundle URL is installed and rejects it as "Not a
+ * valid widget bundle" unless `configurationSchema` is a well-formed object
+ * schema that exposes a `properties` object (and a `uiSchema` is present). An
+ * empty `{}` — whose `properties` is `undefined` — fails that validation. We
+ * therefore declare an object schema with an empty set of properties (it just
+ * renders an empty configuration dialog) plus an empty uiSchema.
+ */
 const blockDefinition: BlockDefinition = {
   name: "search-bar-widget",
   factory: factory,
   attributes: [],
   blockLevel: "block",
-  configurationSchema: {},
+  configurationSchema: { type: "object", properties: {} },
+  uiSchema: {},
   label: "Search Bar Placement",
   iconUrl: ICON_DATA_URI,
 };
