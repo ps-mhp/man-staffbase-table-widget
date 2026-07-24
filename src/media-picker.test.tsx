@@ -115,6 +115,14 @@ describe("MediaPicker", () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it("gives its controls an explicit dark text colour (readable on the host)", () => {
+    const client = stubClient({});
+    render(<MediaPicker client={client} onSelect={jest.fn()} onClose={jest.fn()} />);
+    expect(screen.getByTestId("media-picker-close")).toHaveStyle({ color: "#1f2933" });
+    expect(screen.getByTestId("media-picker-upload")).toHaveStyle({ color: "#1f2933" });
+    expect(screen.getByTestId("media-picker-search")).toHaveStyle({ color: "#1f2933" });
+  });
+
   it("loads more media via the cursor/offset", async () => {
     const listMedia = jest
       .fn()

@@ -208,6 +208,13 @@ function EditableCell({
    * on the initiating mousedown keeps the contenteditable focused (so the cell
    * doesn't blur/close mid-drag), and the new width is persisted on release by
    * reading the sanitized markup back out.
+   *
+   * The move/up listeners are attached in the **capture** phase: when the
+   * editor runs inside the injected config-dialog modal, a bubble-phase
+   * `mouseup` listener on `document.body` stops propagation for events inside
+   * the modal (to keep the host popover from dismissing). A bubble-phase
+   * listener on `document` would therefore never receive the `mouseup` and the
+   * drag would never end; capturing runs before that `stopPropagation`.
    */
   const startResize = (event: React.MouseEvent): void => {
     event.preventDefault();
@@ -224,12 +231,12 @@ function EditableCell({
       setTick((t) => t + 1);
     };
     const onUp = (): void => {
-      document.removeEventListener("mousemove", onMove);
-      document.removeEventListener("mouseup", onUp);
+      document.removeEventListener("mousemove", onMove, true);
+      document.removeEventListener("mouseup", onUp, true);
       onInput(sanitizeRichText(ref.current?.innerHTML ?? ""));
     };
-    document.addEventListener("mousemove", onMove);
-    document.addEventListener("mouseup", onUp);
+    document.addEventListener("mousemove", onMove, true);
+    document.addEventListener("mouseup", onUp, true);
   };
 
   const handlePos = ((): { left: number; top: number } | null => {

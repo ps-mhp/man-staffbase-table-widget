@@ -49,6 +49,8 @@ const panelStyle: React.CSSProperties = {
   boxSizing: "border-box",
   boxShadow: "0 8px 40px rgba(0, 0, 0, 0.35)",
   overflow: "hidden",
+  color: "#1f2933",
+  font: "14px/1.4 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
 };
 
 const headerStyle: React.CSSProperties = {
@@ -66,6 +68,8 @@ const searchInputStyle: React.CSSProperties = {
   border: "1px solid #cfd4da",
   borderRadius: "6px",
   outline: "none",
+  color: "#1f2933",
+  background: "#fff",
 };
 
 const buttonStyle: React.CSSProperties = {
@@ -74,6 +78,7 @@ const buttonStyle: React.CSSProperties = {
   border: "1px solid #cfd4da",
   borderRadius: "6px",
   background: "#fafbfc",
+  color: "#1f2933",
   cursor: "pointer",
   whiteSpace: "nowrap",
 };
@@ -94,6 +99,7 @@ const tileStyle: React.CSSProperties = {
   border: "1px solid #e0e4e8",
   borderRadius: "6px",
   background: "#fff",
+  color: "#1f2933",
   padding: "6px",
   cursor: "pointer",
   display: "flex",

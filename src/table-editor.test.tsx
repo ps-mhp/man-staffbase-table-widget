@@ -309,5 +309,42 @@ describe("TableEditor", () => {
 
       expect(screen.getByTestId("image-resize-handle")).toBeInTheDocument();
     });
+
+    it("stops resizing on mouseup even when a modal ancestor swallows the event", () => {
+      const onChange = jest.fn();
+      const withImage = model([
+        ["", "Q1", "Q2"],
+        ["Umsatz", '<img src="https://cdn.example.com/a.png" style="width:200px">', "200"],
+        ["Kosten", "50", "60"],
+      ]);
+      render(<TableEditor value={withImage} onChange={onChange} mediaClient={stubMediaClient()} />);
+
+      const td = cellTd("Zeile 2, Spalte 2");
+      fireEvent.doubleClick(td);
+      fireEvent.click(td.querySelector("img")!);
+
+      // Mimic the config-dialog modal: a bubble-phase listener on document.body
+      // that stops mouseup from ever reaching a bubble-phase document listener.
+      const swallow = (event: Event): void => event.stopPropagation();
+      document.body.addEventListener("mouseup", swallow);
+      try {
+        const handle = screen.getByTestId("image-resize-handle");
+        fireEvent.mouseDown(handle, { clientX: 200 });
+        fireEvent.mouseMove(document, { clientX: 260 });
+        // Dispatched on the handle, so it bubbles up to (and is stopped at) body.
+        fireEvent.mouseUp(handle, { clientX: 260 });
+
+        // The capture-phase release handler still ran: one persisted change.
+        expect(onChange).toHaveBeenCalledTimes(1);
+        const arg = onChange.mock.calls.at(-1)![0] as TableModel;
+        expect(arg.data[1][1]).toMatch(/<img[^>]*width:\d+px/);
+
+        // The drag is over: further movement no longer resizes.
+        fireEvent.mouseMove(document, { clientX: 600 });
+        expect(onChange).toHaveBeenCalledTimes(1);
+      } finally {
+        document.body.removeEventListener("mouseup", swallow);
+      }
+    });
   });
 });
