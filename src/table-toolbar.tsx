@@ -281,6 +281,13 @@ const IconUpload = (): ReactElement => (
     <path d="M3 12v1h10v-1" />
   </svg>
 );
+const IconImage = (): ReactElement => (
+  <svg {...svgBase} aria-hidden>
+    <rect x="2" y="3" width="12" height="10" rx="1.5" />
+    <circle cx="5.5" cy="6.5" r="1" />
+    <path d="M3 12l3.5-3.5L9 11l2-2 2 2" />
+  </svg>
+);
 const IconChevron = (): ReactElement => (
   <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
     <path d="M3 4.5L6 8l3-3.5" />
@@ -321,6 +328,7 @@ export interface TableToolbarProps {
   onClearSort: () => void;
   onCopyFormat: () => void;
   onUpload: (file: File) => void;
+  onInsertImage: () => void;
   onDone?: () => void;
 }
 
@@ -537,6 +545,7 @@ export const TableToolbar = (props: TableToolbarProps): ReactElement => {
     onClearSort,
     onCopyFormat,
     onUpload,
+    onInsertImage,
     onDone,
   } = props;
 
@@ -754,6 +763,11 @@ export const TableToolbar = (props: TableToolbarProps): ReactElement => {
           <button type="button" className="tw-rb__big" data-testid="toolbar-painter" title="Format kopieren" disabled={disabled && !painterActive} onClick={onCopyFormat} style={painterActive ? { color: "#0a6ec4", background: "#e4f0fb" } : undefined}>
             <IconPainter />
             <span>Format</span>
+          </button>
+
+          <button type="button" className="tw-rb__big" data-testid="toolbar-image-button" title="Bild in Zelle einfügen" disabled={disabled} onClick={onInsertImage}>
+            <IconImage />
+            <span>Bild</span>
           </button>
 
           <button type="button" className="tw-rb__big" data-testid="toolbar-upload-button" title="Tabelle hochladen (.csv, .xlsx)" onClick={() => fileInputRef.current?.click()}>

@@ -48,6 +48,56 @@ describe("sanitizeRichText", () => {
     expect(sanitizeRichText('<sup style="x" onclick="y">2</sup>')).toBe("<sup>2</sup>");
   });
 
+  it("keeps images with an https src and re-emits safe sizing styles", () => {
+    expect(sanitizeRichText('<img src="https://cdn.example.com/a.png">')).toBe(
+      '<img src="https://cdn.example.com/a.png" alt="" style="height:auto;max-width:100%">',
+    );
+  });
+
+  it("keeps images with a root-relative src", () => {
+    expect(sanitizeRichText('<img src="/api/media/secure/x.jpeg">')).toBe(
+      '<img src="/api/media/secure/x.jpeg" alt="" style="height:auto;max-width:100%">',
+    );
+  });
+
+  it("preserves a pixel width from inline style and clamps it", () => {
+    expect(sanitizeRichText('<img src="https://x.com/a.png" style="width:220px">')).toBe(
+      '<img src="https://x.com/a.png" alt="" style="width:220px;height:auto;max-width:100%">',
+    );
+    expect(sanitizeRichText('<img src="https://x.com/a.png" width="150">')).toBe(
+      '<img src="https://x.com/a.png" alt="" style="width:150px;height:auto;max-width:100%">',
+    );
+    expect(sanitizeRichText('<img src="https://x.com/a.png" style="width:99999px">')).toBe(
+      '<img src="https://x.com/a.png" alt="" style="width:4000px;height:auto;max-width:100%">',
+    );
+  });
+
+  it("escapes alt text and keeps it", () => {
+    expect(sanitizeRichText('<img src="https://x.com/a.png" alt="A &amp; B">')).toBe(
+      '<img src="https://x.com/a.png" alt="A &amp; B" style="height:auto;max-width:100%">',
+    );
+  });
+
+  it("drops images with an unsafe or missing src", () => {
+    expect(sanitizeRichText("<img src=x onerror=alert(1)>")).toBe("");
+    expect(sanitizeRichText('<img src="javascript:alert(1)">')).toBe("");
+    expect(sanitizeRichText('<img src="data:image/png;base64,AAAA">')).toBe("");
+    expect(sanitizeRichText('<img src="http://insecure.example.com/a.png">')).toBe("");
+    expect(sanitizeRichText("<img>")).toBe("");
+  });
+
+  it("ignores non-pixel widths on images", () => {
+    expect(sanitizeRichText('<img src="https://x.com/a.png" style="width:50%">')).toBe(
+      '<img src="https://x.com/a.png" alt="" style="height:auto;max-width:100%">',
+    );
+  });
+
+  it("keeps an image alongside text in the same cell", () => {
+    expect(sanitizeRichText('Logo: <img src="https://x.com/a.png"> ok')).toBe(
+      'Logo: <img src="https://x.com/a.png" alt="" style="height:auto;max-width:100%"> ok',
+    );
+  });
+
   it("returns empty string for nullish input", () => {
     expect(sanitizeRichText(null)).toBe("");
     expect(sanitizeRichText(undefined)).toBe("");

@@ -4,6 +4,27 @@ import { screen, render, fireEvent, waitFor } from "@testing-library/react";
 import { TableEditor } from "./table-editor";
 import { TableModel } from "./table-model";
 import * as tableImport from "./table-import";
+import { MediaClient, MediaItem } from "./media-client";
+
+const mediaItem = (id: string): MediaItem => ({
+  id,
+  url: `https://cdn.example.com/${id}.png`,
+  previewUrl: `https://cdn.example.com/${id}-preview.png`,
+  fileName: `${id}.png`,
+  type: "image",
+  width: 640,
+  height: 480,
+});
+
+/** Minimal MediaClient stub covering only what the editor exercises. */
+const stubMediaClient = (overrides: Partial<MediaClient> = {}): MediaClient =>
+  ({
+    listMedia: jest.fn(async () => ({ items: [mediaItem("a")], total: 1, nextOffset: null })),
+    searchMedia: jest.fn(async () => ({ items: [], nextCursor: null })),
+    uploadMedia: jest.fn(async () => mediaItem("up")),
+    ensurePublicImageUrl: jest.fn(async (m: MediaItem) => `${m.url}?public=1`),
+    ...overrides,
+  }) as unknown as MediaClient;
 
 const model = (data: string[][], overrides: Partial<TableModel> = {}): TableModel => ({
   data,
@@ -229,5 +250,64 @@ describe("TableEditor", () => {
     fireEvent.click(screen.getByTestId("sort-asc"));
     const arg = onChange.mock.calls.at(-1)![0] as TableModel;
     expect(arg.sort).toEqual({ col: 1, dir: "asc" });
+  });
+
+  describe("images", () => {
+    it("opens the media picker from the toolbar when a cell is selected", () => {
+      const client = stubMediaClient();
+      render(<TableEditor value={sample()} onChange={jest.fn()} mediaClient={client} />);
+      fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
+      fireEvent.click(screen.getByTestId("toolbar-image-button"));
+      expect(screen.getByTestId("media-picker")).toBeInTheDocument();
+    });
+
+    it("inserts the selected image into the active cell", async () => {
+      const onChange = jest.fn();
+      const client = stubMediaClient();
+      render(<TableEditor value={sample()} onChange={onChange} mediaClient={client} />);
+
+      fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
+      fireEvent.click(screen.getByTestId("toolbar-image-button"));
+      fireEvent.click(await screen.findByTestId("media-picker-item-a"));
+
+      await waitFor(() => expect(onChange).toHaveBeenCalled());
+      const arg = onChange.mock.calls.at(-1)![0] as TableModel;
+      // "Zeile 2, Spalte 2" is data[1][1] (holds "100"); markup is appended.
+      expect(arg.data[1][1]).toContain('<img src="https://cdn.example.com/a.png?public=1"');
+      expect(arg.data[1][1]).toContain("100");
+    });
+
+    it("uploads and embeds an image pasted from the clipboard", async () => {
+      const onChange = jest.fn();
+      const client = stubMediaClient();
+      render(<TableEditor value={sample()} onChange={onChange} mediaClient={client} />);
+
+      const cell = cellDiv("Zeile 2, Spalte 2");
+      const file = new File([new Uint8Array([1, 2])], "shot.png", { type: "image/png" });
+      fireEvent.paste(cell, {
+        clipboardData: { files: [file], items: [], getData: () => "" },
+      });
+
+      await waitFor(() => expect(client.uploadMedia).toHaveBeenCalled());
+      await waitFor(() => expect(onChange).toHaveBeenCalled());
+      const arg = onChange.mock.calls.at(-1)![0] as TableModel;
+      expect(arg.data[1][1]).toContain('<img src="https://cdn.example.com/up.png?public=1"');
+    });
+
+    it("shows a resize handle when an image in an editing cell is clicked", () => {
+      const withImage = model([
+        ["", "Q1", "Q2"],
+        ["Umsatz", '<img src="https://cdn.example.com/a.png" style="width:200px">', "200"],
+        ["Kosten", "50", "60"],
+      ]);
+      render(<TableEditor value={withImage} onChange={jest.fn()} mediaClient={stubMediaClient()} />);
+
+      const td = cellTd("Zeile 2, Spalte 2");
+      fireEvent.doubleClick(td);
+      const img = td.querySelector("img")!;
+      fireEvent.click(img);
+
+      expect(screen.getByTestId("image-resize-handle")).toBeInTheDocument();
+    });
   });
 });

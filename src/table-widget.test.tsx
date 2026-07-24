@@ -126,6 +126,40 @@ describe("TableWidget", () => {
     expect(container.querySelector("sup")).toHaveTextContent("2");
   });
 
+  it("renders an embedded image at its stored width", () => {
+    const tabledata = JSON.stringify({
+      data: [
+        ["", "Bild"],
+        ["Logo", '<img src="https://cdn.example.com/logo.png" style="width:120px">'],
+      ],
+    });
+
+    const { container } = render(
+      <TableWidget contentLanguage="de_DE" tabledata={tabledata} />,
+    );
+
+    const img = container.querySelector("img");
+    expect(img).not.toBeNull();
+    expect(img).toHaveAttribute("src", "https://cdn.example.com/logo.png");
+    expect(img!.getAttribute("style")).toContain("width:120px");
+    expect(img!.getAttribute("style")).toContain("max-width:100%");
+  });
+
+  it("does not render an image with an unsafe source", () => {
+    const tabledata = JSON.stringify({
+      data: [
+        ["", "Bild"],
+        ["X", '<img src="javascript:alert(1)">'],
+      ],
+    });
+
+    const { container } = render(
+      <TableWidget contentLanguage="de_DE" tabledata={tabledata} />,
+    );
+
+    expect(container.querySelector("img")).toBeNull();
+  });
+
   it("renders line breaks within a cell", () => {
     const tabledata = JSON.stringify({
       data: [

@@ -81,8 +81,8 @@ New, focused modules (each independently testable):
 - **`rich-text.ts`** — extend the sanitizer to allow `<img>` with a validated
   `src` (`https:` or root-relative `/…`), escaped `alt`, and a numeric pixel
   `width` re-emitted as `width:Npx;height:auto;max-width:100%`. Everything else
-  on the tag is dropped. `richTextToPlain` treats an image as empty text (with
-  its `alt` used for sorting/plain output).
+  on the tag is dropped. `richTextToPlain` returns an image as empty text (an
+  image cell therefore sorts as blank).
 - **`media-picker.tsx`** — the explorer modal component (search, grid, upload,
   select), depending only on an injected `MediaClient`.
 - **`table-editor.tsx`** — adds a toolbar "Bild einfügen" action that opens the

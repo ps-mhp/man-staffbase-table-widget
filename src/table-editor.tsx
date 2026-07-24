@@ -12,7 +12,7 @@
  */
 
 import * as React from "react";
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import * as ContextMenu from "@radix-ui/react-context-menu";
 import {
   TableModel,
@@ -37,12 +37,20 @@ import { sanitizeRichText } from "./rich-text";
 import { formatToStyle } from "./cell-style";
 import { TableToolbar } from "./table-toolbar";
 import { importTableFile } from "./table-import";
+import { MediaClient, createMediaClient } from "./media-client";
+import { MediaPicker, PickedImage } from "./media-picker";
+import { buildImageMarkup, clampImageWidth } from "./cell-image";
 
 export interface TableEditorProps {
   value: TableModel;
   onChange: (model: TableModel) => void;
   /** Optional: when provided, the toolbar shows a "Fertig" button. */
   onDone?: () => void;
+  /**
+   * Media API client used by the image picker and clipboard-image upload.
+   * Defaults to a same-origin {@link createMediaClient}; injectable for tests.
+   */
+  mediaClient?: MediaClient;
 }
 
 const cellBoxStyle: React.CSSProperties = {
@@ -118,6 +126,26 @@ const cellsInRange = (range: CellRange): Array<[number, number]> => {
 };
 
 /**
+ * Returns the first image file found on a clipboard payload (either as a
+ * `File` in `files` or an image `DataTransferItem`), or `null` if the paste
+ * carries no image. Used to route a pasted screenshot/image into an upload.
+ */
+const firstImageFile = (clipboard: DataTransfer | null): File | null => {
+  if (!clipboard) return null;
+  const files = clipboard.files ? Array.from(clipboard.files) : [];
+  const fromFiles = files.find((f) => f.type.startsWith("image/"));
+  if (fromFiles) return fromFiles;
+  const items = clipboard.items ? Array.from(clipboard.items) : [];
+  for (const item of items) {
+    if (item.kind === "file" && item.type.startsWith("image/")) {
+      const file = item.getAsFile();
+      if (file) return file;
+    }
+  }
+  return null;
+};
+
+/**
  * A single cell's content. It is only `contenteditable` while it is the cell
  * being edited (entered via double-click); the rest of the time editing is
  * off so that mouse drags select cells instead of text/caret. Content is set
@@ -143,11 +171,16 @@ function EditableCell({
   onStopEdit: () => void;
 }): ReactElement {
   const ref = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [selectedImg, setSelectedImg] = useState<HTMLImageElement | null>(null);
+  // Bumped to re-render (reposition the resize handle) during a drag.
+  const [, setTick] = useState(0);
 
   useEffect(() => {
     const el = ref.current;
     if (el && el !== document.activeElement && el.innerHTML !== html) {
       el.innerHTML = html;
+      setSelectedImg(null);
     }
   }, [html]);
 
@@ -165,18 +198,87 @@ function EditableCell({
     }
   }, [editing]);
 
+  // Leaving edit mode always clears any image resize selection/handle.
+  useEffect(() => {
+    if (!editing) setSelectedImg(null);
+  }, [editing]);
+
+  /**
+   * Drags the bottom-right handle to resize the selected image. `preventDefault`
+   * on the initiating mousedown keeps the contenteditable focused (so the cell
+   * doesn't blur/close mid-drag), and the new width is persisted on release by
+   * reading the sanitized markup back out.
+   */
+  const startResize = (event: React.MouseEvent): void => {
+    event.preventDefault();
+    event.stopPropagation();
+    const img = selectedImg;
+    if (!img) return;
+    const startX = event.clientX;
+    const startWidth = img.getBoundingClientRect().width || img.offsetWidth || 100;
+
+    const onMove = (moveEvent: MouseEvent): void => {
+      const width = clampImageWidth(startWidth + (moveEvent.clientX - startX));
+      img.style.width = `${width}px`;
+      img.style.height = "auto";
+      setTick((t) => t + 1);
+    };
+    const onUp = (): void => {
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+      onInput(sanitizeRichText(ref.current?.innerHTML ?? ""));
+    };
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+  };
+
+  const handlePos = ((): { left: number; top: number } | null => {
+    const img = selectedImg;
+    const cont = containerRef.current;
+    if (!editing || !img || !cont || !cont.contains(img)) return null;
+    const imgRect = img.getBoundingClientRect();
+    const contRect = cont.getBoundingClientRect();
+    return { left: imgRect.right - contRect.left, top: imgRect.bottom - contRect.top };
+  })();
+
   return (
-    <div
-      ref={ref}
-      role="textbox"
-      contentEditable={editing}
-      suppressContentEditableWarning
-      aria-label={ariaLabel}
-      style={{ ...editableStyle, ...format, cursor: editing ? "text" : "default" }}
-      onPaste={onPaste}
-      onBlur={onStopEdit}
-      onInput={() => onInput(sanitizeRichText(ref.current?.innerHTML ?? ""))}
-    />
+    <div ref={containerRef} style={{ position: "relative" }}>
+      <div
+        ref={ref}
+        role="textbox"
+        contentEditable={editing}
+        suppressContentEditableWarning
+        aria-label={ariaLabel}
+        style={{ ...editableStyle, ...format, cursor: editing ? "text" : "default" }}
+        onPaste={onPaste}
+        onBlur={onStopEdit}
+        onInput={() => onInput(sanitizeRichText(ref.current?.innerHTML ?? ""))}
+        onClick={(event) => {
+          const target = event.target as HTMLElement;
+          setSelectedImg(editing && target.tagName === "IMG" ? (target as HTMLImageElement) : null);
+        }}
+      />
+      {handlePos && (
+        <div
+          data-testid="image-resize-handle"
+          aria-label="Bildgröße ändern"
+          onMouseDown={startResize}
+          style={{
+            position: "absolute",
+            left: handlePos.left - 6,
+            top: handlePos.top - 6,
+            width: "12px",
+            height: "12px",
+            background: "#0074d9",
+            border: "2px solid #fff",
+            borderRadius: "2px",
+            boxShadow: "0 0 0 1px rgba(0,0,0,0.25)",
+            cursor: "nwse-resize",
+            zIndex: 5,
+          }}
+        />
+      )}
+    </div>
   );
 }
 
@@ -215,16 +317,21 @@ function MenuItem({
  * CSV/XLSX upload. Row 0 and column 0 are the frozen header row/column and
  * are never deletable.
  */
-export const TableEditor = ({ value, onChange, onDone }: TableEditorProps): ReactElement => {
+export const TableEditor = ({ value, onChange, onDone, mediaClient }: TableEditorProps): ReactElement => {
   const data = value.data;
   const rowCount = data.length;
   const colCount = data[0]?.length ?? 0;
+
+  const client = useMemo(() => mediaClient ?? createMediaClient(), [mediaClient]);
 
   const [selection, setSelection] = useState<CellRange | null>(null);
   const [anchor, setAnchor] = useState<[number, number] | null>(null);
   const [editing, setEditing] = useState<[number, number] | null>(null);
   const activeCell = useRef<[number, number] | null>(null);
   const isDragging = useRef(false);
+  // The cell an inserted/pasted/uploaded image lands in, and picker visibility.
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const imageTarget = useRef<[number, number] | null>(null);
   const [copiedPattern, setCopiedPattern] = useState<{
     rows: number;
     cols: number;
@@ -320,12 +427,70 @@ export const TableEditor = ({ value, onChange, onDone }: TableEditorProps): Reac
     onChange({ ...value, data: updateCell(data, row, col, next) });
   };
 
+  // --- Image insertion (picker, clipboard upload) ---
+
+  /** Initial on-screen width, in px, for a freshly inserted image. */
+  const DEFAULT_INSERT_WIDTH = 320;
+
+  const imageMarkup = (image: PickedImage): string => {
+    const width = image.width ? Math.min(image.width, DEFAULT_INSERT_WIDTH) : DEFAULT_INSERT_WIDTH;
+    return buildImageMarkup({ src: image.url, alt: image.alt, width });
+  };
+
+  /** Appends the image to the target cell's content (images flow inline). */
+  const insertImageIntoCell = (row: number, col: number, image: PickedImage): void => {
+    const markup = imageMarkup(image);
+    if (!markup) return;
+    const existing = data[row]?.[col] ?? "";
+    handleInput(row, col, existing ? `${existing}${markup}` : markup);
+  };
+
+  /** The cell an image should target: the one being edited, else the selection. */
+  const currentImageTarget = (): [number, number] | null =>
+    editing ?? (selection ? [selection.top, selection.left] : null);
+
+  const openImagePicker = (): void => {
+    const target = currentImageTarget();
+    if (!target) return;
+    imageTarget.current = target;
+    setPickerOpen(true);
+  };
+
+  const handlePickImage = (image: PickedImage): void => {
+    const target = imageTarget.current;
+    if (target) insertImageIntoCell(target[0], target[1], image);
+    setPickerOpen(false);
+  };
+
+  /** Uploads a clipboard/paste image, publishes it, and inserts it. */
+  const uploadAndInsertImage = async (file: File, row: number, col: number): Promise<void> => {
+    try {
+      const item = await client.uploadMedia(file);
+      const url = await client.ensurePublicImageUrl(item);
+      insertImageIntoCell(row, col, {
+        url,
+        width: item.width,
+        height: item.height,
+        alt: item.fileName,
+      });
+    } catch (err) {
+      window.alert(err instanceof Error ? err.message : "Bild konnte nicht eingefügt werden.");
+    }
+  };
+
   /**
    * Multi-cell paste (tab/newline-separated, e.g. from a spreadsheet) is
-   * written as a block starting at the target cell; a single-cell paste is
-   * inserted as plain text so no foreign markup/styling leaks in.
+   * written as a block starting at the target cell; a pasted image is uploaded
+   * and embedded; a single-cell text paste is inserted as plain text so no
+   * foreign markup/styling leaks in.
    */
   const handlePaste = (event: React.ClipboardEvent<HTMLDivElement>, row: number, col: number): void => {
+    const imageFile = firstImageFile(event.clipboardData);
+    if (imageFile) {
+      event.preventDefault();
+      void uploadAndInsertImage(imageFile, row, col);
+      return;
+    }
     const text = event.clipboardData?.getData("text") ?? "";
     if (text.includes("\t") || text.includes("\n")) {
       event.preventDefault();
@@ -521,6 +686,7 @@ export const TableEditor = ({ value, onChange, onDone }: TableEditorProps): Reac
         onClearSort={clearSort}
         onCopyFormat={handleCopyFormat}
         onUpload={handleUpload}
+        onInsertImage={openImagePicker}
         onDone={onDone}
       />
 
@@ -606,6 +772,8 @@ export const TableEditor = ({ value, onChange, onDone }: TableEditorProps): Reac
             <MenuItem testId="merge-cells" onSelect={doMerge} disabled={selection === null}>Zellen verbinden</MenuItem>
             <MenuItem testId="unmerge-cells" onSelect={doUnmerge} disabled={selection === null}>Verbindung aufheben</MenuItem>
             <ContextMenu.Separator style={separatorStyle} />
+            <MenuItem testId="insert-image" onSelect={openImagePicker} disabled={selection === null}>Bild einfügen…</MenuItem>
+            <ContextMenu.Separator style={separatorStyle} />
             <ContextMenu.Sub>
               <ContextMenu.SubTrigger style={menuItemStyle} data-testid="text-options">Textoptionen ▸</ContextMenu.SubTrigger>
               <ContextMenu.Portal>
@@ -634,6 +802,14 @@ export const TableEditor = ({ value, onChange, onDone }: TableEditorProps): Reac
           </ContextMenu.Content>
         </ContextMenu.Portal>
       </ContextMenu.Root>
+
+      {pickerOpen && (
+        <MediaPicker
+          client={client}
+          onSelect={handlePickImage}
+          onClose={() => setPickerOpen(false)}
+        />
+      )}
     </div>
   );
 };
