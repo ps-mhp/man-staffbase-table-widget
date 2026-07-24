@@ -123,6 +123,14 @@ describe("MediaPicker", () => {
     expect(screen.getByTestId("media-picker-search")).toHaveStyle({ color: "#1f2933" });
   });
 
+  it("lets the search bar fill and keeps the action buttons compact", () => {
+    const client = stubClient({});
+    render(<MediaPicker client={client} onSelect={jest.fn()} onClose={jest.fn()} />);
+    expect(screen.getByTestId("media-picker-search")).toHaveStyle({ flex: "1 1 auto" });
+    expect(screen.getByTestId("media-picker-upload")).toHaveStyle({ flex: "0 0 auto" });
+    expect(screen.getByTestId("media-picker-close")).toHaveStyle({ flex: "0 0 auto" });
+  });
+
   it("loads more media via the cursor/offset", async () => {
     const listMedia = jest
       .fn()

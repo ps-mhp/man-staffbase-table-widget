@@ -56,13 +56,17 @@ const panelStyle: React.CSSProperties = {
 const headerStyle: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
-  gap: "12px",
+  gap: "8px",
   padding: "14px 18px",
   borderBottom: "1px solid #e5e8ec",
 };
 
 const searchInputStyle: React.CSSProperties = {
-  flex: 1,
+  // Grow to fill; `minWidth: 0` lets it actually shrink/grow inside the flex row
+  // instead of being pinned to its intrinsic width.
+  flex: "1 1 auto",
+  minWidth: 0,
+  width: "100%",
   padding: "8px 12px",
   fontSize: "14px",
   border: "1px solid #cfd4da",
@@ -70,6 +74,24 @@ const searchInputStyle: React.CSSProperties = {
   outline: "none",
   color: "#1f2933",
   background: "#fff",
+  boxSizing: "border-box",
+};
+
+// Icon-only header buttons: only as wide as needed and, crucially, `flex: 0 0
+// auto` so the host page's own `button { flex: … }` rules can't stretch them.
+const iconButtonStyle: React.CSSProperties = {
+  flex: "0 0 auto",
+  width: "38px",
+  height: "38px",
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: 0,
+  border: "1px solid #cfd4da",
+  borderRadius: "6px",
+  background: "#fafbfc",
+  color: "#1f2933",
+  cursor: "pointer",
 };
 
 const buttonStyle: React.CSSProperties = {
@@ -135,6 +157,33 @@ const stateStyle: React.CSSProperties = {
 
 const DEBOUNCE_MS = 300;
 const IMAGE_ACCEPT = "image/*";
+
+const iconSvgProps = {
+  width: 18,
+  height: 18,
+  viewBox: "0 0 16 16",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.5,
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+  "aria-hidden": true,
+};
+
+/** Upload / "from computer" glyph. */
+const IconUpload = (): ReactElement => (
+  <svg {...iconSvgProps}>
+    <path d="M8 10.5V3M5 5.5L8 2.5l3 3" />
+    <path d="M3 11.5v1.5h10v-1.5" />
+  </svg>
+);
+
+/** Close (×) glyph. */
+const IconClose = (): ReactElement => (
+  <svg {...iconSvgProps}>
+    <path d="M4 4l8 8M12 4l-8 8" />
+  </svg>
+);
 
 /**
  * The "Staffbase Medien" explorer: a modal that lists and searches the
@@ -271,12 +320,14 @@ export function MediaPicker({ client, onSelect, onClose }: MediaPickerProps): Re
           />
           <button
             type="button"
-            style={buttonStyle}
+            style={{ ...iconButtonStyle, opacity: uploading ? 0.5 : 1 }}
             data-testid="media-picker-upload"
+            title="Bild hochladen"
+            aria-label="Bild hochladen"
             disabled={uploading}
             onClick={() => uploadInputRef.current?.click()}
           >
-            {uploading ? "Lädt hoch…" : "Hochladen"}
+            <IconUpload />
           </button>
           <input
             ref={uploadInputRef}
@@ -293,11 +344,13 @@ export function MediaPicker({ client, onSelect, onClose }: MediaPickerProps): Re
           />
           <button
             type="button"
-            style={buttonStyle}
+            style={iconButtonStyle}
             data-testid="media-picker-close"
+            title="Schließen"
+            aria-label="Schließen"
             onClick={onClose}
           >
-            Schließen
+            <IconClose />
           </button>
         </div>
 
