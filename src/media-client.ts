@@ -78,26 +78,73 @@ interface ResourceInfo {
 interface RawMedium {
   id?: string;
   fileName?: string;
+  /** Flat URL used by the search endpoint (no nested `resourceInfo`). */
+  url?: string;
+  /** Mediaserver public id; its path tail is a human-readable name. */
+  publicId?: string;
   resourceInfo?: ResourceInfo;
   transformations?: {
     t_preview?: { resourceInfo?: ResourceInfo };
   };
 }
 
+/** Last path segment of a URL/public id (drops any query string), or "". */
+const basename = (value: string): string => {
+  const noQuery = value.split(/[?#]/)[0];
+  const parts = noQuery.split("/").filter(Boolean);
+  return parts.length > 0 ? parts[parts.length - 1] : "";
+};
+
+/**
+ * Infers the media kind from a Staffbase media URL. Secure URLs embed it in
+ * the path (`/v2/image/upload/…`); otherwise it is guessed from the file
+ * extension. Returns `undefined` when nothing indicates a kind.
+ */
+const typeFromUrl = (url: string): string | undefined => {
+  const inPath = /\/(image|video|raw)\//i.exec(url);
+  if (inPath) return inPath[1].toLowerCase();
+  const ext = basename(url).split(".").pop()?.toLowerCase() ?? "";
+  if (["png", "jpg", "jpeg", "gif", "webp", "svg", "bmp", "avif"].includes(ext)) return "image";
+  if (["mp4", "mov", "webm", "m4v", "avi"].includes(ext)) return "video";
+  return undefined;
+};
+
+/**
+ * Normalizes either shape returned by the media endpoints into a
+ * {@link MediaItem}: the full `MediumSchema` (list/upload, with
+ * `resourceInfo`/`transformations`) or the flat search item (`{id, url,
+ * publicId}`). For flat items the type and a friendly file name are derived
+ * from the URL and public id.
+ */
 const toMediaItem = (m: RawMedium): MediaItem | null => {
   const info = m.resourceInfo ?? {};
-  const url = info.url ?? "";
+  const url = info.url ?? m.url ?? "";
   if (!m.id || !url) return null;
   const preview = m.transformations?.t_preview?.resourceInfo?.url ?? url;
+  const fileName = m.fileName || (m.publicId ? basename(m.publicId) : "") || basename(url) || m.id;
   return {
     id: m.id,
     url,
     previewUrl: preview,
-    fileName: m.fileName ?? m.id,
-    type: info.type ?? "raw",
+    fileName,
+    type: info.type ?? typeFromUrl(url) ?? "raw",
     width: info.width,
     height: info.height,
   };
+};
+
+/**
+ * Extracts the raw media array from a response body, tolerating both the
+ * `{ data: [medium] }` shape (list) and the `{ entries: [{ data: medium }] }`
+ * shape (search).
+ */
+const extractRawMedia = (body: { data?: RawMedium[]; entries?: Array<{ data?: RawMedium }> }): RawMedium[] => {
+  if (Array.isArray(body.entries)) {
+    return body.entries
+      .map((entry) => entry?.data)
+      .filter((d): d is RawMedium => !!d && typeof d === "object");
+  }
+  return Array.isArray(body.data) ? body.data : [];
 };
 
 export interface MediaClientOptions {
@@ -153,14 +200,16 @@ export class MediaClient {
     const res = await this.request(`?limit=${limit}&offset=${offset}`);
     const body = (await res.json()) as {
       data?: RawMedium[];
+      entries?: Array<{ data?: RawMedium }>;
       total?: number;
       offset?: number;
       limit?: number;
     };
-    const items = (body.data ?? []).map(toMediaItem).filter((x): x is MediaItem => x !== null);
+    const raw = extractRawMedia(body);
+    const items = raw.map(toMediaItem).filter((x): x is MediaItem => x !== null);
     const total = body.total ?? offset + items.length;
-    const consumed = offset + (body.data?.length ?? 0);
-    return { items, total, nextOffset: consumed < total && items.length > 0 ? consumed : null };
+    const consumed = offset + raw.length;
+    return { items, total, nextOffset: consumed < total && raw.length > 0 ? consumed : null };
   }
 
   /** Searches media by free-text query (filename/content/type). */
@@ -178,10 +227,13 @@ export class MediaClient {
     const res = await this.request(`/search?${search.toString()}`);
     const body = (await res.json()) as {
       data?: RawMedium[];
+      entries?: Array<{ data?: RawMedium }>;
       cursor?: string | null;
       nextCursor?: string | null;
     };
-    const items = (body.data ?? []).map(toMediaItem).filter((x): x is MediaItem => x !== null);
+    const items = extractRawMedia(body)
+      .map(toMediaItem)
+      .filter((x): x is MediaItem => x !== null);
     return { items, nextCursor: body.nextCursor ?? body.cursor ?? null };
   }
 

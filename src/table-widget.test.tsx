@@ -77,6 +77,17 @@ describe("TableWidget", () => {
     expect(screen.getByRole("table")).toHaveStyle({ width: "100%" });
   });
 
+  it("separates columns with a transparent 8px gap (no coloured border)", () => {
+    render(<TableWidget contentLanguage="de_DE" />);
+
+    const table = screen.getByRole("table");
+    expect(table).toHaveStyle({
+      borderCollapse: "separate",
+      borderSpacing: "8px 0",
+      background: "transparent",
+    });
+  });
+
   it("renders merged cells with colSpan and skips covered cells", () => {
     const tabledata = JSON.stringify({
       data: [

@@ -92,6 +92,26 @@ describe("MediaClient.listMedia", () => {
     const { items } = await client.listMedia();
     expect(items.map((i) => i.id)).toEqual(["a"]);
   });
+
+  it("also tolerates the entries/data wrapper shape", async () => {
+    const fetchImpl = jest.fn(async () =>
+      jsonResponse({
+        total: 1,
+        entries: [
+          {
+            data: {
+              id: "z",
+              url: "https://cdn.example.com/v2/image/upload/z.png",
+            },
+          },
+        ],
+      }),
+    );
+    const client = createMediaClient({ fetchImpl });
+    const { items } = await client.listMedia();
+    expect(items.map((i) => i.id)).toEqual(["z"]);
+    expect(items[0].type).toBe("image");
+  });
 });
 
 describe("MediaClient.searchMedia", () => {
@@ -109,6 +129,37 @@ describe("MediaClient.searchMedia", () => {
     expect(calledUrl).toContain("cursor=CURSOR1");
     expect(result.items).toHaveLength(1);
     expect(result.nextCursor).toBe("CURSOR2");
+  });
+
+  it("parses the entries/data search shape and infers type + name", async () => {
+    const fetchImpl = jest.fn(async () =>
+      jsonResponse({
+        entries: [
+          {
+            data: {
+              id: "6891d4eb475efa6e9e143dbf",
+              publicId: "AAAA/London_Office_Header",
+              cloud: "eyo-live-de",
+              url: "https://www.onetruck.man/api/media/secure/external/v2/image/upload/6891d4eb475efa6e9e143dbf.png",
+            },
+          },
+        ],
+        total: 1,
+      }),
+    );
+    const client = createMediaClient({ fetchImpl });
+
+    const { items } = await client.searchMedia({ query: "London" });
+
+    expect(items).toHaveLength(1);
+    expect(items[0]).toMatchObject({
+      id: "6891d4eb475efa6e9e143dbf",
+      url: "https://www.onetruck.man/api/media/secure/external/v2/image/upload/6891d4eb475efa6e9e143dbf.png",
+      type: "image",
+      fileName: "London_Office_Header",
+    });
+    // The picker filters by type === "image", so inference matters.
+    expect(items[0].previewUrl).toBe(items[0].url);
   });
 });
 

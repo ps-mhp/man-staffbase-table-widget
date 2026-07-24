@@ -114,7 +114,7 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
   return (
     <div
       className="table-widget-scroll"
-      style={{ overflow: "auto", maxWidth: "100%", maxHeight: "70vh", containerType: "inline-size" }}
+      style={{ overflow: "auto", maxWidth: "100%", maxHeight: "70vh", containerType: "inline-size", background: "transparent" }}
     >
       <table
         style={{
@@ -122,6 +122,12 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
           borderSpacing: "8px 0",
           tableLayout: "auto",
           width: "100%",
+          // The 8px horizontal border-spacing between columns paints the
+          // table's own background. Force it transparent so the gap is a real
+          // gap (whatever sits behind the table shows through) rather than a
+          // white/coloured stripe — the columns are separated without any
+          // coloured border.
+          background: "transparent",
         }}
       >
         <thead>
