@@ -60,10 +60,56 @@ function moveSearchBar(searchBar: Node, reference: Element): void {
 }
 
 /**
+ * Schedules `run` for when the page is ready enough to safely relocate the
+ * search bar.
+ *
+ * The hosting application (a React app) attaches the search bar's event
+ * handlers *after* the `#search-input` element is in the DOM. Moving the input
+ * before that wiring is complete leaves it non-functional — even though the
+ * move itself preserves the node (moving the same input manually once the page
+ * has finished loading keeps the search fully working). So we defer the move
+ * until the document has finished loading and then yield two animation frames,
+ * giving the host a chance to finish binding its handlers first.
+ *
+ * @param run the relocation to perform once ready.
+ * @returns a function that cancels a still-pending schedule.
+ */
+export function whenPageReady(run: () => void): () => void {
+  let cancelled = false;
+
+  const afterFrames = (): void => {
+    if (cancelled) return;
+    if (typeof requestAnimationFrame === "function") {
+      requestAnimationFrame(() => {
+        if (cancelled) return;
+        requestAnimationFrame(() => {
+          if (!cancelled) run();
+        });
+      });
+    } else {
+      setTimeout(() => {
+        if (!cancelled) run();
+      }, 0);
+    }
+  };
+
+  if (document.readyState === "complete") {
+    afterFrames();
+  } else {
+    window.addEventListener("load", afterFrames, { once: true });
+  }
+
+  return (): void => {
+    cancelled = true;
+    window.removeEventListener("load", afterFrames);
+  };
+}
+
+/**
  * Starts watching the DOM for a `<search-bar-widget>` block and the hosting
- * application's search input. As soon as both are present, the search input is
- * moved to the block's position, the (now redundant) block is removed, and
- * watching stops.
+ * application's search input. As soon as both are present *and the page is
+ * ready* (see {@link whenPageReady}), the search input is moved to the block's
+ * position, the (now redundant) block is removed, and watching stops.
  *
  * The relocation happens exactly once. Until both elements exist the observer
  * simply keeps waiting, so this is safe to start on bundle load regardless of
@@ -72,15 +118,41 @@ function moveSearchBar(searchBar: Node, reference: Element): void {
  *
  * @param root the subtree to search/observe; defaults to `document`. Exposed
  * for testing so a test can scope the observer to a detached container.
- * @returns a cleanup function that disconnects the observer.
+ * @param schedule how to defer the move until the page is ready; defaults to
+ * {@link whenPageReady}. Exposed for testing so a test can run the move
+ * synchronously (or control exactly when it happens).
+ * @returns a cleanup function that disconnects the observer and cancels any
+ * pending move.
  */
-export function startSearchBarRelocator(root: ParentNode = document): () => void {
+export function startSearchBarRelocator(
+  root: ParentNode = document,
+  schedule: (run: () => void) => () => void = whenPageReady,
+): () => void {
   let done = false;
+  let disposed = false;
   let observer: MutationObserver | null = null;
+  let cancelSchedule: (() => void) | null = null;
 
   const disconnect = (): void => {
     observer?.disconnect();
     observer = null;
+  };
+
+  /**
+   * Performs the actual relocation. Re-queries both elements at move time (the
+   * host may have re-rendered and replaced the search input between the moment
+   * both were first seen and the moment the page became ready), so we always
+   * move the live node.
+   */
+  const relocate = (): void => {
+    if (disposed) return;
+
+    const widget = root.querySelector(SEARCH_BAR_WIDGET_TAG);
+    const searchBar = root.querySelector<HTMLElement>(SEARCH_INPUT_SELECTOR);
+    if (!widget || !searchBar) return;
+
+    moveSearchBar(searchBar, widget);
+    widget.remove();
   };
 
   const scan = (): void => {
@@ -92,11 +164,10 @@ export function startSearchBarRelocator(root: ParentNode = document): () => void
     const searchBar = root.querySelector<HTMLElement>(SEARCH_INPUT_SELECTOR);
     if (!searchBar) return;
 
-    moveSearchBar(searchBar, widget);
-    widget.remove();
-
+    // Both present: stop scanning and defer the move until the page is ready.
     done = true;
     disconnect();
+    cancelSchedule = schedule(relocate);
   };
 
   scan();
@@ -111,7 +182,9 @@ export function startSearchBarRelocator(root: ParentNode = document): () => void
   }
 
   return (): void => {
+    disposed = true;
     done = true;
     disconnect();
+    cancelSchedule?.();
   };
 }

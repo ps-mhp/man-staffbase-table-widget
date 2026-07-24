@@ -119,7 +119,7 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
       <table
         style={{
           borderCollapse: "separate",
-          borderSpacing: "3px 0",
+          borderSpacing: "8px 0",
           tableLayout: "auto",
           width: "100%",
         }}

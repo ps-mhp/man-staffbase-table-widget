@@ -16,6 +16,12 @@ import { startSearchBarRelocator } from "./search-bar-relocator";
 /** Flushes the microtask queue (MutationObserver callbacks) plus a macrotask. */
 const flush = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0));
 
+/** A scheduler that runs the relocation immediately (bypasses the ready gate). */
+const runNow = (run: () => void): (() => void) => {
+  run();
+  return () => {};
+};
+
 const makeContainer = (html: string): HTMLElement => {
   const container = document.createElement("div");
   container.innerHTML = html;
@@ -38,7 +44,7 @@ describe("startSearchBarRelocator", () => {
       <section id="target"><search-bar-widget id="w">[[SEARCH_BAR_PLACEMENT]]</search-bar-widget></section>
     `);
 
-    stop = startSearchBarRelocator(container);
+    stop = startSearchBarRelocator(container, runNow);
 
     expect(container.querySelector("search-bar-widget")).toBeNull();
     const searchBar = container.querySelector<HTMLElement>("#search-input");
@@ -49,7 +55,7 @@ describe("startSearchBarRelocator", () => {
   it("waits until the search bar appears, then relocates", async () => {
     const container = makeContainer(`<section id="target"><search-bar-widget>[[SEARCH_BAR_PLACEMENT]]</search-bar-widget></section>`);
 
-    stop = startSearchBarRelocator(container);
+    stop = startSearchBarRelocator(container, runNow);
 
     // No search bar yet: the block is left untouched.
     expect(container.querySelector("search-bar-widget")).not.toBeNull();
@@ -63,6 +69,55 @@ describe("startSearchBarRelocator", () => {
     expect(container.querySelector<HTMLElement>("#search-input")?.parentElement?.id).toBe("target");
   });
 
+  it("does not move the search bar until the ready gate fires", () => {
+    const container = makeContainer(`
+      <header><input id="search-input" /></header>
+      <section id="target"><search-bar-widget>[[SEARCH_BAR_PLACEMENT]]</search-bar-widget></section>
+    `);
+
+    let release: () => void = () => {};
+    stop = startSearchBarRelocator(container, (run) => {
+      release = run;
+      return () => {};
+    });
+
+    // Gate has not fired yet: the search bar stays where it is.
+    expect(container.querySelector("search-bar-widget")).not.toBeNull();
+    expect(container.querySelector<HTMLElement>("#search-input")?.parentElement?.tagName.toLowerCase()).toBe("header");
+
+    release();
+
+    // Gate fired: now the relocation happens.
+    expect(container.querySelector("search-bar-widget")).toBeNull();
+    expect(container.querySelector<HTMLElement>("#search-input")?.parentElement?.id).toBe("target");
+  });
+
+  it("re-queries the live search input at move time", () => {
+    const container = makeContainer(`
+      <header><input id="search-input" value="old" /></header>
+      <section id="target"><search-bar-widget>[[SEARCH_BAR_PLACEMENT]]</search-bar-widget></section>
+    `);
+
+    let release: () => void = () => {};
+    stop = startSearchBarRelocator(container, (run) => {
+      release = run;
+      return () => {};
+    });
+
+    // Host replaces the search input before the gate fires.
+    container.querySelector("#search-input")!.remove();
+    const fresh = document.createElement("input");
+    fresh.id = "search-input";
+    fresh.setAttribute("value", "new");
+    container.querySelector("header")!.appendChild(fresh);
+
+    release();
+
+    const moved = container.querySelector<HTMLInputElement>("#search-input");
+    expect(moved?.getAttribute("value")).toBe("new");
+    expect(moved?.parentElement?.id).toBe("target");
+  });
+
   it("uses moveBefore when the parent supports it", () => {
     const container = makeContainer(`
       <header><input id="search-input" /></header>
@@ -74,7 +129,7 @@ describe("startSearchBarRelocator", () => {
     });
     (target as unknown as { moveBefore: unknown }).moveBefore = moveBefore;
 
-    stop = startSearchBarRelocator(container);
+    stop = startSearchBarRelocator(container, runNow);
 
     expect(moveBefore).toHaveBeenCalledTimes(1);
     const [movedNode, refNode] = moveBefore.mock.calls[0];
@@ -94,7 +149,7 @@ describe("startSearchBarRelocator", () => {
     });
     (target as unknown as { moveBefore: unknown }).moveBefore = moveBefore;
 
-    stop = startSearchBarRelocator(container);
+    stop = startSearchBarRelocator(container, runNow);
 
     expect(moveBefore).toHaveBeenCalledTimes(1);
     // The insertBefore fallback still relocated the search bar and removed the block.
@@ -105,7 +160,7 @@ describe("startSearchBarRelocator", () => {
   it("stops relocating after the cleanup function is called", async () => {
     const container = makeContainer(`<section id="target"><search-bar-widget>[[SEARCH_BAR_PLACEMENT]]</search-bar-widget></section>`);
 
-    stop = startSearchBarRelocator(container);
+    stop = startSearchBarRelocator(container, runNow);
     stop();
 
     const input = document.createElement("input");
@@ -116,5 +171,24 @@ describe("startSearchBarRelocator", () => {
     // Observer was disconnected, so nothing was moved or removed.
     expect(container.querySelector("search-bar-widget")).not.toBeNull();
     expect(container.querySelector("#search-input")).not.toBeNull();
+  });
+
+  it("cancels a pending move when disposed before the ready gate fires", () => {
+    const container = makeContainer(`
+      <header><input id="search-input" /></header>
+      <section id="target"><search-bar-widget>[[SEARCH_BAR_PLACEMENT]]</search-bar-widget></section>
+    `);
+
+    let release: () => void = () => {};
+    stop = startSearchBarRelocator(container, (run) => {
+      release = run;
+      return () => {};
+    });
+
+    stop(); // dispose before the gate fires
+    release(); // late gate must be a no-op
+
+    expect(container.querySelector("search-bar-widget")).not.toBeNull();
+    expect(container.querySelector<HTMLElement>("#search-input")?.parentElement?.tagName.toLowerCase()).toBe("header");
   });
 });
