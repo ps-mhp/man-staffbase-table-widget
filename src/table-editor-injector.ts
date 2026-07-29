@@ -70,9 +70,17 @@ const panelStyle: React.CSSProperties = {
   boxShadow: "0 4px 24px rgba(0, 0, 0, 0.3)",
 };
 
+/**
+ * Holds the editor at exactly the panel's remaining height and does *not*
+ * scroll itself — the editor scrolls its grid internally so the toolbar stays
+ * put no matter how long the table is. `minHeight: 0` is required for a flex
+ * item to be allowed to shrink below its content size.
+ */
 const panelBodyStyle: React.CSSProperties = {
   flex: 1,
-  overflow: "auto",
+  minHeight: 0,
+  display: "flex",
+  overflow: "hidden",
 };
 
 const reopenButtonStyle: React.CSSProperties = {

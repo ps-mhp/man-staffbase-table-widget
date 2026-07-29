@@ -30,6 +30,12 @@ const RIBBON_CSS = `
   flex-wrap: wrap;
   align-items: stretch;
   gap: 0;
+  /* Never shrinks away inside the editor's flex column, and stays pinned to
+     the top should the editor ever sit in a scrolling container instead. */
+  flex: 0 0 auto;
+  position: sticky;
+  top: 0;
+  z-index: 30;
   padding: 5px 3px;
   border: 1px solid #d9dee3;
   border-radius: 8px;

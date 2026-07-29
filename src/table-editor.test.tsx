@@ -141,6 +141,17 @@ describe("TableEditor", () => {
     expect(cell).toHaveStyle({ fontWeight: "bold", textAlign: "right", color: "#ff0000" });
   });
 
+  it("scrolls only the grid, keeping the toolbar in place", () => {
+    render(<TableEditor value={sample()} onChange={jest.fn()} />);
+
+    expect(screen.getByTestId("table-editor")).toHaveStyle({
+      display: "flex",
+      flexDirection: "column",
+    });
+    const gridWrap = screen.getByTestId("table-editor-grid").parentElement!;
+    expect(gridWrap).toHaveStyle({ overflow: "auto", flex: "1 1 auto" });
+  });
+
   it("applies a vertical alignment via the toolbar to the selection", () => {
     const onChange = jest.fn();
     render(<TableEditor value={sample()} onChange={onChange} />);

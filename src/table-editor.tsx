@@ -54,6 +54,22 @@ export interface TableEditorProps {
   mediaClient?: MediaClient;
 }
 
+/**
+ * Column layout so the toolbar keeps a fixed spot at the top and only the
+ * grid below it scrolls — with a long table the controls stay reachable
+ * instead of scrolling out of view. Needs a parent that hands down a height
+ * (the injected modal does); where it doesn't, `height: 100%` resolves to
+ * auto and the editor simply grows with its content as before.
+ */
+const editorRootStyle: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  flex: "1 1 auto",
+  height: "100%",
+  minHeight: 0,
+  maxWidth: "100%",
+};
+
 const cellBoxStyle: React.CSSProperties = {
   border: "1px solid #d5d9dd",
   padding: "0",
@@ -664,7 +680,7 @@ export const TableEditor = ({ value, onChange, onDone, mediaClient }: TableEdito
     );
 
   return (
-    <div className="table-editor" data-testid="table-editor">
+    <div className="table-editor" data-testid="table-editor" style={editorRootStyle}>
       <TableToolbar
         hasSelection={selection !== null}
         activeFormat={anchorFormat}
@@ -705,7 +721,12 @@ export const TableEditor = ({ value, onChange, onDone, mediaClient }: TableEdito
             className="table-editor__grid-wrap"
             onMouseUp={handleCellMouseUp}
             style={{
-              display: "inline-block",
+              // The only scrolling area of the editor. `alignSelf` keeps the
+              // shrink-to-fit width the old `inline-block` gave it, so the
+              // frame hugs a narrow table instead of stretching.
+              flex: "1 1 auto",
+              minHeight: 0,
+              alignSelf: "flex-start",
               maxWidth: "100%",
               overflow: "auto",
               border: "1px solid #d9dee3",
