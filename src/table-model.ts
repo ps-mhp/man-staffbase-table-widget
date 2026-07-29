@@ -372,8 +372,10 @@ const cleanFormat = (fmt: CellFormat): CellFormat | null => {
   if (fmt.underline) next.underline = true;
   if (fmt.strikethrough) next.strikethrough = true;
   if (fmt.align && fmt.align !== "left") next.align = fmt.align;
-  // "middle" is the browser default for table cells, so it is never stored.
-  if (fmt.valign && fmt.valign !== "middle") next.valign = fmt.valign;
+  // Every value is stored, "middle" included: the surrounding page may style
+  // table cells as top-aligned, so centering has to be emitted explicitly
+  // rather than relying on the browser default.
+  if (fmt.valign) next.valign = fmt.valign;
   if (fmt.color) next.color = fmt.color;
   if (fmt.background) next.background = fmt.background;
   if (typeof fmt.fontSize === "number") next.fontSize = fmt.fontSize;

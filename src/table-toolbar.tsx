@@ -626,7 +626,7 @@ export const TableToolbar = (props: TableToolbarProps): ReactElement => {
               <RibbonButton testId="toolbar-valign-top" variant="icon" title="Oben ausrichten" disabled={disabled} active={activeFormat.valign === "top"} onClick={() => onVerticalAlign("top")}>
                 <IconVAlignTop />
               </RibbonButton>
-              <RibbonButton testId="toolbar-valign-middle" variant="icon" title="Mittig ausrichten" disabled={disabled} active={(activeFormat.valign ?? "middle") === "middle"} onClick={() => onVerticalAlign("middle")}>
+              <RibbonButton testId="toolbar-valign-middle" variant="icon" title="Mittig ausrichten" disabled={disabled} active={activeFormat.valign === "middle"} onClick={() => onVerticalAlign("middle")}>
                 <IconVAlignMiddle />
               </RibbonButton>
               <RibbonButton testId="toolbar-valign-bottom" variant="icon" title="Unten ausrichten" disabled={disabled} active={activeFormat.valign === "bottom"} onClick={() => onVerticalAlign("bottom")}>
