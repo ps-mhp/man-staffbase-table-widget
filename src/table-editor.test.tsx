@@ -5,6 +5,7 @@ import { TableEditor } from "./table-editor";
 import { TableModel } from "./table-model";
 import * as tableImport from "./table-import";
 import { MediaClient, MediaItem } from "./media-client";
+import { DEFAULT_IMAGE_WIDTH } from "./cell-image";
 
 const mediaItem = (id: string): MediaItem => ({
   id,
@@ -373,6 +374,160 @@ describe("TableEditor", () => {
       } finally {
         document.body.removeEventListener("mouseup", swallow);
       }
+    });
+  });
+
+  describe("multi-selection and image sizing", () => {
+    const imgCell = (name: string, width?: number): string =>
+      `<img src="https://cdn.example.com/${name}.png"${width ? ` style="width:${width}px"` : ""}>`;
+
+    /** Two images side by side: "a" (2:1, 300px wide) and "b" (1:1, 40px wide). */
+    const withImages = (): TableModel =>
+      model([
+        ["", "Q1", "Q2"],
+        ["Bilder", imgCell("a", 300), imgCell("b", 40)],
+      ]);
+
+    const natural: Record<string, { width: number; height: number }> = {
+      "https://cdn.example.com/a.png": { width: 600, height: 300 },
+      "https://cdn.example.com/b.png": { width: 200, height: 200 },
+    };
+    const measure = jest.fn(async (src: string) => natural[src] ?? null);
+
+    /** Ctrl/Cmd-click adds a cell to the selection instead of replacing it. */
+    const addToSelection = (label: string): void => {
+      fireEvent.mouseDown(cellTd(label), { ctrlKey: true });
+    };
+
+    it("keeps earlier cells selected when Ctrl-clicking another one", () => {
+      render(<TableEditor value={withImages()} onChange={jest.fn()} measure={measure} />);
+      fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
+      addToSelection("Zeile 2, Spalte 3");
+
+      expect(cellTd("Zeile 2, Spalte 2")).toHaveStyle({ background: "#eaf4ff" });
+      expect(cellTd("Zeile 2, Spalte 3")).toHaveStyle({ background: "#eaf4ff" });
+    });
+
+    it("applies a format to every cell of a multi-cell selection", () => {
+      const onChange = jest.fn();
+      render(<TableEditor value={withImages()} onChange={onChange} measure={measure} />);
+      fireEvent.mouseDown(cellTd("Zeile 1, Spalte 2"));
+      addToSelection("Zeile 2, Spalte 3");
+      fireEvent.click(screen.getByTestId("toolbar-bold"));
+
+      const arg = onChange.mock.calls.at(-1)![0] as TableModel;
+      expect(arg.formats["0,1"]).toEqual({ bold: true });
+      expect(arg.formats["1,2"]).toEqual({ bold: true });
+    });
+
+    it("enables the image size button as soon as one image is selected", () => {
+      render(<TableEditor value={withImages()} onChange={jest.fn()} measure={measure} />);
+      expect(screen.getByTestId("toolbar-image-size")).toBeDisabled();
+
+      fireEvent.mouseDown(cellTd("Zeile 1, Spalte 2"));
+      expect(screen.getByTestId("toolbar-image-size")).toBeDisabled();
+
+      fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
+      expect(screen.getByTestId("toolbar-image-size")).not.toBeDisabled();
+    });
+
+    it("offers only the reset option while a single image is selected", () => {
+      render(<TableEditor value={withImages()} onChange={jest.fn()} measure={measure} />);
+      fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
+      fireEvent.click(screen.getByTestId("toolbar-image-size"));
+
+      expect(screen.getByTestId("toolbar-image-equal-height")).toBeDisabled();
+      expect(screen.getByTestId("toolbar-image-equal-width")).toBeDisabled();
+      expect(screen.getByTestId("toolbar-image-reset-size")).not.toBeDisabled();
+    });
+
+    it("scales the other images to the height of the first selected one", async () => {
+      const onChange = jest.fn();
+      render(<TableEditor value={withImages()} onChange={onChange} measure={measure} />);
+      // "a" first: 300px wide at 2:1 -> 150px high. "b" is 1:1, so 150px wide.
+      fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
+      addToSelection("Zeile 2, Spalte 3");
+      fireEvent.click(screen.getByTestId("toolbar-image-size"));
+      fireEvent.click(screen.getByTestId("toolbar-image-equal-height"));
+
+      await waitFor(() => expect(onChange).toHaveBeenCalled());
+      const arg = onChange.mock.calls.at(-1)![0] as TableModel;
+      expect(arg.data[1][1]).toContain("width:300px");
+      expect(arg.data[1][2]).toContain("width:150px");
+    });
+
+    it("takes the reference from the first image, whichever order it was clicked", async () => {
+      const onChange = jest.fn();
+      render(<TableEditor value={withImages()} onChange={onChange} measure={measure} />);
+      // "b" first (40px wide): every image ends up 40px wide.
+      fireEvent.mouseDown(cellTd("Zeile 2, Spalte 3"));
+      addToSelection("Zeile 2, Spalte 2");
+      fireEvent.click(screen.getByTestId("toolbar-image-size"));
+      fireEvent.click(screen.getByTestId("toolbar-image-equal-width"));
+
+      await waitFor(() => expect(onChange).toHaveBeenCalled());
+      const arg = onChange.mock.calls.at(-1)![0] as TableModel;
+      expect(arg.data[1][1]).toContain("width:40px");
+      expect(arg.data[1][2]).toContain("width:40px");
+    });
+
+    it("equalizes images of a dragged range too", async () => {
+      const onChange = jest.fn();
+      render(<TableEditor value={withImages()} onChange={onChange} measure={measure} />);
+      fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
+      fireEvent.mouseDown(cellTd("Zeile 2, Spalte 3"), { shiftKey: true });
+      fireEvent.click(screen.getByTestId("toolbar-image-size"));
+      fireEvent.click(screen.getByTestId("toolbar-image-equal-width"));
+
+      await waitFor(() => expect(onChange).toHaveBeenCalled());
+      const arg = onChange.mock.calls.at(-1)![0] as TableModel;
+      expect(arg.data[1][2]).toContain("width:300px");
+    });
+
+    it("resets every selected image to the default width without measuring", async () => {
+      const onChange = jest.fn();
+      const measureSpy = jest.fn(async () => null);
+      render(<TableEditor value={withImages()} onChange={onChange} measure={measureSpy} />);
+      fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
+      addToSelection("Zeile 2, Spalte 3");
+      fireEvent.click(screen.getByTestId("toolbar-image-size"));
+      fireEvent.click(screen.getByTestId("toolbar-image-reset-size"));
+
+      await waitFor(() => expect(onChange).toHaveBeenCalled());
+      const arg = onChange.mock.calls.at(-1)![0] as TableModel;
+      expect(arg.data[1][1]).toContain(`width:${DEFAULT_IMAGE_WIDTH}px`);
+      expect(arg.data[1][2]).toContain(`width:${DEFAULT_IMAGE_WIDTH}px`);
+      expect(measureSpy).not.toHaveBeenCalled();
+    });
+
+    it("resets a single selected image too", async () => {
+      const onChange = jest.fn();
+      render(<TableEditor value={withImages()} onChange={onChange} measure={measure} />);
+      fireEvent.mouseDown(cellTd("Zeile 2, Spalte 3"));
+      fireEvent.click(screen.getByTestId("toolbar-image-size"));
+      fireEvent.click(screen.getByTestId("toolbar-image-reset-size"));
+
+      await waitFor(() => expect(onChange).toHaveBeenCalled());
+      const arg = onChange.mock.calls.at(-1)![0] as TableModel;
+      expect(arg.data[1][1]).toContain("width:300px");
+      expect(arg.data[1][2]).toContain(`width:${DEFAULT_IMAGE_WIDTH}px`);
+    });
+
+    it("warns and changes nothing when no image can be measured", async () => {
+      const onChange = jest.fn();
+      const alert = jest.spyOn(window, "alert").mockImplementation(() => undefined);
+      const unmeasurable = model([["", "Q1", "Q2"], ["Bilder", imgCell("a"), imgCell("b")]]);
+      render(
+        <TableEditor value={unmeasurable} onChange={onChange} measure={jest.fn(async () => null)} />,
+      );
+      fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
+      addToSelection("Zeile 2, Spalte 3");
+      fireEvent.click(screen.getByTestId("toolbar-image-size"));
+      fireEvent.click(screen.getByTestId("toolbar-image-equal-height"));
+
+      await waitFor(() => expect(alert).toHaveBeenCalled());
+      expect(onChange).not.toHaveBeenCalled();
+      alert.mockRestore();
     });
   });
 });

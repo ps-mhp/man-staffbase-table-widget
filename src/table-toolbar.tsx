@@ -210,7 +210,8 @@ const RIBBON_CSS = `
   font-size: 13px;
   color: #2b3742;
 }
-.tw-rb__menu-item:hover { background: #eef3f8; }
+.tw-rb__menu-item:hover:not(:disabled) { background: #eef3f8; }
+.tw-rb__menu-item:disabled { opacity: 0.45; cursor: not-allowed; }
 .tw-rb__swatch { width: 16px; height: 16px; border: 1px solid #cfd4da; border-radius: 3px; flex: 0 0 auto; }
 `;
 
@@ -304,6 +305,14 @@ const IconImage = (): ReactElement => (
     <path d="M3 12l3.5-3.5L9 11l2-2 2 2" />
   </svg>
 );
+/** Two images plus size arrows — the "equalize image size" action. */
+const IconImageSize = (): ReactElement => (
+  <svg {...svgBase} aria-hidden>
+    <rect x="1.5" y="4" width="5.5" height="8" rx="1" />
+    <rect x="9" y="6" width="5.5" height="4" rx="1" />
+    <path d="M8 2.5v11" strokeWidth={1.1} strokeDasharray="1.5 1.5" />
+  </svg>
+);
 const IconChevron = (): ReactElement => (
   <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
     <path d="M3 4.5L6 8l3-3.5" />
@@ -346,6 +355,13 @@ export interface TableToolbarProps {
   onCopyFormat: () => void;
   onUpload: (file: File) => void;
   onInsertImage: () => void;
+  /** True when the selection holds at least one image. */
+  hasSelectedImages: boolean;
+  /** True when it holds at least two — i.e. one can be the size reference. */
+  canEqualizeImages: boolean;
+  onEqualizeImageHeight: () => void;
+  onEqualizeImageWidth: () => void;
+  onResetImageSize: () => void;
   onDone?: () => void;
 }
 
@@ -564,6 +580,11 @@ export const TableToolbar = (props: TableToolbarProps): ReactElement => {
     onCopyFormat,
     onUpload,
     onInsertImage,
+    hasSelectedImages,
+    canEqualizeImages,
+    onEqualizeImageHeight,
+    onEqualizeImageWidth,
+    onResetImageSize,
     onDone,
   } = props;
 
@@ -796,6 +817,37 @@ export const TableToolbar = (props: TableToolbarProps): ReactElement => {
             <IconImage />
             <span>Bild</span>
           </button>
+
+          <Dropdown
+            testId="toolbar-image-size-menu"
+            trigger={(toggle) => (
+              <button
+                type="button"
+                className="tw-rb__big"
+                data-testid="toolbar-image-size"
+                title="Größe der markierten Bilder angleichen (Maßstab ist das zuerst markierte Bild)"
+                disabled={!hasSelectedImages}
+                onClick={toggle}
+              >
+                <IconImageSize />
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "2px" }}>Bildgröße <IconChevron /></span>
+              </button>
+            )}
+          >
+            {(close) => (
+              <>
+                <button type="button" className="tw-rb__menu-item" data-testid="toolbar-image-equal-height" disabled={!canEqualizeImages} title={canEqualizeImages ? undefined : "Mindestens zwei markierte Bilder nötig"} onClick={() => { onEqualizeImageHeight(); close(); }}>
+                  Gleiche Höhe wie erstes Bild
+                </button>
+                <button type="button" className="tw-rb__menu-item" data-testid="toolbar-image-equal-width" disabled={!canEqualizeImages} title={canEqualizeImages ? undefined : "Mindestens zwei markierte Bilder nötig"} onClick={() => { onEqualizeImageWidth(); close(); }}>
+                  Gleiche Breite wie erstes Bild
+                </button>
+                <button type="button" className="tw-rb__menu-item" data-testid="toolbar-image-reset-size" onClick={() => { onResetImageSize(); close(); }}>
+                  Standardgröße
+                </button>
+              </>
+            )}
+          </Dropdown>
 
           <button type="button" className="tw-rb__big" data-testid="toolbar-upload-button" title="Tabelle hochladen (.csv, .xlsx)" onClick={() => fileInputRef.current?.click()}>
             <IconUpload />

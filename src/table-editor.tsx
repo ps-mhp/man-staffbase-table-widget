@@ -40,7 +40,16 @@ import { TableToolbar } from "./table-toolbar";
 import { importTableFile } from "./table-import";
 import { MediaClient, createMediaClient } from "./media-client";
 import { MediaPicker, PickedImage } from "./media-picker";
-import { buildImageMarkup, clampImageWidth } from "./cell-image";
+import {
+  buildImageMarkup,
+  clampImageWidth,
+  countCellImages,
+  equalizedWidths,
+  listCellImages,
+  setCellImageWidths,
+  DEFAULT_IMAGE_WIDTH,
+} from "./cell-image";
+import { MeasureImage, measureImage } from "./image-measure";
 
 export interface TableEditorProps {
   value: TableModel;
@@ -52,6 +61,11 @@ export interface TableEditorProps {
    * Defaults to a same-origin {@link createMediaClient}; injectable for tests.
    */
   mediaClient?: MediaClient;
+  /**
+   * Resolves an image's intrinsic size, needed to equalize image heights.
+   * Defaults to {@link measureImage}; injectable for tests.
+   */
+  measure?: MeasureImage;
 }
 
 /**
@@ -137,6 +151,26 @@ const cellsInRange = (range: CellRange): Array<[number, number]> => {
   for (let r = range.top; r <= range.bottom; r++) {
     for (let c = range.left; c <= range.right; c++) {
       cells.push([r, c]);
+    }
+  }
+  return cells;
+};
+
+/**
+ * The cells of several (possibly overlapping) selected ranges, in selection
+ * order: range by range, and row-major inside each range. Duplicates are
+ * dropped, so a cell keeps the position of its *first* selection — that order
+ * is what makes "the first marked image" well-defined.
+ */
+const cellsInRanges = (ranges: ReadonlyArray<CellRange>): Array<[number, number]> => {
+  const seen = new Set<string>();
+  const cells: Array<[number, number]> = [];
+  for (const range of ranges) {
+    for (const [row, col] of cellsInRange(range)) {
+      const key = `${row},${col}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      cells.push([row, col]);
     }
   }
   return cells;
@@ -341,14 +375,27 @@ function MenuItem({
  * CSV/XLSX upload. Row 0 and column 0 are the frozen header row/column and
  * are never deletable.
  */
-export const TableEditor = ({ value, onChange, onDone, mediaClient }: TableEditorProps): ReactElement => {
+export const TableEditor = ({
+  value,
+  onChange,
+  onDone,
+  mediaClient,
+  measure = measureImage,
+}: TableEditorProps): ReactElement => {
   const data = value.data;
   const rowCount = data.length;
   const colCount = data[0]?.length ?? 0;
 
   const client = useMemo(() => mediaClient ?? createMediaClient(), [mediaClient]);
 
-  const [selection, setSelection] = useState<CellRange | null>(null);
+  /**
+   * All selected ranges, oldest first. A plain click/drag keeps a single
+   * range; Ctrl/Cmd-click appends another one. The *last* range is the active
+   * one that structural operations (insert/delete/merge/sort) act on, while
+   * formatting and the image tools act on every selected cell.
+   */
+  const [ranges, setRanges] = useState<CellRange[]>([]);
+  const selection = ranges.length > 0 ? ranges[ranges.length - 1] : null;
   const [anchor, setAnchor] = useState<[number, number] | null>(null);
   const [editing, setEditing] = useState<[number, number] | null>(null);
   const activeCell = useRef<[number, number] | null>(null);
@@ -377,35 +424,43 @@ export const TableEditor = ({ value, onChange, onDone, mediaClient }: TableEdito
   }, []);
 
   const isSelected = (row: number, col: number): boolean =>
-    selection !== null &&
-    row >= selection.top &&
-    row <= selection.bottom &&
-    col >= selection.left &&
-    col <= selection.right;
+    ranges.some(
+      (range) =>
+        row >= range.top && row <= range.bottom && col >= range.left && col <= range.right,
+    );
 
-  const selectSingle = (row: number, col: number): void => {
+  /** Starts a new range — replacing the selection, or adding to it (Ctrl/Cmd). */
+  const selectSingle = (row: number, col: number, additive = false): void => {
     setAnchor([row, col]);
-    setSelection({ top: row, left: col, bottom: row, right: col });
+    const range: CellRange = { top: row, left: col, bottom: row, right: col };
+    setRanges((prev) => (additive ? [...prev, range] : [range]));
   };
 
+  /** Grows the range that is currently being drawn (shift-click / drag). */
   const extendTo = (row: number, col: number): void => {
     const start = anchor ?? [row, col];
-    setSelection(normalizeRange(start, [row, col]));
+    const range = normalizeRange(start, [row, col]);
+    setRanges((prev) => (prev.length > 0 ? [...prev.slice(0, -1), range] : [range]));
   };
 
   const selectRow = (row: number): void => {
     setAnchor([row, 0]);
-    setSelection({ top: row, left: 0, bottom: row, right: colCount - 1 });
+    setRanges([{ top: row, left: 0, bottom: row, right: colCount - 1 }]);
   };
 
   const selectColumn = (col: number): void => {
     setAnchor([0, col]);
-    setSelection({ top: 0, left: col, bottom: rowCount - 1, right: col });
+    setRanges([{ top: 0, left: col, bottom: rowCount - 1, right: col }]);
   };
 
   const selectAll = (): void => {
     setAnchor([0, 0]);
-    setSelection({ top: 0, left: 0, bottom: rowCount - 1, right: colCount - 1 });
+    setRanges([{ top: 0, left: 0, bottom: rowCount - 1, right: colCount - 1 }]);
+  };
+
+  const clearSelection = (): void => {
+    setRanges([]);
+    setAnchor(null);
   };
 
   const handleCellMouseDown = (event: React.MouseEvent, row: number, col: number): void => {
@@ -421,7 +476,7 @@ export const TableEditor = ({ value, onChange, onDone, mediaClient }: TableEdito
     // Selecting a different cell ends any in-progress edit.
     if (editing) setEditing(null);
     event.preventDefault();
-    selectSingle(row, col);
+    selectSingle(row, col, event.ctrlKey || event.metaKey);
     isDragging.current = true;
   };
 
@@ -453,11 +508,8 @@ export const TableEditor = ({ value, onChange, onDone, mediaClient }: TableEdito
 
   // --- Image insertion (picker, clipboard upload) ---
 
-  /** Initial on-screen width, in px, for a freshly inserted image. */
-  const DEFAULT_INSERT_WIDTH = 320;
-
   const imageMarkup = (image: PickedImage): string => {
-    const width = image.width ? Math.min(image.width, DEFAULT_INSERT_WIDTH) : DEFAULT_INSERT_WIDTH;
+    const width = image.width ? Math.min(image.width, DEFAULT_IMAGE_WIDTH) : DEFAULT_IMAGE_WIDTH;
     return buildImageMarkup({ src: image.url, alt: image.alt, width });
   };
 
@@ -531,11 +583,66 @@ export const TableEditor = ({ value, onChange, onDone, mediaClient }: TableEdito
     }
   };
 
+  // --- Equalizing image sizes across the selection ---
+
+  /** How many inline images the current selection holds (cheap, per render). */
+  const selectedImageCount = useMemo(
+    () =>
+      cellsInRanges(ranges).reduce((sum, [row, col]) => sum + countCellImages(data[row]?.[col]), 0),
+    [ranges, data],
+  );
+
+  /**
+   * Resizes every selected image. `"height"`/`"width"` take the **first**
+   * selected image as the reference (with `"height"` deriving each image's
+   * width from its own aspect ratio, since only widths are persisted);
+   * `"default"` resets all of them to {@link DEFAULT_IMAGE_WIDTH}. Selection
+   * order defines "first", which is why multiple ranges are kept in the order
+   * they were Ctrl/Cmd-clicked.
+   */
+  const resizeImages = async (mode: "height" | "width" | "default"): Promise<void> => {
+    const images = cellsInRanges(ranges).flatMap(([row, col]) =>
+      listCellImages(data[row]?.[col]).map((image) => ({ row, col, ...image })),
+    );
+    if (images.length === 0 || (mode !== "default" && images.length < 2)) return;
+
+    let widths: Array<number | undefined>;
+    if (mode === "default") {
+      widths = images.map(() => DEFAULT_IMAGE_WIDTH);
+    } else {
+      const naturals = await Promise.all(images.map((image) => measure(image.src)));
+      widths = equalizedWidths(
+        mode,
+        images.map((image, i) => ({ width: image.width, natural: naturals[i] })),
+      );
+    }
+    if (widths.every((width) => width === undefined)) {
+      window.alert("Bildgrößen konnten nicht ermittelt werden.");
+      return;
+    }
+
+    // One markup rewrite per cell, carrying the widths of all its images.
+    const perCell = new Map<string, Array<number | undefined>>();
+    images.forEach((image, i) => {
+      const key = `${image.row},${image.col}`;
+      const cellWidths = perCell.get(key) ?? [];
+      cellWidths[image.index] = widths[i];
+      perCell.set(key, cellWidths);
+    });
+
+    let nextData = data;
+    perCell.forEach((cellWidths, key) => {
+      const [row, col] = key.split(",").map(Number);
+      nextData = updateCell(nextData, row, col, setCellImageWidths(nextData[row]?.[col], cellWidths));
+    });
+    onChange({ ...value, data: nextData });
+  };
+
   // --- Format helpers ---
 
   const applyFormat = (patch: CellFormat): void => {
-    if (!selection) return;
-    onChange(setFormat(value, cellsInRange(selection), patch));
+    if (ranges.length === 0) return;
+    onChange(setFormat(value, cellsInRanges(ranges), patch));
   };
 
   const anchorFormat: CellFormat = selection
@@ -654,8 +761,7 @@ export const TableEditor = ({ value, onChange, onDone, mediaClient }: TableEdito
   const handleUpload = (file: File): void => {
     importTableFile(file)
       .then((imported) => {
-        setSelection(null);
-        setAnchor(null);
+        clearSelection();
         onChange(imported);
       })
       .catch((err: unknown) => {
@@ -712,6 +818,11 @@ export const TableEditor = ({ value, onChange, onDone, mediaClient }: TableEdito
         onCopyFormat={handleCopyFormat}
         onUpload={handleUpload}
         onInsertImage={openImagePicker}
+        hasSelectedImages={selectedImageCount > 0}
+        canEqualizeImages={selectedImageCount > 1}
+        onEqualizeImageHeight={() => void resizeImages("height")}
+        onEqualizeImageWidth={() => void resizeImages("width")}
+        onResetImageSize={() => void resizeImages("default")}
         onDone={onDone}
       />
 
