@@ -37,3 +37,14 @@ export function formatToStyle(format: CellFormat): React.CSSProperties {
   if (typeof format.fontSize === "number") style.fontSize = `${format.fontSize}px`;
   return style;
 }
+
+/**
+ * The part of a {@link CellFormat} that has to sit on the cell *box*
+ * (`<td>`/`<th>`) rather than on the text: `vertical-align` only has an
+ * effect on the table cell itself. Kept separate from {@link formatToStyle}
+ * because the editor renders the text inside a contenteditable child of the
+ * cell, where the property would be a no-op.
+ */
+export function formatToCellStyle(format: CellFormat): React.CSSProperties {
+  return format.valign ? { verticalAlign: format.valign } : {};
+}

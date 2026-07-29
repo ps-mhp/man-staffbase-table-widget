@@ -19,6 +19,7 @@ import {
   CellRange,
   CellFormat,
   TextAlign,
+  VerticalAlign,
   normalizeRange,
   insertRow,
   insertColumn,
@@ -34,7 +35,7 @@ import {
 } from "./table-model";
 import { updateCell, parsePastedText, pasteBlock } from "./grid-operations";
 import { sanitizeRichText } from "./rich-text";
-import { formatToStyle } from "./cell-style";
+import { formatToStyle, formatToCellStyle } from "./cell-style";
 import { TableToolbar } from "./table-toolbar";
 import { importTableFile } from "./table-import";
 import { MediaClient, createMediaClient } from "./media-client";
@@ -671,6 +672,7 @@ export const TableEditor = ({ value, onChange, onDone, mediaClient }: TableEdito
         insert={{ row: fullRowSelected, col: fullColSelected }}
         onToggle={toggleKey}
         onAlign={(align: TextAlign) => applyFormat({ align })}
+        onVerticalAlign={(valign: VerticalAlign) => applyFormat({ valign })}
         onColor={(color) => applyFormat({ color })}
         onClearColor={() => applyFormat({ color: undefined })}
         onBackground={(background) => applyFormat({ background })}
@@ -740,6 +742,7 @@ export const TableEditor = ({ value, onChange, onDone, mediaClient }: TableEdito
                         rowSpan={merge && merge.rowSpan > 1 ? merge.rowSpan : undefined}
                         style={{
                           ...(isHeader ? headerCellBoxStyle : cellBoxStyle),
+                          ...formatToCellStyle(cellFormat(value, rowIndex, colIndex)),
                           ...(isSelected(rowIndex, colIndex) ? selectedCellStyle : {}),
                         }}
                         onMouseDown={(e) => handleCellMouseDown(e, rowIndex, colIndex)}
@@ -793,6 +796,10 @@ export const TableEditor = ({ value, onChange, onDone, mediaClient }: TableEdito
                   <MenuItem testId="align-left" onSelect={() => applyFormat({ align: "left" })}>Linksbündig</MenuItem>
                   <MenuItem testId="align-center" onSelect={() => applyFormat({ align: "center" })}>Zentriert</MenuItem>
                   <MenuItem testId="align-right" onSelect={() => applyFormat({ align: "right" })}>Rechtsbündig</MenuItem>
+                  <ContextMenu.Separator style={separatorStyle} />
+                  <MenuItem testId="valign-top" onSelect={() => applyFormat({ valign: "top" })}>Oben ausrichten</MenuItem>
+                  <MenuItem testId="valign-middle" onSelect={() => applyFormat({ valign: "middle" })}>Mittig ausrichten</MenuItem>
+                  <MenuItem testId="valign-bottom" onSelect={() => applyFormat({ valign: "bottom" })}>Unten ausrichten</MenuItem>
                 </ContextMenu.SubContent>
               </ContextMenu.Portal>
             </ContextMenu.Sub>
@@ -833,6 +840,7 @@ function fullFormatPatch(source: CellFormat): CellFormat {
     underline: source.underline,
     strikethrough: source.strikethrough,
     align: source.align,
+    valign: source.valign,
     color: source.color,
     background: source.background,
     fontSize: source.fontSize,

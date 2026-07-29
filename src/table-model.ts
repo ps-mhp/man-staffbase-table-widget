@@ -27,6 +27,12 @@ export interface Merge {
 
 export type TextAlign = "left" | "center" | "right";
 
+/**
+ * Vertical placement of a cell's content inside its (possibly taller) cell
+ * box. Mirrors the CSS `vertical-align` values used for table cells.
+ */
+export type VerticalAlign = "top" | "middle" | "bottom";
+
 /** Per-cell text formatting. All properties optional / additive. */
 export interface CellFormat {
   bold?: boolean;
@@ -34,6 +40,7 @@ export interface CellFormat {
   underline?: boolean;
   strikethrough?: boolean;
   align?: TextAlign;
+  valign?: VerticalAlign;
   color?: string;
   background?: string;
   fontSize?: number;
@@ -365,6 +372,8 @@ const cleanFormat = (fmt: CellFormat): CellFormat | null => {
   if (fmt.underline) next.underline = true;
   if (fmt.strikethrough) next.strikethrough = true;
   if (fmt.align && fmt.align !== "left") next.align = fmt.align;
+  // "middle" is the browser default for table cells, so it is never stored.
+  if (fmt.valign && fmt.valign !== "middle") next.valign = fmt.valign;
   if (fmt.color) next.color = fmt.color;
   if (fmt.background) next.background = fmt.background;
   if (typeof fmt.fontSize === "number") next.fontSize = fmt.fontSize;

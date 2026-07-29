@@ -141,6 +141,23 @@ describe("TableEditor", () => {
     expect(cell).toHaveStyle({ fontWeight: "bold", textAlign: "right", color: "#ff0000" });
   });
 
+  it("applies a vertical alignment via the toolbar to the selection", () => {
+    const onChange = jest.fn();
+    render(<TableEditor value={sample()} onChange={onChange} />);
+    fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
+    fireEvent.click(screen.getByTestId("toolbar-valign-bottom"));
+    const arg = onChange.mock.calls[0][0] as TableModel;
+    expect(arg.formats["1,1"]).toEqual({ valign: "bottom" });
+  });
+
+  it("renders a cell's vertical alignment on the cell box", () => {
+    const formatted = model([["", "Q1"], ["Umsatz", "100"]], {
+      formats: { "1,1": { valign: "top" } },
+    });
+    render(<TableEditor value={formatted} onChange={jest.fn()} />);
+    expect(cellTd("Zeile 2, Spalte 2")).toHaveStyle({ verticalAlign: "top" });
+  });
+
   it("enables 'unmerge' only when the selection overlaps a merge", () => {
     const merged = model([["", "Q1", "Q2"], ["Umsatz", "100", "200"]], {
       merges: [{ row: 1, col: 1, rowSpan: 1, colSpan: 2 }],

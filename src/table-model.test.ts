@@ -216,6 +216,18 @@ describe("setFormat / cellFormat", () => {
     expect(cleared.formats["1,1"]).toBeUndefined();
   });
 
+  it("stores a non-default vertical alignment and drops the default", () => {
+    const m = model([["", "A"], ["R", "1"]]);
+    expect(cellFormat(setFormat(m, [[1, 1]], { valign: "top" }), 1, 1)).toEqual({
+      valign: "top",
+    });
+    // "middle" is the browser default, so it is not persisted.
+    const reset = setFormat(setFormat(m, [[1, 1]], { valign: "bottom" }), [[1, 1]], {
+      valign: "middle",
+    });
+    expect(cellFormat(reset, 1, 1)).toEqual({});
+  });
+
   it("shifts formats when a row is inserted", () => {
     const m = model([["", "A"], ["R", "1"]], { formats: { "1,1": { bold: true } } });
     const result = insertRow(m, 1);

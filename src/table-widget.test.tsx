@@ -122,6 +122,21 @@ describe("TableWidget", () => {
     });
   });
 
+  it("applies vertical alignment to the cell box", () => {
+    const tabledata = JSON.stringify({
+      data: [
+        ["", "A"],
+        ["R", "1"],
+      ],
+      formats: { "0,1": { valign: "bottom" }, "1,1": { valign: "top" } },
+    });
+
+    render(<TableWidget contentLanguage="de_DE" tabledata={tabledata} />);
+
+    expect(screen.getByText("1").closest("td")).toHaveStyle({ verticalAlign: "top" });
+    expect(screen.getByText("A").closest("th")).toHaveStyle({ verticalAlign: "bottom" });
+  });
+
   it("renders super/subscript markup in cells", () => {
     const tabledata = JSON.stringify({
       data: [

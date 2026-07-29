@@ -13,7 +13,7 @@
 
 import * as React from "react";
 import { ReactElement, useEffect, useRef, useState } from "react";
-import { CellFormat, TextAlign } from "./table-model";
+import { CellFormat, TextAlign, VerticalAlign } from "./table-model";
 
 const FONT_SIZES = [10, 12, 14, 16, 18, 20, 24, 28, 32];
 
@@ -251,6 +251,16 @@ const IconAlignRight = (): ReactElement => (
   <svg {...svgBase} aria-hidden><path d="M2 4h12M6 8h8M4 12h10" /></svg>
 );
 
+const IconVAlignTop = (): ReactElement => (
+  <svg {...svgBase} aria-hidden><path d="M2 3h12M5 6h6M5 9h6" /></svg>
+);
+const IconVAlignMiddle = (): ReactElement => (
+  <svg {...svgBase} aria-hidden><path d="M5 4h6M2 8h12M5 12h6" /></svg>
+);
+const IconVAlignBottom = (): ReactElement => (
+  <svg {...svgBase} aria-hidden><path d="M5 4h6M5 7h6M2 13h12" /></svg>
+);
+
 const IconInsert = (): ReactElement => (
   <svg {...svgBase} aria-hidden>
     <rect x="2" y="2" width="12" height="12" rx="1" opacity="0.5" />
@@ -306,6 +316,7 @@ export interface TableToolbarProps {
 
   onToggle: (key: "bold" | "italic" | "underline" | "strikethrough") => void;
   onAlign: (align: TextAlign) => void;
+  onVerticalAlign: (align: VerticalAlign) => void;
   onColor: (color: string) => void;
   onClearColor: () => void;
   onBackground: (color: string) => void;
@@ -523,6 +534,7 @@ export const TableToolbar = (props: TableToolbarProps): ReactElement => {
     insert,
     onToggle,
     onAlign,
+    onVerticalAlign,
     onColor,
     onClearColor,
     onBackground,
@@ -610,6 +622,15 @@ export const TableToolbar = (props: TableToolbarProps): ReactElement => {
               </RibbonButton>
               <RibbonButton testId="toolbar-align-right" variant="icon" title="Rechtsbündig" disabled={disabled} active={activeFormat.align === "right"} onClick={() => onAlign("right")}>
                 <IconAlignRight />
+              </RibbonButton>
+              <RibbonButton testId="toolbar-valign-top" variant="icon" title="Oben ausrichten" disabled={disabled} active={activeFormat.valign === "top"} onClick={() => onVerticalAlign("top")}>
+                <IconVAlignTop />
+              </RibbonButton>
+              <RibbonButton testId="toolbar-valign-middle" variant="icon" title="Mittig ausrichten" disabled={disabled} active={(activeFormat.valign ?? "middle") === "middle"} onClick={() => onVerticalAlign("middle")}>
+                <IconVAlignMiddle />
+              </RibbonButton>
+              <RibbonButton testId="toolbar-valign-bottom" variant="icon" title="Unten ausrichten" disabled={disabled} active={activeFormat.valign === "bottom"} onClick={() => onVerticalAlign("bottom")}>
+                <IconVAlignBottom />
               </RibbonButton>
             </div>
             <div className="tw-rb__row">

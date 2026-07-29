@@ -12,14 +12,15 @@
  */
 
 import ExcelJS from "exceljs";
-import { TableModel, Merge, CellFormat, TextAlign, formatKey } from "./table-model";
+import { TableModel, Merge, CellFormat, TextAlign, VerticalAlign, formatKey } from "./table-model";
 
 /**
  * Imports a user-provided spreadsheet file into a {@link TableModel}.
  * `.csv` is parsed locally; `.xlsx`/`.xls` are parsed with ExcelJS, which is
  * loaded lazily (dynamic import) so it never weighs down the widget bundle
  * that renders on live pages. XLSX import preserves merged cells, per-cell
- * formatting (bold/italic/underline/strike/colour/fill/size/alignment) and
+ * formatting (bold/italic/underline/strike/colour/fill/size/alignment incl.
+ * vertical alignment) and
  * super-/sub-script runs.
  */
 export async function importTableFile(file: File): Promise<TableModel> {
@@ -172,6 +173,10 @@ const cellToFormat = (cell: ExcelJS.Cell): CellFormat | null => {
   const align = cell.alignment?.horizontal;
   if (align === "left" || align === "center" || align === "right") {
     format.align = align as TextAlign;
+  }
+  const valign = cell.alignment?.vertical;
+  if (valign === "top" || valign === "middle" || valign === "bottom") {
+    format.valign = valign as VerticalAlign;
   }
   const fill = cell.fill;
   if (fill && fill.type === "pattern" && fill.pattern === "solid") {

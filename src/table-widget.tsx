@@ -19,7 +19,7 @@ import {
   mergeAt,
   cellFormat,
 } from "./table-model";
-import { formatToStyle } from "./cell-style";
+import { formatToStyle, formatToCellStyle } from "./cell-style";
 import { sanitizeRichText, richTextToPlain } from "./rich-text";
 
 /**
@@ -134,6 +134,7 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
           <tr>
             {headerRow.map((cell, colIndex) => {
               if (isCovered(model, 0, colIndex)) return null;
+              const headerFormat = cellFormat(model, 0, colIndex);
               return (
                 <th
                   key={colIndex}
@@ -144,7 +145,8 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
                     ...headerCellStyle,
                     textAlign: alignFor(colIndex),
                     ...(colIndex === 0 ? firstColumnStyle : {}),
-                    ...formatToStyle(cellFormat(model, 0, colIndex)),
+                    ...formatToStyle(headerFormat),
+                    ...formatToCellStyle(headerFormat),
                     background: "#fff",
                     position: "sticky",
                     top: 0,
@@ -166,7 +168,8 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
               <tr key={rowIndex}>
                 {row.map((cell, colIndex) => {
                   if (isCovered(model, rowIndex, colIndex)) return null;
-                  const format = formatToStyle(cellFormat(model, rowIndex, colIndex));
+                  const cellFmt = cellFormat(model, rowIndex, colIndex);
+                  const format = { ...formatToStyle(cellFmt), ...formatToCellStyle(cellFmt) };
                   const spans = spanProps(rowIndex, colIndex);
                   return colIndex === 0 ? (
                     <th
