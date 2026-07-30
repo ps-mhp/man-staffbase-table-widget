@@ -21,6 +21,7 @@ import { configurationSchema, uiSchema } from "./configuration-schema";
 import { startTableEditorInjector } from "./table-editor-injector";
 import { SLOT_SELECTOR, tableModelToSlotMarkup } from "./table-dom";
 import { parseTableModel, serializeTableModel } from "./table-model";
+import { isTablePayload } from "./table-payload";
 import { asTableMode, writesSlots } from "./table-mode";
 import icon from "../resources/table-widget.svg";
 import pkg from '../package.json'
@@ -136,7 +137,34 @@ const factory: BlockFactory = (BaseBlockClass, _widgetApi) => {
       return { ...config, tabledata: normalized };
     }
 
+    /**
+     * The default implementation draws a generic placeholder, which means none
+     * of this class's rendering runs while the author is in the editor — and
+     * therefore no slot node exists there. Whatever the editor serializes on
+     * save, it can only keep child nodes that are actually present, so the
+     * editor has to run the same path as a live page.
+     */
+    public renderBlockInEditor(container: HTMLElement): void {
+      this.renderBlock(container);
+    }
+
+    /**
+     * Rewrites a legacy raw-JSON `tabledata` into the encoded payload on the
+     * element itself. `parseConfig` is the documented channel for this, but it
+     * is not observably called in every host, and a raw-JSON attribute is the
+     * form the translation pipeline truncates.
+     *
+     * Converges after a single pass: the value written is a payload, so the
+     * `attributeChangedCallback` it triggers takes the early return.
+     */
+    private normalizeStoredData(): void {
+      const raw = this.getAttribute("tabledata");
+      if (raw === null || raw === "" || isTablePayload(raw)) return;
+      this.setAttribute("tabledata", serializeTableModel(parseTableModel(raw)));
+    }
+
     public renderBlock(container: HTMLElement): void {
+      this.normalizeStoredData();
       // Anything that rewrites the element's children — the host, or a
       // translation writing back into the page — detaches the mount, and a root
       // bound to a detached node renders nowhere. Re-create both when that

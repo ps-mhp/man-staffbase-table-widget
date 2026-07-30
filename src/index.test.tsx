@@ -14,7 +14,7 @@
 import { screen, waitFor, within } from "@testing-library/dom";
 
 import { tableModelToSlotMarkup } from "./table-dom";
-import { TableModel, serializeTableModel } from "./table-model";
+import { TableModel, parseTableModel, serializeTableModel } from "./table-model";
 
 import "../dev/bootstrap";
 
@@ -96,6 +96,22 @@ describe("Widget test", () => {
     // the attribute would put the source language back.
     expect(widget.querySelector("[data-table]")!.textContent).toContain("Uebersetzt");
     expect(within(rendered).queryByText("Quelltext")).not.toBeInTheDocument();
+  });
+
+  it("rewrites a legacy raw-JSON attribute into the encoded payload", async () => {
+    const host = document.createElement("div");
+    // Raw JSON, entity-escaped — the form every instance saved before the
+    // hardening still carries, and the form translation truncates.
+    host.innerHTML =
+      '<table-widget tabledata="[[&quot;&quot;,&quot;Altbestand&quot;]]"></table-widget>';
+    document.body.appendChild(host);
+    const widget = host.firstElementChild as HTMLElement;
+
+    await waitFor(() =>
+      expect(widget.getAttribute("tabledata")).toMatch(/^b64:/),
+    );
+    // Converged, and the table still reads the same.
+    expect(parseTableModel(widget.getAttribute("tabledata")!).data[0][1]).toBe("Altbestand");
   });
 
   it("mounts the grid editor into the config dialog rendered by the dev harness", async () => {
