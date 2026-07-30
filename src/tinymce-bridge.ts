@@ -15,6 +15,7 @@ import { openTableEditor } from "./table-editor-modal";
 import { readTableModel, serializeTableModel, TableModel } from "./table-model";
 import { SLOT_ATTRIBUTE, tableModelToSlotMarkup, parseSlotMarkup } from "./table-dom";
 import { t } from "./i18n";
+import { log } from "./debug-log";
 
 /**
  * Writes the table into the **page content** instead of the widget config.
@@ -218,8 +219,10 @@ const widgetAt = (target: EventTarget | null): Element | null => {
 const attachSchema = (editor: TinyMceEditor, done: WeakSet<TinyMceEditor>): void => {
   if (done.has(editor)) return;
   done.add(editor);
-  editor.schema?.addValidChildren?.(VALID_CHILDREN);
+  const schema = editor.schema;
+  schema?.addValidChildren?.(VALID_CHILDREN);
   diagnostics.schemasPatched += 1;
+  log(`schema patched (addValidChildren ${schema?.addValidChildren ? "available" : "MISSING"})`);
 };
 
 /**
@@ -230,6 +233,11 @@ const attach = (editor: TinyMceEditor, attached: WeakSet<TinyMceEditor>): void =
   if (attached.has(editor)) return;
   attached.add(editor);
   diagnostics.editorsAttached += 1;
+  log("editor attached", {
+    addStyle: typeof editor.dom?.addStyle,
+    on: typeof editor.on,
+    undoManager: typeof editor.undoManager?.transact,
+  });
 
   editor.dom?.addStyle?.(editorStyle());
 
@@ -241,9 +249,15 @@ const attach = (editor: TinyMceEditor, attached: WeakSet<TinyMceEditor>): void =
     if (event.format !== undefined && event.format !== "html") return;
     const filled = injectSlotsIntoContent(event.content);
     diagnostics.serializations += 1;
-    if (filled !== event.content) diagnostics.contentFilled += 1;
+    const didFill = filled !== event.content;
+    if (didFill) diagnostics.contentFilled += 1;
     diagnostics.lastContent = filled;
     event.content = filled;
+    log(`serialization seen (${didFill ? "filled" : "unchanged"})`, {
+      before: event.content.length,
+      after: filled.length,
+      hasWidget: filled.includes(`<${WIDGET_TAG}`),
+    });
   };
   editor.on?.("GetContent", fillOnWayOut as (event: never) => void);
   editor.on?.("PostProcess", fillOnWayOut as (event: never) => void);
@@ -424,6 +438,7 @@ export function startTinyMceBridge(
     if (bound.has(tinymce)) return;
     bound.add(tinymce);
     diagnostics.tinymceFound = true;
+    log("tinymce found", { editors: (tinymce.editors ?? []).length, on: typeof tinymce.on });
     // `AddEditor` first: an editor created while the existing ones are being
     // walked must not slip through the gap between the two.
     tinymce.on?.("AddEditor", (event) => attachWhenReady(event.editor));
@@ -443,6 +458,9 @@ export function startTinyMceBridge(
   // Already loaded — the accessor above only fires on future assignments.
   const found = lookup();
   if (found) bind(found);
+  log(`bridge watching ${diagnostics.scopesWatched}/${scopes.length} window(s)`, {
+    tinymceAlreadyPresent: Boolean(found),
+  });
 
   return stop;
 }

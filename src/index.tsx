@@ -20,6 +20,7 @@ import { TableWidgetProps, TableWidget } from "./table-widget";
 import { configurationSchema, uiSchema } from "./configuration-schema";
 import { startTableEditorInjector } from "./table-editor-injector";
 import { startTinyMceBridge } from "./tinymce-bridge";
+import { startSaveInterceptor } from "./save-interceptor";
 import { SLOT_SELECTOR, tableModelToSlotMarkup } from "./table-dom";
 import { parseTableModel, serializeTableModel } from "./table-model";
 import { isTablePayload } from "./table-payload";
@@ -66,6 +67,15 @@ export const stopTableEditorInjector = startTableEditorInjector();
  * Exported only so tests can stop the lookup on teardown.
  */
 export const stopTinyMceBridge = startTinyMceBridge();
+
+/**
+ * Fills the widget's content into the page save request as a last station, in
+ * case the editor bridge above never got a chance to — see
+ * `save-interceptor.ts`. Independent of it on purpose: the two fail for
+ * different reasons, and the injection is idempotent, so whichever lands first
+ * makes the other a no-op.
+ */
+export const stopSaveInterceptor = startSaveInterceptor();
 
 /**
  * This factory creates the class which is registered with the tagname in the `custom element registry`
