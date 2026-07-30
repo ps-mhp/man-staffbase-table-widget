@@ -28,7 +28,7 @@ export const MAX_IMAGE_WIDTH = 2000;
 
 /**
  * On-screen width, in pixels, a freshly inserted image gets — and the width
- * the "Standardgröße" toolbar action resets images back to.
+ * the toolbar's "default size" action resets images back to.
  */
 export const DEFAULT_IMAGE_WIDTH = 320;
 

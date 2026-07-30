@@ -14,13 +14,14 @@
 import React, { ReactElement, useMemo, useState } from "react";
 import { BlockAttributes } from "widget-sdk";
 import {
-  parseTableModel,
+  readTableModel,
   isCovered,
   mergeAt,
   cellFormat,
 } from "./table-model";
 import { formatToStyle, formatToCellStyle } from "./cell-style";
 import { sanitizeRichText, richTextToPlain } from "./rich-text";
+import { t } from "./i18n";
 
 /**
  * React Component
@@ -72,8 +73,32 @@ interface SortState {
   asc: boolean;
 }
 
+const noticeStyle: React.CSSProperties = {
+  padding: "12px 14px",
+  border: "1px solid #f0c8c2",
+  borderLeft: "4px solid #b42318",
+  borderRadius: "4px",
+  background: "#fdf3f2",
+  color: "#7a271a",
+  fontSize: "14px",
+  lineHeight: 1.45,
+};
+
+/**
+ * Shown instead of the table when `tabledata` arrived unreadable. Rendering the
+ * starter grid instead — as this widget used to — is worse than an error: it
+ * looks like a legitimately empty table, so nobody notices that an author's
+ * content was lost somewhere on the way to the page.
+ */
+const UnreadableNotice = (): ReactElement => (
+  <div role="alert" style={noticeStyle} data-testid="table-widget-unreadable">
+    <strong>{t("errTableDataUnreadable")}</strong>
+    <div>{t("errTableDataUnreadableHint")}</div>
+  </div>
+);
+
 export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
-  const model = useMemo(() => parseTableModel(tabledata), [tabledata]);
+  const { model, status } = useMemo(() => readTableModel(tabledata), [tabledata]);
   const { data } = model;
   const headerRow = data[0] ?? [];
 
@@ -110,6 +135,9 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
       ...(merge.rowSpan > 1 ? { rowSpan: merge.rowSpan } : {}),
     };
   };
+
+  // Placed after every hook so the hook order stays stable across renders.
+  if (status === "unreadable") return <UnreadableNotice />;
 
   return (
     <div

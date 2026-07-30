@@ -13,6 +13,7 @@
 
 import ExcelJS from "exceljs";
 import { TableModel, Merge, CellFormat, TextAlign, VerticalAlign, formatKey } from "./table-model";
+import { t } from "./i18n";
 
 /**
  * Imports a user-provided spreadsheet file into a {@link TableModel}.
@@ -31,7 +32,7 @@ export async function importTableFile(file: File): Promise<TableModel> {
   if (name.endsWith(".xlsx") || name.endsWith(".xls")) {
     return importXlsx(await file.arrayBuffer());
   }
-  throw new Error(`Nicht unterstütztes Dateiformat: ${file.name}`);
+  throw new Error(t("errUnsupportedFile", { name: file.name }));
 }
 
 const emptyModel = (data: string[][]): TableModel => ({

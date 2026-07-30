@@ -6,6 +6,7 @@ import { TableModel } from "./table-model";
 import * as tableImport from "./table-import";
 import { MediaClient, MediaItem } from "./media-client";
 import { DEFAULT_IMAGE_WIDTH } from "./cell-image";
+import { setLocale } from "./i18n";
 
 const mediaItem = (id: string): MediaItem => ({
   id,
@@ -529,5 +530,29 @@ describe("TableEditor", () => {
       expect(onChange).not.toHaveBeenCalled();
       alert.mockRestore();
     });
+  });
+});
+
+describe("TableEditor localization", () => {
+  afterEach(() => setLocale("de"));
+
+  it("labels the UI in the active locale", () => {
+    setLocale("fr");
+    render(<TableEditor value={sample()} onChange={jest.fn()} onDone={jest.fn()} />);
+
+    expect(screen.getByTestId("toolbar-done")).toHaveTextContent("Enregistrer");
+    expect(screen.getByTestId("toolbar-merge")).toHaveTextContent("Fusionner");
+    expect(screen.getByTestId("toolbar-bold")).toHaveAttribute("title", "Gras");
+    expect(screen.getByLabelText("Ligne 2, colonne 1")).toHaveTextContent("Umsatz");
+  });
+
+  it("localizes the context menu too", () => {
+    setLocale("pl");
+    render(<TableEditor value={sample()} onChange={jest.fn()} />);
+
+    const td = screen.getByLabelText("Wiersz 2, kolumna 2").closest("td")!;
+    fireEvent.mouseDown(td);
+    fireEvent.contextMenu(td);
+    expect(screen.getByTestId("merge-cells")).toHaveTextContent("Scal komórki");
   });
 });

@@ -11,7 +11,8 @@
  * limitations under the License.
  */
 
-import { TableData, parseTableData } from "./table-json";
+import { TableData, DEFAULT_TABLE_DATA, parseTableData } from "./table-json";
+import { decodeTablePayload, encodeTablePayload, isTablePayload } from "./table-payload";
 
 /**
  * A merged cell region. `(row, col)` is the anchor (top-left) cell that is
@@ -93,41 +94,73 @@ const isValidMerge = (m: unknown): m is Merge =>
   typeof (m as Merge).colSpan === "number";
 
 /**
- * Parses the widget's `tabledata` attribute into a {@link TableModel}.
+ * How much of the stored `tabledata` a reader could make sense of.
  *
- * Backward compatible: a legacy JSON **array** (`string[][]`) is read as a
- * model with no merges/formats and no preset sort, so existing widget
- * instances render exactly as before. A JSON **object** is read as the full
- * model. Any malformed part falls back to a safe default.
+ * The distinction matters because the two failure-free-looking cases are very
+ * different: `"empty"` is a freshly placed widget that legitimately shows the
+ * starter grid, while `"unreadable"` means an author's table was lost in
+ * transit. Collapsing both into the starter grid — as this module used to —
+ * turns data loss into a table that merely looks unconfigured.
  */
-export function parseTableModel(raw: string | undefined | null): TableModel {
-  const empty = (data: TableData): TableModel => ({
+export type TableDataStatus = "empty" | "ok" | "unreadable";
+
+export interface TableModelResult {
+  model: TableModel;
+  status: TableDataStatus;
+}
+
+/** Mirrors the shape {@link parseTableData} accepts without falling back. */
+const isUsableGrid = (value: unknown): boolean =>
+  Array.isArray(value) &&
+  value.length > 0 &&
+  value.some((row) => Array.isArray(row) && row.length > 0);
+
+/**
+ * Reads the widget's `tabledata` attribute and reports how well it could be
+ * read alongside the model.
+ *
+ * Accepted inputs, in order: a base64 payload as written by
+ * {@link serializeTableModel}; a legacy JSON **array** (`string[][]`), read as
+ * a model with no merges/formats/sort; a legacy JSON **object**, read as the
+ * full model. Anything else yields the starter grid and a status saying why.
+ */
+export function readTableModel(raw: string | undefined | null): TableModelResult {
+  const bare = (data: TableData): TableModel => ({
     data,
     merges: [],
     formats: {},
     sort: null,
   });
+  const fallback = (status: TableDataStatus): TableModelResult => ({
+    model: bare(DEFAULT_TABLE_DATA),
+    status,
+  });
 
-  if (!raw) return empty(parseTableData(raw));
+  if (!raw || raw.trim() === "") return fallback("empty");
+
+  const decoded = decodeTablePayload(raw);
+  // Marked as encoded but undecodable — corrupt, never "just legacy JSON".
+  if (decoded === null && isTablePayload(raw)) return fallback("unreadable");
+  const json = decoded ?? raw;
 
   let parsed: unknown;
   try {
-    parsed = JSON.parse(raw);
+    parsed = JSON.parse(json);
   } catch {
-    return empty(parseTableData(raw));
+    return fallback("unreadable");
   }
 
   // Legacy format: a bare 2D array.
   if (Array.isArray(parsed)) {
-    return empty(parseTableData(raw));
+    if (!isUsableGrid(parsed)) return fallback("unreadable");
+    return { model: bare(parseTableData(json)), status: "ok" };
   }
 
-  if (typeof parsed !== "object" || parsed === null) {
-    return empty(parseTableData(undefined));
-  }
+  if (typeof parsed !== "object" || parsed === null) return fallback("unreadable");
 
   const obj = parsed as Record<string, unknown>;
-  const data = parseTableData(JSON.stringify(obj.data ?? []));
+  if (!isUsableGrid(obj.data)) return fallback("unreadable");
+  const data = parseTableData(JSON.stringify(obj.data));
   const rows = data.length;
   const cols = data[0]?.length ?? 0;
 
@@ -158,28 +191,42 @@ export function parseTableModel(raw: string | undefined | null): TableModel {
     sort = { col: rawSort.col, dir: rawSort.dir };
   }
 
-  return { data, merges, formats, sort };
+  return { model: { data, merges, formats, sort }, status: "ok" };
 }
 
 /**
- * Serializes a model back to the JSON string stored in `tabledata`. To keep
- * the attribute small and diff-friendly, a model with no merges, no formats
- * and no preset sort is written back in the legacy `string[][]` shape.
+ * Parses the widget's `tabledata` attribute into a {@link TableModel},
+ * discarding the status. Use {@link readTableModel} where unreadable data has
+ * to be told apart from an unconfigured widget.
+ */
+export function parseTableModel(raw: string | undefined | null): TableModel {
+  return readTableModel(raw).model;
+}
+
+/**
+ * Serializes a model into the value stored in `tabledata`.
+ *
+ * The JSON keeps the legacy `string[][]` shape for a model without merges,
+ * formats or a preset sort, and is then base64-wrapped by
+ * {@link encodeTablePayload} — see that module for why the attribute must not
+ * contain raw JSON.
  */
 export function serializeTableModel(model: TableModel): string {
   const hasMerges = model.merges.length > 0;
   const hasFormats = Object.keys(model.formats).length > 0;
   const hasSort = model.sort !== null;
 
-  if (!hasMerges && !hasFormats && !hasSort) {
-    return JSON.stringify(model.data);
-  }
-  return JSON.stringify({
-    data: model.data,
-    merges: model.merges,
-    formats: model.formats,
-    sort: model.sort,
-  });
+  const json =
+    !hasMerges && !hasFormats && !hasSort
+      ? JSON.stringify(model.data)
+      : JSON.stringify({
+          data: model.data,
+          merges: model.merges,
+          formats: model.formats,
+          sort: model.sort,
+        });
+
+  return encodeTablePayload(json);
 }
 
 /** The merge whose anchor is exactly `(row, col)`, if any. */

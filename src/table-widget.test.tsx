@@ -3,6 +3,7 @@ import { screen, render } from "@testing-library/react";
 
 import { TableWidget } from "./table-widget";
 import { serializeTableData } from "./table-json";
+import { serializeTableModel } from "./table-model";
 
 describe("TableWidget", () => {
   it("renders the default table when no data is provided", () => {
@@ -65,10 +66,32 @@ describe("TableWidget", () => {
     expect(rowHeader).toHaveStyle({ maxWidth: "75cqw", whiteSpace: "normal" });
   });
 
-  it("falls back to the default table for malformed JSON", () => {
+  it("shows a notice instead of a placeholder table when the data is unreadable", () => {
     render(<TableWidget contentLanguage="de_DE" tabledata="not json" />);
 
-    expect(screen.getByText("Spalte 1")).toBeInTheDocument();
+    expect(screen.getByTestId("table-widget-unreadable")).toBeInTheDocument();
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+    // The starter grid must not stand in for lost content.
+    expect(screen.queryByText("Spalte 1")).not.toBeInTheDocument();
+  });
+
+  it("shows the notice for the truncated value a translated article delivers", () => {
+    render(<TableWidget contentLanguage="de_DE" tabledata="{" />);
+
+    expect(screen.getByTestId("table-widget-unreadable")).toBeInTheDocument();
+  });
+
+  it("renders a base64-encoded payload", () => {
+    const data = [
+      ["", 'Umsatz "netto"'],
+      ["Q1", "100"],
+    ];
+    const tabledata = serializeTableModel({ data, merges: [], formats: {}, sort: null });
+
+    render(<TableWidget contentLanguage="de_DE" tabledata={tabledata} />);
+
+    expect(screen.getByText('Umsatz "netto"')).toBeInTheDocument();
+    expect(screen.getByText("100")).toBeInTheDocument();
   });
 
   it("renders the table at full width of its container", () => {

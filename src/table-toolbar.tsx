@@ -14,6 +14,7 @@
 import * as React from "react";
 import { ReactElement, useEffect, useRef, useState } from "react";
 import { CellFormat, TextAlign, VerticalAlign } from "./table-model";
+import { t } from "./i18n";
 
 const FONT_SIZES = [10, 12, 14, 16, 18, 20, 24, 28, 32];
 
@@ -501,8 +502,8 @@ function ColorButton({
           <button
             type="button"
             className="tw-rb__caret"
-            title={`${title}: Optionen`}
-            aria-label={`${title}: Optionen`}
+            title={t("colorOptions", { label: title })}
+            aria-label={t("colorOptions", { label: title })}
             disabled={disabled}
             onMouseDown={(e) => e.preventDefault()}
             onClick={toggle}
@@ -522,7 +523,7 @@ function ColorButton({
                 close();
               }}
             >
-              <span className="tw-rb__swatch" style={{ background: STANDARD_BAR }} /> Standard
+              <span className="tw-rb__swatch" style={{ background: STANDARD_BAR }} /> {t("colorStandard")}
             </button>
             <button
               type="button"
@@ -532,7 +533,7 @@ function ColorButton({
                 inputRef.current?.click();
               }}
             >
-              <span className="tw-rb__swatch" style={{ background: value ?? "#233848" }} /> Farbe wählen…
+              <span className="tw-rb__swatch" style={{ background: value ?? "#233848" }} /> {t("colorPick")}
             </button>
           </>
         )}
@@ -543,7 +544,7 @@ function ColorButton({
 
 /**
  * Excel-style ribbon shown above the grid editor, grouped into sections
- * ("Speichern", "Schriftart", "Ausrichtung", "Zellen", "Werkzeuge"). Only the
+ * (save, font, cells, tools — all labels localized via {@link t}). Only the
  * functions this widget actually supports are exposed. All controls except
  * save and upload act on the current cell selection and are disabled when no
  * cell is selected.
@@ -607,12 +608,12 @@ export const TableToolbar = (props: TableToolbarProps): ReactElement => {
       {onDone && (
         <div className="tw-rb__section">
           <div className="tw-rb__body">
-            <button type="button" className="tw-rb__big tw-rb__big--primary" data-testid="toolbar-done" title="Speichern" onClick={onDone}>
+            <button type="button" className="tw-rb__big tw-rb__big--primary" data-testid="toolbar-done" title={t("save")} onClick={onDone}>
               <IconSave />
-              <span>Speichern</span>
+              <span>{t("save")}</span>
             </button>
           </div>
-          <div className="tw-rb__label">Speichern</div>
+          <div className="tw-rb__label">{t("sectionSave")}</div>
         </div>
       )}
 
@@ -623,65 +624,65 @@ export const TableToolbar = (props: TableToolbarProps): ReactElement => {
               <select
                 className="tw-rb__select"
                 data-testid="toolbar-fontsize"
-                aria-label="Schriftgröße"
+                aria-label={t("fontSize")}
                 disabled={disabled}
                 value={activeFormat.fontSize ?? ""}
                 onChange={(e) => onFontSize(e.target.value === "" ? null : Number(e.target.value))}
               >
-                <option value="">Standard</option>
+                <option value="">{t("fontSizeDefault")}</option>
                 {FONT_SIZES.map((size) => (
                   <option key={size} value={size}>
                     {size}
                   </option>
                 ))}
               </select>
-              <RibbonButton testId="toolbar-fontsize-inc" variant="step" title="Schrift vergrößern" disabled={disabled} onClick={() => onFontSizeStep(1)}>
+              <RibbonButton testId="toolbar-fontsize-inc" variant="step" title={t("fontSizeIncrease")} disabled={disabled} onClick={() => onFontSizeStep(1)}>
                 <span style={{ fontSize: "14px" }}>A</span><span style={{ fontSize: "9px" }}>▲</span>
               </RibbonButton>
-              <RibbonButton testId="toolbar-fontsize-dec" variant="step" title="Schrift verkleinern" disabled={disabled} onClick={() => onFontSizeStep(-1)}>
+              <RibbonButton testId="toolbar-fontsize-dec" variant="step" title={t("fontSizeDecrease")} disabled={disabled} onClick={() => onFontSizeStep(-1)}>
                 <span style={{ fontSize: "11px" }}>A</span><span style={{ fontSize: "9px" }}>▼</span>
               </RibbonButton>
-              <RibbonButton testId="toolbar-align-left" variant="icon" title="Linksbündig" disabled={disabled} active={activeFormat.align === "left"} onClick={() => onAlign("left")}>
+              <RibbonButton testId="toolbar-align-left" variant="icon" title={t("alignLeft")} disabled={disabled} active={activeFormat.align === "left"} onClick={() => onAlign("left")}>
                 <IconAlignLeft />
               </RibbonButton>
-              <RibbonButton testId="toolbar-align-center" variant="icon" title="Zentriert" disabled={disabled} active={activeFormat.align === "center"} onClick={() => onAlign("center")}>
+              <RibbonButton testId="toolbar-align-center" variant="icon" title={t("alignCenter")} disabled={disabled} active={activeFormat.align === "center"} onClick={() => onAlign("center")}>
                 <IconAlignCenter />
               </RibbonButton>
-              <RibbonButton testId="toolbar-align-right" variant="icon" title="Rechtsbündig" disabled={disabled} active={activeFormat.align === "right"} onClick={() => onAlign("right")}>
+              <RibbonButton testId="toolbar-align-right" variant="icon" title={t("alignRight")} disabled={disabled} active={activeFormat.align === "right"} onClick={() => onAlign("right")}>
                 <IconAlignRight />
               </RibbonButton>
-              <RibbonButton testId="toolbar-valign-top" variant="icon" title="Oben ausrichten" disabled={disabled} active={activeFormat.valign === "top"} onClick={() => onVerticalAlign("top")}>
+              <RibbonButton testId="toolbar-valign-top" variant="icon" title={t("valignTop")} disabled={disabled} active={activeFormat.valign === "top"} onClick={() => onVerticalAlign("top")}>
                 <IconVAlignTop />
               </RibbonButton>
-              <RibbonButton testId="toolbar-valign-middle" variant="icon" title="Mittig ausrichten" disabled={disabled} active={activeFormat.valign === "middle"} onClick={() => onVerticalAlign("middle")}>
+              <RibbonButton testId="toolbar-valign-middle" variant="icon" title={t("valignMiddle")} disabled={disabled} active={activeFormat.valign === "middle"} onClick={() => onVerticalAlign("middle")}>
                 <IconVAlignMiddle />
               </RibbonButton>
-              <RibbonButton testId="toolbar-valign-bottom" variant="icon" title="Unten ausrichten" disabled={disabled} active={activeFormat.valign === "bottom"} onClick={() => onVerticalAlign("bottom")}>
+              <RibbonButton testId="toolbar-valign-bottom" variant="icon" title={t("valignBottom")} disabled={disabled} active={activeFormat.valign === "bottom"} onClick={() => onVerticalAlign("bottom")}>
                 <IconVAlignBottom />
               </RibbonButton>
             </div>
             <div className="tw-rb__row">
-              <RibbonButton testId="toolbar-bold" variant="icon" title="Fett" disabled={disabled} active={activeFormat.bold} onClick={() => onToggle("bold")}>
-                <strong>F</strong>
+              <RibbonButton testId="toolbar-bold" variant="icon" title={t("bold")} disabled={disabled} active={activeFormat.bold} onClick={() => onToggle("bold")}>
+                <strong>{t("boldGlyph")}</strong>
               </RibbonButton>
-              <RibbonButton testId="toolbar-italic" variant="icon" title="Kursiv" disabled={disabled} active={activeFormat.italic} onClick={() => onToggle("italic")}>
-                <em>K</em>
+              <RibbonButton testId="toolbar-italic" variant="icon" title={t("italic")} disabled={disabled} active={activeFormat.italic} onClick={() => onToggle("italic")}>
+                <em>{t("italicGlyph")}</em>
               </RibbonButton>
-              <RibbonButton testId="toolbar-underline" variant="icon" title="Unterstrichen" disabled={disabled} active={activeFormat.underline} onClick={() => onToggle("underline")}>
-                <span style={{ textDecoration: "underline" }}>U</span>
+              <RibbonButton testId="toolbar-underline" variant="icon" title={t("underline")} disabled={disabled} active={activeFormat.underline} onClick={() => onToggle("underline")}>
+                <span style={{ textDecoration: "underline" }}>{t("underlineGlyph")}</span>
               </RibbonButton>
-              <RibbonButton testId="toolbar-strike" variant="icon" title="Durchgestrichen" disabled={disabled} active={activeFormat.strikethrough} onClick={() => onToggle("strikethrough")}>
-                <span style={{ textDecoration: "line-through" }}>S</span>
+              <RibbonButton testId="toolbar-strike" variant="icon" title={t("strikethrough")} disabled={disabled} active={activeFormat.strikethrough} onClick={() => onToggle("strikethrough")}>
+                <span style={{ textDecoration: "line-through" }}>{t("strikethroughGlyph")}</span>
               </RibbonButton>
-              <RibbonButton testId="toolbar-superscript" variant="icon" title="Hochstellen" disabled={disabled} onClick={onSuperscript}>
+              <RibbonButton testId="toolbar-superscript" variant="icon" title={t("superscript")} disabled={disabled} onClick={onSuperscript}>
                 <IconSuperscript />
               </RibbonButton>
-              <RibbonButton testId="toolbar-subscript" variant="icon" title="Tiefstellen" disabled={disabled} onClick={onSubscript}>
+              <RibbonButton testId="toolbar-subscript" variant="icon" title={t("subscript")} disabled={disabled} onClick={onSubscript}>
                 <IconSubscript />
               </RibbonButton>
               <ColorButton
                 testId="toolbar-bg"
-                title="Hintergrundfarbe"
+                title={t("backgroundColor")}
                 disabled={disabled}
                 value={activeFormat.background}
                 onChange={onBackground}
@@ -696,7 +697,7 @@ export const TableToolbar = (props: TableToolbarProps): ReactElement => {
               />
               <ColorButton
                 testId="toolbar-color"
-                title="Schriftfarbe"
+                title={t("textColor")}
                 disabled={disabled}
                 value={activeFormat.color}
                 onChange={onColor}
@@ -706,29 +707,29 @@ export const TableToolbar = (props: TableToolbarProps): ReactElement => {
             </div>
           </div>
         </div>
-        <div className="tw-rb__label">Schrift</div>
+        <div className="tw-rb__label">{t("sectionFont")}</div>
       </div>
 
       <div className="tw-rb__section">
         <div className="tw-rb__body">
           <div className="tw-rb__rows">
             <div className="tw-rb__row" style={{ width: "100%" }} >
-              <RibbonButton testId="toolbar-merge" variant="block" title="Zellen verbinden" disabled={disabled} onClick={onMerge}>
-                Verbinden
+              <RibbonButton testId="toolbar-merge" variant="block" title={t("mergeCells")} disabled={disabled} onClick={onMerge}>
+                {t("mergeShort")}
               </RibbonButton>
             </div>
             <div className="tw-rb__row" style={{ width: "100%" }} >
-              <RibbonButton testId="toolbar-unmerge" variant="block" title="Verbindung aufheben" disabled={!canUnmerge} onClick={onUnmerge}>
-                Lösen
+              <RibbonButton testId="toolbar-unmerge" variant="block" title={t("unmergeCells")} disabled={!canUnmerge} onClick={onUnmerge}>
+                {t("unmergeShort")}
               </RibbonButton>
             </div>
           </div>
           <Dropdown
             testId="toolbar-insert-menu"
             trigger={(toggle) => (
-              <button type="button" className="tw-rb__big" data-testid="toolbar-insert" title="Einfügen" onClick={toggle}>
+              <button type="button" className="tw-rb__big" data-testid="toolbar-insert" title={t("insert")} onClick={toggle}>
                 <IconInsert />
-                <span style={{ display: "inline-flex", alignItems: "center", gap: "2px" }}>Einfügen <IconChevron /></span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "2px" }}>{t("insert")} <IconChevron /></span>
               </button>
             )}
           >
@@ -737,20 +738,20 @@ export const TableToolbar = (props: TableToolbarProps): ReactElement => {
                 {showRow && (
                   <>
                     <button type="button" className="tw-rb__menu-item" data-testid="toolbar-insert-row-above" onClick={() => { onInsertRowAbove(); close(); }}>
-                      Zeile oberhalb
+                      {t("insertRowAbove")}
                     </button>
                     <button type="button" className="tw-rb__menu-item" data-testid="toolbar-insert-row-below" onClick={() => { onInsertRowBelow(); close(); }}>
-                      Zeile unterhalb
+                      {t("insertRowBelow")}
                     </button>
                   </>
                 )}
                 {showCol && (
                   <>
                     <button type="button" className="tw-rb__menu-item" data-testid="toolbar-insert-col-left" onClick={() => { onInsertColLeft(); close(); }}>
-                      Spalte links
+                      {t("insertColLeft")}
                     </button>
                     <button type="button" className="tw-rb__menu-item" data-testid="toolbar-insert-col-right" onClick={() => { onInsertColRight(); close(); }}>
-                      Spalte rechts
+                      {t("insertColRight")}
                     </button>
                   </>
                 )}
@@ -761,25 +762,25 @@ export const TableToolbar = (props: TableToolbarProps): ReactElement => {
           <Dropdown
             testId="toolbar-delete-menu"
             trigger={(toggle) => (
-              <button type="button" className="tw-rb__big" data-testid="toolbar-delete" title="Löschen" disabled={disabled} onClick={toggle}>
+              <button type="button" className="tw-rb__big" data-testid="toolbar-delete" title={t("delete")} disabled={disabled} onClick={toggle}>
                 <IconDelete />
-                <span style={{ display: "inline-flex", alignItems: "center", gap: "2px" }}>Löschen <IconChevron /></span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "2px" }}>{t("delete")} <IconChevron /></span>
               </button>
             )}
           >
             {(close) => (
               <>
                 <button type="button" className="tw-rb__menu-item" data-testid="toolbar-delete-rows" onClick={() => { onDeleteRows(); close(); }}>
-                  Zeile(n) löschen
+                  {t("deleteRows")}
                 </button>
                 <button type="button" className="tw-rb__menu-item" data-testid="toolbar-delete-cols" onClick={() => { onDeleteCols(); close(); }}>
-                  Spalte(n) löschen
+                  {t("deleteCols")}
                 </button>
               </>
             )}
           </Dropdown>
         </div>
-        <div className="tw-rb__label">Zellen</div>
+        <div className="tw-rb__label">{t("sectionCells")}</div>
       </div>
 
       <div className="tw-rb__section">
@@ -787,35 +788,35 @@ export const TableToolbar = (props: TableToolbarProps): ReactElement => {
           <Dropdown
             testId="toolbar-sort-menu"
             trigger={(toggle) => (
-              <button type="button" className="tw-rb__big" data-testid="toolbar-sort" title="Sortierung" disabled={disabled} onClick={toggle}>
+              <button type="button" className="tw-rb__big" data-testid="toolbar-sort" title={t("sort")} disabled={disabled} onClick={toggle}>
                 <IconSort />
-                <span style={{ display: "inline-flex", alignItems: "center", gap: "2px" }}>Sortieren <IconChevron /></span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "2px" }}>{t("sortShort")} <IconChevron /></span>
               </button>
             )}
           >
             {(close) => (
               <>
                 <button type="button" className="tw-rb__menu-item" data-testid="toolbar-sort-asc" onClick={() => { onSortAsc(); close(); }}>
-                  Aufsteigend (diese Spalte)
+                  {t("sortAsc")}
                 </button>
                 <button type="button" className="tw-rb__menu-item" data-testid="toolbar-sort-desc" onClick={() => { onSortDesc(); close(); }}>
-                  Absteigend (diese Spalte)
+                  {t("sortDesc")}
                 </button>
                 <button type="button" className="tw-rb__menu-item" data-testid="toolbar-sort-clear" onClick={() => { onClearSort(); close(); }}>
-                  Sortierung entfernen
+                  {t("sortClear")}
                 </button>
               </>
             )}
           </Dropdown>
 
-          <button type="button" className="tw-rb__big" data-testid="toolbar-painter" title="Format kopieren" disabled={disabled && !painterActive} onClick={onCopyFormat} style={painterActive ? { color: "#0a6ec4", background: "#e4f0fb" } : undefined}>
+          <button type="button" className="tw-rb__big" data-testid="toolbar-painter" title={t("copyFormat")} disabled={disabled && !painterActive} onClick={onCopyFormat} style={painterActive ? { color: "#0a6ec4", background: "#e4f0fb" } : undefined}>
             <IconPainter />
-            <span>Format</span>
+            <span>{t("formatShort")}</span>
           </button>
 
-          <button type="button" className="tw-rb__big" data-testid="toolbar-image-button" title="Bild in Zelle einfügen" disabled={disabled} onClick={onInsertImage}>
+          <button type="button" className="tw-rb__big" data-testid="toolbar-image-button" title={t("insertImage")} disabled={disabled} onClick={onInsertImage}>
             <IconImage />
-            <span>Bild</span>
+            <span>{t("imageShort")}</span>
           </button>
 
           <Dropdown
@@ -825,45 +826,45 @@ export const TableToolbar = (props: TableToolbarProps): ReactElement => {
                 type="button"
                 className="tw-rb__big"
                 data-testid="toolbar-image-size"
-                title="Größe der markierten Bilder angleichen (Maßstab ist das zuerst markierte Bild)"
+                title={t("imageSizeTitle")}
                 disabled={!hasSelectedImages}
                 onClick={toggle}
               >
                 <IconImageSize />
-                <span style={{ display: "inline-flex", alignItems: "center", gap: "2px" }}>Bildgröße <IconChevron /></span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "2px" }}>{t("imageSizeShort")} <IconChevron /></span>
               </button>
             )}
           >
             {(close) => (
               <>
-                <button type="button" className="tw-rb__menu-item" data-testid="toolbar-image-equal-height" disabled={!canEqualizeImages} title={canEqualizeImages ? undefined : "Mindestens zwei markierte Bilder nötig"} onClick={() => { onEqualizeImageHeight(); close(); }}>
-                  Gleiche Höhe wie erstes Bild
+                <button type="button" className="tw-rb__menu-item" data-testid="toolbar-image-equal-height" disabled={!canEqualizeImages} title={canEqualizeImages ? undefined : t("imageEqualizeHint")} onClick={() => { onEqualizeImageHeight(); close(); }}>
+                  {t("imageEqualHeight")}
                 </button>
-                <button type="button" className="tw-rb__menu-item" data-testid="toolbar-image-equal-width" disabled={!canEqualizeImages} title={canEqualizeImages ? undefined : "Mindestens zwei markierte Bilder nötig"} onClick={() => { onEqualizeImageWidth(); close(); }}>
-                  Gleiche Breite wie erstes Bild
+                <button type="button" className="tw-rb__menu-item" data-testid="toolbar-image-equal-width" disabled={!canEqualizeImages} title={canEqualizeImages ? undefined : t("imageEqualizeHint")} onClick={() => { onEqualizeImageWidth(); close(); }}>
+                  {t("imageEqualWidth")}
                 </button>
                 <button type="button" className="tw-rb__menu-item" data-testid="toolbar-image-reset-size" onClick={() => { onResetImageSize(); close(); }}>
-                  Standardgröße
+                  {t("imageDefaultSize")}
                 </button>
               </>
             )}
           </Dropdown>
 
-          <button type="button" className="tw-rb__big" data-testid="toolbar-upload-button" title="Tabelle hochladen (.csv, .xlsx)" onClick={() => fileInputRef.current?.click()}>
+          <button type="button" className="tw-rb__big" data-testid="toolbar-upload-button" title={t("uploadTable")} onClick={() => fileInputRef.current?.click()}>
             <IconUpload />
-            <span>Importieren</span>
+            <span>{t("importShort")}</span>
           </button>
           <input
             ref={fileInputRef}
             type="file"
             accept=".csv,.xlsx,.xls"
             data-testid="toolbar-upload"
-            aria-label="Tabelle hochladen"
+            aria-label={t("uploadTableAria")}
             onChange={handleFile}
             style={{ display: "none" }}
           />
         </div>
-        <div className="tw-rb__label">Werkzeuge</div>
+        <div className="tw-rb__label">{t("sectionTools")}</div>
       </div>
     </div>
   );

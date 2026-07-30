@@ -13,6 +13,7 @@
 
 import { UiSchema } from "@rjsf/utils";
 import { JSONSchema7 } from "json-schema";
+import { t } from "./i18n";
 
 /**
  * schema used for generation of the configuration dialog
@@ -28,7 +29,7 @@ export const configurationSchema: JSONSchema7 = {
   properties: {
     tabledata: {
       type: "string",
-      title: "Tabellendaten",
+      title: t("configTableDataTitle"),
     },
   },
 };
@@ -40,6 +41,6 @@ export const configurationSchema: JSONSchema7 = {
 export const uiSchema: UiSchema = {
   tabledata: {
     "ui:widget": "textarea",
-    "ui:help": "Wird über den Tabellen-Editor oberhalb bearbeitet.",
+    "ui:help": t("configTableDataHelp"),
   },
 };

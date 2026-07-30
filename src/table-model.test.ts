@@ -14,6 +14,7 @@
 import {
   TableModel,
   parseTableModel,
+  readTableModel,
   serializeTableModel,
   insertRow,
   insertColumn,
@@ -28,6 +29,8 @@ import {
   cellFormat,
   normalizeRange,
 } from "./table-model";
+import { decodeTablePayload, encodeTablePayload } from "./table-payload";
+import { DEFAULT_TABLE_DATA } from "./table-json";
 
 const model = (data: string[][], overrides: Partial<TableModel> = {}): TableModel => ({
   data,
@@ -74,10 +77,49 @@ describe("parseTableModel", () => {
   });
 });
 
+describe("readTableModel", () => {
+  const grid = JSON.stringify([["", "A"], ["R", "1"]]);
+
+  it("reports 'empty' for a widget that was never configured", () => {
+    expect(readTableModel(undefined).status).toBe("empty");
+    expect(readTableModel("").status).toBe("empty");
+    expect(readTableModel("   ").status).toBe("empty");
+  });
+
+  it("reports 'ok' for encoded, legacy array and legacy object values", () => {
+    expect(readTableModel(encodeTablePayload(grid)).status).toBe("ok");
+    expect(readTableModel(grid).status).toBe("ok");
+    expect(readTableModel(JSON.stringify({ data: [["", "A"]] })).status).toBe("ok");
+  });
+
+  it("reports 'unreadable' for a value truncated at its first quote", () => {
+    // The exact value a translated article delivered.
+    const result = readTableModel("{");
+    expect(result.status).toBe("unreadable");
+    expect(result.model.data).toEqual(DEFAULT_TABLE_DATA);
+  });
+
+  it("reports 'unreadable' for other broken shapes", () => {
+    expect(readTableModel("not json").status).toBe("unreadable");
+    expect(readTableModel("5").status).toBe("unreadable");
+    expect(readTableModel("[]").status).toBe("unreadable");
+    expect(readTableModel(JSON.stringify({ merges: [] })).status).toBe("unreadable");
+    expect(readTableModel("b64:not base64!!").status).toBe("unreadable");
+  });
+});
+
 describe("serializeTableModel", () => {
   it("writes legacy array shape when there are no merges/formats/sort", () => {
     const raw = serializeTableModel(model([["", "A"], ["R", "1"]]));
-    expect(JSON.parse(raw)).toEqual([["", "A"], ["R", "1"]]);
+    expect(JSON.parse(decodeTablePayload(raw)!)).toEqual([["", "A"], ["R", "1"]]);
+  });
+
+  it("stores an opaque base64 payload, never raw JSON", () => {
+    const raw = serializeTableModel(model([["", 'A "quoted" head'], ["R", "1"]]));
+    // The quote-terminated attribute is exactly how translated articles lost
+    // their tables, so the stored value must not contain any of these.
+    expect(raw).not.toMatch(/["'<>&]/);
+    expect(parseTableModel(raw).data[0][1]).toBe('A "quoted" head');
   });
 
   it("writes object shape when merges exist and round-trips", () => {

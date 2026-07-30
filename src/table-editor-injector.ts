@@ -16,6 +16,7 @@ import * as ReactDOM from "react-dom/client";
 import { createPortal } from "react-dom";
 import { TableEditor } from "./table-editor";
 import { TableModel, parseTableModel, serializeTableModel } from "./table-model";
+import { t } from "./i18n";
 
 /**
  * The DOM id RJSF/MUI renders for the `tabledata` schema property when
@@ -104,7 +105,8 @@ const reopenButtonStyle: React.CSSProperties = {
  * since RJSF renders the real textarea inline in whatever (often narrow)
  * form container the host page provides. The modal opens automatically as
  * soon as this component mounts; a small placeholder button is shown at the
- * textarea's position to reopen it after the user closes it via "Fertig".
+ * textarea's position to reopen it after the user closes it via the
+ * toolbar's save button.
  * Edits made before closing are preserved (state lives here, not in the
  * modal), so reopening shows the table exactly as it was left.
  */
@@ -184,7 +186,7 @@ function InjectedEditor({ textarea }: InjectedEditorProps): React.ReactElement {
         style: reopenButtonStyle,
         onClick: () => setIsOpen(true),
       },
-      "Tabelle bearbeiten",
+      t("editTable"),
     );
   }
 

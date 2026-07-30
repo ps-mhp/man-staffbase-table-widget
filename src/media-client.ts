@@ -11,6 +11,8 @@
  * limitations under the License.
  */
 
+import { t } from "./i18n";
+
 /**
  * Thin, dependency-light wrapper around the Staffbase **Media API**
  * (`/api/media`). The widget has no backend and the widget SDK exposes no
@@ -181,12 +183,12 @@ export class MediaClient {
       });
     } catch (err) {
       throw new MediaApiError(
-        err instanceof Error ? err.message : "Netzwerkfehler bei der Medienanfrage.",
+        err instanceof Error ? err.message : t("errMediaNetwork"),
       );
     }
     if (!res.ok) {
       throw new MediaApiError(
-        `Medienanfrage fehlgeschlagen (HTTP ${res.status}).`,
+        t("errMediaRequest", { status: res.status }),
         res.status,
       );
     }
@@ -244,7 +246,7 @@ export class MediaClient {
     form.append("file", file, fileName ?? file.name);
     const res = await this.request("", { method: "POST", body: form });
     const item = toMediaItem((await res.json()) as RawMedium);
-    if (!item) throw new MediaApiError("Upload lieferte kein gültiges Medium zurück.");
+    if (!item) throw new MediaApiError(t("errUploadNoMedium"));
     return item;
   }
 
@@ -273,7 +275,8 @@ export class MediaClient {
       const [publicUrl] = await this.publishUrls([item.url]);
       return publicUrl && publicUrl.length > 0 ? publicUrl : item.url;
     } catch (err) {
-      console.warn("Medium konnte nicht veröffentlicht werden; verwende gesicherte URL.", err);
+      // Developer-facing diagnostic, not UI copy — deliberately not localized.
+      console.warn("Could not publish medium; falling back to the authenticated URL.", err);
       return item.url;
     }
   }

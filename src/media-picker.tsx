@@ -14,6 +14,7 @@
 import * as React from "react";
 import { ReactElement, useCallback, useEffect, useRef, useState } from "react";
 import { MediaClient, MediaItem } from "./media-client";
+import { t } from "./i18n";
 
 /** The image an author picked/uploaded, ready to embed in a cell. */
 export interface PickedImage {
@@ -186,7 +187,7 @@ const IconClose = (): ReactElement => (
 );
 
 /**
- * The "Staffbase Medien" explorer: a modal that lists and searches the
+ * The Staffbase media explorer: a modal that lists and searches the
  * platform's media (via the injected {@link MediaClient}), lets the author
  * upload a new image, and — on selection — makes the image public and hands
  * the resulting URL back to the caller for embedding.
@@ -233,7 +234,7 @@ export function MediaPicker({ client, onSelect, onClose }: MediaPickerProps): Re
       } catch (err) {
         if (seq !== requestSeq.current) return;
         setItems([]);
-        setError(err instanceof Error ? err.message : "Medien konnten nicht geladen werden.");
+        setError(err instanceof Error ? err.message : t("errMediaLoad"));
       } finally {
         if (seq === requestSeq.current) setLoading(false);
       }
@@ -263,7 +264,7 @@ export function MediaPicker({ client, onSelect, onClose }: MediaPickerProps): Re
         setNextCursor(res.nextCursor);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Weitere Medien konnten nicht geladen werden.");
+      setError(err instanceof Error ? err.message : t("errMediaLoadMore"));
     } finally {
       setLoading(false);
     }
@@ -276,7 +277,7 @@ export function MediaPicker({ client, onSelect, onClose }: MediaPickerProps): Re
       const url = await client.ensurePublicImageUrl(item);
       onSelect({ url, width: item.width, height: item.height, alt: item.fileName });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Bild konnte nicht eingefügt werden.");
+      setError(err instanceof Error ? err.message : t("errImageInsert"));
     } finally {
       setBusyId(null);
     }
@@ -290,7 +291,7 @@ export function MediaPicker({ client, onSelect, onClose }: MediaPickerProps): Re
       const url = await client.ensurePublicImageUrl(item);
       onSelect({ url, width: item.width, height: item.height, alt: item.fileName });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload fehlgeschlagen.");
+      setError(err instanceof Error ? err.message : t("errUpload"));
     } finally {
       setUploading(false);
     }
@@ -307,13 +308,13 @@ export function MediaPicker({ client, onSelect, onClose }: MediaPickerProps): Re
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div style={panelStyle} role="dialog" aria-label="Staffbase Medien">
+      <div style={panelStyle} role="dialog" aria-label={t("mediaTitle")}>
         <div style={headerStyle}>
           <input
             type="search"
             value={query}
-            placeholder="Medien durchsuchen…"
-            aria-label="Medien durchsuchen"
+            placeholder={t("mediaSearchPlaceholder")}
+            aria-label={t("mediaSearchAria")}
             data-testid="media-picker-search"
             style={searchInputStyle}
             onChange={(e) => setQuery(e.target.value)}
@@ -322,8 +323,8 @@ export function MediaPicker({ client, onSelect, onClose }: MediaPickerProps): Re
             type="button"
             style={{ ...iconButtonStyle, opacity: uploading ? 0.5 : 1 }}
             data-testid="media-picker-upload"
-            title="Bild hochladen"
-            aria-label="Bild hochladen"
+            title={t("mediaUpload")}
+            aria-label={t("mediaUpload")}
             disabled={uploading}
             onClick={() => uploadInputRef.current?.click()}
           >
@@ -334,7 +335,7 @@ export function MediaPicker({ client, onSelect, onClose }: MediaPickerProps): Re
             type="file"
             accept={IMAGE_ACCEPT}
             data-testid="media-picker-upload-input"
-            aria-label="Bild hochladen"
+            aria-label={t("mediaUpload")}
             style={{ display: "none" }}
             onChange={(e) => {
               const file = e.target.files?.[0];
@@ -346,8 +347,8 @@ export function MediaPicker({ client, onSelect, onClose }: MediaPickerProps): Re
             type="button"
             style={iconButtonStyle}
             data-testid="media-picker-close"
-            title="Schließen"
-            aria-label="Schließen"
+            title={t("close")}
+            aria-label={t("close")}
             onClick={onClose}
           >
             <IconClose />
@@ -382,13 +383,13 @@ export function MediaPicker({ client, onSelect, onClose }: MediaPickerProps): Re
 
           {loading && items.length === 0 && (
             <div style={stateStyle} data-testid="media-picker-loading">
-              Medien werden geladen…
+              {t("mediaLoading")}
             </div>
           )}
 
           {!loading && error === null && items.length === 0 && (
             <div style={stateStyle} data-testid="media-picker-empty">
-              Keine Medien gefunden.
+              {t("mediaEmpty")}
             </div>
           )}
 
@@ -401,7 +402,7 @@ export function MediaPicker({ client, onSelect, onClose }: MediaPickerProps): Re
                 disabled={busy}
                 onClick={() => void loadMore()}
               >
-                {loading ? "Lädt…" : "Mehr laden"}
+                {loading ? t("loadingShort") : t("loadMore")}
               </button>
             </div>
           )}

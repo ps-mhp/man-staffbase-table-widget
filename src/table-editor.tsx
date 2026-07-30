@@ -50,11 +50,12 @@ import {
   DEFAULT_IMAGE_WIDTH,
 } from "./cell-image";
 import { MeasureImage, measureImage } from "./image-measure";
+import { t } from "./i18n";
 
 export interface TableEditorProps {
   value: TableModel;
   onChange: (model: TableModel) => void;
-  /** Optional: when provided, the toolbar shows a "Fertig" button. */
+  /** Optional: when provided, the toolbar shows a save/close button. */
   onDone?: () => void;
   /**
    * Media API client used by the image picker and clipboard-image upload.
@@ -319,7 +320,7 @@ function EditableCell({
       {handlePos && (
         <div
           data-testid="image-resize-handle"
-          aria-label="Bildgröße ändern"
+          aria-label={t("resizeImage")}
           onMouseDown={startResize}
           style={{
             position: "absolute",
@@ -550,7 +551,7 @@ export const TableEditor = ({
         alt: item.fileName,
       });
     } catch (err) {
-      window.alert(err instanceof Error ? err.message : "Bild konnte nicht eingefügt werden.");
+      window.alert(err instanceof Error ? err.message : t("errImageInsert"));
     }
   };
 
@@ -617,7 +618,7 @@ export const TableEditor = ({
       );
     }
     if (widths.every((width) => width === undefined)) {
-      window.alert("Bildgrößen konnten nicht ermittelt werden.");
+      window.alert(t("errImageSizes"));
       return;
     }
 
@@ -765,7 +766,7 @@ export const TableEditor = ({
         onChange(imported);
       })
       .catch((err: unknown) => {
-        window.alert(err instanceof Error ? err.message : "Import fehlgeschlagen");
+        window.alert(err instanceof Error ? err.message : t("errImport"));
       });
   };
 
@@ -849,9 +850,9 @@ export const TableEditor = ({
             <table style={{ borderCollapse: "collapse" }} data-testid="table-editor-grid">
             <thead>
               <tr>
-                <th style={handleStyle} data-testid="select-all" onClick={selectAll} aria-label="Alles auswählen" />
+                <th style={handleStyle} data-testid="select-all" onClick={selectAll} aria-label={t("selectAll")} />
                 {Array.from({ length: colCount }, (_, col) => (
-                  <th key={col} style={handleStyle} data-testid={`col-handle-${col}`} aria-label={`Spalte ${col + 1} auswählen`} onClick={() => selectColumn(col)}>
+                  <th key={col} style={handleStyle} data-testid={`col-handle-${col}`} aria-label={t("selectColumn", { n: col + 1 })} onClick={() => selectColumn(col)}>
                     ▽
                   </th>
                 ))}
@@ -860,7 +861,7 @@ export const TableEditor = ({
             <tbody>
               {data.map((row, rowIndex) => (
                 <tr key={rowIndex}>
-                  <th style={handleStyle} data-testid={`row-handle-${rowIndex}`} aria-label={`Zeile ${rowIndex + 1} auswählen`} onClick={() => selectRow(rowIndex)}>
+                  <th style={handleStyle} data-testid={`row-handle-${rowIndex}`} aria-label={t("selectRow", { n: rowIndex + 1 })} onClick={() => selectRow(rowIndex)}>
                     ▷
                   </th>
                   {row.map((cell, colIndex) => {
@@ -884,7 +885,7 @@ export const TableEditor = ({
                       >
                         <EditableCell
                           html={sanitizeRichText(cell)}
-                          ariaLabel={`Zeile ${rowIndex + 1}, Spalte ${colIndex + 1}`}
+                          ariaLabel={t("cellAria", { row: rowIndex + 1, col: colIndex + 1 })}
                           editing={isEditing(rowIndex, colIndex)}
                           format={formatToStyle(cellFormat(value, rowIndex, colIndex))}
                           onInput={(next) => handleInput(rowIndex, colIndex, next)}
@@ -903,45 +904,45 @@ export const TableEditor = ({
 
         <ContextMenu.Portal>
           <ContextMenu.Content style={menuContentStyle} data-testid="table-editor-menu">
-            <MenuItem testId="insert-row-above" onSelect={insertRowAbove} disabled={selection === null}>Zeile oberhalb einfügen</MenuItem>
-            <MenuItem testId="insert-row-below" onSelect={insertRowBelow} disabled={selection === null}>Zeile unterhalb einfügen</MenuItem>
-            <MenuItem testId="insert-col-left" onSelect={insertColLeft} disabled={selection === null}>Spalte links einfügen</MenuItem>
-            <MenuItem testId="insert-col-right" onSelect={insertColRight} disabled={selection === null}>Spalte rechts einfügen</MenuItem>
+            <MenuItem testId="insert-row-above" onSelect={insertRowAbove} disabled={selection === null}>{t("menuInsertRowAbove")}</MenuItem>
+            <MenuItem testId="insert-row-below" onSelect={insertRowBelow} disabled={selection === null}>{t("menuInsertRowBelow")}</MenuItem>
+            <MenuItem testId="insert-col-left" onSelect={insertColLeft} disabled={selection === null}>{t("menuInsertColLeft")}</MenuItem>
+            <MenuItem testId="insert-col-right" onSelect={insertColRight} disabled={selection === null}>{t("menuInsertColRight")}</MenuItem>
             <ContextMenu.Separator style={separatorStyle} />
-            <MenuItem testId="delete-rows" onSelect={doDeleteRows} disabled={selection === null}>Zeile(n) löschen</MenuItem>
-            <MenuItem testId="delete-cols" onSelect={doDeleteCols} disabled={selection === null}>Spalte(n) löschen</MenuItem>
+            <MenuItem testId="delete-rows" onSelect={doDeleteRows} disabled={selection === null}>{t("deleteRows")}</MenuItem>
+            <MenuItem testId="delete-cols" onSelect={doDeleteCols} disabled={selection === null}>{t("deleteCols")}</MenuItem>
             <ContextMenu.Separator style={separatorStyle} />
-            <MenuItem testId="merge-cells" onSelect={doMerge} disabled={selection === null}>Zellen verbinden</MenuItem>
-            <MenuItem testId="unmerge-cells" onSelect={doUnmerge} disabled={selection === null}>Verbindung aufheben</MenuItem>
+            <MenuItem testId="merge-cells" onSelect={doMerge} disabled={selection === null}>{t("mergeCells")}</MenuItem>
+            <MenuItem testId="unmerge-cells" onSelect={doUnmerge} disabled={selection === null}>{t("unmergeCells")}</MenuItem>
             <ContextMenu.Separator style={separatorStyle} />
-            <MenuItem testId="insert-image" onSelect={openImagePicker} disabled={selection === null}>Bild einfügen…</MenuItem>
+            <MenuItem testId="insert-image" onSelect={openImagePicker} disabled={selection === null}>{t("menuInsertImage")}</MenuItem>
             <ContextMenu.Separator style={separatorStyle} />
             <ContextMenu.Sub>
-              <ContextMenu.SubTrigger style={menuItemStyle} data-testid="text-options">Textoptionen ▸</ContextMenu.SubTrigger>
+              <ContextMenu.SubTrigger style={menuItemStyle} data-testid="text-options">{t("menuTextOptions")} ▸</ContextMenu.SubTrigger>
               <ContextMenu.Portal>
                 <ContextMenu.SubContent style={menuContentStyle}>
-                  <MenuItem testId="fmt-bold" onSelect={() => toggleKey("bold")}>Fett</MenuItem>
-                  <MenuItem testId="fmt-italic" onSelect={() => toggleKey("italic")}>Kursiv</MenuItem>
-                  <MenuItem testId="fmt-underline" onSelect={() => toggleKey("underline")}>Unterstrichen</MenuItem>
-                  <MenuItem testId="fmt-strike" onSelect={() => toggleKey("strikethrough")}>Durchgestrichen</MenuItem>
+                  <MenuItem testId="fmt-bold" onSelect={() => toggleKey("bold")}>{t("bold")}</MenuItem>
+                  <MenuItem testId="fmt-italic" onSelect={() => toggleKey("italic")}>{t("italic")}</MenuItem>
+                  <MenuItem testId="fmt-underline" onSelect={() => toggleKey("underline")}>{t("underline")}</MenuItem>
+                  <MenuItem testId="fmt-strike" onSelect={() => toggleKey("strikethrough")}>{t("strikethrough")}</MenuItem>
                   <ContextMenu.Separator style={separatorStyle} />
-                  <MenuItem testId="align-left" onSelect={() => applyFormat({ align: "left" })}>Linksbündig</MenuItem>
-                  <MenuItem testId="align-center" onSelect={() => applyFormat({ align: "center" })}>Zentriert</MenuItem>
-                  <MenuItem testId="align-right" onSelect={() => applyFormat({ align: "right" })}>Rechtsbündig</MenuItem>
+                  <MenuItem testId="align-left" onSelect={() => applyFormat({ align: "left" })}>{t("alignLeft")}</MenuItem>
+                  <MenuItem testId="align-center" onSelect={() => applyFormat({ align: "center" })}>{t("alignCenter")}</MenuItem>
+                  <MenuItem testId="align-right" onSelect={() => applyFormat({ align: "right" })}>{t("alignRight")}</MenuItem>
                   <ContextMenu.Separator style={separatorStyle} />
-                  <MenuItem testId="valign-top" onSelect={() => applyFormat({ valign: "top" })}>Oben ausrichten</MenuItem>
-                  <MenuItem testId="valign-middle" onSelect={() => applyFormat({ valign: "middle" })}>Mittig ausrichten</MenuItem>
-                  <MenuItem testId="valign-bottom" onSelect={() => applyFormat({ valign: "bottom" })}>Unten ausrichten</MenuItem>
+                  <MenuItem testId="valign-top" onSelect={() => applyFormat({ valign: "top" })}>{t("valignTop")}</MenuItem>
+                  <MenuItem testId="valign-middle" onSelect={() => applyFormat({ valign: "middle" })}>{t("valignMiddle")}</MenuItem>
+                  <MenuItem testId="valign-bottom" onSelect={() => applyFormat({ valign: "bottom" })}>{t("valignBottom")}</MenuItem>
                 </ContextMenu.SubContent>
               </ContextMenu.Portal>
             </ContextMenu.Sub>
             <ContextMenu.Sub>
-              <ContextMenu.SubTrigger style={menuItemStyle} data-testid="sort-options">Sortierung ▸</ContextMenu.SubTrigger>
+              <ContextMenu.SubTrigger style={menuItemStyle} data-testid="sort-options">{t("sort")} ▸</ContextMenu.SubTrigger>
               <ContextMenu.Portal>
                 <ContextMenu.SubContent style={menuContentStyle}>
-                  <MenuItem testId="sort-asc" onSelect={doSort("asc")} disabled={selection === null}>Aufsteigend (diese Spalte)</MenuItem>
-                  <MenuItem testId="sort-desc" onSelect={doSort("desc")} disabled={selection === null}>Absteigend (diese Spalte)</MenuItem>
-                  <MenuItem testId="sort-clear" onSelect={clearSort}>Sortierung entfernen</MenuItem>
+                  <MenuItem testId="sort-asc" onSelect={doSort("asc")} disabled={selection === null}>{t("sortAsc")}</MenuItem>
+                  <MenuItem testId="sort-desc" onSelect={doSort("desc")} disabled={selection === null}>{t("sortDesc")}</MenuItem>
+                  <MenuItem testId="sort-clear" onSelect={clearSort}>{t("sortClear")}</MenuItem>
                 </ContextMenu.SubContent>
               </ContextMenu.Portal>
             </ContextMenu.Sub>
