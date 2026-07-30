@@ -26,6 +26,8 @@ import { asTableMode, writesSlots } from "./table-mode";
 import icon from "../resources/table-widget.svg";
 import pkg from '../package.json'
 
+console.log('I GET LOADED!');
+
 /**
  * Define which attributes are handled by the widget. This should be also reflected in configuration schema
  */
