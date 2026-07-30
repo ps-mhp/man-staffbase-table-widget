@@ -20,7 +20,7 @@ import { TableWidgetProps, TableWidget } from "./table-widget";
 import { configurationSchema, uiSchema } from "./configuration-schema";
 import { startTableEditorInjector } from "./table-editor-injector";
 import { SLOT_SELECTOR, tableModelToSlotMarkup } from "./table-dom";
-import { parseTableModel } from "./table-model";
+import { parseTableModel, serializeTableModel } from "./table-model";
 import { asTableMode, writesSlots } from "./table-mode";
 import icon from "../resources/table-widget.svg";
 import pkg from '../package.json'
@@ -61,42 +61,55 @@ const factory: BlockFactory = (BaseBlockClass, _widgetApi) => {
   return class TableWidgetBlock extends BaseBlockClass implements BaseBlock {
     private _root: ReactDOM.Root | null = null;
     /**
-     * The slot markup this instance was created from, captured before anything
-     * rendered over it. Holding on to it is what makes the translatable form
-     * usable at all: the base class builds its own wrapper inside the element,
-     * so by the time `renderBlock` runs the persisted child nodes are gone.
+     * Own container for the React tree. Deliberately not the container the SDK
+     * hands over: that may be the element itself, and a React root owns its
+     * container's entire child list — it would wipe the slot node on every
+     * commit. With a nested mount the two never fight over the same children.
      */
-    private _slots: string | null = null;
+    private _mount: HTMLElement | null = null;
+    /**
+     * Slot markup that came from the stored document, captured before anything
+     * rendered over it. Only this form can have been rewritten by a content
+     * translation, so it is kept strictly apart from the markup this class
+     * generates itself — the generated form is just the attribute in another
+     * shape and must never masquerade as translated content.
+     */
+    private _captured: string | null = null;
+    /** The slot node this class generated, as opposed to one the document had. */
+    private _slotNode: Element | null = null;
+    private _captureDone = false;
 
     public constructor() {
       super();
     }
 
     /**
-     * Captures the slot markup *before* delegating to the base class, which is
-     * the only point where the element still holds the child nodes that came
-     * from the stored article HTML.
+     * Reads the slot markup the document delivered, at most once.
+     *
+     * Called from every path that touches the slots, because the order of the
+     * lifecycle callbacks cannot be relied on: upgrading an element runs
+     * `attributeChangedCallback` *before* `connectedCallback`, so capturing in
+     * the latter would happen after the first render had already regenerated
+     * the slots from the attribute — destroying translated content before ever
+     * reading it. Nothing is recorded while no slot node is present, so child
+     * nodes that arrive later can still be picked up.
      */
-    public connectedCallback(): void {
-      this.captureSlots();
-      const base = Object.getPrototypeOf(TableWidgetBlock.prototype) as {
-        connectedCallback?: () => void;
-      };
-      base.connectedCallback?.call(this);
-    }
-
-    private captureSlots(): void {
+    private captureFromDocument(): void {
+      if (this._captureDone) return;
       const slot = this.querySelector(SLOT_SELECTOR);
-      if (slot) this._slots = slot.outerHTML;
+      if (!slot) return;
+      if (slot !== this._slotNode) this._captured = slot.outerHTML;
+      this._captureDone = true;
     }
 
     private get props(): TableWidgetProps {
+      this.captureFromDocument();
       const attrs = this.parseAttributes<TableWidgetProps>();
       return {
         ...attrs,
         // Empty string rather than `undefined`: `BlockAttributes` is indexed as
         // `string | number | boolean`, and an absent slot reads as falsy anyway.
-        tableslots: this._slots ?? "",
+        tableslots: this._captured ?? "",
         contentLanguage: this.contentLanguage,
       };
     }
@@ -108,38 +121,70 @@ const factory: BlockFactory = (BaseBlockClass, _widgetApi) => {
      */
     public parseConfig<T extends Record<string, unknown>>(attributes: T): Record<string, string> {
       const config = super.parseConfig(attributes);
-      this.syncSlots(config.tabledata, config.tablemode);
-      return config;
+      // Re-serialize on every save, not just when the grid editor produced a
+      // new value: an instance whose author only touched another field would
+      // otherwise keep its raw-JSON attribute, which is exactly the form the
+      // translation pipeline truncates. `parseTableModel` reads both forms and
+      // `serializeTableModel` always encodes, so this is idempotent.
+      const normalized = serializeTableModel(parseTableModel(config.tabledata));
+      // An author's edit supersedes whatever this instance carried, including
+      // slots a translation had rewritten — those describe the old table. The
+      // capture is closed at the same time so the stale node cannot be read
+      // back in on the next render.
+      this._captured = null;
+      this._captureDone = true;
+      return { ...config, tabledata: normalized };
+    }
+
+    public renderBlock(container: HTMLElement): void {
+      // Anything that rewrites the element's children — the host, or a
+      // translation writing back into the page — detaches the mount, and a root
+      // bound to a detached node renders nowhere. Re-create both when that
+      // happened instead of silently rendering into limbo.
+      if (!this._mount || this._mount.parentNode !== container) {
+        this._root?.unmount();
+        this._root = null;
+        this._mount = document.createElement("div");
+        container.appendChild(this._mount);
+      }
+      this._root ??= ReactDOM.createRoot(this._mount);
+      this._root.render(<TableWidget {...this.props} />);
+      this.syncSlotNode();
     }
 
     /**
-     * Brings the element's child content in line with the selected mode. The
-     * `tabledata` attribute is written in every mode so switching back can
-     * never lose an author's table — in `slots` mode the reader simply ignores
-     * it (see `table-widget.tsx`).
+     * Keeps the element's child content in the shape it is meant to be stored
+     * in. Runs after every render because that is also what follows an
+     * attribute change, so the slots can never go stale against `tabledata`.
      */
-    private syncSlots(tabledata: string | undefined, tablemode: string | undefined): void {
+    private syncSlotNode(): void {
+      this.captureFromDocument();
       const existing = this.querySelector(SLOT_SELECTOR);
-      if (!writesSlots(asTableMode(tablemode))) {
+      if (!writesSlots(asTableMode(this.getAttribute("tablemode")))) {
         existing?.remove();
-        this._slots = null;
+        this._slotNode = null;
         return;
       }
+      // Content the document delivered stays untouched: it is the only form a
+      // translation can have rewritten, and regenerating it from the attribute
+      // would replace the translation with the source language.
+      if (this._captured !== null) return;
+
       const template = document.createElement("template");
-      template.innerHTML = tableModelToSlotMarkup(parseTableModel(tabledata));
+      template.innerHTML = tableModelToSlotMarkup(
+        parseTableModel(this.getAttribute("tabledata") ?? undefined),
+      );
       const slot = template.content.firstElementChild;
       if (!slot) return;
+      // Both sides are parser-normalized here, so this compares content rather
+      // than incidental differences in quoting or attribute order.
+      if (existing && existing.outerHTML === slot.outerHTML) return;
       if (existing) {
         existing.replaceWith(slot);
       } else {
         this.insertBefore(slot, this.firstChild);
       }
-      this._slots = slot.outerHTML;
-    }
-
-    public renderBlock(container: HTMLElement): void {
-      this._root ??= ReactDOM.createRoot(container);
-      this._root.render(<TableWidget {...this.props} />);
+      this._slotNode = slot;
     }
 
     /**

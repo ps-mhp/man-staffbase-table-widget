@@ -110,10 +110,9 @@ export const en: Messages = {
   configTableDataHelp: "Edited with the table editor above.",
 
   configTableModeTitle: "Table storage",
-  configTableModeHelp: "\"Attribute\" is the previous behaviour. \"Slots\" stores the table as translatable content inside the widget. \"Both\" writes each form and prefers the slots when reading.",
+  configTableModeHelp: "\"Attribute\" is the previous behaviour. \"Slots\" additionally stores the table as translatable content inside the widget; the attribute is kept as a fallback. The form that was actually rendered is reported in the data-table-source attribute.",
   configTableModeAttribute: "Attribute (not translatable)",
   configTableModeSlots: "Slots (translatable)",
-  configTableModeBoth: "Both (slots preferred)",
 
   errImageInsert: "The image could not be inserted.",
   errImageSizes: "The image sizes could not be determined.",

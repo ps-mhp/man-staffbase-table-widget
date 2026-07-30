@@ -110,10 +110,9 @@ export const fr: Messages = {
   configTableDataHelp: "Modifiées via l'éditeur de tableau ci-dessus.",
 
   configTableModeTitle: "Stockage du tableau",
-  configTableModeHelp: "« Attribut » correspond au comportement précédent. « Slots » stocke le tableau comme contenu traduisible dans le widget. « Les deux » écrit les deux formes et privilégie les slots à la lecture.",
+  configTableModeHelp: "« Attribut » correspond au comportement précédent. « Slots » stocke en plus le tableau comme contenu traduisible dans le widget ; l'attribut est conservé comme solution de repli. La forme réellement affichée est indiquée dans l'attribut data-table-source.",
   configTableModeAttribute: "Attribut (non traduisible)",
   configTableModeSlots: "Slots (traduisible)",
-  configTableModeBoth: "Les deux (slots prioritaires)",
 
   errImageInsert: "L'image n'a pas pu être insérée.",
   errImageSizes: "Les tailles des images n'ont pas pu être déterminées.",

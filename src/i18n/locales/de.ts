@@ -110,10 +110,9 @@ export const de: Messages = {
   configTableDataHelp: "Wird über den Tabellen-Editor oberhalb bearbeitet.",
 
   configTableModeTitle: "Speicherform der Tabelle",
-  configTableModeHelp: "„Attribut“ ist das bisherige Verhalten. „Slots“ legt die Tabelle als übersetzbaren Inhalt im Widget ab. „Beides“ schreibt beide Formen und liest bevorzugt die Slots.",
+  configTableModeHelp: "„Attribut“ ist das bisherige Verhalten. „Slots“ legt die Tabelle zusätzlich als übersetzbaren Inhalt im Widget ab; das Attribut bleibt als Rückfallebene erhalten. Welche Form gerendert wurde, steht im Attribut data-table-source.",
   configTableModeAttribute: "Attribut (nicht übersetzbar)",
   configTableModeSlots: "Slots (übersetzbar)",
-  configTableModeBoth: "Beides (Slots bevorzugt)",
 
   errImageInsert: "Bild konnte nicht eingefügt werden.",
   errImageSizes: "Bildgrößen konnten nicht ermittelt werden.",

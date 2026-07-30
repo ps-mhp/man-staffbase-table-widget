@@ -290,27 +290,37 @@ describe("TableWidget storage modes", () => {
     expect(screen.queryByText("Criterio")).not.toBeInTheDocument();
   });
 
-  it("slots mode reports a problem instead of silently falling back", () => {
-    // This is the signal that tells us the editor stripped the child nodes.
+  it("slots mode still renders the attribute when the slots are missing", () => {
+    // A mode must never be able to blank the page.
     render(<TableWidget contentLanguage="de_DE" tablemode="slots" tabledata={attr} />);
 
-    expect(screen.getByTestId("table-widget-unreadable")).toBeInTheDocument();
-    expect(screen.queryByText("Criterio")).not.toBeInTheDocument();
+    expect(screen.getByText("Criterio")).toBeInTheDocument();
+    expect(screen.queryByTestId("table-widget-unreadable")).not.toBeInTheDocument();
   });
 
-  it("both mode prefers the slots", () => {
+  it("reports which storage form was rendered", () => {
+    const { unmount } = render(
+      <TableWidget contentLanguage="de_DE" tablemode="slots" tabledata={attr} tableslots={slots} />,
+    );
+    expect(screen.getByRole("table").closest("[data-table-source]")).toHaveAttribute(
+      "data-table-source",
+      "slots",
+    );
+    unmount();
+
+    render(<TableWidget contentLanguage="de_DE" tablemode="slots" tabledata={attr} />);
+    expect(screen.getByRole("table").closest("[data-table-source]")).toHaveAttribute(
+      "data-table-source",
+      "attribute",
+    );
+  });
+
+  it("accepts the retired \"both\" value as a synonym for slots", () => {
     render(
       <TableWidget contentLanguage="de_DE" tablemode="both" tabledata={attr} tableslots={slots} />,
     );
 
     expect(screen.getByText("Kriterium")).toBeInTheDocument();
-  });
-
-  it("both mode falls back to the attribute when the slots were stripped", () => {
-    render(<TableWidget contentLanguage="de_DE" tablemode="both" tabledata={attr} />);
-
-    expect(screen.getByText("Criterio")).toBeInTheDocument();
-    expect(screen.queryByTestId("table-widget-unreadable")).not.toBeInTheDocument();
   });
 
   it("defaults to attribute mode for instances saved before the switch existed", () => {

@@ -149,7 +149,6 @@ export interface Messages {
   configTableModeHelp: string;
   configTableModeAttribute: string;
   configTableModeSlots: string;
-  configTableModeBoth: string;
 
   // --- Errors ---
   errImageInsert: string;

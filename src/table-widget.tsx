@@ -20,7 +20,7 @@ import {
   cellFormat,
   TableDataStatus,
 } from "./table-model";
-import { asTableMode } from "./table-mode";
+import { asTableMode, writesSlots } from "./table-mode";
 import { formatToStyle, formatToCellStyle } from "./cell-style";
 import { sanitizeRichText, richTextToPlain } from "./rich-text";
 import { parseSlotMarkup } from "./table-dom";
@@ -42,14 +42,22 @@ export type TableWidgetProps = BlockAttributes & {
    */
   tableslots?: string;
   /**
-   * Which storage form is authoritative — see `table-mode.ts`. In `"slots"`
-   * mode the attribute is deliberately *not* used as a fallback even though it
-   * is still written: that is what makes the slot form verifiable on its own.
-   * If the editor strips the child nodes, the widget says so instead of
-   * quietly rendering the attribute and hiding the answer.
+   * Whether the slots may be used at all — see `table-mode.ts`. It can never
+   * suppress rendering: which form was used is reported through
+   * `data-table-source` on the rendered container, so the slot form stays
+   * verifiable without a mode being able to blank the page.
    */
   tablemode?: string;
 };
+
+/**
+ * Which storage form the rendered table came from. Emitted as
+ * `data-table-source` so it can be read straight off the element in DevTools:
+ * `slots` proves the translatable child content survived, `attribute` means it
+ * was missing and the fallback carried the table, `none` means neither held
+ * anything usable.
+ */
+type TableSource = "slots" | "attribute" | "none";
 
 const baseCellStyle: React.CSSProperties = {
   padding: "8px 12px",
@@ -124,13 +132,20 @@ export const TableWidget = ({
   tablemode,
 }: TableWidgetProps): ReactElement => {
   const mode = asTableMode(tablemode);
-  const { model, status } = useMemo(() => {
+  const { model, status, source } = useMemo(() => {
     // Slots win wherever they are allowed: they are the form a content
-    // translation actually rewrites, so they carry the translated text.
-    const fromSlots = mode === "attribute" ? null : parseSlotMarkup(tableslots);
-    if (fromSlots) return { model: fromSlots, status: "ok" as TableDataStatus };
-    if (mode === "slots") return { ...readTableModel(undefined), status: "unreadable" as const };
-    return readTableModel(tabledata);
+    // translation actually rewrites, so they carry the translated text. The
+    // attribute is always the fallback — a missing slot must never cost the
+    // reader the table.
+    const fromSlots = writesSlots(mode) ? parseSlotMarkup(tableslots) : null;
+    if (fromSlots) {
+      return { model: fromSlots, status: "ok" as TableDataStatus, source: "slots" as TableSource };
+    }
+    const read = readTableModel(tabledata);
+    return {
+      ...read,
+      source: (read.status === "ok" ? "attribute" : "none") as TableSource,
+    };
   }, [tabledata, tableslots, mode]);
   const { data } = model;
   const headerRow = data[0] ?? [];
@@ -175,6 +190,7 @@ export const TableWidget = ({
   return (
     <div
       className="table-widget-scroll"
+      data-table-source={source}
       style={{ overflow: "auto", maxWidth: "100%", maxHeight: "70vh", containerType: "inline-size", background: "transparent" }}
     >
       <table

@@ -110,10 +110,9 @@ export const it: Messages = {
   configTableDataHelp: "Modificati tramite l'editor di tabelle sopra.",
 
   configTableModeTitle: "Archiviazione della tabella",
-  configTableModeHelp: "«Attributo» è il comportamento precedente. «Slot» archivia la tabella come contenuto traducibile nel widget. «Entrambi» scrive le due forme e in lettura preferisce gli slot.",
+  configTableModeHelp: "«Attributo» è il comportamento precedente. «Slot» archivia inoltre la tabella come contenuto traducibile nel widget; l'attributo resta come riserva. La forma effettivamente resa è indicata nell'attributo data-table-source.",
   configTableModeAttribute: "Attributo (non traducibile)",
   configTableModeSlots: "Slot (traducibile)",
-  configTableModeBoth: "Entrambi (slot preferiti)",
 
   errImageInsert: "Non è stato possibile inserire l'immagine.",
   errImageSizes: "Non è stato possibile determinare le dimensioni delle immagini.",

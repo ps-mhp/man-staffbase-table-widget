@@ -110,10 +110,9 @@ export const nl: Messages = {
   configTableDataHelp: "Wordt bewerkt via de tabeleditor hierboven.",
 
   configTableModeTitle: "Opslag van de tabel",
-  configTableModeHelp: "„Attribuut” is het vorige gedrag. „Slots” slaat de tabel op als vertaalbare inhoud in de widget. „Beide” schrijft beide vormen en geeft bij het lezen voorrang aan de slots.",
+  configTableModeHelp: "„Attribuut” is het vorige gedrag. „Slots” slaat de tabel daarnaast op als vertaalbare inhoud in de widget; het attribuut blijft als terugval bewaard. Welke vorm daadwerkelijk is weergegeven, staat in het attribuut data-table-source.",
   configTableModeAttribute: "Attribuut (niet vertaalbaar)",
   configTableModeSlots: "Slots (vertaalbaar)",
-  configTableModeBoth: "Beide (slots hebben voorrang)",
 
   errImageInsert: "De afbeelding kon niet worden ingevoegd.",
   errImageSizes: "De afbeeldingsgroottes konden niet worden bepaald.",

@@ -43,7 +43,6 @@ export const configurationSchema: JSONSchema7 = {
       oneOf: [
         { const: "attribute", title: t("configTableModeAttribute") },
         { const: "slots", title: t("configTableModeSlots") },
-        { const: "both", title: t("configTableModeBoth") },
       ],
     },
   },
