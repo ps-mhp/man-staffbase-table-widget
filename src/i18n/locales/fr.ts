@@ -105,6 +105,7 @@ export const fr: Messages = {
   loadMore: "Charger plus",
 
   editTable: "Modifier le tableau",
+  editorPreviewHint: "Widget de tableau — double-cliquez pour modifier",
 
   configTableDataTitle: "Données du tableau",
   configTableDataHelp: "Modifiées via l'éditeur de tableau ci-dessus.",

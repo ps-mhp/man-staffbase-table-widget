@@ -17,6 +17,7 @@ import { createPortal } from "react-dom";
 import { TableEditor } from "./table-editor";
 import { TableModel, parseTableModel, serializeTableModel } from "./table-model";
 import { t } from "./i18n";
+import { overlayStyle, panelStyle, panelBodyStyle, reopenButtonStyle } from "./modal-styles";
 
 /**
  * The DOM id RJSF/MUI renders for the `tabledata` schema property when
@@ -45,54 +46,6 @@ function setNativeTextareaValue(element: HTMLTextAreaElement, value: string): vo
 interface InjectedEditorProps {
   textarea: HTMLTextAreaElement;
 }
-
-const overlayStyle: React.CSSProperties = {
-  position: "fixed",
-  inset: 0,
-  background: "rgba(0, 0, 0, 0.5)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  // Max 32-bit z-index so the editor always sits above the hosting app's own
-  // config dialog / modals (Staffbase renders the widget's settings dialog on
-  // top of the page; without this the editor would be hidden behind it).
-  zIndex: 2147483647,
-};
-
-const panelStyle: React.CSSProperties = {
-  background: "#fff",
-  borderRadius: "6px",
-  width: "90vw",
-  height: "90vh",
-  padding: "24px",
-  display: "flex",
-  flexDirection: "column",
-  boxSizing: "border-box",
-  boxShadow: "0 4px 24px rgba(0, 0, 0, 0.3)",
-};
-
-/**
- * Holds the editor at exactly the panel's remaining height and does *not*
- * scroll itself — the editor scrolls its grid internally so the toolbar stays
- * put no matter how long the table is. `minHeight: 0` is required for a flex
- * item to be allowed to shrink below its content size.
- */
-const panelBodyStyle: React.CSSProperties = {
-  flex: 1,
-  minHeight: 0,
-  display: "flex",
-  overflow: "hidden",
-};
-
-const reopenButtonStyle: React.CSSProperties = {
-  border: "1px dashed #b7bcc3",
-  background: "#fafbfc",
-  color: "#3a4148",
-  cursor: "pointer",
-  padding: "8px 16px",
-  borderRadius: "4px",
-  fontSize: "13px",
-};
 
 /**
  * Bridges the controlled `TableEditor` component with the plain-DOM RJSF

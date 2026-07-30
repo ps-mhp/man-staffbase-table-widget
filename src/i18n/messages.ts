@@ -141,6 +141,8 @@ export interface Messages {
 
   // --- Injected editor ---
   editTable: string;
+  /** Shown above the table preview inside the page editor (CSS `content`). */
+  editorPreviewHint: string;
 
   // --- Config dialog (RJSF schema) ---
   configTableDataTitle: string;

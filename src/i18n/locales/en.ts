@@ -105,6 +105,7 @@ export const en: Messages = {
   loadMore: "Load more",
 
   editTable: "Edit table",
+  editorPreviewHint: "Table widget — double-click to edit",
 
   configTableDataTitle: "Table data",
   configTableDataHelp: "Edited with the table editor above.",

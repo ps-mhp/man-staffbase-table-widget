@@ -105,6 +105,7 @@ export const pl: Messages = {
   loadMore: "Wczytaj więcej",
 
   editTable: "Edytuj tabelę",
+  editorPreviewHint: "Widget tabeli — kliknij dwukrotnie, aby edytować",
 
   configTableDataTitle: "Dane tabeli",
   configTableDataHelp: "Edytowane w edytorze tabeli powyżej.",

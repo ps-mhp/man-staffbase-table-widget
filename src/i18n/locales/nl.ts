@@ -105,6 +105,7 @@ export const nl: Messages = {
   loadMore: "Meer laden",
 
   editTable: "Tabel bewerken",
+  editorPreviewHint: "Tabelwidget — dubbelklik om te bewerken",
 
   configTableDataTitle: "Tabelgegevens",
   configTableDataHelp: "Wordt bewerkt via de tabeleditor hierboven.",

@@ -19,6 +19,7 @@ import { BlockFactory, BlockDefinition, ExternalBlockDefinition, BaseBlock } fro
 import { TableWidgetProps, TableWidget } from "./table-widget";
 import { configurationSchema, uiSchema } from "./configuration-schema";
 import { startTableEditorInjector } from "./table-editor-injector";
+import { startTinyMceBridge } from "./tinymce-bridge";
 import { SLOT_SELECTOR, tableModelToSlotMarkup } from "./table-dom";
 import { parseTableModel, serializeTableModel } from "./table-model";
 import { isTablePayload } from "./table-payload";
@@ -52,6 +53,19 @@ const widgetAttributes: string[] = [
  * never needs to call this.
  */
 export const stopTableEditorInjector = startTableEditorInjector();
+
+/**
+ * Bridges the page editor (TinyMCE) so the table is stored as translatable
+ * content of the widget element rather than only in its configuration — see
+ * `tinymce-bridge.ts` for why the widget SDK cannot do this itself.
+ *
+ * Installed here, at module load, for the same reason as the injector above:
+ * this runs whether or not any widget instance exists, which is exactly what is
+ * needed to reach an editor that has not been given a widget yet.
+ *
+ * Exported only so tests can stop the lookup on teardown.
+ */
+export const stopTinyMceBridge = startTinyMceBridge();
 
 /**
  * This factory creates the class which is registered with the tagname in the `custom element registry`
