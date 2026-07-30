@@ -109,6 +109,12 @@ export const pl: Messages = {
   configTableDataTitle: "Dane tabeli",
   configTableDataHelp: "Edytowane w edytorze tabeli powyżej.",
 
+  configTableModeTitle: "Sposób zapisu tabeli",
+  configTableModeHelp: "„Atrybut” to dotychczasowe zachowanie. „Sloty” zapisują tabelę jako tłumaczalną treść w widżecie. „Oba” zapisuje obie formy i przy odczycie preferuje sloty.",
+  configTableModeAttribute: "Atrybut (nieprzetłumaczalny)",
+  configTableModeSlots: "Sloty (tłumaczalne)",
+  configTableModeBoth: "Oba (sloty preferowane)",
+
   errImageInsert: "Nie udało się wstawić obrazu.",
   errImageSizes: "Nie udało się ustalić rozmiarów obrazów.",
   errImport: "Import nie udał się",

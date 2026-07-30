@@ -3,7 +3,8 @@ import { screen, render } from "@testing-library/react";
 
 import { TableWidget } from "./table-widget";
 import { serializeTableData } from "./table-json";
-import { serializeTableModel } from "./table-model";
+import { serializeTableModel, TableModel } from "./table-model";
+import { tableModelToSlotMarkup } from "./table-dom";
 
 describe("TableWidget", () => {
   it("renders the default table when no data is provided", () => {
@@ -252,5 +253,75 @@ describe("TableWidget", () => {
 
     const rowHeaders = screen.getAllByRole("rowheader").map((el) => el.textContent);
     expect(rowHeaders).toEqual(["A", "B"]);
+  });
+});
+
+describe("TableWidget storage modes", () => {
+  const source: TableModel = {
+    data: [["", "Criterio"], ["Consumo", "Igual"]],
+    merges: [],
+    formats: { "1,1": { bold: true } },
+    sort: null,
+  };
+  const translated: TableModel = {
+    ...source,
+    data: [["", "Kriterium"], ["Verbrauch", "Gleich"]],
+  };
+
+  const attr = serializeTableModel(source);
+  const slots = tableModelToSlotMarkup(translated);
+
+  it("attribute mode ignores the slots even when they are present", () => {
+    render(
+      <TableWidget contentLanguage="de_DE" tablemode="attribute" tabledata={attr} tableslots={slots} />,
+    );
+
+    expect(screen.getByText("Criterio")).toBeInTheDocument();
+    expect(screen.queryByText("Kriterium")).not.toBeInTheDocument();
+  });
+
+  it("slots mode renders the translated slots", () => {
+    render(
+      <TableWidget contentLanguage="de_DE" tablemode="slots" tabledata={attr} tableslots={slots} />,
+    );
+
+    expect(screen.getByText("Kriterium")).toBeInTheDocument();
+    expect(screen.getByText("Verbrauch")).toBeInTheDocument();
+    expect(screen.queryByText("Criterio")).not.toBeInTheDocument();
+  });
+
+  it("slots mode reports a problem instead of silently falling back", () => {
+    // This is the signal that tells us the editor stripped the child nodes.
+    render(<TableWidget contentLanguage="de_DE" tablemode="slots" tabledata={attr} />);
+
+    expect(screen.getByTestId("table-widget-unreadable")).toBeInTheDocument();
+    expect(screen.queryByText("Criterio")).not.toBeInTheDocument();
+  });
+
+  it("both mode prefers the slots", () => {
+    render(
+      <TableWidget contentLanguage="de_DE" tablemode="both" tabledata={attr} tableslots={slots} />,
+    );
+
+    expect(screen.getByText("Kriterium")).toBeInTheDocument();
+  });
+
+  it("both mode falls back to the attribute when the slots were stripped", () => {
+    render(<TableWidget contentLanguage="de_DE" tablemode="both" tabledata={attr} />);
+
+    expect(screen.getByText("Criterio")).toBeInTheDocument();
+    expect(screen.queryByTestId("table-widget-unreadable")).not.toBeInTheDocument();
+  });
+
+  it("defaults to attribute mode for instances saved before the switch existed", () => {
+    render(<TableWidget contentLanguage="de_DE" tabledata={attr} tableslots={slots} />);
+
+    expect(screen.getByText("Criterio")).toBeInTheDocument();
+  });
+
+  it("keeps formatting from the slots", () => {
+    render(<TableWidget contentLanguage="de_DE" tablemode="slots" tableslots={slots} />);
+
+    expect(screen.getByText("Gleich").closest("td")).toHaveStyle({ fontWeight: "bold" });
   });
 });

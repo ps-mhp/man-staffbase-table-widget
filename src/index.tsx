@@ -19,6 +19,9 @@ import { BlockFactory, BlockDefinition, ExternalBlockDefinition, BaseBlock } fro
 import { TableWidgetProps, TableWidget } from "./table-widget";
 import { configurationSchema, uiSchema } from "./configuration-schema";
 import { startTableEditorInjector } from "./table-editor-injector";
+import { SLOT_SELECTOR, tableModelToSlotMarkup } from "./table-dom";
+import { parseTableModel } from "./table-model";
+import { asTableMode, writesSlots } from "./table-mode";
 import icon from "../resources/table-widget.svg";
 import pkg from '../package.json'
 
@@ -27,6 +30,7 @@ import pkg from '../package.json'
  */
 const widgetAttributes: string[] = [
   'tabledata',
+  'tablemode',
 ];
 
 /**
@@ -56,17 +60,81 @@ const factory: BlockFactory = (BaseBlockClass, _widgetApi) => {
    */
   return class TableWidgetBlock extends BaseBlockClass implements BaseBlock {
     private _root: ReactDOM.Root | null = null;
+    /**
+     * The slot markup this instance was created from, captured before anything
+     * rendered over it. Holding on to it is what makes the translatable form
+     * usable at all: the base class builds its own wrapper inside the element,
+     * so by the time `renderBlock` runs the persisted child nodes are gone.
+     */
+    private _slots: string | null = null;
 
     public constructor() {
       super();
+    }
+
+    /**
+     * Captures the slot markup *before* delegating to the base class, which is
+     * the only point where the element still holds the child nodes that came
+     * from the stored article HTML.
+     */
+    public connectedCallback(): void {
+      this.captureSlots();
+      const base = Object.getPrototypeOf(TableWidgetBlock.prototype) as {
+        connectedCallback?: () => void;
+      };
+      base.connectedCallback?.call(this);
+    }
+
+    private captureSlots(): void {
+      const slot = this.querySelector(SLOT_SELECTOR);
+      if (slot) this._slots = slot.outerHTML;
     }
 
     private get props(): TableWidgetProps {
       const attrs = this.parseAttributes<TableWidgetProps>();
       return {
         ...attrs,
+        // Empty string rather than `undefined`: `BlockAttributes` is indexed as
+        // `string | number | boolean`, and an absent slot reads as falsy anyway.
+        tableslots: this._slots ?? "",
         contentLanguage: this.contentLanguage,
       };
+    }
+
+    /**
+     * Runs after the config dialog closed and the attributes were applied. The
+     * only lifecycle hook that gives access to *this* element while the author
+     * is editing, so it is where the translatable child content is written.
+     */
+    public parseConfig<T extends Record<string, unknown>>(attributes: T): Record<string, string> {
+      const config = super.parseConfig(attributes);
+      this.syncSlots(config.tabledata, config.tablemode);
+      return config;
+    }
+
+    /**
+     * Brings the element's child content in line with the selected mode. The
+     * `tabledata` attribute is written in every mode so switching back can
+     * never lose an author's table — in `slots` mode the reader simply ignores
+     * it (see `table-widget.tsx`).
+     */
+    private syncSlots(tabledata: string | undefined, tablemode: string | undefined): void {
+      const existing = this.querySelector(SLOT_SELECTOR);
+      if (!writesSlots(asTableMode(tablemode))) {
+        existing?.remove();
+        this._slots = null;
+        return;
+      }
+      const template = document.createElement("template");
+      template.innerHTML = tableModelToSlotMarkup(parseTableModel(tabledata));
+      const slot = template.content.firstElementChild;
+      if (!slot) return;
+      if (existing) {
+        existing.replaceWith(slot);
+      } else {
+        this.insertBefore(slot, this.firstChild);
+      }
+      this._slots = slot.outerHTML;
     }
 
     public renderBlock(container: HTMLElement): void {

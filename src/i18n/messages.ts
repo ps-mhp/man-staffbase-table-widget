@@ -145,6 +145,11 @@ export interface Messages {
   // --- Config dialog (RJSF schema) ---
   configTableDataTitle: string;
   configTableDataHelp: string;
+  configTableModeTitle: string;
+  configTableModeHelp: string;
+  configTableModeAttribute: string;
+  configTableModeSlots: string;
+  configTableModeBoth: string;
 
   // --- Errors ---
   errImageInsert: string;

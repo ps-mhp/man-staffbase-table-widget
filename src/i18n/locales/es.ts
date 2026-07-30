@@ -109,6 +109,12 @@ export const es: Messages = {
   configTableDataTitle: "Datos de la tabla",
   configTableDataHelp: "Se edita con el editor de tablas de arriba.",
 
+  configTableModeTitle: "Almacenamiento de la tabla",
+  configTableModeHelp: "«Atributo» es el comportamiento anterior. «Slots» guarda la tabla como contenido traducible dentro del widget. «Ambos» escribe las dos formas y prioriza los slots al leer.",
+  configTableModeAttribute: "Atributo (no traducible)",
+  configTableModeSlots: "Slots (traducible)",
+  configTableModeBoth: "Ambos (slots preferidos)",
+
   errImageInsert: "No se pudo insertar la imagen.",
   errImageSizes: "No se pudieron determinar los tamaños de las imágenes.",
   errImport: "Error de importación",

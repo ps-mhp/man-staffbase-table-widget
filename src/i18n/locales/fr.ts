@@ -109,6 +109,12 @@ export const fr: Messages = {
   configTableDataTitle: "Données du tableau",
   configTableDataHelp: "Modifiées via l'éditeur de tableau ci-dessus.",
 
+  configTableModeTitle: "Stockage du tableau",
+  configTableModeHelp: "« Attribut » correspond au comportement précédent. « Slots » stocke le tableau comme contenu traduisible dans le widget. « Les deux » écrit les deux formes et privilégie les slots à la lecture.",
+  configTableModeAttribute: "Attribut (non traduisible)",
+  configTableModeSlots: "Slots (traduisible)",
+  configTableModeBoth: "Les deux (slots prioritaires)",
+
   errImageInsert: "L'image n'a pas pu être insérée.",
   errImageSizes: "Les tailles des images n'ont pas pu être déterminées.",
   errImport: "Échec de l'importation",

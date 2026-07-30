@@ -113,6 +113,12 @@ export const pt: Messages = {
   configTableDataTitle: "Dados da tabela",
   configTableDataHelp: "Editados pelo editor de tabelas acima.",
 
+  configTableModeTitle: "Armazenamento da tabela",
+  configTableModeHelp: "“Atributo” é o comportamento anterior. “Slots” armazena a tabela como conteúdo traduzível dentro do widget. “Ambos” grava as duas formas e prioriza os slots na leitura.",
+  configTableModeAttribute: "Atributo (não traduzível)",
+  configTableModeSlots: "Slots (traduzível)",
+  configTableModeBoth: "Ambos (slots priorizados)",
+
   errImageInsert: "Não foi possível inserir a imagem.",
   errImageSizes: "Não foi possível determinar os tamanhos das imagens.",
   errImport: "Falha na importação",

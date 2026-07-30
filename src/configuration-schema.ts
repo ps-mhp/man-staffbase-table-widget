@@ -14,6 +14,7 @@
 import { UiSchema } from "@rjsf/utils";
 import { JSONSchema7 } from "json-schema";
 import { t } from "./i18n";
+import { DEFAULT_TABLE_MODE } from "./table-mode";
 
 /**
  * schema used for generation of the configuration dialog
@@ -24,12 +25,26 @@ import { t } from "./i18n";
  * through the custom grid editor that is injected into this dialog
  * (see `table-editor-injector.ts`); the plain textarea rendered by RJSF
  * acts as a fallback/backing field in case the injection fails to mount.
+ *
+ * `tablemode` selects where the table is stored — see `table-mode.ts`. It is a
+ * plain author-facing choice so that the attribute form and the translatable
+ * slot form can be verified against a live Staffbase instance one at a time.
  */
 export const configurationSchema: JSONSchema7 = {
   properties: {
     tabledata: {
       type: "string",
       title: t("configTableDataTitle"),
+    },
+    tablemode: {
+      type: "string",
+      title: t("configTableModeTitle"),
+      default: DEFAULT_TABLE_MODE,
+      oneOf: [
+        { const: "attribute", title: t("configTableModeAttribute") },
+        { const: "slots", title: t("configTableModeSlots") },
+        { const: "both", title: t("configTableModeBoth") },
+      ],
     },
   },
 };
@@ -42,5 +57,8 @@ export const uiSchema: UiSchema = {
   tabledata: {
     "ui:widget": "textarea",
     "ui:help": t("configTableDataHelp"),
+  },
+  tablemode: {
+    "ui:help": t("configTableModeHelp"),
   },
 };

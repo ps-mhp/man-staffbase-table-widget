@@ -18,9 +18,12 @@ import {
   isCovered,
   mergeAt,
   cellFormat,
+  TableDataStatus,
 } from "./table-model";
+import { asTableMode } from "./table-mode";
 import { formatToStyle, formatToCellStyle } from "./cell-style";
 import { sanitizeRichText, richTextToPlain } from "./rich-text";
+import { parseSlotMarkup } from "./table-dom";
 import { t } from "./i18n";
 
 /**
@@ -28,6 +31,24 @@ import { t } from "./i18n";
  */
 export type TableWidgetProps = BlockAttributes & {
   tabledata?: string;
+  /**
+   * The widget element's slot markup, read before rendering replaces it (see
+   * `index.tsx`). Passed as a string rather than a parsed model so this
+   * component stays purely attribute-driven and directly testable.
+   *
+   * Preferred over `tabledata` whenever it holds a usable grid: after a
+   * content translation the slots carry the translated text while the
+   * attribute still holds the source language.
+   */
+  tableslots?: string;
+  /**
+   * Which storage form is authoritative — see `table-mode.ts`. In `"slots"`
+   * mode the attribute is deliberately *not* used as a fallback even though it
+   * is still written: that is what makes the slot form verifiable on its own.
+   * If the editor strips the child nodes, the widget says so instead of
+   * quietly rendering the attribute and hiding the answer.
+   */
+  tablemode?: string;
 };
 
 const baseCellStyle: React.CSSProperties = {
@@ -97,8 +118,20 @@ const UnreadableNotice = (): ReactElement => (
   </div>
 );
 
-export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
-  const { model, status } = useMemo(() => readTableModel(tabledata), [tabledata]);
+export const TableWidget = ({
+  tabledata,
+  tableslots,
+  tablemode,
+}: TableWidgetProps): ReactElement => {
+  const mode = asTableMode(tablemode);
+  const { model, status } = useMemo(() => {
+    // Slots win wherever they are allowed: they are the form a content
+    // translation actually rewrites, so they carry the translated text.
+    const fromSlots = mode === "attribute" ? null : parseSlotMarkup(tableslots);
+    if (fromSlots) return { model: fromSlots, status: "ok" as TableDataStatus };
+    if (mode === "slots") return { ...readTableModel(undefined), status: "unreadable" as const };
+    return readTableModel(tabledata);
+  }, [tabledata, tableslots, mode]);
   const { data } = model;
   const headerRow = data[0] ?? [];
 
