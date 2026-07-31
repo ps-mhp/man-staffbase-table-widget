@@ -63,6 +63,45 @@ export interface TranslateTableInput {
   readonly model: TableModel;
   readonly sourceLanguage: string;
   readonly targetLanguage: string;
+  /**
+   * The editor's own request headers, to be reused verbatim. Without them the
+   * endpoint answers 403 — see {@link buildHeaders}.
+   */
+  readonly hostHeaders?: HeadersInit;
+}
+
+/**
+ * Headers that must not be carried over from the editor's request.
+ *
+ * `x-request-id` correlates one call in the tenant's logs; sending a second
+ * call under the same id makes the two indistinguishable there. It is a
+ * tracing id, not an authorization one, so dropping it is safe — if a 403
+ * ever survives this, it is the first thing to try adding back.
+ *
+ * Headers the Fetch spec forbids a caller to set (`cookie`, `origin`,
+ * `referer`, `sec-*`, `user-agent`, `content-length`, …) need no handling: the
+ * browser silently drops them from a request's header list and sets its own.
+ */
+const DROPPED_HOST_HEADERS = ["x-request-id"];
+
+/**
+ * Builds the request headers by **copying the editor's own** and overriding
+ * only what this request needs.
+ *
+ * Not hand-assembled on purpose. The endpoint rejects a call without
+ * `x-csrf-token` with 403, and the tenant also sees `staffbase-app` and
+ * `x-staffbase-app-version` on every editor call. Enumerating those here would
+ * mean re-discovering the list every time Staffbase adds a required header;
+ * copying whatever the editor just sent is correct by construction, since this
+ * request goes to the same endpoint from the same session.
+ */
+export function buildHeaders(hostHeaders?: HeadersInit): Headers {
+  const headers = new Headers(hostHeaders ?? undefined);
+  DROPPED_HOST_HEADERS.forEach((name) => headers.delete(name));
+  headers.set("Content-Type", "application/json");
+  headers.set("Accept", "application/json");
+  headers.set(SELF_REQUEST_HEADER, "1");
+  return headers;
 }
 
 /**
@@ -88,7 +127,7 @@ export function extractTranslatedHtml(body: unknown): string | null {
  * response that carries no translated table.
  */
 export async function translateTableModel(
-  { model, sourceLanguage, targetLanguage }: TranslateTableInput,
+  { model, sourceLanguage, targetLanguage, hostHeaders }: TranslateTableInput,
   { path = TRANSLATIONS_PATH, fetchImpl }: TranslationClientOptions = {},
 ): Promise<TableModel> {
   const doFetch = fetchImpl ?? ((...args: Parameters<typeof fetch>) => fetch(...args));
@@ -98,10 +137,7 @@ export async function translateTableModel(
     response = await doFetch(path, {
       method: "POST",
       credentials: "same-origin",
-      headers: {
-        "Content-Type": "application/json",
-        [SELF_REQUEST_HEADER]: "1",
-      },
+      headers: buildHeaders(hostHeaders),
       body: JSON.stringify({
         sourceLanguage,
         targetLanguage,

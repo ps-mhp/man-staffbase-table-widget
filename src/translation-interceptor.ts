@@ -12,6 +12,7 @@
  */
 
 import { log } from "./debug-log";
+import { showGrowl } from "./growl";
 import { collectStrings, findStringByKey, mapStrings } from "./json-strings";
 import { TableModel, encodeTableAttribute, parseTableModel } from "./table-model";
 import {
@@ -55,6 +56,26 @@ interface SourceWidget {
 }
 
 /**
+ * What the author is told when the table did not make it through.
+ *
+ * Every one of these ends the same way, because from the author's side the
+ * outcome is identical and actionable in only one way: the translated article
+ * has a table in the wrong language, and it has to be filled in by hand. The
+ * differences between them are a matter for the console and the diagnostics.
+ *
+ * Silence is not an option here — the editor reports a successful translation
+ * either way, so an author who is not told has no reason to check.
+ */
+const STAYS_IN_SOURCE = "Sie bleibt in der Ausgangssprache und muss manuell übersetzt werden.";
+
+export const MESSAGES = {
+  translationFailed: `Tabellen-Widget: Die Tabelle konnte nicht übersetzt werden. ${STAYS_IN_SOURCE}`,
+  notInserted: `Tabellen-Widget: Die übersetzte Tabelle konnte nicht eingefügt werden. ${STAYS_IN_SOURCE}`,
+  notReadable: `Tabellen-Widget: Die Tabelle konnte nicht zur Übersetzung übergeben werden. ${STAYS_IN_SOURCE}`,
+  unsupportedTransport: `Tabellen-Widget: Die Übersetzung der Tabelle wird von dieser Editor-Version nicht unterstützt. ${STAYS_IN_SOURCE}`,
+} as const;
+
+/**
  * What the interceptor has actually managed to do, readable in the browser
  * console via `window.__tableWidgetTranslation`.
  *
@@ -77,19 +98,59 @@ export const diagnostics = {
   responsesPatched: 0,
   /** Translation calls seen on `XMLHttpRequest` — see the module comment. */
   xhrRequestsSeen: 0,
+  /**
+   * Whether the editor's last translation request carried `x-csrf-token`. It is
+   * copied onto this bundle's own call; without it the endpoint answers 403.
+   */
+  hostCsrfTokenSeen: false,
   /** Why the last request was passed through untouched, if it was. */
   lastSkipReason: null as string | null,
   /** Language pair of the last handled request. */
   lastLanguages: null as string | null,
+  /** Warnings surfaced to the author. */
+  warningsShown: 0,
+  /** The last message the author was shown. */
+  lastWarning: null as string | null,
 };
 
 const publishDiagnostics = (): void => {
   (window as unknown as Record<string, unknown>).__tableWidgetTranslation = diagnostics;
 };
 
-const skip = (reason: string): null => {
+/**
+ * How the author is told. Replaced at install time by
+ * {@link TranslationInterceptorOptions.notify} so the orchestration can be
+ * tested without a DOM assertion in every case.
+ */
+let notifyAuthor: (message: string) => void = (message) => {
+  showGrowl(message, { kind: "warning" });
+};
+
+const warn = (message: string): void => {
+  diagnostics.warningsShown += 1;
+  diagnostics.lastWarning = message;
+  log(`warning shown: ${message}`);
+  try {
+    notifyAuthor(message);
+  } catch (error) {
+    // A failure to render the warning must not take the article's translation
+    // down with it.
+    log("could not show the warning", error);
+  }
+};
+
+/**
+ * Passes the request through, recording why.
+ *
+ * `warning` is given only for the cases where a table provably was in the
+ * request and provably will not be translated. The everyday reasons — no
+ * widget in the content, source and target language equal — are not failures
+ * and must stay silent, or the author is warned on every save.
+ */
+const skip = (reason: string, warning?: string): null => {
   diagnostics.lastSkipReason = reason;
   log(`translation passed through: ${reason}`);
+  if (warning !== undefined) warn(warning);
   return null;
 };
 
@@ -107,14 +168,24 @@ const methodOf = (input: RequestInfo | URL, init?: RequestInit): string =>
   (init?.method ?? (typeof input === "object" && "method" in input ? input.method : "GET") ?? "GET")
     .toUpperCase();
 
-/** True when the caller already marked the request as this bundle's own. */
-const isSelfRequest = (input: RequestInfo | URL, init?: RequestInit): boolean => {
-  const fromInit = new Headers(init?.headers ?? undefined).has(SELF_REQUEST_HEADER);
-  if (fromInit) return true;
-  return typeof input === "object" && "headers" in input
-    ? input.headers.has(SELF_REQUEST_HEADER)
-    : false;
+/**
+ * The headers the editor is about to send, following the Fetch spec's own
+ * precedence: `init.headers` replaces a `Request`'s headers rather than
+ * merging with them.
+ *
+ * They are reused verbatim for this bundle's own call — `x-csrf-token` in
+ * particular, without which the endpoint answers 403. See `buildHeaders` in
+ * `translation-client.ts`.
+ */
+const hostHeadersOf = (input: RequestInfo | URL, init?: RequestInit): Headers => {
+  if (init?.headers !== undefined) return new Headers(init.headers);
+  if (typeof input === "object" && "headers" in input) return new Headers(input.headers);
+  return new Headers();
 };
+
+/** True when the caller already marked the request as this bundle's own. */
+const isSelfRequest = (input: RequestInfo | URL, init?: RequestInit): boolean =>
+  hostHeadersOf(input, init).has(SELF_REQUEST_HEADER);
 
 /**
  * The request body as text, or `null` when it cannot be read without
@@ -207,6 +278,8 @@ export interface TranslationInterceptorOptions {
   readonly path?: string;
   /** Injectable translator, so the orchestration is testable on its own. */
   readonly translate?: typeof translateTableModel;
+  /** How to tell the author. Defaults to a growl; see `growl.ts`. */
+  readonly notify?: (message: string) => void;
 }
 
 /**
@@ -219,7 +292,12 @@ async function planFor(
   input: RequestInfo | URL,
   init: RequestInit | undefined,
   path: string,
-): Promise<{ sources: SourceWidget[]; sourceLanguage: string; targetLanguage: string } | null> {
+): Promise<{
+  sources: SourceWidget[];
+  sourceLanguage: string;
+  targetLanguage: string;
+  hostHeaders: Headers;
+} | null> {
   if (!urlOf(input).includes(path)) return null;
   if (methodOf(input, init) !== "POST") return null;
   if (isSelfRequest(input, init)) return null;
@@ -230,25 +308,31 @@ async function planFor(
   if (raw === null) return skip("request body not readable");
   if (!containsWidget(raw)) return skip("no table widget in request");
 
+  // From here on a widget is provably in the request, so anything that goes
+  // wrong costs the author a translated table and has to be said out loud.
   let body: unknown;
   try {
     body = JSON.parse(raw);
   } catch {
-    return skip("request body is not JSON");
+    return skip("request body is not JSON", MESSAGES.notReadable);
   }
 
   const sources = collectSourceWidgets(body);
-  if (sources.length === 0) return skip("no widget tag parsed from request");
+  if (sources.length === 0) return skip("no widget tag parsed from request", MESSAGES.notReadable);
   diagnostics.requestsWithWidget += 1;
 
   const sourceLanguage = findStringByKey(body, "sourceLanguage");
   const targetLanguage = findStringByKey(body, "targetLanguage");
-  if (!sourceLanguage || !targetLanguage) return skip("language pair missing from request");
+  if (!sourceLanguage || !targetLanguage) {
+    return skip("language pair missing from request", MESSAGES.notReadable);
+  }
   if (sourceLanguage === targetLanguage) return skip("source and target language are equal");
 
+  const hostHeaders = hostHeadersOf(input, init);
   diagnostics.lastLanguages = `${sourceLanguage} → ${targetLanguage}`;
+  diagnostics.hostCsrfTokenSeen = hostHeaders.has("x-csrf-token");
   diagnostics.lastSkipReason = null;
-  return { sources, sourceLanguage, targetLanguage };
+  return { sources, sourceLanguage, targetLanguage, hostHeaders };
 }
 
 /**
@@ -262,9 +346,12 @@ async function planFor(
 export function startTranslationInterceptor({
   path = TRANSLATIONS_PATH,
   translate = translateTableModel,
+  notify,
 }: TranslationInterceptorOptions = {}): () => void {
   const originalFetch = window.fetch;
   const originalOpen = XMLHttpRequest.prototype.open;
+  const originalNotify = notifyAuthor;
+  if (notify) notifyAuthor = notify;
 
   window.fetch = async function patchedFetch(
     input: RequestInfo | URL,
@@ -278,8 +365,14 @@ export function startTranslationInterceptor({
     }
     if (plan === null) return originalFetch.call(window, input, init);
 
-    const { sources, sourceLanguage, targetLanguage } = plan;
-    log(`translating ${sources.length} table(s)`, { sourceLanguage, targetLanguage });
+    const { sources, sourceLanguage, targetLanguage, hostHeaders } = plan;
+    log(`translating ${sources.length} table(s)`, {
+      sourceLanguage,
+      targetLanguage,
+      // The endpoint answers 403 without it, so its absence is the first thing
+      // to check when a translation fails.
+      csrfToken: hostHeaders.has("x-csrf-token"),
+    });
 
     // The table translations run alongside the editor's own request rather
     // than after it: they are independent calls to the same endpoint, and
@@ -288,12 +381,20 @@ export function startTranslationInterceptor({
     const tables = Promise.all(
       sources.map(async ({ model }) => {
         try {
-          const result = await translate({ model, sourceLanguage, targetLanguage });
+          const result = await translate({
+            model,
+            sourceLanguage,
+            targetLanguage,
+            hostHeaders,
+          });
           diagnostics.tablesTranslated += 1;
           return result;
         } catch (error) {
           diagnostics.tablesFailed += 1;
           log("table translation failed; leaving it in the source language", error);
+          // Identical messages collapse into one growl, so several failed
+          // tables in one article do not stack up the same sentence.
+          warn(MESSAGES.translationFailed);
           return null;
         }
       }),
@@ -303,10 +404,13 @@ export function startTranslationInterceptor({
     const translated = await tables;
 
     if (translated.every((model) => model === null)) {
+      // Already warned per table above; saying it twice adds nothing.
       diagnostics.lastSkipReason = "no table could be translated";
       return response;
     }
     if (!response.ok || response.status === 204) {
+      // The editor's own call failed, so it will show its own error. Ours would
+      // only add noise about a table nobody is going to see translated anyway.
       diagnostics.lastSkipReason = `response not patchable (HTTP ${response.status})`;
       return response;
     }
@@ -317,6 +421,7 @@ export function startTranslationInterceptor({
       if (patched === null) {
         diagnostics.lastSkipReason = "response did not match the request's widgets";
         log("translation response left untouched", diagnostics.lastSkipReason);
+        warn(MESSAGES.notInserted);
         return response;
       }
       diagnostics.responsesPatched += 1;
@@ -325,6 +430,7 @@ export function startTranslationInterceptor({
     } catch (error) {
       diagnostics.lastSkipReason = "response could not be rewritten";
       log("translation response left untouched", error);
+      warn(MESSAGES.notInserted);
       return response;
     }
   };
@@ -350,6 +456,7 @@ export function startTranslationInterceptor({
     if (String(url).includes(path) && method.toUpperCase() === "POST") {
       diagnostics.xhrRequestsSeen += 1;
       log("translation request went through XMLHttpRequest — table not translated", String(url));
+      warn(MESSAGES.unsupportedTransport);
     }
     forwardOpen.call(this, method, url, ...rest);
   } as typeof XMLHttpRequest.prototype.open;
@@ -361,6 +468,7 @@ export function startTranslationInterceptor({
   return () => {
     window.fetch = originalFetch;
     XMLHttpRequest.prototype.open = originalOpen;
+    notifyAuthor = originalNotify;
     diagnostics.installed = false;
   };
 }

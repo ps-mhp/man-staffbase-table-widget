@@ -74,6 +74,34 @@ describe("translateTableModel", () => {
     expect(headers.get(SELF_REQUEST_HEADER)).toBe("1");
   });
 
+  it("reuses the editor's headers, which is what keeps the endpoint from 403ing", async () => {
+    const fetchImpl = mockFetch(async () => jsonResponse(translatedBody()));
+
+    await translateTableModel(
+      {
+        ...input,
+        hostHeaders: {
+          "x-csrf-token": "CSRF_d7op7pvzznc0qu9e8h90",
+          "staffbase-app": "mansales; version=2026.3.113; platform=web",
+          "x-staffbase-app-version": "2026.3.113",
+          "x-request-id": "mansales-6978d8019d4dda7218979ae8-GXiGm",
+          accept: "*/*",
+        },
+      },
+      { fetchImpl: fetchImpl as unknown as typeof fetch },
+    );
+
+    const headers = new Headers(fetchImpl.mock.calls[0][1]?.headers);
+    expect(headers.get("x-csrf-token")).toBe("CSRF_d7op7pvzznc0qu9e8h90");
+    expect(headers.get("staffbase-app")).toContain("mansales");
+    expect(headers.get("x-staffbase-app-version")).toBe("2026.3.113");
+    // Overridden rather than inherited.
+    expect(headers.get("accept")).toBe("application/json");
+    expect(headers.get("content-type")).toBe("application/json");
+    // A tracing id must not be reused for a second, different call.
+    expect(headers.has("x-request-id")).toBe(false);
+  });
+
   it("throws on a non-2xx status", async () => {
     const fetchImpl = mockFetch(async () => new Response("nope", { status: 503 }));
     await expect(

@@ -82,6 +82,18 @@ response — the response's copy may already be mangled by failure (2).
 language tabs, locate the widget, `setAttribute`) needs editor internals and
 re-introduces the coupling the rejected design died of.
 
+**The second request reuses the editor's own headers.** A hand-assembled
+`Content-Type` + marker call is answered with **403**: the endpoint requires
+`x-csrf-token`, and the editor also sends `staffbase-app` and
+`x-staffbase-app-version` on every call. Enumerating those here would mean
+re-discovering the list whenever Staffbase adds a required header, so whatever
+the editor just sent is copied wholesale — same endpoint, same session, correct
+by construction. Overridden: `Content-Type` and `Accept` (`application/json`),
+plus the self-request marker. Dropped: `x-request-id`, a per-call tracing id
+that must not label two different calls. Headers the Fetch spec forbids a
+caller to set (`cookie`, `origin`, `sec-*`, `content-length`, …) need no
+handling — the browser drops them and sets its own.
+
 **Only `fetch` is handled.** Faking an `XMLHttpRequest` response means faking
 `readyState`, `status` and every event on the instance. If the editor ever uses
 XHR for this call, `diagnostics.xhrRequestsSeen` counts it and a console line
@@ -94,6 +106,31 @@ body, missing language pair, failed table translation, non-2xx response, widget
 count mismatch between request and response. A table left in the source language
 is a missing feature; an article the editor cannot load is a broken one.
 
+**And every one of them that costs the author a translated table says so.** The
+editor reports a successful translation either way, so an author who is not
+warned has no reason to check the table and finds out after publishing.
+Staffbase exposes no documented API for its toasts, so `growl.ts` builds the
+platform's own markup (`role="alert" aria-live="polite" class="ds-growl …"`) and
+appends it to the platform's growl container when one is in the DOM; otherwise
+it creates and positions its own, and adds fallback inline styles so the message
+is visible even if the modifier class does not exist. If the real API is ever
+identified, `showGrowl` is the single place to redirect.
+
+Warned (message in `MESSAGES`):
+
+| Case | Message |
+| --- | --- |
+| second API call failed | `translationFailed` |
+| response could not be rewritten / widget mismatch | `notInserted` |
+| body not JSON, no widget parsed, language pair missing | `notReadable` |
+| call went through `XMLHttpRequest` | `unsupportedTransport` |
+
+Deliberately silent: no widget in the article, source and target language equal
+(both are everyday states, not failures), and a non-2xx response to the
+editor's own call — the editor surfaces that itself, and a second toast about
+the table would only add noise. Repeated identical messages collapse into one
+growl, so five widgets failing in one article produce one warning.
+
 Translated cells are re-sanitized through `rich-text.ts` before they reach the
 model — the string has been through a third-party service and ends up in
 `dangerouslySetInnerHTML`. A cell the service emptied keeps its source value.
@@ -104,7 +141,8 @@ model — the string has been through a third-party service and ends up in
 
 ```js
 { installed, requestsSeen, requestsWithWidget, tablesTranslated,
-  tablesFailed, responsesPatched, xhrRequestsSeen, lastSkipReason, lastLanguages }
+  tablesFailed, responsesPatched, xhrRequestsSeen, hostCsrfTokenSeen,
+  warningsShown, lastWarning, lastSkipReason, lastLanguages }
 ```
 
 Console lines are prefixed `[table-widget]`; silence them with
@@ -122,5 +160,6 @@ Diagnosis by symptom:
 | `requestsSeen` stays 0, `xhrRequestsSeen` rises | editor uses XHR; the fetch hook cannot help |
 | `requestsSeen` stays 0, `xhrRequestsSeen` too | different endpoint path, or the bundle is in another frame than the editor |
 | `lastSkipReason: "no table widget in request"` | the editor does not send the widget markup for translation |
+| `tablesFailed` rises, second call is 403 | `x-csrf-token` missing — check `hostCsrfTokenSeen` |
 | `tablesFailed` rises | the second API call is rejected — check its response |
 | `responsesPatched` rises but the tab is unchanged | the editor does not take the tab content from this response |

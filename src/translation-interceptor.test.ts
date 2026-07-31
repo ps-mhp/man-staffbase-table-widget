@@ -1,7 +1,12 @@
 import { TableModel, parseTableModel } from "./table-model";
 import { encodeTablePayload } from "./table-payload";
-import { SELF_REQUEST_HEADER, TRANSLATIONS_PATH, translateTableModel } from "./translation-client";
-import { diagnostics, startTranslationInterceptor } from "./translation-interceptor";
+import {
+  SELF_REQUEST_HEADER,
+  TRANSLATIONS_PATH,
+  TranslateTableInput,
+  translateTableModel,
+} from "./translation-client";
+import { MESSAGES, diagnostics, startTranslationInterceptor } from "./translation-interceptor";
 
 /** The table as an author's widget carries it in the article. */
 const SOURCE_MODEL: TableModel = {
@@ -37,8 +42,8 @@ const responseBody = (tabledata: string = SOURCE_TABLEDATA): string =>
   JSON.stringify({ contents: { value: articleHtml(tabledata, "Hello") } });
 
 /** A translator that renames every cell, standing in for the second API call. */
-const fakeTranslate = jest.fn(
-  async ({ model }: { model: TableModel }): Promise<TableModel> => ({
+const fakeTranslate = jest.fn<Promise<TableModel>, [TranslateTableInput]>(
+  async ({ model }): Promise<TableModel> => ({
     ...model,
     data: model.data.map((row) => row.map((cell) => (cell === "" ? "" : `${cell}-en`))),
   }),
@@ -51,18 +56,23 @@ const modelFromResponse = async (response: Response): Promise<TableModel> => {
   return parseTableModel(attribute);
 };
 
+/** Stands in for the growl, so the warning paths are asserted on messages. */
+const notify = jest.fn<void, [string]>();
+
 describe("startTranslationInterceptor", () => {
   let hostFetch: jest.Mock<Promise<Response>, [RequestInfo | URL, RequestInit?]>;
   let stop: () => void;
 
   beforeEach(() => {
     fakeTranslate.mockClear();
+    notify.mockClear();
     hostFetch = jest.fn<Promise<Response>, [RequestInfo | URL, RequestInit?]>(
       async () => new Response(responseBody(), { status: 200 }),
     );
     window.fetch = hostFetch as unknown as typeof fetch;
     stop = startTranslationInterceptor({
       translate: fakeTranslate as unknown as typeof translateTableModel,
+      notify,
     });
   });
 
@@ -86,6 +96,32 @@ describe("startTranslationInterceptor", () => {
     expect(model.data).toEqual([["", "Spalte 1-en"], ["Zeile 1-en", "Auto-en"]]);
     // Coordinates-keyed state rides along untouched.
     expect(model.formats).toEqual({ "0,1": { bold: true } });
+  });
+
+  it("hands the editor's own headers to the table translation", async () => {
+    await window.fetch(TRANSLATIONS_PATH, {
+      method: "POST",
+      headers: { "x-csrf-token": "CSRF_abc", "staffbase-app": "mansales; platform=web" },
+      body: requestBody(),
+    });
+
+    const headers = new Headers(fakeTranslate.mock.calls[0][0].hostHeaders);
+    expect(headers.get("x-csrf-token")).toBe("CSRF_abc");
+    expect(headers.get("staffbase-app")).toBe("mansales; platform=web");
+    expect(diagnostics.hostCsrfTokenSeen).toBe(true);
+  });
+
+  it("takes the headers off a Request object too", async () => {
+    await window.fetch(
+      new Request(`https://tenant.example${TRANSLATIONS_PATH}`, {
+        method: "POST",
+        headers: { "x-csrf-token": "CSRF_from_request" },
+        body: requestBody(),
+      }),
+    );
+
+    const headers = new Headers(fakeTranslate.mock.calls[0][0].hostHeaders);
+    expect(headers.get("x-csrf-token")).toBe("CSRF_from_request");
   });
 
   it("keeps the rest of the translated article exactly as the host sent it", async () => {
@@ -204,6 +240,77 @@ describe("startTranslationInterceptor", () => {
     xhr.open("POST", TRANSLATIONS_PATH);
 
     expect(diagnostics.xhrRequestsSeen).toBe(seen + 1);
+  });
+
+  describe("warning the author", () => {
+    it("warns when the table translation fails", async () => {
+      fakeTranslate.mockRejectedValueOnce(new Error("service down"));
+
+      await window.fetch(TRANSLATIONS_PATH, { method: "POST", body: requestBody() });
+
+      expect(notify).toHaveBeenCalledWith(MESSAGES.translationFailed);
+    });
+
+    it("warns when the translated table could not be inserted", async () => {
+      hostFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({ contents: { value: "<p>Hello</p>" } }), { status: 200 }),
+      );
+
+      await window.fetch(TRANSLATIONS_PATH, { method: "POST", body: requestBody() });
+
+      expect(notify).toHaveBeenCalledWith(MESSAGES.notInserted);
+    });
+
+    it("warns when the request carries a widget it cannot read", async () => {
+      await window.fetch(TRANSLATIONS_PATH, {
+        method: "POST",
+        body: `not json, but it mentions ${widgetTag("b64:AA")}`,
+      });
+
+      expect(notify).toHaveBeenCalledWith(MESSAGES.notReadable);
+    });
+
+    it("warns when the language pair is missing", async () => {
+      await window.fetch(TRANSLATIONS_PATH, {
+        method: "POST",
+        body: JSON.stringify({ contents: { value: articleHtml(SOURCE_TABLEDATA, "Hallo") } }),
+      });
+
+      expect(notify).toHaveBeenCalledWith(MESSAGES.notReadable);
+    });
+
+    it("warns when the call goes through XMLHttpRequest", () => {
+      new XMLHttpRequest().open("POST", TRANSLATIONS_PATH);
+
+      expect(notify).toHaveBeenCalledWith(MESSAGES.unsupportedTransport);
+    });
+
+    it("stays silent on a successful translation", async () => {
+      await window.fetch(TRANSLATIONS_PATH, { method: "POST", body: requestBody() });
+
+      expect(notify).not.toHaveBeenCalled();
+    });
+
+    it("stays silent for an article without a widget", async () => {
+      await window.fetch(TRANSLATIONS_PATH, {
+        method: "POST",
+        body: JSON.stringify({
+          sourceLanguage: "de_DE",
+          targetLanguage: "en_US",
+          contents: { value: "<p>Hallo</p>" },
+        }),
+      });
+
+      expect(notify).not.toHaveBeenCalled();
+    });
+
+    it("stays silent when the editor's own call failed — it reports that itself", async () => {
+      hostFetch.mockResolvedValueOnce(new Response("nope", { status: 500 }));
+
+      await window.fetch(TRANSLATIONS_PATH, { method: "POST", body: requestBody() });
+
+      expect(notify).not.toHaveBeenCalled();
+    });
   });
 
   it("restores the original fetch on cleanup", () => {
