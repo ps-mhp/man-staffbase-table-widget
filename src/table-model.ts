@@ -12,6 +12,7 @@
  */
 
 import { TableData, parseTableData } from "./table-json";
+import { decodeTablePayload, encodeTablePayload, isTablePayload } from "./table-payload";
 
 /**
  * A merged cell region. `(row, col)` is the anchor (top-left) cell that is
@@ -95,10 +96,15 @@ const isValidMerge = (m: unknown): m is Merge =>
 /**
  * Parses the widget's `tabledata` attribute into a {@link TableModel}.
  *
- * Backward compatible: a legacy JSON **array** (`string[][]`) is read as a
- * model with no merges/formats and no preset sort, so existing widget
- * instances render exactly as before. A JSON **object** is read as the full
- * model. Any malformed part falls back to a safe default.
+ * Accepts all three shapes the attribute has ever had, newest first:
+ *  - a base64 payload (`b64:…`, see `table-payload.ts`) — what is written
+ *    today, because it is the only form the translation pipeline cannot
+ *    corrupt;
+ *  - a JSON **object** with `data`/`merges`/`formats`/`sort`;
+ *  - a legacy JSON **array** (`string[][]`), read as a model with no merges,
+ *    formats or preset sort, so existing instances render exactly as before.
+ *
+ * Any malformed part falls back to a safe default.
  */
 export function parseTableModel(raw: string | undefined | null): TableModel {
   const empty = (data: TableData): TableModel => ({
@@ -109,6 +115,14 @@ export function parseTableModel(raw: string | undefined | null): TableModel {
   });
 
   if (!raw) return empty(parseTableData(raw));
+
+  // A payload that carries the marker but does not decode is broken data, not
+  // legacy JSON — reading it as JSON would only produce the same empty table
+  // via a longer path, so bail out directly.
+  if (isTablePayload(raw)) {
+    const decoded = decodeTablePayload(raw);
+    return decoded === null ? empty(parseTableData(undefined)) : parseTableModel(decoded);
+  }
 
   let parsed: unknown;
   try {
@@ -180,6 +194,19 @@ export function serializeTableModel(model: TableModel): string {
     formats: model.formats,
     sort: model.sort,
   });
+}
+
+/**
+ * Serializes a model into the exact string that goes into the `tabledata`
+ * attribute — i.e. {@link serializeTableModel} wrapped in the base64 payload.
+ *
+ * Everything that writes the attribute (the config dialog's backing textarea,
+ * the translation interceptor) must go through here, so no raw JSON with its
+ * quote-escaping hazard is ever stored again. Reading stays tolerant of the
+ * older forms; see {@link parseTableModel}.
+ */
+export function encodeTableAttribute(model: TableModel): string {
+  return encodeTablePayload(serializeTableModel(model));
 }
 
 /** The merge whose anchor is exactly `(row, col)`, if any. */

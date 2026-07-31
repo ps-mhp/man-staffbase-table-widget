@@ -12,7 +12,8 @@
     "type-check": "tsc --pretty --noEmit",
     "type-check:watch": "tsc --pretty --noEmit --watch",
     "lint": "eslint",
-    "lint:fix": "eslint --fix"
+    "lint:fix": "eslint --fix",
+    "release": "bash scripts/release.sh"
   },
   "keywords": [],
   "author": "",

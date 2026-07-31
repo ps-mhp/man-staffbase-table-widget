@@ -15,7 +15,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import { createPortal } from "react-dom";
 import { TableEditor } from "./table-editor";
-import { TableModel, parseTableModel, serializeTableModel } from "./table-model";
+import { TableModel, parseTableModel, encodeTableAttribute } from "./table-model";
 
 /**
  * The DOM id RJSF/MUI renders for the `tabledata` schema property when
@@ -172,7 +172,7 @@ function InjectedEditor({ textarea }: InjectedEditorProps): React.ReactElement {
 
   const handleChange = (model: TableModel): void => {
     setValue(model);
-    setNativeTextareaValue(textarea, serializeTableModel(model));
+    setNativeTextareaValue(textarea, encodeTableAttribute(model));
   };
 
   if (!isOpen) {

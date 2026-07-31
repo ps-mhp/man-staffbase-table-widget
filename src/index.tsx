@@ -19,6 +19,7 @@ import { BlockFactory, BlockDefinition, ExternalBlockDefinition, BaseBlock } fro
 import { TableWidgetProps, TableWidget } from "./table-widget";
 import { configurationSchema, uiSchema } from "./configuration-schema";
 import { startTableEditorInjector } from "./table-editor-injector";
+import { startTranslationInterceptor } from "./translation-interceptor";
 import icon from "../resources/table-widget.svg";
 import pkg from '../package.json'
 
@@ -45,6 +46,21 @@ const widgetAttributes: string[] = [
  * never needs to call this.
  */
 export const stopTableEditorInjector = startTableEditorInjector();
+
+/**
+ * Makes the table travel with Staffbase's content translation.
+ *
+ * The table lives in the `tabledata` attribute — the only storage the widget
+ * SDK offers — and `POST /api/translations` translates text nodes, not
+ * attributes. This wraps that call so the table gets its own translation
+ * request and the result is written into the response the editor receives; see
+ * `translation-interceptor.ts` for why it sits at that layer.
+ *
+ * Installed unconditionally for the same reason as the editor injector: on a
+ * live content page the endpoint is never called, so the wrapper only ever
+ * forwards. Exported so tests can restore the original `fetch`.
+ */
+export const stopTranslationInterceptor = startTranslationInterceptor();
 
 /**
  * This factory creates the class which is registered with the tagname in the `custom element registry`

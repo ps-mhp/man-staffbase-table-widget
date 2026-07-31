@@ -15,6 +15,7 @@ import {
   TableModel,
   parseTableModel,
   serializeTableModel,
+  encodeTableAttribute,
   insertRow,
   insertColumn,
   deleteRow,
@@ -240,5 +241,33 @@ describe("setSort", () => {
     const m = model([["", "A"], ["R", "1"]]);
     expect(setSort(m, { col: 1, dir: "desc" }).sort).toEqual({ col: 1, dir: "desc" });
     expect(setSort(m, null).sort).toBeNull();
+  });
+});
+
+describe("encoded attribute payloads", () => {
+  it("round-trips a full model through the attribute form", () => {
+    const source = model([["", 'Spalte "1"'], ["Zeile 1", "Auto"]], {
+      merges: [{ row: 0, col: 0, rowSpan: 2, colSpan: 1 }],
+      formats: { "0,1": { bold: true } },
+      sort: { col: 1, dir: "asc" },
+    });
+
+    const attribute = encodeTableAttribute(source);
+
+    expect(attribute.startsWith("b64:")).toBe(true);
+    expect(parseTableModel(attribute)).toEqual(source);
+  });
+
+  it("still reads the legacy raw-JSON forms", () => {
+    expect(parseTableModel('[["","A"],["R","1"]]').data).toEqual([["", "A"], ["R", "1"]]);
+    expect(parseTableModel('{"data":[["","A"]],"merges":[],"formats":{},"sort":null}').data).toEqual([
+      ["", "A"],
+    ]);
+  });
+
+  it("falls back to the default table for a corrupt payload", () => {
+    // A marker with unusable content is broken data, not legacy JSON — it must
+    // not be re-read as a table of the literal string.
+    expect(parseTableModel("b64:not base64!!").data).toEqual(parseTableModel(undefined).data);
   });
 });

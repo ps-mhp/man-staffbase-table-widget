@@ -5,6 +5,7 @@ import validator from "@rjsf/validator-ajv8";
 
 import { startTableEditorInjector } from "./table-editor-injector";
 import { configurationSchema, uiSchema } from "./configuration-schema";
+import { parseTableModel } from "./table-model";
 
 describe("startTableEditorInjector", () => {
   it("injects a grid editor next to the tabledata textarea and hides the textarea", async () => {
@@ -74,7 +75,10 @@ describe("startTableEditorInjector", () => {
 
     await waitFor(() => expect(onSubmit).toHaveBeenCalled());
     const formData = onSubmit.mock.calls[0][0].formData;
-    const table = JSON.parse(formData.tabledata);
+    // The attribute is written as an encoded payload, never as raw JSON — see
+    // `table-payload.ts` for why.
+    expect(formData.tabledata.startsWith("b64:")).toBe(true);
+    const table = parseTableModel(formData.tabledata).data;
     expect(table[1][0]).toBe("Geänderte Zeile");
 
     await act(async () => {

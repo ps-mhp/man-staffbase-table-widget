@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-undef
 module.exports = {
   setupFilesAfterEnv: ["./test/jest-setup.ts"],
-  testEnvironment: "jsdom",
+  testEnvironment: "<rootDir>/test/jsdom-with-fetch-environment.js",
   moduleNameMapper: {
     "\\.svg": "<rootDir>/__mocks__/svg.js",
     "^nanoid(/(.*)|$)": "nanoid$1",
