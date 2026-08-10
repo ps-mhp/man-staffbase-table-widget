@@ -8,9 +8,14 @@
 #   scripts/release.sh rc                    # same, explicit
 #   scripts/release.sh final                 # promote the open candidate line
 #   scripts/release.sh minor -m "message"    # open a candidate on the next minor
+#   scripts/release.sh rc --install          # install into Staffbase afterwards
+#   scripts/release.sh rc --no-install       # never ask, never install
 #   scripts/release.sh rc --dry-run          # print every step, change nothing
 #
 # Bumps: rc (default), final, patch, minor, major.
+#
+# When neither --install nor --no-install is given and the terminal is
+# interactive, the script asks at the end whether to run scripts/install.sh.
 #
 # Publishing is irreversible from the CDN's point of view — jsDelivr caches a
 # tag permanently — so the script refuses to overwrite an existing tag and
@@ -23,13 +28,16 @@ cd "$(dirname "$0")/.."
 BUMP="rc"
 DRY_RUN=0
 MESSAGE=""
+INSTALL="ask"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     rc|final|patch|minor|major) BUMP="$1"; shift ;;
     --dry-run|-n) DRY_RUN=1; shift ;;
+    --install) INSTALL="yes"; shift ;;
+    --no-install) INSTALL="no"; shift ;;
     -m|--message) MESSAGE="${2:-}"; shift 2 ;;
-    -h|--help) sed -n '3,17p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '3,22p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
 done
@@ -150,4 +158,23 @@ printf '%s\n\n' "$CDN_URL"
 
 if [[ $DRY_RUN == 1 ]]; then
   printf '\033[1;33m(dry run — nothing was changed)\033[0m\n\n'
+  exit 0
+fi
+
+# --- Install ---------------------------------------------------------------
+
+# jsDelivr builds the tag on first request; installing immediately is fine, the
+# CDN fetches from GitHub on the initial miss.
+if [[ "$INSTALL" == "ask" ]]; then
+  if [[ -t 0 ]]; then
+    read -r -p "Install $VERSION into Staffbase now? [y/N] " answer
+    [[ "$answer" =~ ^[Yy]$ ]] && INSTALL="yes" || INSTALL="no"
+  else
+    INSTALL="no"
+  fi
+fi
+
+if [[ "$INSTALL" == "yes" ]]; then
+  step "Install"
+  scripts/install.sh "$VERSION" --yes
 fi

@@ -20,6 +20,20 @@ $ npm install
 | `npm run lint` | Checks the codebase on style issues |
 | `npm run lint:fix` | Fixes style issues in the codebase |
 
+## Release and installation
+
+| Command | Description |
+|---|---|
+| `scripts/release.sh` | Verifies, builds, commits, tags and publishes the next release candidate |
+| `scripts/release.sh final` | Promotes the open candidate line to a final release |
+| `scripts/release.sh rc --install` | Same, and installs the new version into Staffbase right away |
+| `scripts/install.sh` | Installs the latest release into Staffbase (replaces the registered widget) |
+| `scripts/install.sh 1.4.0-rc.12 --dry-run` | Shows what installing that version would change |
+
+`scripts/install.sh` reads its configuration from a gitignored `.env` — copy
+`.env.example` and fill in `STAFFBASE_API_URL`, `STAFFBASE_API_TOKEN` and the
+widgets to install by default (`STAFFBASE_WIDGETS`).
+
 
 ## Building the form for configuration
 
