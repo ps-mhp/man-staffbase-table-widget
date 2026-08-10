@@ -6,7 +6,7 @@ import { TableModel } from "./table-model";
 import * as tableImport from "./table-import";
 import { MediaClient, MediaItem } from "./media-client";
 import { DEFAULT_IMAGE_WIDTH } from "./cell-image";
-import { IMAGE_FIT_CLASS } from "./image-fit";
+import { IMAGE_FIT_CLASS, IMAGE_NO_FIT_CLASS } from "./image-fit";
 
 const mediaItem = (id: string): MediaItem => ({
   id,
@@ -450,7 +450,9 @@ describe("TableEditor", () => {
         />,
       );
 
-      expect(container.querySelector(".table-editor__grid-wrap")).not.toHaveClass(IMAGE_FIT_CLASS);
+      const wrap = container.querySelector(".table-editor__grid-wrap");
+      expect(wrap).not.toHaveClass(IMAGE_FIT_CLASS);
+      expect(wrap).toHaveClass(IMAGE_NO_FIT_CLASS);
     });
 
     it("toggles the fit option without touching the cells", () => {
@@ -581,6 +583,69 @@ describe("TableEditor", () => {
       await waitFor(() => expect(alert).toHaveBeenCalled());
       expect(onChange).not.toHaveBeenCalled();
       alert.mockRestore();
+    });
+  });
+
+  describe("clearing formatting", () => {
+    const formatted = (): TableModel =>
+      model(
+        [
+          ["", "Q1"],
+          ["Zeile", 'm<sup>2</sup><img src="https://cdn.example.com/a.png" style="width:300px">'],
+        ],
+        { formats: { "0,1": { bold: true }, "1,1": { color: "#f00" } } },
+      );
+
+    const clearVia = (testId: string, value: TableModel): jest.Mock => {
+      const onChange = jest.fn();
+      render(<TableEditor value={value} onChange={onChange} />);
+      fireEvent.click(screen.getByTestId("toolbar-clear-format"));
+      fireEvent.click(screen.getByTestId(testId));
+      return onChange;
+    };
+
+    it("resets the whole table when nothing is selected", () => {
+      const onChange = clearVia("toolbar-clear-format-all", formatted());
+
+      const arg = onChange.mock.calls.at(-1)![0] as TableModel;
+      expect(arg.formats).toEqual({});
+      expect(arg.data[1][1]).not.toContain("<sup>");
+      expect(arg.data[1][1]).not.toContain("width:300px");
+      expect(arg.data[1][1]).toContain("cdn.example.com/a.png");
+    });
+
+    it("keeps image widths when only text formatting is cleared", () => {
+      const arg = clearVia("toolbar-clear-format-text", formatted()).mock.calls.at(-1)![0] as TableModel;
+
+      expect(arg.formats).toEqual({});
+      expect(arg.data[1][1]).toContain("width:300px");
+      expect(arg.data[1][1]).not.toContain("<sup>");
+    });
+
+    it("keeps cell formats when only image sizes are reset", () => {
+      const arg = clearVia("toolbar-clear-format-images", formatted()).mock.calls.at(-1)![0] as TableModel;
+
+      expect(arg.formats).toEqual(formatted().formats);
+      expect(arg.data[1][1]).toContain("<sup>2</sup>");
+      expect(arg.data[1][1]).not.toContain("width:300px");
+    });
+
+    it("limits the reset to the selection", () => {
+      const onChange = jest.fn();
+      render(<TableEditor value={formatted()} onChange={onChange} />);
+
+      fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
+      fireEvent.click(screen.getByTestId("toolbar-clear-format"));
+      fireEvent.click(screen.getByTestId("toolbar-clear-format-all"));
+
+      const arg = onChange.mock.calls.at(-1)![0] as TableModel;
+      expect(arg.formats).toEqual({ "0,1": { bold: true } });
+      expect(arg.data[1][1]).not.toContain("<sup>");
+    });
+
+    it("stays available without a selection", () => {
+      render(<TableEditor value={formatted()} onChange={jest.fn()} />);
+      expect(screen.getByTestId("toolbar-clear-format")).not.toBeDisabled();
     });
   });
 });

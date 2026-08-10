@@ -14,6 +14,7 @@
 import * as React from "react";
 import { ReactElement, useEffect, useRef, useState } from "react";
 import { CellFormat, TextAlign, VerticalAlign } from "./table-model";
+import { ClearScope } from "./clear-format";
 
 const FONT_SIZES = [10, 12, 14, 16, 18, 20, 24, 28, 32];
 
@@ -361,8 +362,13 @@ const IconImageSize = (): ReactElement => (
     <path d="M8 2.5v11" strokeWidth={1.1} strokeDasharray="1.5 1.5" />
   </svg>
 );
-const IconChevron = (): ReactElement => (
-  <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+const IconClearFormat = (): ReactElement => (
+  <svg {...svgBase} aria-hidden>
+    <path d="M6 3h7M9.5 3L7 13" />
+    <path d="M2 7l4 4M6 7l-4 4" />
+  </svg>
+);
+const IconChevron = (): ReactElement => (  <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
     <path d="M3 4.5L6 8l3-3.5" />
   </svg>
 );
@@ -416,6 +422,13 @@ export interface TableToolbarProps {
    */
   fitImages: boolean;
   onToggleFitImages: () => void;
+  /**
+   * Resets formatting — on the selection, or on the whole table when nothing
+   * is selected, which is why these stay enabled without a selection.
+   */
+  onClearFormatting: (scope: ClearScope) => void;
+  /** True while a selection limits the reset to part of the table. */
+  hasClearTarget: boolean;
   onDone?: () => void;
 }
 
@@ -641,6 +654,8 @@ export const TableToolbar = (props: TableToolbarProps): ReactElement => {
     onResetImageSize,
     fitImages,
     onToggleFitImages,
+    onClearFormatting,
+    hasClearTarget,
     onDone,
   } = props;
 
@@ -917,6 +932,43 @@ export const TableToolbar = (props: TableToolbarProps): ReactElement => {
             <span className="tw-rb__switch-track" aria-hidden="true" />
             <span>Bilder anpassen</span>
           </button>
+
+          <Dropdown
+            testId="toolbar-clear-format-menu"
+            trigger={(toggle) => (
+              <button
+                type="button"
+                className="tw-rb__big"
+                data-testid="toolbar-clear-format"
+                title={
+                  hasClearTarget
+                    ? "Formatierung der Markierung entfernen"
+                    : "Formatierung der ganzen Tabelle entfernen (nichts markiert)"
+                }
+                onClick={toggle}
+              >
+                <IconClearFormat />
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "2px" }}>Formatierung <IconChevron /></span>
+              </button>
+            )}
+          >
+            {(close) => {
+              const suffix = hasClearTarget ? "der Markierung" : "der ganzen Tabelle";
+              return (
+                <>
+                  <button type="button" className="tw-rb__menu-item" data-testid="toolbar-clear-format-all" onClick={() => { onClearFormatting("all"); close(); }}>
+                    {`Alles entfernen (${suffix})`}
+                  </button>
+                  <button type="button" className="tw-rb__menu-item" data-testid="toolbar-clear-format-text" onClick={() => { onClearFormatting("text"); close(); }}>
+                    Nur Textformatierung entfernen
+                  </button>
+                  <button type="button" className="tw-rb__menu-item" data-testid="toolbar-clear-format-images" onClick={() => { onClearFormatting("images"); close(); }}>
+                    Nur Bildgrößen zurücksetzen
+                  </button>
+                </>
+              );
+            }}
+          </Dropdown>
 
           <button type="button" className="tw-rb__big" data-testid="toolbar-upload-button" title="Tabelle hochladen (.csv, .xlsx)" onClick={() => fileInputRef.current?.click()}>
             <IconUpload />

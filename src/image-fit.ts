@@ -22,6 +22,15 @@
  * shrinking the image — which is what made an image in a header-less column
  * collapse. Container query units (`cqw`) resolve against the scroll wrapper,
  * which has a width of its own, so no such cycle exists.
+ *
+ * Both rule sets have to win against the host page. Staffbase ships article
+ * styles like `.content img { max-width: 100% }`, which have the same
+ * specificity as a single class of ours and are loaded after the widget, so
+ * they would otherwise take over — and being a percentage, they reintroduce
+ * exactly the cell-derived shrinking described above: two identical images
+ * end up different sizes because their columns hold different amounts of
+ * text. The selectors therefore repeat the class (raising specificity
+ * without inventing markup) and mark `max-width` as `!important`.
  */
 
 /**
@@ -55,6 +64,17 @@ export const IMAGE_FIT_STEPS: ReadonlyArray<ImageFitStep> = [
 export const IMAGE_FIT_CLASS = "tw-fit-images";
 
 /**
+ * Counterpart for a table with the option switched off. It still needs a
+ * rule of its own: without one, the host page's `max-width: 100%` applies
+ * and images would keep being squeezed by their column — the very thing the
+ * option is supposed to turn off.
+ */
+export const IMAGE_NO_FIT_CLASS = "tw-unfit-images";
+
+/** Repeated class, so a single-class host rule cannot outrank ours. */
+const scope = (className: string): string => `.${className}.${className} img`;
+
+/**
  * Scoped stylesheet implementing the cap. `min()` combines the two rules —
  * never wider than the container, and never wider than the step — so a single
  * declaration covers both; the container queries then only have to lower the
@@ -64,12 +84,15 @@ export const IMAGE_FIT_CLASS = "tw-fit-images";
  * markup only ever stores a width, so the height follows.
  */
 export const IMAGE_FIT_CSS = [
-  `.${IMAGE_FIT_CLASS} img { max-width: 100cqw; height: auto; }`,
+  `${scope(IMAGE_FIT_CLASS)} { max-width: 100cqw !important; height: auto; }`,
   ...IMAGE_FIT_STEPS.map(
     ({ from, maxWidth }) =>
-      `@container (min-width: ${from}px) { .${IMAGE_FIT_CLASS} img { max-width: min(100cqw, ${maxWidth}px); } }`,
+      `@container (min-width: ${from}px) { ${scope(IMAGE_FIT_CLASS)} { max-width: min(100cqw, ${maxWidth}px) !important; } }`,
   ),
 ].join("\n");
+
+/** Stylesheet for the option switched off: render at the stored size. */
+export const IMAGE_NO_FIT_CSS = `${scope(IMAGE_NO_FIT_CLASS)} { max-width: none !important; height: auto; }`;
 
 /**
  * The cap that applies at a given container width — the same value the

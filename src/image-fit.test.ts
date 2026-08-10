@@ -15,6 +15,8 @@ import {
   IMAGE_FIT_CLASS,
   IMAGE_FIT_CSS,
   IMAGE_FIT_STEPS,
+  IMAGE_NO_FIT_CLASS,
+  IMAGE_NO_FIT_CSS,
   imageFitMaxWidth,
 } from "./image-fit";
 
@@ -47,9 +49,18 @@ describe("imageFitMaxWidth", () => {
 
 describe("IMAGE_FIT_CSS", () => {
   it("scopes every rule to the fit class", () => {
-    const selectors = IMAGE_FIT_CSS.match(/\.[a-z-]+ img/g) ?? [];
+    const selectors = IMAGE_FIT_CSS.match(/\.[a-z.-]+ img/g) ?? [];
     expect(selectors.length).toBeGreaterThan(0);
-    selectors.forEach((selector) => expect(selector).toBe(`.${IMAGE_FIT_CLASS} img`));
+    selectors.forEach((selector) =>
+      expect(selector).toBe(`.${IMAGE_FIT_CLASS}.${IMAGE_FIT_CLASS} img`),
+    );
+  });
+
+  it("outranks a single-class rule from the host page", () => {
+    // Staffbase's article styles (`.content img { max-width: 100% }`) load
+    // after the widget, so equal specificity would lose.
+    expect(IMAGE_FIT_CSS).toContain(`.${IMAGE_FIT_CLASS}.${IMAGE_FIT_CLASS} img`);
+    expect(IMAGE_FIT_CSS).toContain("!important");
   });
 
   it("measures the container, not the cell", () => {
@@ -68,5 +79,17 @@ describe("IMAGE_FIT_CSS", () => {
       expect(IMAGE_FIT_CSS).toContain(`@container (min-width: ${from}px)`);
       expect(IMAGE_FIT_CSS).toContain(`min(100cqw, ${maxWidth}px)`);
     });
+  });
+});
+
+describe("IMAGE_NO_FIT_CSS", () => {
+  it("lifts any cap the host page would impose", () => {
+    expect(IMAGE_NO_FIT_CSS).toContain(`.${IMAGE_NO_FIT_CLASS}.${IMAGE_NO_FIT_CLASS} img`);
+    expect(IMAGE_NO_FIT_CSS).toContain("max-width: none !important");
+  });
+
+  it("uses a class of its own", () => {
+    expect(IMAGE_NO_FIT_CLASS).not.toBe(IMAGE_FIT_CLASS);
+    expect(IMAGE_NO_FIT_CSS).not.toContain(IMAGE_FIT_CLASS);
   });
 });

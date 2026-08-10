@@ -51,7 +51,8 @@ import {
   DEFAULT_IMAGE_WIDTH,
 } from "./cell-image";
 import { MeasureImage, measureImage } from "./image-measure";
-import { IMAGE_FIT_CLASS, IMAGE_FIT_CSS } from "./image-fit";
+import { IMAGE_FIT_CLASS, IMAGE_FIT_CSS, IMAGE_NO_FIT_CLASS, IMAGE_NO_FIT_CSS } from "./image-fit";
+import { ClearScope, clearFormatting } from "./clear-format";
 
 export interface TableEditorProps {
   value: TableModel;
@@ -712,6 +713,13 @@ export const TableEditor = ({
 
   const toggleFitImages = (): void => onChange(setFitImages(value, !value.fitImages));
 
+  /**
+   * Without a selection this resets the whole table — the diagnostic case,
+   * where the point is to rule out stored formatting entirely.
+   */
+  const clearFormats = (scope: ClearScope): void =>
+    onChange(clearFormatting(value, cellsInRanges(ranges), scope));
+
   // --- Format painter (pattern-based, like Excel) ---
 
   /**
@@ -829,13 +837,15 @@ export const TableEditor = ({
         onResetImageSize={() => void resizeImages("default")}
         fitImages={value.fitImages}
         onToggleFitImages={toggleFitImages}
+        onClearFormatting={clearFormats}
+        hasClearTarget={ranges.length > 0}
         onDone={onDone}
       />
 
       <ContextMenu.Root>
         <ContextMenu.Trigger asChild>
           <div
-            className={`table-editor__grid-wrap${value.fitImages ? ` ${IMAGE_FIT_CLASS}` : ""}`}
+            className={`table-editor__grid-wrap ${value.fitImages ? IMAGE_FIT_CLASS : IMAGE_NO_FIT_CLASS}`}
             onMouseUp={handleCellMouseUp}
             style={{
               // The only scrolling area of the editor. `alignSelf` keeps the
@@ -855,7 +865,7 @@ export const TableEditor = ({
               background: "#fff",
             }}
           >
-            {value.fitImages && <style>{IMAGE_FIT_CSS}</style>}
+            {value.fitImages ? <style>{IMAGE_FIT_CSS}</style> : <style>{IMAGE_NO_FIT_CSS}</style>}
             <table style={{ borderCollapse: "collapse" }} data-testid="table-editor-grid">
             <thead>
               <tr>

@@ -3,7 +3,7 @@ import { screen, render } from "@testing-library/react";
 
 import { TableWidget } from "./table-widget";
 import { serializeTableData } from "./table-json";
-import { IMAGE_FIT_CLASS } from "./image-fit";
+import { IMAGE_FIT_CLASS, IMAGE_NO_FIT_CLASS } from "./image-fit";
 
 describe("TableWidget", () => {
   it("renders the default table when no data is provided", () => {
@@ -198,7 +198,9 @@ describe("TableWidget", () => {
 
     const wrap = container.querySelector(".table-widget-scroll");
     expect(wrap).not.toHaveClass(IMAGE_FIT_CLASS);
-    expect(container.querySelector("style")).toBeNull();
+    expect(wrap).toHaveClass(IMAGE_NO_FIT_CLASS);
+    // The host page caps article images, so "off" still needs a rule.
+    expect(container.querySelector("style")?.textContent).toContain("max-width: none !important");
   });
 
   it("does not render an image with an unsafe source", () => {
