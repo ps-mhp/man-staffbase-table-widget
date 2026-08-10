@@ -168,7 +168,7 @@ describe("TableWidget", () => {
     expect(img).not.toBeNull();
     expect(img).toHaveAttribute("src", "https://cdn.example.com/logo.png");
     expect(img!.getAttribute("style")).toContain("width:120px");
-    expect(img!.getAttribute("style")).toContain("max-width:100%");
+    expect(img!.getAttribute("style")).toContain("max-width:none");
   });
 
   it("does not render an image with an unsafe source", () => {

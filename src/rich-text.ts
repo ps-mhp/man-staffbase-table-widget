@@ -72,8 +72,15 @@ const readImageWidth = (el: HTMLElement): number | null => {
 /**
  * Serializes a single `<img>` into safe markup, or `""` if its `src` is not
  * an allowed URL. The width (when set) is re-emitted together with
- * `height:auto;max-width:100%` so the image keeps its aspect ratio and never
- * overflows its cell.
+ * `height:auto` so the image keeps its aspect ratio.
+ *
+ * `max-width:none` is deliberate: a percentage `max-width` resolves against
+ * the cell, which in an auto-layout table is itself derived from the content.
+ * Browsers break that cycle by letting the image shrink, so a narrow column
+ * (e.g. one without a header) would squeeze the picture below its real size.
+ * With `none` the image always renders at its configured — or, when no width
+ * is set, its intrinsic — size and the column widens to fit it; anything too
+ * wide for the widget is reachable via the horizontal scroll of the table.
  */
 const serializeImage = (el: HTMLElement): string => {
   const src = el.getAttribute("src");
@@ -81,8 +88,8 @@ const serializeImage = (el: HTMLElement): string => {
   const alt = escapeAttr(el.getAttribute("alt") ?? "");
   const width = readImageWidth(el);
   const style = width
-    ? `width:${width}px;height:auto;max-width:100%`
-    : "height:auto;max-width:100%";
+    ? `width:${width}px;height:auto;max-width:none`
+    : "height:auto;max-width:none";
   return `<img src="${escapeAttr(src)}" alt="${alt}" style="${style}">`;
 };
 

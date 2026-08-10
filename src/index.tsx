@@ -52,9 +52,12 @@ export const stopTableEditorInjector = startTableEditorInjector();
  *
  * The table lives in the `tabledata` attribute — the only storage the widget
  * SDK offers — and `POST /api/translations` translates text nodes, not
- * attributes. This wraps that call so the table gets its own translation
+ * attributes (nor, in the new editor's block format, a custom block's
+ * properties). This wraps that call so the table gets its own translation
  * request and the result is written into the response the editor receives; see
- * `translation-interceptor.ts` for why it sits at that layer.
+ * `translation-interceptor.ts` for why it sits at that layer, and for how the
+ * classic editor's article HTML and the Content Designer's block tree are both
+ * served.
  *
  * Installed unconditionally for the same reason as the editor injector: on a
  * live content page the endpoint is never called, so the wrapper only ever

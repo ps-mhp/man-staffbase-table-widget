@@ -34,16 +34,16 @@ describe("clampImageWidth", () => {
 describe("buildImageMarkup", () => {
   it("builds sanitized markup for a safe https src", () => {
     expect(buildImageMarkup({ src: "https://cdn.example.com/a.png" })).toBe(
-      '<img src="https://cdn.example.com/a.png" alt="" style="height:auto;max-width:100%">',
+      '<img src="https://cdn.example.com/a.png" alt="" style="height:auto;max-width:none">',
     );
   });
 
   it("includes a clamped width when provided", () => {
     expect(buildImageMarkup({ src: "https://x.com/a.png", width: 320 })).toBe(
-      '<img src="https://x.com/a.png" alt="" style="width:320px;height:auto;max-width:100%">',
+      '<img src="https://x.com/a.png" alt="" style="width:320px;height:auto;max-width:none">',
     );
     expect(buildImageMarkup({ src: "https://x.com/a.png", width: 1 })).toBe(
-      `<img src="https://x.com/a.png" alt="" style="width:${MIN_IMAGE_WIDTH}px;height:auto;max-width:100%">`,
+      `<img src="https://x.com/a.png" alt="" style="width:${MIN_IMAGE_WIDTH}px;height:auto;max-width:none">`,
     );
   });
 
@@ -100,8 +100,8 @@ describe("setCellImageWidths", () => {
   it("sets each image's width by index and sanitizes the result", () => {
     const html = '<img src="https://x.com/a.png"> x <img src="/b.png" style="width:10px">';
     expect(setCellImageWidths(html, [200, 90])).toBe(
-      '<img src="https://x.com/a.png" alt="" style="width:200px;height:auto;max-width:100%">' +
-        ' x <img src="/b.png" alt="" style="width:90px;height:auto;max-width:100%">',
+      '<img src="https://x.com/a.png" alt="" style="width:200px;height:auto;max-width:none">' +
+        ' x <img src="/b.png" alt="" style="width:90px;height:auto;max-width:none">',
     );
   });
 

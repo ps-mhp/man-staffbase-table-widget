@@ -59,8 +59,49 @@ of the widget's serialized form, which the save provably keeps.
 | `translation-payload.ts` | model ⇄ translatable HTML with `data-cell` coordinates |
 | `translation-client.ts` | the second `POST /api/translations` |
 | `widget-html.ts` | find/rewrite `<table-widget>` opening tags in an HTML string |
+| `content-document.ts` | find/rewrite the widget's `customBlock` in the new editor's block tree |
 | `json-strings.ts` | shape-agnostic access to a JSON body's string leaves |
 | `translation-interceptor.ts` | wraps `fetch`, orchestrates, reports diagnostics |
+
+## Addendum: the new editor (Content Designer)
+
+Verified on a live tenant on 2026-07-31 (`/studio/content/page/:id/edit`).
+
+**Storage.** A page is a block tree, not an HTML string. The widget is a
+`customBlock` and its attributes are JSON:
+
+```json
+"95edb914-…": { "type": "customBlock", "config": { "settings": { "content": {
+  "selectedBlock": {
+    "customElementName": "table-widget",
+    "url": "https://cdn.jsdelivr.net/…/man.table-widget.js",
+    "properties": { "tabledata": "b64:…" }
+  } } } } }
+```
+
+**Rendering needs nothing.** The published page's HTML (`GET /api/pages/:id`)
+carries `<sb-custom-block custom-block="{…}">`, which loads the bundle and
+mounts `<table-widget tabledata="b64:…">` inside a shadow root. A page that
+looks blank in the new editor is an unpublished draft — the live route always
+serves the last *published* version.
+
+**Translation needed a second carrier.** The editor calls the same endpoint with
+`Content-Type: application/vnd.staffbase.translations.content_document.v1+json`
+and a body of `{sourceLanguage, targetLanguage, document: {content, blocks}}`,
+and the service returns the document with every `customBlock` untouched —
+confirmed by probing it with `tabledata` as `b64:`, as raw JSON, and as HTML,
+plus an extra plain-text property: none of them came back translated. So the
+interception is the only mechanism, and `translation-interceptor.ts` now picks
+its carrier from the body shape: article HTML → `widget-html.ts`, block tree →
+`content-document.ts`. Blocks are matched by **path** (which contains the block
+id), so a table is written back into its own block or not at all.
+
+**Known limitation.** Studio loads a custom block's bundle only when the block's
+config dialog is opened — not on page load, block selection, the add-block
+panel, or the preview tab. The interceptor is therefore installed during an
+"add language and translate automatically" run only if the author opened the
+table's config earlier in the same session. In the classic editor the bundle is
+loaded on every admin page, so it always applies there.
 
 ### Decisions
 

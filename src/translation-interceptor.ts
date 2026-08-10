@@ -11,6 +11,12 @@
  * limitations under the License.
  */
 
+import {
+  containsContentDocumentWidget,
+  findContentDocumentTables,
+  tablePathKey,
+  withContentDocumentTables,
+} from "./content-document";
 import { log } from "./debug-log";
 import { showGrowl } from "./growl";
 import { collectStrings, findStringByKey, mapStrings } from "./json-strings";
@@ -39,6 +45,13 @@ import { WidgetTag, containsWidget, findWidgetTags, replaceWidgetTags, withTable
  * language's tab exactly as it always does, and the author's save persists it —
  * no editor internals, no DOM surgery, no second storage format.
  *
+ * Both editors are served: the classic one sends the page as an HTML string
+ * with the widget's element in it (`widget-html.ts`), the new one (Content
+ * Designer) sends a tree of blocks with the widget as a `customBlock`
+ * (`content-document.ts`). Same endpoint, same language pair, same response
+ * rewrite — only *where the table sits in the body* differs, which is what
+ * {@link TableCarrier} abstracts over.
+ *
  * The one thing it does depend on is that the editor uses `fetch`. If it ever
  * uses `XMLHttpRequest` instead, patching a response is a different and far
  * more invasive job, so that case is detected and reported loudly rather than
@@ -53,6 +66,28 @@ import { WidgetTag, containsWidget, findWidgetTags, replaceWidgetTags, withTable
 interface SourceWidget {
   readonly tag: WidgetTag;
   readonly model: TableModel;
+}
+
+/**
+ * How one body format carries tables: the models found in the request, and how
+ * to write the translated ones back into the response.
+ *
+ * Everything else about the interception — language pair, headers, warnings,
+ * failure handling — is identical for both editors, so the format-specific part
+ * is confined to this one interface and the two functions that build it.
+ */
+interface TableCarrier {
+  /** Which editor's body shape this is, for the diagnostics. */
+  readonly format: "html" | "content-document";
+  /** The tables in the request, in the order the translations come back in. */
+  readonly models: readonly TableModel[];
+  /**
+   * Writes the translated models into a parsed response body.
+   *
+   * @returns the rewritten body, or `null` when nothing could be matched up —
+   * in which case the host's own response is handed on untouched.
+   */
+  patch(body: unknown, translated: ReadonlyArray<TableModel | null>): { readonly body: unknown } | null;
 }
 
 /**
@@ -107,6 +142,12 @@ export const diagnostics = {
   lastSkipReason: null as string | null,
   /** Language pair of the last handled request. */
   lastLanguages: null as string | null,
+  /**
+   * Which editor sent the last request carrying a table: `html` for the classic
+   * editor, `content-document` for the Content Designer. The first thing to
+   * check when the table translates in one editor and not in the other.
+   */
+  lastFormat: null as "html" | "content-document" | null,
   /** Warnings surfaced to the author. */
   warningsShown: 0,
   /** The last message the author was shown. */
@@ -269,6 +310,57 @@ export function patchResponseBody(
   return patched ? { body: next } : null;
 }
 
+/**
+ * The carrier for the classic editor: the page as an HTML string, the widget
+ * as its own element inside it.
+ */
+const htmlCarrier = (body: unknown): TableCarrier | null => {
+  const sources = collectSourceWidgets(body);
+  if (sources.length === 0) return null;
+  return {
+    format: "html",
+    models: sources.map(({ model }) => model),
+    patch: (responseBody, translated) => patchResponseBody(responseBody, sources, translated),
+  };
+};
+
+/**
+ * The carrier for the new editor: the page as a block tree, the widget as a
+ * `customBlock` whose `tabledata` is a JSON string rather than an attribute.
+ *
+ * Blocks are matched by their path (which contains the block's own id), so a
+ * response that no longer holds a given block simply leaves that table in the
+ * source language instead of writing it somewhere else.
+ */
+const contentDocumentCarrier = (body: unknown): TableCarrier | null => {
+  const tables = findContentDocumentTables(body);
+  if (tables.length === 0) return null;
+
+  return {
+    format: "content-document",
+    models: tables.map(({ tabledata }) => parseTableModel(tabledata)),
+    patch: (responseBody, translated) => {
+      const values = new Map<string, string>();
+      tables.forEach((table, index) => {
+        const model = translated[index];
+        if (model) values.set(tablePathKey(table), encodeTableAttribute(model));
+      });
+      if (values.size === 0) return null;
+
+      const { body: next, applied } = withContentDocumentTables(responseBody, values);
+      return applied === 0 ? null : { body: next };
+    },
+  };
+};
+
+/**
+ * The carrier for whatever the editor just sent, or `null` when the body holds
+ * no table this bundle owns.
+ */
+export function carrierFor(body: unknown): TableCarrier | null {
+  return htmlCarrier(body) ?? contentDocumentCarrier(body);
+}
+
 /* ------------------------------------------------------------------ *
  * Orchestration                                                      *
  * ------------------------------------------------------------------ */
@@ -293,7 +385,7 @@ async function planFor(
   init: RequestInit | undefined,
   path: string,
 ): Promise<{
-  sources: SourceWidget[];
+  carrier: TableCarrier;
   sourceLanguage: string;
   targetLanguage: string;
   hostHeaders: Headers;
@@ -306,7 +398,9 @@ async function planFor(
 
   const raw = await readRequestBody(input, init);
   if (raw === null) return skip("request body not readable");
-  if (!containsWidget(raw)) return skip("no table widget in request");
+  if (!containsWidget(raw) && !containsContentDocumentWidget(raw)) {
+    return skip("no table widget in request");
+  }
 
   // From here on a widget is provably in the request, so anything that goes
   // wrong costs the author a translated table and has to be said out loud.
@@ -317,9 +411,10 @@ async function planFor(
     return skip("request body is not JSON", MESSAGES.notReadable);
   }
 
-  const sources = collectSourceWidgets(body);
-  if (sources.length === 0) return skip("no widget tag parsed from request", MESSAGES.notReadable);
+  const carrier = carrierFor(body);
+  if (carrier === null) return skip("no widget parsed from request", MESSAGES.notReadable);
   diagnostics.requestsWithWidget += 1;
+  diagnostics.lastFormat = carrier.format;
 
   const sourceLanguage = findStringByKey(body, "sourceLanguage");
   const targetLanguage = findStringByKey(body, "targetLanguage");
@@ -332,7 +427,7 @@ async function planFor(
   diagnostics.lastLanguages = `${sourceLanguage} → ${targetLanguage}`;
   diagnostics.hostCsrfTokenSeen = hostHeaders.has("x-csrf-token");
   diagnostics.lastSkipReason = null;
-  return { sources, sourceLanguage, targetLanguage, hostHeaders };
+  return { carrier, sourceLanguage, targetLanguage, hostHeaders };
 }
 
 /**
@@ -365,8 +460,8 @@ export function startTranslationInterceptor({
     }
     if (plan === null) return originalFetch.call(window, input, init);
 
-    const { sources, sourceLanguage, targetLanguage, hostHeaders } = plan;
-    log(`translating ${sources.length} table(s)`, {
+    const { carrier, sourceLanguage, targetLanguage, hostHeaders } = plan;
+    log(`translating ${carrier.models.length} table(s) from a ${carrier.format} body`, {
       sourceLanguage,
       targetLanguage,
       // The endpoint answers 403 without it, so its absence is the first thing
@@ -379,7 +474,7 @@ export function startTranslationInterceptor({
     // serializing them would add their full latency to a spinner the author is
     // already waiting on.
     const tables = Promise.all(
-      sources.map(async ({ model }) => {
+      carrier.models.map(async (model) => {
         try {
           const result = await translate({
             model,
@@ -417,7 +512,7 @@ export function startTranslationInterceptor({
 
     try {
       const text = await response.clone().text();
-      const patched = patchResponseBody(JSON.parse(text), sources, translated);
+      const patched = carrier.patch(JSON.parse(text), translated);
       if (patched === null) {
         diagnostics.lastSkipReason = "response did not match the request's widgets";
         log("translation response left untouched", diagnostics.lastSkipReason);

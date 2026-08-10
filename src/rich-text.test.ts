@@ -50,31 +50,31 @@ describe("sanitizeRichText", () => {
 
   it("keeps images with an https src and re-emits safe sizing styles", () => {
     expect(sanitizeRichText('<img src="https://cdn.example.com/a.png">')).toBe(
-      '<img src="https://cdn.example.com/a.png" alt="" style="height:auto;max-width:100%">',
+      '<img src="https://cdn.example.com/a.png" alt="" style="height:auto;max-width:none">',
     );
   });
 
   it("keeps images with a root-relative src", () => {
     expect(sanitizeRichText('<img src="/api/media/secure/x.jpeg">')).toBe(
-      '<img src="/api/media/secure/x.jpeg" alt="" style="height:auto;max-width:100%">',
+      '<img src="/api/media/secure/x.jpeg" alt="" style="height:auto;max-width:none">',
     );
   });
 
   it("preserves a pixel width from inline style and clamps it", () => {
     expect(sanitizeRichText('<img src="https://x.com/a.png" style="width:220px">')).toBe(
-      '<img src="https://x.com/a.png" alt="" style="width:220px;height:auto;max-width:100%">',
+      '<img src="https://x.com/a.png" alt="" style="width:220px;height:auto;max-width:none">',
     );
     expect(sanitizeRichText('<img src="https://x.com/a.png" width="150">')).toBe(
-      '<img src="https://x.com/a.png" alt="" style="width:150px;height:auto;max-width:100%">',
+      '<img src="https://x.com/a.png" alt="" style="width:150px;height:auto;max-width:none">',
     );
     expect(sanitizeRichText('<img src="https://x.com/a.png" style="width:99999px">')).toBe(
-      '<img src="https://x.com/a.png" alt="" style="width:4000px;height:auto;max-width:100%">',
+      '<img src="https://x.com/a.png" alt="" style="width:4000px;height:auto;max-width:none">',
     );
   });
 
   it("escapes alt text and keeps it", () => {
     expect(sanitizeRichText('<img src="https://x.com/a.png" alt="A &amp; B">')).toBe(
-      '<img src="https://x.com/a.png" alt="A &amp; B" style="height:auto;max-width:100%">',
+      '<img src="https://x.com/a.png" alt="A &amp; B" style="height:auto;max-width:none">',
     );
   });
 
@@ -88,13 +88,13 @@ describe("sanitizeRichText", () => {
 
   it("ignores non-pixel widths on images", () => {
     expect(sanitizeRichText('<img src="https://x.com/a.png" style="width:50%">')).toBe(
-      '<img src="https://x.com/a.png" alt="" style="height:auto;max-width:100%">',
+      '<img src="https://x.com/a.png" alt="" style="height:auto;max-width:none">',
     );
   });
 
   it("keeps an image alongside text in the same cell", () => {
     expect(sanitizeRichText('Logo: <img src="https://x.com/a.png"> ok')).toBe(
-      'Logo: <img src="https://x.com/a.png" alt="" style="height:auto;max-width:100%"> ok',
+      'Logo: <img src="https://x.com/a.png" alt="" style="height:auto;max-width:none"> ok',
     );
   });
 

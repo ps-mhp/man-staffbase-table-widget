@@ -313,6 +313,128 @@ describe("startTranslationInterceptor", () => {
     });
   });
 
+  /**
+   * The new editor (Content Designer) sends the page as a block tree instead of
+   * article HTML — same endpoint, same language pair, different body. Payload
+   * shape taken from a real `POST /api/translations` of a `/studio/content/page/…`
+   * page.
+   */
+  describe("a content document from the new editor", () => {
+    const BLOCK_ID = "95edb914-821f-445a-92c7-be185b579c3c";
+
+    const contentDocument = (tabledata: string): Record<string, unknown> => ({
+      content: ["08a81a63"],
+      blocks: {
+        "08a81a63": { type: "section", children: [BLOCK_ID] },
+        [BLOCK_ID]: {
+          type: "customBlock",
+          config: {
+            settings: {
+              content: {
+                selectedBlock: {
+                  customElementName: "table-widget",
+                  name: "Table Widget",
+                  url: "https://cdn.jsdelivr.net/gh/ps-mhp/man-staffbase-table-widget@1.4.0/dist/man.table-widget.js",
+                  properties: { tabledata },
+                  version: "1.0.0",
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const documentRequestBody = (): string =>
+      JSON.stringify({
+        sourceLanguage: "de_DE",
+        targetLanguage: "en_US",
+        document: contentDocument(SOURCE_TABLEDATA),
+      });
+
+    /** What the service returns: the document echoed, the widget untouched. */
+    const documentResponseBody = (): string =>
+      JSON.stringify({
+        sourceLanguage: "de_DE",
+        targetLanguage: "en_US",
+        document: contentDocument(SOURCE_TABLEDATA),
+      });
+
+    const modelFromDocumentResponse = async (response: Response): Promise<TableModel> => {
+      const body = JSON.parse(await response.text());
+      const properties = body.document.blocks[BLOCK_ID].config.settings.content.selectedBlock
+        .properties as { tabledata: string };
+      return parseTableModel(properties.tabledata);
+    };
+
+    beforeEach(() => {
+      hostFetch.mockResolvedValue(new Response(documentResponseBody(), { status: 200 }));
+    });
+
+    it("translates the table and writes it back into its own block", async () => {
+      const response = await window.fetch(TRANSLATIONS_PATH, {
+        method: "POST",
+        body: documentRequestBody(),
+      });
+
+      expect(fakeTranslate).toHaveBeenCalledTimes(1);
+      expect(fakeTranslate.mock.calls[0][0]).toMatchObject({
+        sourceLanguage: "de_DE",
+        targetLanguage: "en_US",
+      });
+
+      const model = await modelFromDocumentResponse(response);
+      expect(model.data).toEqual([["", "Spalte 1-en"], ["Zeile 1-en", "Auto-en"]]);
+      expect(model.formats).toEqual({ "0,1": { bold: true } });
+      expect(diagnostics.lastFormat).toBe("content-document");
+    });
+
+    it("keeps the rest of the document exactly as the host sent it", async () => {
+      const response = await window.fetch(TRANSLATIONS_PATH, {
+        method: "POST",
+        body: documentRequestBody(),
+      });
+      const body = JSON.parse(await response.text());
+
+      expect(body.document.content).toEqual(["08a81a63"]);
+      expect(body.document.blocks["08a81a63"]).toEqual({ type: "section", children: [BLOCK_ID] });
+      expect(
+        body.document.blocks[BLOCK_ID].config.settings.content.selectedBlock.customElementName,
+      ).toBe("table-widget");
+    });
+
+    it("leaves the response alone when its block is gone, and says so", async () => {
+      const original = JSON.stringify({
+        sourceLanguage: "de_DE",
+        targetLanguage: "en_US",
+        document: { content: [], blocks: {} },
+      });
+      hostFetch.mockResolvedValueOnce(new Response(original, { status: 200 }));
+
+      const response = await window.fetch(TRANSLATIONS_PATH, {
+        method: "POST",
+        body: documentRequestBody(),
+      });
+
+      expect(await response.text()).toBe(original);
+      expect(notify).toHaveBeenCalledWith(MESSAGES.notInserted);
+    });
+
+    it("does not translate a document without the widget", async () => {
+      await window.fetch(TRANSLATIONS_PATH, {
+        method: "POST",
+        body: JSON.stringify({
+          sourceLanguage: "de_DE",
+          targetLanguage: "en_US",
+          document: { content: ["a"], blocks: { a: { type: "text", content: "Hallo" } } },
+        }),
+      });
+
+      expect(fakeTranslate).not.toHaveBeenCalled();
+      expect(notify).not.toHaveBeenCalled();
+    });
+  });
+
   it("restores the original fetch on cleanup", () => {
     stop();
     expect(window.fetch).toBe(hostFetch);
