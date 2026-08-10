@@ -34,14 +34,19 @@
  */
 
 /**
- * Cap steps, keyed by the container width they start at. The thresholds are
- * Tailwind's breakpoints (`sm`, `lg`, `xl`), used here as a familiar,
- * already-tuned ladder rather than as a dependency — the project ships no
- * Tailwind.
+ * Cap steps, keyed by the container width they start at. Each cap is roughly
+ * half the container it applies to, which is what actually keeps a table
+ * readable: an image may dominate its own column but never the whole row,
+ * so the remaining columns still have room and the table fits the viewport.
  *
- * Below the first threshold the image may use the full container; from there
- * on it is additionally capped in pixels, so a wide screen shows a readable
- * image next to the remaining columns instead of one that fills the row.
+ * The thresholds are Tailwind's breakpoints (`xs`, `sm`, `lg`, `xl`), used
+ * as a familiar, already-tuned ladder rather than as a dependency — the
+ * project ships no Tailwind.
+ *
+ * An earlier ladder started at 480px and only tightened from there, which
+ * made it useless in practice: the images people paste are around 400px
+ * wide, so they never reached any cap and tables kept overflowing on
+ * narrow viewports.
  */
 export interface ImageFitStep {
   /** Container width, in pixels, from which this cap applies. */
@@ -50,10 +55,17 @@ export interface ImageFitStep {
   maxWidth: number;
 }
 
+/**
+ * Cap below the first threshold. It is the base rule rather than a step,
+ * because a container query can only ask for a *minimum* width.
+ */
+export const IMAGE_FIT_BASE_MAX_WIDTH = 160;
+
 export const IMAGE_FIT_STEPS: ReadonlyArray<ImageFitStep> = [
-  { from: 640, maxWidth: 480 },
-  { from: 1024, maxWidth: 640 },
-  { from: 1280, maxWidth: 768 },
+  { from: 480, maxWidth: 240 },
+  { from: 640, maxWidth: 320 },
+  { from: 1024, maxWidth: 480 },
+  { from: 1280, maxWidth: 640 },
 ];
 
 /**
@@ -84,7 +96,7 @@ const scope = (className: string): string => `.${className}.${className} img`;
  * markup only ever stores a width, so the height follows.
  */
 export const IMAGE_FIT_CSS = [
-  `${scope(IMAGE_FIT_CLASS)} { max-width: 100cqw !important; height: auto; }`,
+  `${scope(IMAGE_FIT_CLASS)} { max-width: min(100cqw, ${IMAGE_FIT_BASE_MAX_WIDTH}px) !important; height: auto; }`,
   ...IMAGE_FIT_STEPS.map(
     ({ from, maxWidth }) =>
       `@container (min-width: ${from}px) { ${scope(IMAGE_FIT_CLASS)} { max-width: min(100cqw, ${maxWidth}px) !important; } }`,
@@ -103,5 +115,5 @@ export function imageFitMaxWidth(containerWidth: number): number {
   const step = [...IMAGE_FIT_STEPS]
     .reverse()
     .find(({ from }) => containerWidth >= from);
-  return step ? Math.min(containerWidth, step.maxWidth) : containerWidth;
+  return Math.min(containerWidth, step ? step.maxWidth : IMAGE_FIT_BASE_MAX_WIDTH);
 }

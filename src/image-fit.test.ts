@@ -12,6 +12,7 @@
  */
 
 import {
+  IMAGE_FIT_BASE_MAX_WIDTH,
   IMAGE_FIT_CLASS,
   IMAGE_FIT_CSS,
   IMAGE_FIT_STEPS,
@@ -21,22 +22,41 @@ import {
 } from "./image-fit";
 
 describe("imageFitMaxWidth", () => {
-  it("allows the full container below the first breakpoint", () => {
-    expect(imageFitMaxWidth(320)).toBe(320);
-    expect(imageFitMaxWidth(639)).toBe(639);
+  it("caps below the first breakpoint too", () => {
+    // The phone case: without a cap here a pasted 400px image alone is
+    // wider than half the screen and the table scrolls sideways.
+    expect(imageFitMaxWidth(479)).toBe(IMAGE_FIT_BASE_MAX_WIDTH);
+    expect(imageFitMaxWidth(320)).toBe(160);
   });
 
   it("caps at the step that the container width reaches", () => {
-    expect(imageFitMaxWidth(640)).toBe(480);
-    expect(imageFitMaxWidth(1023)).toBe(480);
-    expect(imageFitMaxWidth(1024)).toBe(640);
-    expect(imageFitMaxWidth(1279)).toBe(640);
-    expect(imageFitMaxWidth(1280)).toBe(768);
-    expect(imageFitMaxWidth(2560)).toBe(768);
+    expect(imageFitMaxWidth(480)).toBe(240);
+    expect(imageFitMaxWidth(639)).toBe(240);
+    expect(imageFitMaxWidth(640)).toBe(320);
+    expect(imageFitMaxWidth(1023)).toBe(320);
+    expect(imageFitMaxWidth(1024)).toBe(480);
+    expect(imageFitMaxWidth(1279)).toBe(480);
+    expect(imageFitMaxWidth(1280)).toBe(640);
+    expect(imageFitMaxWidth(2560)).toBe(640);
+  });
+
+  it("shrinks a typical pasted image on a narrow viewport", () => {
+    // Regression: a 768px viewport leaves the widget about 720px, and a
+    // 400px image used to pass through untouched because the cap there
+    // was 480px.
+    expect(imageFitMaxWidth(720)).toBeLessThan(400);
+  });
+
+  it("keeps the cap near half the container", () => {
+    for (const width of [320, 480, 640, 1024, 1280, 1920]) {
+      const cap = imageFitMaxWidth(width);
+      expect(cap).toBeLessThanOrEqual(width * 0.55);
+      expect(cap).toBeGreaterThanOrEqual(Math.min(width, 1280) * 0.33);
+    }
   });
 
   it("never exceeds the container itself", () => {
-    for (const width of [200, 640, 900, 1024, 1400]) {
+    for (const width of [100, 200, 640, 900, 1024, 1400]) {
       expect(imageFitMaxWidth(width)).toBeLessThanOrEqual(width);
     }
   });
@@ -44,6 +64,9 @@ describe("imageFitMaxWidth", () => {
   it("caps monotonically as the container grows", () => {
     const steps = [...IMAGE_FIT_STEPS].map((step) => step.from);
     expect(steps).toEqual([...steps].sort((a, b) => a - b));
+
+    const caps = [IMAGE_FIT_BASE_MAX_WIDTH, ...IMAGE_FIT_STEPS.map((s) => s.maxWidth)];
+    expect(caps).toEqual([...caps].sort((a, b) => a - b));
   });
 });
 
@@ -67,6 +90,7 @@ describe("IMAGE_FIT_CSS", () => {
     // A percentage would resolve against the auto-layout cell width and let
     // the column squeeze the image; `cqw` resolves against the wrapper.
     expect(IMAGE_FIT_CSS).toContain("100cqw");
+    expect(IMAGE_FIT_CSS).toContain(`min(100cqw, ${IMAGE_FIT_BASE_MAX_WIDTH}px)`);
     expect(IMAGE_FIT_CSS).not.toMatch(/max-width:\s*\d+%/);
   });
 
