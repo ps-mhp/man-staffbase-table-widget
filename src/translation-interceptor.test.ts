@@ -9,12 +9,15 @@ import {
 import { MESSAGES, diagnostics, startTranslationInterceptor } from "./translation-interceptor";
 
 /** The table as an author's widget carries it in the article. */
+
+import { DEFAULT_VISIBLE_ROWS } from "./row-collapse";
 const SOURCE_MODEL: TableModel = {
   data: [["", "Spalte 1"], ["Zeile 1", "Auto"]],
   merges: [],
   formats: { "0,1": { bold: true } },
   sort: null,
   fitImages: true,
+  visibleRows: DEFAULT_VISIBLE_ROWS,
 };
 
 const widgetTag = (tabledata: string): string => `<table-widget tabledata="${tabledata}"></table-widget>`;

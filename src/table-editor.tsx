@@ -30,6 +30,7 @@ import {
   setFormat,
   setSort,
   setFitImages,
+  setVisibleRows,
   cellFormat,
   isCovered,
   mergeAt,
@@ -713,6 +714,8 @@ export const TableEditor = ({
 
   const toggleFitImages = (): void => onChange(setFitImages(value, !value.fitImages));
 
+  const changeVisibleRows = (rows: number): void => onChange(setVisibleRows(value, rows));
+
   /**
    * Without a selection this resets the whole table — the diagnostic case,
    * where the point is to rule out stored formatting entirely.
@@ -837,6 +840,8 @@ export const TableEditor = ({
         onResetImageSize={() => void resizeImages("default")}
         fitImages={value.fitImages}
         onToggleFitImages={toggleFitImages}
+        visibleRows={value.visibleRows}
+        onChangeVisibleRows={changeVisibleRows}
         onClearFormatting={clearFormats}
         hasClearTarget={ranges.length > 0}
         onDone={onDone}

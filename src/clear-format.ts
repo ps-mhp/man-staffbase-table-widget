@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-import { TableModel, formatKey } from "./table-model";
+import { TableModel } from "./table-model";
 import { sanitizeRichText } from "./rich-text";
 import { cellHasImage } from "./cell-image";
 

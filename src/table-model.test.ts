@@ -11,6 +11,8 @@
  * limitations under the License.
  */
 
+import { DEFAULT_VISIBLE_ROWS } from "./row-collapse";
+
 import {
   TableModel,
   parseTableModel,
@@ -27,6 +29,7 @@ import {
   setFormat,
   setSort,
   setFitImages,
+  setVisibleRows,
   cellFormat,
   normalizeRange,
 } from "./table-model";
@@ -37,6 +40,7 @@ const model = (data: string[][], overrides: Partial<TableModel> = {}): TableMode
   formats: {},
   sort: null,
   fitImages: true,
+  visibleRows: DEFAULT_VISIBLE_ROWS,
   ...overrides,
 });
 
@@ -329,5 +333,54 @@ describe("encoded attribute payloads", () => {
     // A marker with unusable content is broken data, not legacy JSON — it must
     // not be re-read as a table of the literal string.
     expect(parseTableModel("b64:not base64!!").data).toEqual(parseTableModel(undefined).data);
+  });
+});
+
+describe("visibleRows", () => {
+  it("defaults to five data rows", () => {
+    expect(parseTableModel(undefined).visibleRows).toBe(DEFAULT_VISIBLE_ROWS);
+    expect(parseTableModel(JSON.stringify([["", "A"]])).visibleRows).toBe(DEFAULT_VISIBLE_ROWS);
+  });
+
+  it("reads an explicit limit, including the zero that shows everything", () => {
+    const three = JSON.stringify({ data: [["", "A"]], visibleRows: 3 });
+    expect(parseTableModel(three).visibleRows).toBe(3);
+    const all = JSON.stringify({ data: [["", "A"]], visibleRows: 0 });
+    expect(parseTableModel(all).visibleRows).toBe(0);
+  });
+
+  it("falls back to the default for an unusable limit", () => {
+    const bogus = JSON.stringify({ data: [["", "A"]], visibleRows: -2 });
+    expect(parseTableModel(bogus).visibleRows).toBe(DEFAULT_VISIBLE_ROWS);
+  });
+
+  it("keeps the compact array shape at the default", () => {
+    const raw = serializeTableModel(model([["", "A"]], { visibleRows: DEFAULT_VISIBLE_ROWS }));
+    expect(JSON.parse(raw)).toEqual([["", "A"]]);
+  });
+
+  it("writes and round-trips a custom limit", () => {
+    const raw = serializeTableModel(model([["", "A"]], { visibleRows: 3 }));
+    expect(JSON.parse(raw)).toMatchObject({ visibleRows: 3 });
+    expect(parseTableModel(raw).visibleRows).toBe(3);
+  });
+
+  it("survives an encode/decode through the attribute payload", () => {
+    const m = parseTableModel(encodeTableAttribute(model([["", "A"]], { visibleRows: 0 })));
+    expect(m.visibleRows).toBe(0);
+  });
+
+  it("is set by setVisibleRows without touching anything else", () => {
+    const m = model([["", "A"]], { sort: { col: 0, dir: "asc" } });
+    const limited = setVisibleRows(m, 2);
+
+    expect(limited.visibleRows).toBe(2);
+    expect(limited.sort).toEqual(m.sort);
+    expect(limited.data).toEqual(m.data);
+  });
+
+  it("normalizes a nonsensical limit rather than storing it", () => {
+    expect(setVisibleRows(model([["", "A"]]), -1).visibleRows).toBe(DEFAULT_VISIBLE_ROWS);
+    expect(setVisibleRows(model([["", "A"]]), 4.7).visibleRows).toBe(4);
   });
 });

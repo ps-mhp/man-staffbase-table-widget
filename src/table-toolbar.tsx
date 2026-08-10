@@ -168,6 +168,39 @@ const RIBBON_CSS = `
 .tw-rb__switch[aria-checked="true"] { border-color: #9dc7ea; background: #f2f8fd; }
 .tw-rb__switch[aria-checked="true"] .tw-rb__switch-track { background: #0074d9; }
 .tw-rb__switch[aria-checked="true"] .tw-rb__switch-track::after { transform: translateX(14px); }
+.tw-rb__rows-limit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 100%;
+  width: 76px;
+  min-width: 76px;
+  padding: 5px 4px;
+  border: 1px solid #dbe0e5;
+  border-radius: 6px;
+  background: #fff;
+  color: #2b3742;
+  font-size: 11px;
+  line-height: 1.15;
+  text-align: center;
+  box-sizing: border-box;
+}
+.tw-rb__rows-limit input {
+  width: 46px;
+  min-height: 22px;
+  padding: 2px 4px;
+  border: 1px solid #dbe0e5;
+  border-radius: 4px;
+  font: inherit;
+  font-size: 12px;
+  text-align: center;
+  color: inherit;
+  background: #fff;
+  box-sizing: border-box;
+}
+.tw-rb__rows-limit input:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(0, 116, 217, 0.4); }
 .tw-rb__select {
   -webkit-appearance: none;
   appearance: none;
@@ -423,6 +456,12 @@ export interface TableToolbarProps {
   fitImages: boolean;
   onToggleFitImages: () => void;
   /**
+   * Data rows shown before the published table collapses behind a button;
+   * `0` shows all of them. A table-wide setting, like {@link fitImages}.
+   */
+  visibleRows: number;
+  onChangeVisibleRows: (rows: number) => void;
+  /**
    * Resets formatting — on the selection, or on the whole table when nothing
    * is selected, which is why these stay enabled without a selection.
    */
@@ -654,6 +693,8 @@ export const TableToolbar = (props: TableToolbarProps): ReactElement => {
     onResetImageSize,
     fitImages,
     onToggleFitImages,
+    visibleRows,
+    onChangeVisibleRows,
     onClearFormatting,
     hasClearTarget,
     onDone,
@@ -932,6 +973,27 @@ export const TableToolbar = (props: TableToolbarProps): ReactElement => {
             <span className="tw-rb__switch-track" aria-hidden="true" />
             <span>Bilder anpassen</span>
           </button>
+
+          <label
+            className="tw-rb__rows-limit"
+            title="Zeilen, die die veröffentlichte Tabelle zeigt, bevor sie hinter einem Button einklappt. 0 zeigt alle Zeilen."
+          >
+            <input
+              type="number"
+              min={0}
+              step={1}
+              data-testid="toolbar-visible-rows"
+              value={visibleRows}
+              onChange={(event) => {
+                // An emptied field reads as NaN. Treating that as 0 would
+                // silently switch collapsing off mid-typing, so it is ignored
+                // until a number is there.
+                const next = event.target.valueAsNumber;
+                if (Number.isFinite(next)) onChangeVisibleRows(next);
+              }}
+            />
+            <span>Sichtbare Zeilen</span>
+          </label>
 
           <Dropdown
             testId="toolbar-clear-format-menu"

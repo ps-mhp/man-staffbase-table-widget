@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-import React, { ReactElement, useMemo, useState } from "react";
+import React, { ReactElement, useId, useMemo, useState } from "react";
 import { BlockAttributes } from "widget-sdk";
 import {
   parseTableModel,
@@ -22,6 +22,13 @@ import {
 import { formatToStyle, formatToCellStyle } from "./cell-style";
 import { sanitizeRichText, richTextToPlain } from "./rich-text";
 import { IMAGE_FIT_CLASS, IMAGE_FIT_CSS, IMAGE_NO_FIT_CLASS, IMAGE_NO_FIT_CSS } from "./image-fit";
+import {
+  clampRowSpan,
+  collapseToggleLabel,
+  collapses,
+  hiddenRowCount,
+  visibleRowOrder,
+} from "./row-collapse";
 
 /**
  * React Component
@@ -63,6 +70,24 @@ const firstColumnStyle: React.CSSProperties = {
   overflowWrap: "break-word",
 };
 
+/**
+ * The row-collapse toggle. Deliberately unassuming — it is a control on
+ * someone else's page, so it borrows the surrounding text colour rather than
+ * introducing a brand colour of its own.
+ */
+const toggleStyle: React.CSSProperties = {
+  display: "block",
+  margin: "12px auto 0",
+  padding: "8px 16px",
+  font: "inherit",
+  fontSize: "0.9em",
+  color: "inherit",
+  background: "transparent",
+  border: "1px solid #3e3b3b",
+  borderRadius: "4px",
+  cursor: "pointer",
+};
+
 /** Renders a cell's (possibly super-/sub-scripted) content as safe markup. */
 const CellContent = ({ value }: { value: string }): ReactElement => (
   <span dangerouslySetInnerHTML={{ __html: sanitizeRichText(value) }} />
@@ -77,6 +102,14 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
   const model = useMemo(() => parseTableModel(tabledata), [tabledata]);
   const { data } = model;
   const headerRow = data[0] ?? [];
+
+  // Whether the reader has revealed the hidden rows. This is a viewing
+  // decision, not content, so it stays out of the model and leaves nothing
+  // behind when the table is saved.
+  const [expanded, setExpanded] = useState(false);
+  // Ties the button to the rows it governs for screen readers. `useId` keeps
+  // it unique when a page carries several tables.
+  const bodyId = `table-widget-body-${useId()}`;
 
   const [sort, setSort] = useState<SortState | null>(
     model.sort ? { col: model.sort.col, asc: model.sort.dir === "asc" } : null,
@@ -99,23 +132,43 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
     });
   }, [data, sort]);
 
+  const limit = model.visibleRows;
+  const collapsible = collapses(bodyOrder.length, limit);
+  const shownOrder = visibleRowOrder(bodyOrder, limit, expanded);
+  const hidden = hiddenRowCount(bodyOrder.length, limit);
+
   const toggleSort = (col: number): void => {
     setSort((prev) => (prev && prev.col === col ? { col, asc: !prev.asc } : { col, asc: true }));
   };
 
-  const spanProps = (row: number, col: number): { colSpan?: number; rowSpan?: number } => {
+  /**
+   * `displayIndex` is the row's position among the rows actually rendered.
+   * A row span is shortened to what is left of them, so a merged cell in the
+   * last visible row cannot reach into rows that the collapse cut away — the
+   * browser would otherwise paint it past the end of the table.
+   */
+  const spanProps = (
+    row: number,
+    col: number,
+    displayIndex: number,
+  ): { colSpan?: number; rowSpan?: number } => {
     const merge = mergeAt(model, row, col);
     if (!merge) return {};
+    const rowSpan = clampRowSpan(merge.rowSpan, displayIndex, shownOrder.length);
     return {
       ...(merge.colSpan > 1 ? { colSpan: merge.colSpan } : {}),
-      ...(merge.rowSpan > 1 ? { rowSpan: merge.rowSpan } : {}),
+      ...(rowSpan > 1 ? { rowSpan } : {}),
     };
   };
 
   return (
+    <div className="table-widget">
     <div
       className={`table-widget-scroll ${model.fitImages ? IMAGE_FIT_CLASS : IMAGE_NO_FIT_CLASS}`}
-      style={{ overflow: "auto", width: "100%", maxWidth: "100%", maxHeight: "70vh", containerType: "inline-size", background: "transparent" }}
+      // No height cap, so `overflow` never triggers vertically and the widget
+      // adds no second scrollbar to a page that already scrolls. Wide tables
+      // still scroll sideways, which the page itself does not do.
+      style={{ overflow: "auto", width: "100%", maxWidth: "100%", containerType: "inline-size", background: "transparent" }}
     >
       {/* Both states need a stylesheet: the host page styles article images
           too, so "off" is an explicit rule rather than the absence of one. */}
@@ -144,7 +197,7 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
                   key={colIndex}
                   scope="col"
                   onClick={() => toggleSort(colIndex)}
-                  {...spanProps(0, colIndex)}
+                  {...spanProps(0, colIndex, 0)}
                   style={{
                     ...headerCellStyle,
                     textAlign: alignFor(colIndex),
@@ -152,10 +205,12 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
                     ...formatToStyle(headerFormat),
                     ...formatToCellStyle(headerFormat),
                     background: "#fff",
-                    position: "sticky",
-                    top: 0,
-                    zIndex: colIndex === 0 ? 3 : 2,
-                    ...(colIndex === 0 ? { left: 0 } : {}),
+                    // Only the first column sticks. A sticky header would
+                    // have nothing to stick to: the wrapper no longer
+                    // scrolls vertically, rows collapse instead.
+                    ...(colIndex === 0
+                      ? { position: "sticky", left: 0, zIndex: 3 }
+                      : {}),
                   }}
                 >
                   <CellContent value={cell} />
@@ -164,8 +219,8 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
             })}
           </tr>
         </thead>
-        <tbody>
-          {bodyOrder.map((rowIndex, displayIndex) => {
+        <tbody id={bodyId}>
+          {shownOrder.map((rowIndex, displayIndex) => {
             const row = data[rowIndex];
             const gapStyle: React.CSSProperties = displayIndex === 0 ? { paddingTop: "16px" } : {};
             return (
@@ -174,7 +229,7 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
                   if (isCovered(model, rowIndex, colIndex)) return null;
                   const cellFmt = cellFormat(model, rowIndex, colIndex);
                   const format = { ...formatToStyle(cellFmt), ...formatToCellStyle(cellFmt) };
-                  const spans = spanProps(rowIndex, colIndex);
+                  const spans = spanProps(rowIndex, colIndex, displayIndex);
                   return colIndex === 0 ? (
                     <th
                       key={colIndex}
@@ -215,6 +270,22 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
           })}
         </tbody>
       </table>
+    </div>
+
+      {/* Outside the scroll wrapper on purpose: inside, the button would
+          drift off screen as soon as a wide table is scrolled sideways. */}
+      {collapsible && (
+        <button
+          type="button"
+          data-testid="table-rows-toggle"
+          onClick={() => setExpanded((open) => !open)}
+          aria-expanded={expanded}
+          aria-controls={bodyId}
+          style={toggleStyle}
+        >
+          {collapseToggleLabel(hidden, expanded)}
+        </button>
+      )}
     </div>
   );
 };

@@ -11,6 +11,7 @@
  * limitations under the License.
  */
 
+import { DEFAULT_VISIBLE_ROWS, clampVisibleRows } from "./row-collapse";
 import { TableData, parseTableData } from "./table-json";
 import { decodeTablePayload, encodeTablePayload, isTablePayload } from "./table-payload";
 
@@ -69,6 +70,13 @@ export interface TableModel {
    * is. The flag belongs to the table as a whole, not to a cell.
    */
   fitImages: boolean;
+  /**
+   * Data rows shown before the table collapses behind a "show more" button
+   * (see `row-collapse.ts`). Defaults to {@link DEFAULT_VISIBLE_ROWS}; `0`
+   * switches collapsing off and renders every row. The header row is never
+   * counted and never hidden.
+   */
+  visibleRows: number;
 }
 
 export const formatKey = (row: number, col: number): string => `${row},${col}`;
@@ -107,7 +115,8 @@ const isValidMerge = (m: unknown): m is Merge =>
  *  - a base64 payload (`b64:…`, see `table-payload.ts`) — what is written
  *    today, because it is the only form the translation pipeline cannot
  *    corrupt;
- *  - a JSON **object** with `data`/`merges`/`formats`/`sort`/`fitImages`;
+ *  - a JSON **object** with `data`/`merges`/`formats`/`sort`/`fitImages`/
+ *    `visibleRows`;
  *  - a legacy JSON **array** (`string[][]`), read as a model with no merges,
  *    formats or preset sort, so existing instances render exactly as before.
  *
@@ -120,6 +129,7 @@ export function parseTableModel(raw: string | undefined | null): TableModel {
     formats: {},
     sort: null,
     fitImages: true,
+    visibleRows: DEFAULT_VISIBLE_ROWS,
   });
 
   if (!raw) return empty(parseTableData(raw));
@@ -180,7 +190,15 @@ export function parseTableModel(raw: string | undefined | null): TableModel {
     sort = { col: rawSort.col, dir: rawSort.dir };
   }
 
-  return { data, merges, formats, sort, fitImages: obj.fitImages !== false };
+  return {
+    data,
+    merges,
+    formats,
+    sort,
+    fitImages: obj.fitImages !== false,
+    visibleRows:
+      obj.visibleRows === undefined ? DEFAULT_VISIBLE_ROWS : clampVisibleRows(obj.visibleRows),
+  };
 }
 
 /**
@@ -197,8 +215,9 @@ export function serializeTableModel(model: TableModel): string {
   // `true`, which keeps every table written before this option existed —
   // and every plain one written after it — in the compact array form.
   const hasImageFit = model.fitImages === false;
+  const hasRowLimit = model.visibleRows !== DEFAULT_VISIBLE_ROWS;
 
-  if (!hasMerges && !hasFormats && !hasSort && !hasImageFit) {
+  if (!hasMerges && !hasFormats && !hasSort && !hasImageFit && !hasRowLimit) {
     return JSON.stringify(model.data);
   }
   return JSON.stringify({
@@ -207,6 +226,7 @@ export function serializeTableModel(model: TableModel): string {
     formats: model.formats,
     sort: model.sort,
     ...(hasImageFit ? { fitImages: false } : {}),
+    ...(hasRowLimit ? { visibleRows: model.visibleRows } : {}),
   });
 }
 
@@ -455,6 +475,11 @@ export function setSort(model: TableModel, sort: SortSpec | null): TableModel {
 /** Turns the image-width cap (see `image-fit.ts`) on or off for the table. */
 export function setFitImages(model: TableModel, fitImages: boolean): TableModel {
   return { ...model, fitImages };
+}
+
+/** Sets how many data rows show before the table collapses; `0` shows all. */
+export function setVisibleRows(model: TableModel, visibleRows: number): TableModel {
+  return { ...model, visibleRows: clampVisibleRows(visibleRows) };
 }
 
 export const cellFormat = (model: TableModel, row: number, col: number): CellFormat =>

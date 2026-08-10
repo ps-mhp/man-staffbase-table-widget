@@ -1,5 +1,5 @@
 import React from "react";
-import { screen, render } from "@testing-library/react";
+import { screen, render, fireEvent } from "@testing-library/react";
 
 import { TableWidget } from "./table-widget";
 import { serializeTableData } from "./table-json";
@@ -261,5 +261,147 @@ describe("TableWidget", () => {
 
     const rowHeaders = screen.getAllByRole("rowheader").map((el) => el.textContent);
     expect(rowHeaders).toEqual(["A", "B"]);
+  });
+
+  describe("collapsing long tables", () => {
+    /** A table with a header row plus `rows` data rows. */
+    const longTable = (rows: number, extra: Record<string, unknown> = {}): string =>
+      JSON.stringify({
+        data: [
+          ["", "Wert"],
+          ...Array.from({ length: rows }, (_, i) => [`Zeile ${i + 1}`, String(i + 1)]),
+        ],
+        ...extra,
+      });
+
+    const rowLabels = (): string[] =>
+      screen.getAllByRole("rowheader").map((el) => el.textContent ?? "");
+
+    it("never scrolls vertically", () => {
+      // The whole point: a scroll area nested in a scrolling page leaves the
+      // reader guessing which one the wheel moves.
+      const { container } = render(
+        <TableWidget contentLanguage="de_DE" tabledata={longTable(20)} />,
+      );
+
+      const wrap = container.querySelector<HTMLElement>(".table-widget-scroll");
+      expect(wrap?.style.maxHeight).toBe("");
+      expect(wrap?.style.overflowY).toBe("");
+    });
+
+    it("shows only the first five rows", () => {
+      render(<TableWidget contentLanguage="de_DE" tabledata={longTable(20)} />);
+
+      expect(rowLabels()).toEqual(["Zeile 1", "Zeile 2", "Zeile 3", "Zeile 4", "Zeile 5"]);
+    });
+
+    it("names how many rows the button reveals", () => {
+      render(<TableWidget contentLanguage="de_DE" tabledata={longTable(20)} />);
+
+      expect(screen.getByTestId("table-rows-toggle")).toHaveTextContent(
+        "Weitere 15 Zeilen einblenden",
+      );
+    });
+
+    it("reveals the rest and folds them away again", () => {
+      render(<TableWidget contentLanguage="de_DE" tabledata={longTable(20)} />);
+      const toggle = screen.getByTestId("table-rows-toggle");
+
+      fireEvent.click(toggle);
+      expect(rowLabels()).toHaveLength(20);
+      expect(toggle).toHaveTextContent("Weniger Zeilen anzeigen");
+      expect(toggle).toHaveAttribute("aria-expanded", "true");
+
+      fireEvent.click(toggle);
+      expect(rowLabels()).toHaveLength(5);
+      expect(toggle).toHaveAttribute("aria-expanded", "false");
+    });
+
+    it("points the button at the rows it governs", () => {
+      const { container } = render(
+        <TableWidget contentLanguage="de_DE" tabledata={longTable(20)} />,
+      );
+
+      const controls = screen.getByTestId("table-rows-toggle").getAttribute("aria-controls");
+      expect(container.querySelector(`#${controls}`)?.tagName).toBe("TBODY");
+    });
+
+    it("keeps the button visible while a wide table scrolls sideways", () => {
+      const { container } = render(
+        <TableWidget contentLanguage="de_DE" tabledata={longTable(20)} />,
+      );
+
+      const wrap = container.querySelector(".table-widget-scroll");
+      expect(wrap?.contains(screen.getByTestId("table-rows-toggle"))).toBe(false);
+    });
+
+    it("leaves a short table alone", () => {
+      render(<TableWidget contentLanguage="de_DE" tabledata={longTable(5)} />);
+
+      expect(rowLabels()).toHaveLength(5);
+      expect(screen.queryByTestId("table-rows-toggle")).toBeNull();
+    });
+
+    it("honours a custom limit", () => {
+      render(
+        <TableWidget contentLanguage="de_DE" tabledata={longTable(20, { visibleRows: 2 })} />,
+      );
+
+      expect(rowLabels()).toEqual(["Zeile 1", "Zeile 2"]);
+      expect(screen.getByTestId("table-rows-toggle")).toHaveTextContent(
+        "Weitere 18 Zeilen einblenden",
+      );
+    });
+
+    it("shows everything when the limit is zero", () => {
+      render(
+        <TableWidget contentLanguage="de_DE" tabledata={longTable(20, { visibleRows: 0 })} />,
+      );
+
+      expect(rowLabels()).toHaveLength(20);
+      expect(screen.queryByTestId("table-rows-toggle")).toBeNull();
+    });
+
+    it("cuts the sorted order, not the stored order", () => {
+      render(
+        <TableWidget
+          contentLanguage="de_DE"
+          tabledata={longTable(20, { visibleRows: 2, sort: { col: 0, dir: "desc" } })}
+        />,
+      );
+
+      expect(rowLabels()).toEqual(["Zeile 20", "Zeile 19"]);
+    });
+
+    it("keeps a merged cell from reaching past the cut", () => {
+      // The merge starts in the last visible row and spans three rows; two of
+      // them were cut away, so the browser would paint it past the table.
+      const tabledata = JSON.stringify({
+        data: [
+          ["", "Wert"],
+          ...Array.from({ length: 10 }, (_, i) => [`Zeile ${i + 1}`, String(i + 1)]),
+        ],
+        merges: [{ row: 5, col: 1, rowSpan: 3, colSpan: 1 }],
+      });
+
+      render(<TableWidget contentLanguage="de_DE" tabledata={tabledata} />);
+
+      expect(screen.getByText("5").closest("td")).not.toHaveAttribute("rowspan");
+    });
+
+    it("restores the full merge once expanded", () => {
+      const tabledata = JSON.stringify({
+        data: [
+          ["", "Wert"],
+          ...Array.from({ length: 10 }, (_, i) => [`Zeile ${i + 1}`, String(i + 1)]),
+        ],
+        merges: [{ row: 5, col: 1, rowSpan: 3, colSpan: 1 }],
+      });
+
+      render(<TableWidget contentLanguage="de_DE" tabledata={tabledata} />);
+      fireEvent.click(screen.getByTestId("table-rows-toggle"));
+
+      expect(screen.getByText("5").closest("td")).toHaveAttribute("rowspan", "3");
+    });
   });
 });

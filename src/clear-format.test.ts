@@ -11,6 +11,8 @@
  * limitations under the License.
  */
 
+import { DEFAULT_VISIBLE_ROWS } from "./row-collapse";
+
 import {
   clearCellFormatting,
   clearFormatting,
@@ -25,6 +27,7 @@ const model = (data: string[][], extra: Partial<TableModel> = {}): TableModel =>
   formats: {},
   sort: null,
   fitImages: true,
+  visibleRows: DEFAULT_VISIBLE_ROWS,
   ...extra,
 });
 

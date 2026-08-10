@@ -1,3 +1,4 @@
+import { DEFAULT_VISIBLE_ROWS } from "./row-collapse";
 import { TableModel } from "./table-model";
 import {
   CELL_ATTRIBUTE,
@@ -12,6 +13,7 @@ const model = (data: string[][], extra: Partial<TableModel> = {}): TableModel =>
   formats: {},
   sort: null,
   fitImages: true,
+  visibleRows: DEFAULT_VISIBLE_ROWS,
   ...extra,
 });
 

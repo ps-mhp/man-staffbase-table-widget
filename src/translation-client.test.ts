@@ -14,11 +14,14 @@ const model: TableModel = {
   formats: {},
   sort: null,
   fitImages: true,
+  visibleRows: DEFAULT_VISIBLE_ROWS,
 };
 
 const input = { model, sourceLanguage: "de_DE", targetLanguage: "en_US" };
 
 /** A response whose table came back translated, in the observed body shape. */
+
+import { DEFAULT_VISIBLE_ROWS } from "./row-collapse";
 const translatedBody = (): unknown => ({
   contents: {
     value:

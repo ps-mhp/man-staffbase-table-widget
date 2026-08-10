@@ -19,6 +19,8 @@ const mediaItem = (id: string): MediaItem => ({
 });
 
 /** Minimal MediaClient stub covering only what the editor exercises. */
+
+import { DEFAULT_VISIBLE_ROWS } from "./row-collapse";
 const stubMediaClient = (overrides: Partial<MediaClient> = {}): MediaClient =>
   ({
     listMedia: jest.fn(async () => ({ items: [mediaItem("a")], total: 1, nextOffset: null })),
@@ -34,6 +36,7 @@ const model = (data: string[][], overrides: Partial<TableModel> = {}): TableMode
   formats: {},
   sort: null,
   fitImages: true,
+  visibleRows: DEFAULT_VISIBLE_ROWS,
   ...overrides,
 });
 
@@ -667,4 +670,66 @@ describe("TableEditor", () => {
       expect(screen.getByTestId("toolbar-clear-format")).not.toBeDisabled();
     });
   });
+
+describe("row limit", () => {
+  const measure = jest.fn(async () => null);
+
+  const longModel = (rows: number): TableModel => ({
+    data: [
+      ["", "Wert"],
+      ...Array.from({ length: rows }, (_, i) => [`Zeile ${i + 1}`, String(i + 1)]),
+    ],
+    merges: [],
+    formats: {},
+    sort: null,
+    fitImages: true,
+    visibleRows: DEFAULT_VISIBLE_ROWS,
+  });
+
+  it("shows the stored limit", () => {
+    render(
+      <TableEditor
+        value={{ ...longModel(10), visibleRows: 3 }}
+        onChange={jest.fn()}
+        measure={measure}
+      />,
+    );
+
+    expect(screen.getByTestId("toolbar-visible-rows")).toHaveValue(3);
+  });
+
+  it("reports a changed limit", () => {
+    const onChange = jest.fn();
+    render(<TableEditor value={longModel(10)} onChange={onChange} measure={measure} />);
+
+    fireEvent.change(screen.getByTestId("toolbar-visible-rows"), { target: { value: "2" } });
+
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ visibleRows: 2 }));
+  });
+
+  it("ignores an emptied field instead of reading it as zero", () => {
+    // Mid-typing NaN must not silently switch collapsing off.
+    const onChange = jest.fn();
+    render(<TableEditor value={longModel(10)} onChange={onChange} measure={measure} />);
+
+    fireEvent.change(screen.getByTestId("toolbar-visible-rows"), { target: { value: "" } });
+
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("never collapses the editing grid itself", () => {
+    // The grid is a working surface — hiding rows someone is about to edit
+    // would serve nothing.
+    render(
+      <TableEditor
+        value={{ ...longModel(10), visibleRows: 2 }}
+        onChange={jest.fn()}
+        measure={measure}
+      />,
+    );
+
+    expect(screen.getAllByTestId(/^row-handle-\d+$/)).toHaveLength(11);
+    expect(screen.queryByTestId("table-rows-toggle")).toBeNull();
+  });
+});
 });
