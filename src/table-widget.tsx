@@ -115,7 +115,7 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
   return (
     <div
       className={`table-widget-scroll ${model.fitImages ? IMAGE_FIT_CLASS : IMAGE_NO_FIT_CLASS}`}
-      style={{ overflow: "auto", maxWidth: "100%", maxHeight: "70vh", containerType: "inline-size", background: "transparent" }}
+      style={{ overflow: "auto", width: "100%", maxWidth: "100%", maxHeight: "70vh", containerType: "inline-size", background: "transparent" }}
     >
       {/* Both states need a stylesheet: the host page styles article images
           too, so "off" is an explicit rule rather than the absence of one. */}

@@ -842,10 +842,25 @@ export const TableEditor = ({
         onDone={onDone}
       />
 
-      <ContextMenu.Root>
+      {/* The container query box has to be a separate, stretched element.
+          `container-type: inline-size` contains the inline axis, so the box's
+          own width can no longer be derived from its contents — putting it on
+          the shrink-to-fit frame below collapsed that frame to zero width. */}
+      <div
+        className={`table-editor__fit-scope ${value.fitImages ? IMAGE_FIT_CLASS : IMAGE_NO_FIT_CLASS}`}
+        style={{
+          flex: "1 1 auto",
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
+          containerType: "inline-size",
+        }}
+      >
+        {value.fitImages ? <style>{IMAGE_FIT_CSS}</style> : <style>{IMAGE_NO_FIT_CSS}</style>}
+        <ContextMenu.Root>
         <ContextMenu.Trigger asChild>
           <div
-            className={`table-editor__grid-wrap ${value.fitImages ? IMAGE_FIT_CLASS : IMAGE_NO_FIT_CLASS}`}
+            className="table-editor__grid-wrap"
             onMouseUp={handleCellMouseUp}
             style={{
               // The only scrolling area of the editor. `alignSelf` keeps the
@@ -856,16 +871,12 @@ export const TableEditor = ({
               alignSelf: "flex-start",
               maxWidth: "100%",
               overflow: "auto",
-              // Matches the widget's scroll wrapper so the image cap resolves
-              // against the same box here as it does when published.
-              containerType: "inline-size",
               border: "1px solid #d9dee3",
               borderRadius: "8px",
               boxShadow: "0 1px 3px rgba(16, 24, 40, 0.06)",
               background: "#fff",
             }}
           >
-            {value.fitImages ? <style>{IMAGE_FIT_CSS}</style> : <style>{IMAGE_NO_FIT_CSS}</style>}
             <table style={{ borderCollapse: "collapse" }} data-testid="table-editor-grid">
             <thead>
               <tr>
@@ -968,6 +979,7 @@ export const TableEditor = ({
           </ContextMenu.Content>
         </ContextMenu.Portal>
       </ContextMenu.Root>
+      </div>
 
       {pickerOpen && (
         <MediaPicker

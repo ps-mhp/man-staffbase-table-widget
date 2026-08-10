@@ -438,7 +438,7 @@ describe("TableEditor", () => {
         <TableEditor value={withImages()} onChange={jest.fn()} measure={measure} />,
       );
 
-      expect(container.querySelector(".table-editor__grid-wrap")).toHaveClass(IMAGE_FIT_CLASS);
+      expect(container.querySelector(".table-editor__fit-scope")).toHaveClass(IMAGE_FIT_CLASS);
     });
 
     it("drops the cap from the preview when the option is off", () => {
@@ -450,9 +450,28 @@ describe("TableEditor", () => {
         />,
       );
 
-      const wrap = container.querySelector(".table-editor__grid-wrap");
+      const wrap = container.querySelector(".table-editor__fit-scope");
       expect(wrap).not.toHaveClass(IMAGE_FIT_CLASS);
       expect(wrap).toHaveClass(IMAGE_NO_FIT_CLASS);
+    });
+
+    it("keeps the container query off the shrink-to-fit frame", () => {
+      // `container-type: inline-size` contains the inline axis, so a box
+      // carrying it cannot derive its own width from its contents. On the
+      // shrink-to-fit grid frame that collapsed the whole editor to zero
+      // width, so the two responsibilities have to stay on separate elements.
+      const { container } = render(
+        <TableEditor value={withImages()} onChange={jest.fn()} measure={measure} />,
+      );
+
+      const scope = container.querySelector<HTMLElement>(".table-editor__fit-scope");
+      const frame = container.querySelector<HTMLElement>(".table-editor__grid-wrap");
+
+      expect(scope?.style.containerType).toBe("inline-size");
+      expect(scope?.style.alignSelf).toBe("");
+      expect(frame?.style.containerType).toBe("");
+      expect(frame?.style.alignSelf).toBe("flex-start");
+      expect(scope?.contains(frame)).toBe(true);
     });
 
     it("toggles the fit option without touching the cells", () => {
