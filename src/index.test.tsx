@@ -12,8 +12,8 @@
  */
 
 import { screen, waitFor } from "@testing-library/dom";
-
-import "dev/bootstrap";
+import { installDevHarness } from "dev/bootstrap";
+import { configurationSchema, uiSchema } from "./configuration-schema";
 
 describe("Widget test", () => {
   let stopTableEditorInjector: () => void;
@@ -23,6 +23,9 @@ describe("Widget test", () => {
         <div id="preview"></div>
         <div id="config"></div>
         `;
+    // Install the harness with the widget's own schema before the widget
+    // bundle calls window.defineBlock, so tests don't need the @widget alias.
+    installDevHarness({ configurationSchema, uiSchema });
     ({ stopTableEditorInjector } = await import("./index"));
   });
 
