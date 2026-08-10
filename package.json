@@ -1,6 +1,6 @@
 {
   "name": "@man/table-widget",
-  "version": "1.4.0-rc.14",
+  "version": "1.4.0-rc.15",
   "description": "",
   "scripts": {
     "start": "webpack serve --open --config webpack.dev.ts",
