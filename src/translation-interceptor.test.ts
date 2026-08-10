@@ -338,7 +338,7 @@ describe("startTranslationInterceptor", () => {
                 selectedBlock: {
                   customElementName: "table-widget",
                   name: "Table Widget",
-                  url: "https://cdn.jsdelivr.net/gh/ps-mhp/man-staffbase-table-widget@1.4.0/dist/man.table-widget.js",
+                  url: "https://cdn.jsdelivr.net/gh/ps-mhp/man-staffbase-table-widget@1.4.0/dist/table-widget.js",
                   properties: { tabledata },
                   version: "1.0.0",
                 },

@@ -1,13 +1,10 @@
-# Dependencies
+# node_modules gibt es hier nicht: gebaut wird ausschließlich aus dem
+# Meta-Repo man-staffbase-cms-extensions.
 node_modules/
-
-# Test coverage
 coverage/
 
-# Logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# dist/ wird bewusst NICHT ignoriert: jsDelivr liefert das Bundle aus dem
+# Git-Tag dieses Repos aus.
 
 # Editor/IDE
 .idea/
@@ -17,7 +14,3 @@ yarn-error.log*
 
 # OS
 .DS_Store
-
-# Environment
-.env
-.env.local

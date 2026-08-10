@@ -13,7 +13,7 @@
 
 import { screen, waitFor } from "@testing-library/dom";
 
-import "../dev/bootstrap";
+import "dev/bootstrap";
 
 describe("Widget test", () => {
   let stopTableEditorInjector: () => void;

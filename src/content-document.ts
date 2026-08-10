@@ -26,7 +26,7 @@
  *   "type": "customBlock",
  *   "config": { "settings": { "content": { "selectedBlock": {
  *     "customElementName": "table-widget",
- *     "url": "https://cdn.jsdelivr.net/…/man.table-widget.js",
+ *     "url": "https://cdn.jsdelivr.net/…/table-widget.js",
  *     "properties": { "tabledata": "b64:…" }
  *   } } } }
  * }

@@ -11,7 +11,11 @@
  * limitations under the License.
  */
 
-import "./public-path";
+import { setPublicPathFromBundle } from "@shared/public-path";
+
+// Muss vor jedem dynamischen `import()` laufen (ExcelJS beim .xlsx-Upload),
+// damit die Chunks vom CDN und nicht von der Hosting-Seite geladen werden.
+setPublicPathFromBundle("table-widget.js");
 import React from "react";
 import ReactDOM from "react-dom/client";
 
