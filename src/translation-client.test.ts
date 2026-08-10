@@ -13,6 +13,7 @@ const model: TableModel = {
   merges: [],
   formats: {},
   sort: null,
+  fitImages: true,
 };
 
 const input = { model, sourceLanguage: "de_DE", targetLanguage: "en_US" };

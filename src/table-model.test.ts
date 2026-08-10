@@ -26,6 +26,7 @@ import {
   mergeAt,
   setFormat,
   setSort,
+  setFitImages,
   cellFormat,
   normalizeRange,
 } from "./table-model";
@@ -35,6 +36,7 @@ const model = (data: string[][], overrides: Partial<TableModel> = {}): TableMode
   merges: [],
   formats: {},
   sort: null,
+  fitImages: true,
   ...overrides,
 });
 
@@ -87,6 +89,64 @@ describe("serializeTableModel", () => {
     });
     const roundTripped = parseTableModel(serializeTableModel(m));
     expect(roundTripped.merges).toEqual(m.merges);
+  });
+});
+
+describe("fitImages", () => {
+  it("defaults to on for a legacy array", () => {
+    expect(parseTableModel(JSON.stringify([["", "A"]])).fitImages).toBe(true);
+  });
+
+  it("defaults to on for an object model that predates the option", () => {
+    const raw = JSON.stringify({ data: [["", "A"]], merges: [], formats: {}, sort: null });
+    expect(parseTableModel(raw).fitImages).toBe(true);
+  });
+
+  it("defaults to on for missing and malformed input", () => {
+    expect(parseTableModel(undefined).fitImages).toBe(true);
+    expect(parseTableModel("not json").fitImages).toBe(true);
+  });
+
+  it("reads only an explicit false as off", () => {
+    const off = JSON.stringify({ data: [["", "A"]], fitImages: false });
+    expect(parseTableModel(off).fitImages).toBe(false);
+    const bogus = JSON.stringify({ data: [["", "A"]], fitImages: "nope" });
+    expect(parseTableModel(bogus).fitImages).toBe(true);
+  });
+
+  it("keeps the compact array shape while the option is on", () => {
+    const raw = serializeTableModel(model([["", "A"]], { fitImages: true }));
+    expect(JSON.parse(raw)).toEqual([["", "A"]]);
+  });
+
+  it("writes the object shape once the option is off and round-trips", () => {
+    const raw = serializeTableModel(model([["", "A"]], { fitImages: false }));
+    expect(JSON.parse(raw)).toMatchObject({ fitImages: false });
+    expect(parseTableModel(raw).fitImages).toBe(false);
+  });
+
+  it("survives an encode/decode through the attribute payload", () => {
+    const off = parseTableModel(encodeTableAttribute(model([["", "A"]], { fitImages: false })));
+    expect(off.fitImages).toBe(false);
+    const on = parseTableModel(encodeTableAttribute(model([["", "A"]], { fitImages: true })));
+    expect(on.fitImages).toBe(true);
+  });
+
+  it("is toggled by setFitImages without touching anything else", () => {
+    const m = model([["", "A"]], { sort: { col: 0, dir: "asc" } });
+    const off = setFitImages(m, false);
+    expect(off.fitImages).toBe(false);
+    expect(off.sort).toEqual(m.sort);
+    expect(off.data).toEqual(m.data);
+    expect(setFitImages(off, true).fitImages).toBe(true);
+  });
+
+  it("survives the operations that rebuild the model", () => {
+    const m = model([["", "A"], ["R", "1"]], { fitImages: false });
+    expect(insertRow(m, 1).fitImages).toBe(false);
+    expect(insertColumn(m, 1).fitImages).toBe(false);
+    expect(deleteRow(m, 1).fitImages).toBe(false);
+    expect(setSort(m, { col: 0, dir: "asc" }).fitImages).toBe(false);
   });
 });
 

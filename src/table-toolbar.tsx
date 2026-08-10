@@ -119,6 +119,54 @@ const RIBBON_CSS = `
   border-color: #0068c2;
 }
 .tw-rb__big--primary:hover:not(:disabled) { background: #0068c2; border-color: #005aa8; }
+/* Toggle for table-wide options. Unlike the action buttons it shows a state,
+   so it renders as a switch rather than lighting up like a pressed button. */
+.tw-rb__switch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 100%;
+  width: 76px;
+  min-width: 76px;
+  padding: 5px 4px;
+  border: 1px solid #dbe0e5;
+  border-radius: 6px;
+  background: #fff;
+  color: #2b3742;
+  cursor: pointer;
+  font-size: 11px;
+  line-height: 1.15;
+  text-align: center;
+  box-sizing: border-box;
+  transition: background 110ms ease, border-color 110ms ease;
+}
+.tw-rb__switch:hover:not(:disabled) { background: #eef3f8; border-color: #b9c2cc; }
+.tw-rb__switch:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(0, 116, 217, 0.4); }
+.tw-rb__switch-track {
+  position: relative;
+  width: 30px;
+  height: 16px;
+  border-radius: 8px;
+  background: #c6ced6;
+  transition: background 110ms ease;
+  flex: 0 0 auto;
+}
+.tw-rb__switch-track::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 110ms ease;
+}
+.tw-rb__switch[aria-checked="true"] { border-color: #9dc7ea; background: #f2f8fd; }
+.tw-rb__switch[aria-checked="true"] .tw-rb__switch-track { background: #0074d9; }
+.tw-rb__switch[aria-checked="true"] .tw-rb__switch-track::after { transform: translateX(14px); }
 .tw-rb__select {
   -webkit-appearance: none;
   appearance: none;
@@ -362,6 +410,12 @@ export interface TableToolbarProps {
   onEqualizeImageHeight: () => void;
   onEqualizeImageWidth: () => void;
   onResetImageSize: () => void;
+  /**
+   * Whether images are capped to the width of the rendered table. Applies to
+   * the whole table, so the switch stays enabled without a selection.
+   */
+  fitImages: boolean;
+  onToggleFitImages: () => void;
   onDone?: () => void;
 }
 
@@ -585,6 +639,8 @@ export const TableToolbar = (props: TableToolbarProps): ReactElement => {
     onEqualizeImageHeight,
     onEqualizeImageWidth,
     onResetImageSize,
+    fitImages,
+    onToggleFitImages,
     onDone,
   } = props;
 
@@ -848,6 +904,19 @@ export const TableToolbar = (props: TableToolbarProps): ReactElement => {
               </>
             )}
           </Dropdown>
+
+          <button
+            type="button"
+            role="switch"
+            aria-checked={fitImages}
+            className="tw-rb__switch"
+            data-testid="toolbar-image-fit"
+            title="Bilder auf die Breite der Tabelle begrenzen. Ausgeschaltet werden sie immer in ihrer eigenen Größe angezeigt."
+            onClick={onToggleFitImages}
+          >
+            <span className="tw-rb__switch-track" aria-hidden="true" />
+            <span>Bilder anpassen</span>
+          </button>
 
           <button type="button" className="tw-rb__big" data-testid="toolbar-upload-button" title="Tabelle hochladen (.csv, .xlsx)" onClick={() => fileInputRef.current?.click()}>
             <IconUpload />

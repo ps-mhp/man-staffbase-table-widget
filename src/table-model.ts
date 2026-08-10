@@ -62,6 +62,13 @@ export interface TableModel {
   merges: Merge[];
   formats: Record<string, CellFormat>;
   sort: SortSpec | null;
+  /**
+   * Whether inline images are capped to the width of the rendered table
+   * (see `image-fit.ts`). Defaults to `true`; turning it off makes every
+   * image render at its configured — or intrinsic — size, however wide that
+   * is. The flag belongs to the table as a whole, not to a cell.
+   */
+  fitImages: boolean;
 }
 
 export const formatKey = (row: number, col: number): string => `${row},${col}`;
@@ -100,7 +107,7 @@ const isValidMerge = (m: unknown): m is Merge =>
  *  - a base64 payload (`b64:…`, see `table-payload.ts`) — what is written
  *    today, because it is the only form the translation pipeline cannot
  *    corrupt;
- *  - a JSON **object** with `data`/`merges`/`formats`/`sort`;
+ *  - a JSON **object** with `data`/`merges`/`formats`/`sort`/`fitImages`;
  *  - a legacy JSON **array** (`string[][]`), read as a model with no merges,
  *    formats or preset sort, so existing instances render exactly as before.
  *
@@ -112,6 +119,7 @@ export function parseTableModel(raw: string | undefined | null): TableModel {
     merges: [],
     formats: {},
     sort: null,
+    fitImages: true,
   });
 
   if (!raw) return empty(parseTableData(raw));
@@ -172,20 +180,25 @@ export function parseTableModel(raw: string | undefined | null): TableModel {
     sort = { col: rawSort.col, dir: rawSort.dir };
   }
 
-  return { data, merges, formats, sort };
+  return { data, merges, formats, sort, fitImages: obj.fitImages !== false };
 }
 
 /**
  * Serializes a model back to the JSON string stored in `tabledata`. To keep
- * the attribute small and diff-friendly, a model with no merges, no formats
- * and no preset sort is written back in the legacy `string[][]` shape.
+ * the attribute small and diff-friendly, a model that carries nothing beyond
+ * its values — no merges, no formats, no preset sort, and image fitting left
+ * at its default — is written back in the legacy `string[][]` shape.
  */
 export function serializeTableModel(model: TableModel): string {
   const hasMerges = model.merges.length > 0;
   const hasFormats = Object.keys(model.formats).length > 0;
   const hasSort = model.sort !== null;
+  // Only the non-default (`false`) needs storing: a missing flag reads as
+  // `true`, which keeps every table written before this option existed —
+  // and every plain one written after it — in the compact array form.
+  const hasImageFit = model.fitImages === false;
 
-  if (!hasMerges && !hasFormats && !hasSort) {
+  if (!hasMerges && !hasFormats && !hasSort && !hasImageFit) {
     return JSON.stringify(model.data);
   }
   return JSON.stringify({
@@ -193,6 +206,7 @@ export function serializeTableModel(model: TableModel): string {
     merges: model.merges,
     formats: model.formats,
     sort: model.sort,
+    ...(hasImageFit ? { fitImages: false } : {}),
   });
 }
 
@@ -436,6 +450,11 @@ export function setFormat(
 /** Sets (or clears with `null`) the preset sort applied by the widget. */
 export function setSort(model: TableModel, sort: SortSpec | null): TableModel {
   return { ...model, sort };
+}
+
+/** Turns the image-width cap (see `image-fit.ts`) on or off for the table. */
+export function setFitImages(model: TableModel, fitImages: boolean): TableModel {
+  return { ...model, fitImages };
 }
 
 export const cellFormat = (model: TableModel, row: number, col: number): CellFormat =>

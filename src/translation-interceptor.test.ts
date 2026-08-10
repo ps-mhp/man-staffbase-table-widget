@@ -14,6 +14,7 @@ const SOURCE_MODEL: TableModel = {
   merges: [],
   formats: { "0,1": { bold: true } },
   sort: null,
+  fitImages: true,
 };
 
 const widgetTag = (tabledata: string): string => `<table-widget tabledata="${tabledata}"></table-widget>`;

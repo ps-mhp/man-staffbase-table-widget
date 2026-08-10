@@ -6,6 +6,7 @@ import { TableModel } from "./table-model";
 import * as tableImport from "./table-import";
 import { MediaClient, MediaItem } from "./media-client";
 import { DEFAULT_IMAGE_WIDTH } from "./cell-image";
+import { IMAGE_FIT_CLASS } from "./image-fit";
 
 const mediaItem = (id: string): MediaItem => ({
   id,
@@ -32,6 +33,7 @@ const model = (data: string[][], overrides: Partial<TableModel> = {}): TableMode
   merges: [],
   formats: {},
   sort: null,
+  fitImages: true,
   ...overrides,
 });
 
@@ -429,6 +431,57 @@ describe("TableEditor", () => {
 
       fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
       expect(screen.getByTestId("toolbar-image-size")).not.toBeDisabled();
+    });
+
+    it("caps images in the preview while the fit option is on", () => {
+      const { container } = render(
+        <TableEditor value={withImages()} onChange={jest.fn()} measure={measure} />,
+      );
+
+      expect(container.querySelector(".table-editor__grid-wrap")).toHaveClass(IMAGE_FIT_CLASS);
+    });
+
+    it("drops the cap from the preview when the option is off", () => {
+      const { container } = render(
+        <TableEditor
+          value={{ ...withImages(), fitImages: false }}
+          onChange={jest.fn()}
+          measure={measure}
+        />,
+      );
+
+      expect(container.querySelector(".table-editor__grid-wrap")).not.toHaveClass(IMAGE_FIT_CLASS);
+    });
+
+    it("toggles the fit option without touching the cells", () => {
+      const onChange = jest.fn();
+      render(<TableEditor value={withImages()} onChange={onChange} measure={measure} />);
+
+      const toggle = screen.getByTestId("toolbar-image-fit");
+      expect(toggle).toHaveAttribute("aria-checked", "true");
+      // Table-wide, so it works without a selection.
+      fireEvent.click(toggle);
+
+      const arg = onChange.mock.calls.at(-1)![0] as TableModel;
+      expect(arg.fitImages).toBe(false);
+      expect(arg.data).toEqual(withImages().data);
+    });
+
+    it("turns the fit option back on", () => {
+      const onChange = jest.fn();
+      render(
+        <TableEditor
+          value={{ ...withImages(), fitImages: false }}
+          onChange={onChange}
+          measure={measure}
+        />,
+      );
+
+      const toggle = screen.getByTestId("toolbar-image-fit");
+      expect(toggle).toHaveAttribute("aria-checked", "false");
+      fireEvent.click(toggle);
+
+      expect((onChange.mock.calls.at(-1)![0] as TableModel).fitImages).toBe(true);
     });
 
     it("offers only the reset option while a single image is selected", () => {

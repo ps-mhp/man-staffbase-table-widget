@@ -29,6 +29,7 @@ import {
   unmergeCells,
   setFormat,
   setSort,
+  setFitImages,
   cellFormat,
   isCovered,
   mergeAt,
@@ -50,6 +51,7 @@ import {
   DEFAULT_IMAGE_WIDTH,
 } from "./cell-image";
 import { MeasureImage, measureImage } from "./image-measure";
+import { IMAGE_FIT_CLASS, IMAGE_FIT_CSS } from "./image-fit";
 
 export interface TableEditorProps {
   value: TableModel;
@@ -708,6 +710,8 @@ export const TableEditor = ({
   };
   const clearSort = (): void => onChange(setSort(value, null));
 
+  const toggleFitImages = (): void => onChange(setFitImages(value, !value.fitImages));
+
   // --- Format painter (pattern-based, like Excel) ---
 
   /**
@@ -823,13 +827,15 @@ export const TableEditor = ({
         onEqualizeImageHeight={() => void resizeImages("height")}
         onEqualizeImageWidth={() => void resizeImages("width")}
         onResetImageSize={() => void resizeImages("default")}
+        fitImages={value.fitImages}
+        onToggleFitImages={toggleFitImages}
         onDone={onDone}
       />
 
       <ContextMenu.Root>
         <ContextMenu.Trigger asChild>
           <div
-            className="table-editor__grid-wrap"
+            className={`table-editor__grid-wrap${value.fitImages ? ` ${IMAGE_FIT_CLASS}` : ""}`}
             onMouseUp={handleCellMouseUp}
             style={{
               // The only scrolling area of the editor. `alignSelf` keeps the
@@ -840,12 +846,16 @@ export const TableEditor = ({
               alignSelf: "flex-start",
               maxWidth: "100%",
               overflow: "auto",
+              // Matches the widget's scroll wrapper so the image cap resolves
+              // against the same box here as it does when published.
+              containerType: "inline-size",
               border: "1px solid #d9dee3",
               borderRadius: "8px",
               boxShadow: "0 1px 3px rgba(16, 24, 40, 0.06)",
               background: "#fff",
             }}
           >
+            {value.fitImages && <style>{IMAGE_FIT_CSS}</style>}
             <table style={{ borderCollapse: "collapse" }} data-testid="table-editor-grid">
             <thead>
               <tr>

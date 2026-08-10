@@ -3,6 +3,7 @@ import { screen, render } from "@testing-library/react";
 
 import { TableWidget } from "./table-widget";
 import { serializeTableData } from "./table-json";
+import { IMAGE_FIT_CLASS } from "./image-fit";
 
 describe("TableWidget", () => {
   it("renders the default table when no data is provided", () => {
@@ -168,7 +169,36 @@ describe("TableWidget", () => {
     expect(img).not.toBeNull();
     expect(img).toHaveAttribute("src", "https://cdn.example.com/logo.png");
     expect(img!.getAttribute("style")).toContain("width:120px");
-    expect(img!.getAttribute("style")).toContain("max-width:none");
+    expect(img!.getAttribute("style")).not.toContain("max-width");
+  });
+
+  it("caps images to the table's width by default", () => {
+    const tabledata = JSON.stringify({
+      data: [["", "Bild"], ["Logo", '<img src="https://cdn.example.com/logo.png">']],
+    });
+
+    const { container } = render(
+      <TableWidget contentLanguage="de_DE" tabledata={tabledata} />,
+    );
+
+    const wrap = container.querySelector(".table-widget-scroll");
+    expect(wrap).toHaveClass(IMAGE_FIT_CLASS);
+    expect(container.querySelector("style")?.textContent).toContain("100cqw");
+  });
+
+  it("renders images unrestricted when the option is off", () => {
+    const tabledata = JSON.stringify({
+      data: [["", "Bild"], ["Logo", '<img src="https://cdn.example.com/logo.png">']],
+      fitImages: false,
+    });
+
+    const { container } = render(
+      <TableWidget contentLanguage="de_DE" tabledata={tabledata} />,
+    );
+
+    const wrap = container.querySelector(".table-widget-scroll");
+    expect(wrap).not.toHaveClass(IMAGE_FIT_CLASS);
+    expect(container.querySelector("style")).toBeNull();
   });
 
   it("does not render an image with an unsafe source", () => {

@@ -11,6 +11,7 @@ const model = (data: string[][], extra: Partial<TableModel> = {}): TableModel =>
   merges: [],
   formats: {},
   sort: null,
+  fitImages: true,
   ...extra,
 });
 
@@ -68,6 +69,12 @@ describe("applyTranslatedCells", () => {
     expect(next.merges).toBe(source.merges);
     expect(next.formats).toBe(source.formats);
     expect(next.sort).toBe(source.sort);
+  });
+
+  it("carries the image-fit option into the translated model", () => {
+    const source = model([["", "Spalte 1"], ["Zeile 1", "Auto"]], { fitImages: false });
+
+    expect(applyTranslatedCells(source, new Map([["1,1", "Car"]])).fitImages).toBe(false);
   });
 
   it("keeps the source value when the translation emptied a non-empty cell", () => {

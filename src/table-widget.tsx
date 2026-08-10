@@ -21,6 +21,7 @@ import {
 } from "./table-model";
 import { formatToStyle, formatToCellStyle } from "./cell-style";
 import { sanitizeRichText, richTextToPlain } from "./rich-text";
+import { IMAGE_FIT_CLASS, IMAGE_FIT_CSS } from "./image-fit";
 
 /**
  * React Component
@@ -113,9 +114,10 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
 
   return (
     <div
-      className="table-widget-scroll"
+      className={`table-widget-scroll${model.fitImages ? ` ${IMAGE_FIT_CLASS}` : ""}`}
       style={{ overflow: "auto", maxWidth: "100%", maxHeight: "70vh", containerType: "inline-size", background: "transparent" }}
     >
+      {model.fitImages && <style>{IMAGE_FIT_CSS}</style>}
       <table
         style={{
           borderCollapse: "separate",

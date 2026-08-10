@@ -74,22 +74,19 @@ const readImageWidth = (el: HTMLElement): number | null => {
  * an allowed URL. The width (when set) is re-emitted together with
  * `height:auto` so the image keeps its aspect ratio.
  *
- * `max-width:none` is deliberate: a percentage `max-width` resolves against
- * the cell, which in an auto-layout table is itself derived from the content.
- * Browsers break that cycle by letting the image shrink, so a narrow column
- * (e.g. one without a header) would squeeze the picture below its real size.
- * With `none` the image always renders at its configured — or, when no width
- * is set, its intrinsic — size and the column widens to fit it; anything too
- * wide for the widget is reachable via the horizontal scroll of the table.
+ * No `max-width` is written here on purpose. Whether an image is capped to
+ * the rendered table's width is a per-table option (`fitImages`), applied by
+ * a stylesheet on the container — see `image-fit.ts`. Baking a cap into the
+ * markup would make the option unswitchable and, with a percentage value,
+ * reintroduce the circular dependency on the auto-layout column width that
+ * squeezed images in narrow columns.
  */
 const serializeImage = (el: HTMLElement): string => {
   const src = el.getAttribute("src");
   if (!isSafeImageSrc(src)) return "";
   const alt = escapeAttr(el.getAttribute("alt") ?? "");
   const width = readImageWidth(el);
-  const style = width
-    ? `width:${width}px;height:auto;max-width:none`
-    : "height:auto;max-width:none";
+  const style = width ? `width:${width}px;height:auto` : "height:auto";
   return `<img src="${escapeAttr(src)}" alt="${alt}" style="${style}">`;
 };
 
