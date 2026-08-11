@@ -23,7 +23,8 @@ import { BlockFactory, BlockDefinition, ExternalBlockDefinition, BaseBlock } fro
 import { TableWidgetProps, TableWidget } from "./table-widget";
 import { configurationSchema, uiSchema } from "./configuration-schema";
 import { startTableEditorInjector } from "./table-editor-injector";
-import { startTranslationInterceptor } from "./translation-interceptor";
+import { getTranslationRegistry } from "@shared/translation/registry";
+import { tableTranslationProvider } from "./translation-provider";
 import icon from "../resources/table-widget.svg";
 import pkg from '../package.json'
 
@@ -52,22 +53,11 @@ const widgetAttributes: string[] = [
 export const stopTableEditorInjector = startTableEditorInjector();
 
 /**
- * Makes the table travel with Staffbase's content translation.
- *
- * The table lives in the `tabledata` attribute — the only storage the widget
- * SDK offers — and `POST /api/translations` translates text nodes, not
- * attributes (nor, in the new editor's block format, a custom block's
- * properties). This wraps that call so the table gets its own translation
- * request and the result is written into the response the editor receives; see
- * `translation-interceptor.ts` for why it sits at that layer, and for how the
- * classic editor's article HTML and the Content Designer's block tree are both
- * served.
- *
- * Installed unconditionally for the same reason as the editor injector: on a
- * live content page the endpoint is never called, so the wrapper only ever
- * forwards. Exported so tests can restore the original `fetch`.
+ * Installed unconditionally at module load: on a live content page the
+ * translation endpoint is never called, so registering costs nothing there.
+ * Exported so tests can unregister.
  */
-export const stopTranslationInterceptor = startTranslationInterceptor();
+export const stopTranslationProvider = getTranslationRegistry().register(tableTranslationProvider);
 
 /**
  * This factory creates the class which is registered with the tagname in the `custom element registry`
