@@ -41,6 +41,9 @@ export const tableTranslationProvider: TranslationProvider = {
     // the article. Skip it entirely.
     if (!stored) return null;
     const model = parseTableModel(stored);
+    // Unreachable today: parseTableModel substitutes DEFAULT_TABLE_DATA for an
+    // empty data array, so a parsed model always has rows. Kept as a safety net
+    // in case that fallback ever becomes conditional.
     if (model.data.length === 0) return null;
     return tableModelToTranslatableHtml(model);
   },
