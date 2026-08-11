@@ -219,7 +219,7 @@ const methodOf = (input: RequestInfo | URL, init?: RequestInit): string =>
  *
  * They are reused verbatim for this bundle's own call — `x-csrf-token` in
  * particular, without which the endpoint answers 403. See `buildHeaders` in
- * `translation-client.ts`.
+ * `@shared/translation/client`.
  */
 const hostHeadersOf = (input: RequestInfo | URL, init?: RequestInit): Headers => {
   if (init?.headers !== undefined) return new Headers(init.headers);
