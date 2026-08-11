@@ -1,5 +1,5 @@
 import { TableModel, parseTableModel } from "./table-model";
-import { encodeTablePayload } from "./table-payload";
+import { encodePayload } from "@shared/payload";
 import {
   SELF_REQUEST_HEADER,
   TRANSLATIONS_PATH,
@@ -22,7 +22,7 @@ const SOURCE_MODEL: TableModel = {
 
 const widgetTag = (tabledata: string): string => `<table-widget tabledata="${tabledata}"></table-widget>`;
 
-const SOURCE_TABLEDATA = encodeTablePayload(
+const SOURCE_TABLEDATA = encodePayload(
   JSON.stringify({
     data: SOURCE_MODEL.data,
     merges: SOURCE_MODEL.merges,

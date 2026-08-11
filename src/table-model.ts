@@ -13,7 +13,7 @@
 
 import { DEFAULT_VISIBLE_ROWS, clampVisibleRows } from "./row-collapse";
 import { TableData, parseTableData } from "./table-json";
-import { decodeTablePayload, encodeTablePayload, isTablePayload } from "./table-payload";
+import { decodePayload, encodePayload, isPayload } from "@shared/payload";
 
 /**
  * A merged cell region. `(row, col)` is the anchor (top-left) cell that is
@@ -112,7 +112,7 @@ const isValidMerge = (m: unknown): m is Merge =>
  * Parses the widget's `tabledata` attribute into a {@link TableModel}.
  *
  * Accepts all three shapes the attribute has ever had, newest first:
- *  - a base64 payload (`b64:…`, see `table-payload.ts`) — what is written
+ *  - a base64 payload (`b64:…`, see `@shared/payload`) — what is written
  *    today, because it is the only form the translation pipeline cannot
  *    corrupt;
  *  - a JSON **object** with `data`/`merges`/`formats`/`sort`/`fitImages`/
@@ -137,8 +137,8 @@ export function parseTableModel(raw: string | undefined | null): TableModel {
   // A payload that carries the marker but does not decode is broken data, not
   // legacy JSON — reading it as JSON would only produce the same empty table
   // via a longer path, so bail out directly.
-  if (isTablePayload(raw)) {
-    const decoded = decodeTablePayload(raw);
+  if (isPayload(raw)) {
+    const decoded = decodePayload(raw);
     return decoded === null ? empty(parseTableData(undefined)) : parseTableModel(decoded);
   }
 
@@ -240,7 +240,7 @@ export function serializeTableModel(model: TableModel): string {
  * older forms; see {@link parseTableModel}.
  */
 export function encodeTableAttribute(model: TableModel): string {
-  return encodeTablePayload(serializeTableModel(model));
+  return encodePayload(serializeTableModel(model));
 }
 
 /** The merge whose anchor is exactly `(row, col)`, if any. */
