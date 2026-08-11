@@ -13,20 +13,26 @@
 
 import {
   containsContentDocumentWidget,
-  findContentDocumentTables,
-  tablePathKey,
-  withContentDocumentTables,
-} from "./content-document";
-import { log } from "./debug-log";
-import { showGrowl } from "./growl";
-import { collectStrings, findStringByKey, mapStrings } from "./json-strings";
+  findContentDocumentBlocks,
+  blockPathKey,
+  withContentDocumentValues,
+} from "@shared/translation/content-document";
+import { log } from "@shared/translation/debug-log";
+import { showGrowl } from "@shared/translation/growl";
+import { collectStrings, findStringByKey, mapStrings } from "@shared/translation/json-strings";
+import { WidgetAttributeRef } from "@shared/translation/types";
+import {
+  WidgetTag, containsWidget, findWidgetTags, replaceWidgetTags, withValue,
+} from "@shared/translation/widget-html";
 import { TableModel, encodeTableAttribute, parseTableModel } from "./table-model";
 import {
   SELF_REQUEST_HEADER,
   TRANSLATIONS_PATH,
   translateTableModel,
 } from "./translation-client";
-import { WidgetTag, containsWidget, findWidgetTags, replaceWidgetTags, withTabledata } from "./widget-html";
+
+/** Where this widget keeps its translatable content. */
+const TABLE_REF: WidgetAttributeRef = { tagName: "table-widget", attribute: "tabledata" };
 
 /**
  * Carries the table through Staffbase's content translation.
@@ -266,9 +272,9 @@ const withBody = (response: Response, body: string): Response => {
 /** Every widget in a parsed request body, in traversal order. */
 export function collectSourceWidgets(body: unknown): SourceWidget[] {
   return collectStrings(body)
-    .filter(containsWidget)
-    .flatMap(findWidgetTags)
-    .map((tag) => ({ tag, model: parseTableModel(tag.tabledata) }));
+    .filter((s) => containsWidget(s, TABLE_REF))
+    .flatMap((s) => findWidgetTags(s, TABLE_REF))
+    .map((tag) => ({ tag, model: parseTableModel(tag.value) }));
 }
 
 /**
@@ -288,20 +294,20 @@ export function patchResponseBody(
   sources: readonly SourceWidget[],
   translated: ReadonlyArray<TableModel | null>,
 ): { readonly body: unknown } | null {
-  const responseTags = collectStrings(body).filter(containsWidget).flatMap(findWidgetTags);
+  const responseTags = collectStrings(body).filter((s) => containsWidget(s, TABLE_REF)).flatMap((s) => findWidgetTags(s, TABLE_REF));
   if (responseTags.length !== sources.length) return null;
 
   let cursor = 0;
   let patched = false;
 
   const next = mapStrings(body, (text) => {
-    if (!containsWidget(text)) return text;
-    const tags = findWidgetTags(text);
+    if (!containsWidget(text, TABLE_REF)) return text;
+    const tags = findWidgetTags(text, TABLE_REF);
     const replacements = tags.map((_, index) => {
       const model = translated[cursor + index];
       if (!model) return null;
       patched = true;
-      return withTabledata(sources[cursor + index].tag, encodeTableAttribute(model));
+      return withValue(sources[cursor + index].tag, TABLE_REF, encodeTableAttribute(model));
     });
     cursor += tags.length;
     return replaceWidgetTags(text, tags, replacements);
@@ -333,21 +339,21 @@ const htmlCarrier = (body: unknown): TableCarrier | null => {
  * source language instead of writing it somewhere else.
  */
 const contentDocumentCarrier = (body: unknown): TableCarrier | null => {
-  const tables = findContentDocumentTables(body);
+  const tables = findContentDocumentBlocks(body, TABLE_REF);
   if (tables.length === 0) return null;
 
   return {
     format: "content-document",
-    models: tables.map(({ tabledata }) => parseTableModel(tabledata)),
+    models: tables.map(({ value }) => parseTableModel(value)),
     patch: (responseBody, translated) => {
       const values = new Map<string, string>();
       tables.forEach((table, index) => {
         const model = translated[index];
-        if (model) values.set(tablePathKey(table), encodeTableAttribute(model));
+        if (model) values.set(blockPathKey(table), encodeTableAttribute(model));
       });
       if (values.size === 0) return null;
 
-      const { body: next, applied } = withContentDocumentTables(responseBody, values);
+      const { body: next, applied } = withContentDocumentValues(responseBody, TABLE_REF, values);
       return applied === 0 ? null : { body: next };
     },
   };
@@ -398,7 +404,7 @@ async function planFor(
 
   const raw = await readRequestBody(input, init);
   if (raw === null) return skip("request body not readable");
-  if (!containsWidget(raw) && !containsContentDocumentWidget(raw)) {
+  if (!containsWidget(raw, TABLE_REF) && !containsContentDocumentWidget(raw, TABLE_REF)) {
     return skip("no table widget in request");
   }
 

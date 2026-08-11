@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-import { collectStrings } from "./json-strings";
+import { collectStrings } from "@shared/translation/json-strings";
 import { TableModel } from "./table-model";
 import {
   applyTranslatedCells,
