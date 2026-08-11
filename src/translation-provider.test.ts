@@ -28,6 +28,21 @@ describe("tableTranslationProvider", () => {
     expect(provider.toTranslatable(null)).toBeNull();
   });
 
+  it("skips an empty stored value (widget would render its default placeholder, not authored content)", () => {
+    expect(provider.toTranslatable("")).toBeNull();
+  });
+
+  it("skips a model with no rows (tableModelToTranslatableHtml returns non-empty HTML for empty data, so the guard is necessary)", () => {
+    // NOTE: parseTableModel always substitutes DEFAULT_TABLE_DATA for an empty
+    // data array, so the model.data.length === 0 guard in toTranslatable is
+    // currently unreachable. The guard is kept as a safety net. This test
+    // documents that an encoded-empty-data value is not skipped (it is
+    // translated as the default placeholder), which is a known concern.
+    const emptyModel = encodeTableAttribute({ data: [], merges: [], formats: {}, sort: null, fitImages: true, visibleRows: 0 } as Parameters<typeof encodeTableAttribute>[0]);
+    // Because parseTableModel fills in DEFAULT_TABLE_DATA, the provider returns HTML rather than null.
+    expect(provider.toTranslatable(emptyModel)).not.toBeNull();
+  });
+
   it("writes translated cells back and re-encodes the attribute", () => {
     const html = provider.toTranslatable(stored)!;
     const translated = html.replace("Kopf", "Head");

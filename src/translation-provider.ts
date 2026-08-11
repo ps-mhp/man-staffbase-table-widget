@@ -35,6 +35,10 @@ export const tableTranslationProvider: TranslationProvider = {
   ref: { tagName: "table-widget", attribute: "tabledata" },
 
   toTranslatable: (stored) => {
+    // An empty attribute value causes the widget to render its built-in default
+    // placeholder table (3×3 with German headers). That table is not authored
+    // content, so translating it would push machine-translated boilerplate into
+    // the article. Skip it entirely.
     if (!stored) return null;
     const model = parseTableModel(stored);
     if (model.data.length === 0) return null;
