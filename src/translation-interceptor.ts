@@ -25,11 +25,8 @@ import {
   WidgetTag, containsWidget, findWidgetTags, replaceWidgetTags, withValue,
 } from "@shared/translation/widget-html";
 import { TableModel, encodeTableAttribute, parseTableModel } from "./table-model";
-import {
-  SELF_REQUEST_HEADER,
-  TRANSLATIONS_PATH,
-  translateTableModel,
-} from "./translation-client";
+import { SELF_REQUEST_HEADER, TRANSLATIONS_PATH } from "@shared/translation/client";
+import { translateTableModel } from "./translation-payload";
 
 /** Where this widget keeps its translatable content. */
 const TABLE_REF: WidgetAttributeRef = { tagName: "table-widget", attribute: "tabledata" };

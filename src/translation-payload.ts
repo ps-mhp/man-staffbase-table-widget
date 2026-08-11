@@ -11,6 +11,7 @@
  * limitations under the License.
  */
 
+import { translateHtml } from "@shared/translation/client";
 import { TableModel, formatKey } from "./table-model";
 import { TableData } from "./table-json";
 import { richTextToPlain, sanitizeRichText } from "./rich-text";
@@ -111,4 +112,32 @@ export function applyTranslatedCells(
   );
 
   return { ...model, data };
+}
+
+/** True for markup that came back from a table translation. */
+export const acceptsTranslatedTable = (html: string): boolean => isTranslatedTableHtml(html);
+
+/**
+ * Translates a table's cell values and returns the model with them replaced.
+ *
+ * Everything the translation did not cover keeps its source-language value, so
+ * a partial or unexpected response degrades to a partially translated table
+ * rather than a broken one.
+ */
+export async function translateTableModel({
+  model,
+  sourceLanguage,
+  targetLanguage,
+  hostHeaders,
+}: {
+  model: TableModel;
+  sourceLanguage: string;
+  targetLanguage: string;
+  hostHeaders?: HeadersInit;
+}): Promise<TableModel> {
+  const html = await translateHtml(
+    { html: tableModelToTranslatableHtml(model), sourceLanguage, targetLanguage, hostHeaders },
+    { accepts: acceptsTranslatedTable },
+  );
+  return applyTranslatedCells(model, readTranslatedCells(html));
 }

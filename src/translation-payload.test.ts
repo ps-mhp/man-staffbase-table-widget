@@ -107,3 +107,74 @@ describe("round trip", () => {
     ]);
   });
 });
+
+// ── translateTableModel ──────────────────────────────────────────────────────
+// The transport layer (headers, HTTP status, network errors) is exercised in
+// @shared/translation/client.test.ts. These cases cover the table-specific
+// bridge: that the right HTML is built, sent, and the returned cells are
+// applied back to the model.
+
+jest.mock("@shared/translation/client", () => ({
+  ...jest.requireActual("@shared/translation/client"),
+  translateHtml: jest.fn(),
+}));
+
+import { translateHtml } from "@shared/translation/client";
+import { acceptsTranslatedTable, translateTableModel } from "./translation-payload";
+
+const fullModel = (): TableModel => ({
+  data: [["", "Spalte 1"], ["Zeile 1", "Auto"]],
+  merges: [],
+  formats: {},
+  sort: null,
+  fitImages: true,
+  visibleRows: DEFAULT_VISIBLE_ROWS,
+});
+
+const translatedHtml =
+  `<div data-tw-table="1"><table><tbody>` +
+  `<tr><th ${CELL_ATTRIBUTE}="0,0"></th><th ${CELL_ATTRIBUTE}="0,1">Column 1</th></tr>` +
+  `<tr><td ${CELL_ATTRIBUTE}="1,0">Row 1</td><td ${CELL_ATTRIBUTE}="1,1">Car</td></tr>` +
+  `</tbody></table></div>`;
+
+describe("translateTableModel", () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it("sends table HTML and returns the model with translated cells", async () => {
+    (translateHtml as jest.Mock).mockResolvedValue(translatedHtml);
+
+    const result = await translateTableModel({
+      model: fullModel(),
+      sourceLanguage: "de_DE",
+      targetLanguage: "en_US",
+    });
+
+    expect(result.data).toEqual([["", "Column 1"], ["Row 1", "Car"]]);
+
+    const [{ html, sourceLanguage, targetLanguage }, { accepts }] =
+      (translateHtml as jest.Mock).mock.calls[0];
+    expect(html).toContain(`${CELL_ATTRIBUTE}="1,1"`);
+    expect(sourceLanguage).toBe("de_DE");
+    expect(targetLanguage).toBe("en_US");
+    expect(accepts).toBe(acceptsTranslatedTable);
+  });
+
+  it("keeps source-language cells for coordinates the service did not cover", async () => {
+    const partial =
+      `<div data-tw-table="1"><table><tbody>` +
+      `<tr><th ${CELL_ATTRIBUTE}="0,0"></th><th ${CELL_ATTRIBUTE}="0,1">Column 1</th></tr>` +
+      `<tr><td ${CELL_ATTRIBUTE}="1,0">Row 1</td></tr>` +
+      `</tbody></table></div>`;
+    (translateHtml as jest.Mock).mockResolvedValue(partial);
+
+    const result = await translateTableModel({
+      model: fullModel(),
+      sourceLanguage: "de_DE",
+      targetLanguage: "en_US",
+    });
+
+    // 1,1 was not in the response → kept in source language
+    expect(result.data[1][1]).toBe("Auto");
+    expect(result.data[0][1]).toBe("Column 1");
+  });
+});

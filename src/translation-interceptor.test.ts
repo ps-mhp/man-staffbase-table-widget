@@ -1,11 +1,7 @@
 import { TableModel, parseTableModel } from "./table-model";
 import { encodePayload } from "@shared/payload";
-import {
-  SELF_REQUEST_HEADER,
-  TRANSLATIONS_PATH,
-  TranslateTableInput,
-  translateTableModel,
-} from "./translation-client";
+import { SELF_REQUEST_HEADER, TRANSLATIONS_PATH } from "@shared/translation/client";
+import { translateTableModel } from "./translation-payload";
 import { MESSAGES, diagnostics, startTranslationInterceptor } from "./translation-interceptor";
 
 /** The table as an author's widget carries it in the article. */
@@ -46,7 +42,7 @@ const responseBody = (tabledata: string = SOURCE_TABLEDATA): string =>
   JSON.stringify({ contents: { value: articleHtml(tabledata, "Hello") } });
 
 /** A translator that renames every cell, standing in for the second API call. */
-const fakeTranslate = jest.fn<Promise<TableModel>, [TranslateTableInput]>(
+const fakeTranslate = jest.fn<Promise<TableModel>, [Parameters<typeof translateTableModel>[0]]>(
   async ({ model }): Promise<TableModel> => ({
     ...model,
     data: model.data.map((row) => row.map((cell) => (cell === "" ? "" : `${cell}-en`))),
