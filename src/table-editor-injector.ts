@@ -12,34 +12,14 @@
  */
 
 import * as React from "react";
-import * as ReactDOM from "react-dom/client";
 import { createPortal } from "react-dom";
+
+import { setNativeFieldValue, startConfigFieldInjector } from "@shared/config-field-injector";
 import { TableEditor } from "./table-editor";
 import { TableModel, parseTableModel, encodeTableAttribute } from "./table-model";
 
-/**
- * The DOM id RJSF/MUI renders for the `tabledata` schema property when
- * `uiSchema["tabledata"]["ui:widget"] === "textarea"` (see
- * `configuration-schema.ts`). Confirmed via a throwaway render spike that
- * this id lands directly on the real `<textarea>` element, not a wrapper.
- */
-const TEXTAREA_SELECTOR = "#root_tabledata";
-
-/**
- * Writes `value` into `element` using the native property setter and then
- * dispatches a bubbling `input` event, so that React's synthetic event
- * system (and therefore RJSF's controlled `onChange`) picks up the change.
- * A plain `element.value = ...` assignment does NOT trigger React's
- * listeners because React overrides the setter on the element instance.
- */
-function setNativeTextareaValue(element: HTMLTextAreaElement, value: string): void {
-  const nativeSetter = Object.getOwnPropertyDescriptor(
-    window.HTMLTextAreaElement.prototype,
-    "value",
-  )?.set;
-  nativeSetter?.call(element, value);
-  element.dispatchEvent(new Event("input", { bubbles: true }));
-}
+/** The schema property whose field the editor takes over. */
+const FIELD_KEY = "tabledata";
 
 interface InjectedEditorProps {
   textarea: HTMLTextAreaElement;
@@ -172,7 +152,7 @@ function InjectedEditor({ textarea }: InjectedEditorProps): React.ReactElement {
 
   const handleChange = (model: TableModel): void => {
     setValue(model);
-    setNativeTextareaValue(textarea, encodeTableAttribute(model));
+    setNativeFieldValue(textarea, encodeTableAttribute(model));
   };
 
   if (!isOpen) {
@@ -220,80 +200,23 @@ function InjectedEditor({ textarea }: InjectedEditorProps): React.ReactElement {
   );
 }
 
-interface MountedEditor {
-  root: ReactDOM.Root;
-  mountPoint: HTMLElement;
-}
-
 /**
- * Watches the DOM for the `#root_tabledata` textarea rendered by RJSF inside
- * the widget's config dialog, and injects the custom `TableEditor` grid UI
- * right before it. The original textarea is hidden (not removed) so it
- * keeps acting as RJSF's real form field; the injected editor stays in sync
- * by writing into it via {@link setNativeTextareaValue}.
+ * Watches for the widget's configuration dialog and injects the grid editor in
+ * front of its `tabledata` field.
  *
- * Safe to call before the dialog exists in the DOM (installs a
- * `MutationObserver` and keeps watching) and safe to call in contexts where
- * the dialog never appears at all, e.g. when the widget bundle runs on a
- * live content page to just render the table (the observer then simply
- * never finds a match).
+ * The field is hidden rather than removed: it stays RJSF's real form field, and
+ * the editor writes every change back into it, so the dialog's own state
+ * remains the source of truth on submit.
  *
- * Idempotent per textarea instance (re-scans do not double-inject), and
- * cleans up editors whose textarea got removed from the DOM (e.g. the
- * dialog was closed) to avoid leaking React roots.
- *
- * @param root the DOM subtree to watch; defaults to `document`. Exposed for
- * testing so tests can scope the observer to a small detached container
- * instead of the whole `document`.
- * @returns a cleanup function that disconnects the observer and unmounts
- * any editors it injected.
+ * @param root the subtree to watch; defaults to the document. Exposed so tests
+ * can scope the observer to a detached container.
+ * @returns a function that stops watching and unmounts the editor.
  */
 export function startTableEditorInjector(root: ParentNode = document): () => void {
-  const mounted = new Map<HTMLTextAreaElement, MountedEditor>();
-
-  const injectInto = (textarea: HTMLTextAreaElement): void => {
-    if (mounted.has(textarea)) return;
-
-    textarea.style.display = "none";
-
-    const mountPoint = document.createElement("div");
-    mountPoint.className = "table-editor-mount";
-    textarea.insertAdjacentElement("beforebegin", mountPoint);
-
-    const editorRoot = ReactDOM.createRoot(mountPoint);
-    editorRoot.render(React.createElement(InjectedEditor, { textarea }));
-
-    mounted.set(textarea, { root: editorRoot, mountPoint });
-  };
-
-  const cleanupDetached = (): void => {
-    for (const [textarea, { root: editorRoot, mountPoint }] of mounted) {
-      if (!document.contains(textarea)) {
-        editorRoot.unmount();
-        mountPoint.remove();
-        mounted.delete(textarea);
-      }
-    }
-  };
-
-  const scan = (): void => {
-    cleanupDetached();
-    const textarea = root.querySelector<HTMLTextAreaElement>(TEXTAREA_SELECTOR);
-    if (textarea) injectInto(textarea);
-  };
-
-  scan();
-
-  const observer = new MutationObserver(scan);
-  const target: Node = root === document ? document.body : (root as Element);
-  observer.observe(target, { childList: true, subtree: true });
-
-  return () => {
-    observer.disconnect();
-    for (const { root: editorRoot, mountPoint } of mounted.values()) {
-      editorRoot.unmount();
-      mountPoint.remove();
-    }
-    mounted.clear();
-  };
+  return startConfigFieldInjector<HTMLTextAreaElement>({
+    fieldKey: FIELD_KEY,
+    root,
+    hideField: true,
+    render: (textarea) => React.createElement(InjectedEditor, { textarea }),
+  });
 }
