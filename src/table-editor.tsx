@@ -65,8 +65,12 @@ import { ClearScope, clearFormatting } from "./clear-format";
 export interface TableEditorProps {
   value: TableModel;
   onChange: (model: TableModel) => void;
-  /** Optional: when provided, the toolbar shows a "Fertig" button. */
-  onDone?: () => void;
+  /** Optional: when provided, the toolbar shows the dialog's control bar. */
+  onSave?: () => void;
+  /** Optional: closes the dialog; asked for by the control bar's second button. */
+  onClose?: () => void;
+  /** Marks the control bar while edits are waiting to be saved. */
+  dirty?: boolean;
   /**
    * Media API client used by the image picker and clipboard-image upload.
    * Defaults to a same-origin {@link createMediaClient}; injectable for tests.
@@ -389,7 +393,9 @@ function MenuItem({
 export const TableEditor = ({
   value,
   onChange,
-  onDone,
+  onSave,
+  onClose,
+  dirty = false,
   mediaClient,
   measure = measureImage,
 }: TableEditorProps): ReactElement => {
@@ -913,7 +919,9 @@ export const TableEditor = ({
         onChangeVisibleRows={changeVisibleRows}
         onClearFormatting={clearFormats}
         hasClearTarget={ranges.length > 0}
-        onDone={onDone}
+        onSave={onSave}
+        onClose={onClose}
+        dirty={dirty}
       />
 
       {/* The container query box has to be a separate, stretched element.
@@ -946,7 +954,9 @@ export const TableEditor = ({
               maxWidth: "100%",
               overflow: "auto",
               border: "1px solid #d9dee3",
-              borderRadius: "8px",
+              // Sits flush under the toolbar: the shared edge stays straight,
+              // only the free corners at the bottom are rounded.
+              borderRadius: "0 0 8px 8px",
               boxShadow: "0 1px 3px rgba(16, 24, 40, 0.06)",
               background: "#fff",
             }}

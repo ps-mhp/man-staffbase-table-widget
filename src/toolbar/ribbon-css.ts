@@ -21,8 +21,7 @@
 export const RIBBON_CSS = `
 .tw-rb {
   display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
+  flex-direction: column;
   gap: 0;
   /* Never shrinks away inside the editor's flex column, and stays pinned to
      the top should the editor ever sit in a scrolling container instead. */
@@ -30,26 +29,29 @@ export const RIBBON_CSS = `
   position: sticky;
   top: 0;
   z-index: 30;
-  padding: 5px 3px;
+  padding: 4px 6px 5px;
   border: 1px solid #d9dee3;
-  border-radius: 8px;
+  /* The grid starts flush underneath, so the toolbar keeps square corners and
+     a shared edge on that side instead of a rounded, floating one. */
+  border-radius: 8px 8px 0 0;
+  border-bottom: none;
   background: #ffffff;
   box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
-  margin-bottom: 10px;
+  margin-bottom: 0;
   font-size: 13px;
   color: #1f2d3a;
   box-sizing: border-box;
 }
-.tw-rb__rows { display: flex; flex-direction: column; justify-content: center; gap: 4px; align-items: flex-start; }
-.tw-rb__row { display: flex; align-items: stretch; gap: 3px; }
+.tw-rb__rows { display: flex; flex-direction: column; justify-content: center; gap: 3px; align-items: flex-start; }
+.tw-rb__row { display: flex; align-items: stretch; gap: 2px; }
 .tw-rb__btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  height: 28px;
-  min-width: 28px;
-  padding: 0 7px;
+  height: 24px;
+  min-width: 24px;
+  padding: 0 6px;
   border: 1px solid #dbe0e5;
   border-radius: 5px;
   background: #fff;
@@ -71,8 +73,8 @@ export const RIBBON_CSS = `
   border-color: #0068c2;
   color: #fff;
 }
-.tw-rb__btn--icon { width: 43px; min-width: 43px; padding: 0; }
-.tw-rb__btn--step { width: 42px; min-width: 42px; padding: 0; gap: 1px; }
+.tw-rb__btn--icon { width: 34px; min-width: 34px; padding: 0; }
+.tw-rb__btn--step { width: 34px; min-width: 34px; padding: 0; gap: 1px; }
 .tw-rb__btn--block { width: 100%; }
 .tw-rb__big {
   display: flex;
@@ -81,15 +83,15 @@ export const RIBBON_CSS = `
   justify-content: center;
   gap: 3px;
   height: 100%;
-  width: 76px;
-  min-width: 76px;
-  padding: 5px 4px;
+  width: 62px;
+  min-width: 62px;
+  padding: 4px 3px;
   border: 1px solid #dbe0e5;
   border-radius: 6px;
   background: #fff;
   color: #2b3742;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1;
   white-space: nowrap;
   box-sizing: border-box;
@@ -112,15 +114,15 @@ export const RIBBON_CSS = `
   justify-content: center;
   gap: 5px;
   height: 100%;
-  width: 76px;
-  min-width: 76px;
-  padding: 5px 4px;
+  width: 62px;
+  min-width: 62px;
+  padding: 4px 3px;
   border: 1px solid #dbe0e5;
   border-radius: 6px;
   background: #fff;
   color: #2b3742;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 10px;
   line-height: 1.15;
   text-align: center;
   box-sizing: border-box;
@@ -278,16 +280,57 @@ export const RIBBON_CSS = `
 .tw-rb__menu-item:hover:not(:disabled) { background: #eef3f8; }
 .tw-rb__menu-item:disabled { opacity: 0.45; cursor: not-allowed; }
 .tw-rb__swatch { width: 16px; height: 16px; border: 1px solid #cfd4da; border-radius: 3px; flex: 0 0 auto; }
-.tw-rb__save { height: auto; align-self: stretch; margin-right: 10px; flex: 0 0 auto; }
-.tw-rb__tabs { display: flex; flex-direction: column; flex: 1 1 auto; min-width: 0; }
-.tw-rb__tablist { display: flex; gap: 2px; border-bottom: 1px solid #e6e9ed; margin-bottom: 6px; }
+.tw-rb__controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #eef1f4;
+  margin-bottom: 3px;
+}
+.tw-rb__ctl {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid #dbe0e5;
+  border-radius: 5px;
+  background: #fff;
+  color: #2b3742;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  box-sizing: border-box;
+  transition: background 110ms ease, border-color 110ms ease;
+}
+.tw-rb__ctl svg { width: 14px; height: 14px; }
+.tw-rb__ctl:hover:not(:disabled) { background: #eef3f8; border-color: #b9c2cc; }
+.tw-rb__ctl:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(0, 116, 217, 0.4); }
+.tw-rb__ctl--primary { color: #fff; background: #0074d9; border-color: #0068c2; }
+.tw-rb__ctl--primary:hover:not(:disabled) { background: #0068c2; border-color: #005aa8; }
+.tw-rb__dirty { font-size: 11px; color: #b45309; white-space: nowrap; }
+.tw-rb__tabs { display: flex; flex-direction: column; min-width: 0; }
+/* Tabs take only the room their labels need; the strip's rule runs on to the
+   right so the row reads as one edge rather than five stretched buttons. */
+.tw-rb__tablist {
+  display: flex;
+  justify-content: flex-start;
+  gap: 2px;
+  border-bottom: 1px solid #e6e9ed;
+  margin: auto 4px;
+}
 .tw-rb__tab {
+  flex: 0 0 auto;
+  width: auto;
   border: none;
   background: transparent;
-  padding: 6px 12px;
-  border-radius: 6px 6px 0 0;
+  padding: 4px 10px;
+  border-radius: 5px 5px 0 0;
   font: inherit;
-  font-size: 13px;
+  font-size: 12px;
   color: #5b6672;
   cursor: pointer;
   border-bottom: 2px solid transparent;
@@ -298,6 +341,5 @@ export const RIBBON_CSS = `
 .tw-rb__tab--active { color: #0a6ec4; border-bottom-color: #0074d9; font-weight: 600; }
 /* Tabs differ in height. Reserving the tallest one keeps the grid below from
    jumping every time the user switches. */
-.tw-rb__panel { display: flex; align-items: stretch; gap: 4px; min-height: 72px; padding: 2px 0; }
+.tw-rb__panel { display: flex; align-items: stretch; gap: 3px; min-height: 56px; padding: 0; }
 `;
-

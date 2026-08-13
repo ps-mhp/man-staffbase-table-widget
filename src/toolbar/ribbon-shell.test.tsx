@@ -21,9 +21,26 @@ const tabs = [
   { id: "b", label: "Beta", render: () => <button data-testid="in-beta">B</button> },
 ];
 
-function Harness({ onDone }: { onDone?: () => void }): React.ReactElement {
+function Harness({
+  onSave,
+  onClose,
+  dirty,
+}: {
+  onSave?: () => void;
+  onClose?: () => void;
+  dirty?: boolean;
+}): React.ReactElement {
   const [active, setActive] = React.useState("a");
-  return <RibbonShell tabs={tabs} activeTab={active} onSelectTab={setActive} onDone={onDone} />;
+  return (
+    <RibbonShell
+      tabs={tabs}
+      activeTab={active}
+      onSelectTab={setActive}
+      onSave={onSave}
+      onClose={onClose}
+      dirty={dirty}
+    />
+  );
 }
 
 describe("RibbonShell", () => {
@@ -56,15 +73,32 @@ describe("RibbonShell", () => {
     expect(screen.getByTestId("in-beta")).toBeInTheDocument();
   });
 
-  it("shows the save button next to the tabs and calls back", () => {
-    const onDone = jest.fn();
-    render(<Harness onDone={onDone} />);
+  it("shows the save button above the tabs and calls back", () => {
+    const onSave = jest.fn();
+    render(<Harness onSave={onSave} />);
     fireEvent.click(screen.getByTestId("toolbar-done"));
-    expect(onDone).toHaveBeenCalled();
+    expect(onSave).toHaveBeenCalled();
   });
 
-  it("omits the save button when no callback is given", () => {
+  it("closes through its own callback, not the save one", () => {
+    const onSave = jest.fn();
+    const onClose = jest.fn();
+    render(<Harness onSave={onSave} onClose={onClose} />);
+    fireEvent.click(screen.getByTestId("toolbar-close"));
+    expect(onClose).toHaveBeenCalled();
+    expect(onSave).not.toHaveBeenCalled();
+  });
+
+  it("notes unsaved edits only while there are any", () => {
+    const { rerender } = render(<Harness onSave={jest.fn()} />);
+    expect(screen.queryByTestId("toolbar-dirty")).not.toBeInTheDocument();
+    rerender(<Harness onSave={jest.fn()} dirty />);
+    expect(screen.getByTestId("toolbar-dirty")).toBeInTheDocument();
+  });
+
+  it("omits the control bar when no callback is given", () => {
     render(<Harness />);
     expect(screen.queryByTestId("toolbar-done")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("toolbar-close")).not.toBeInTheDocument();
   });
 });

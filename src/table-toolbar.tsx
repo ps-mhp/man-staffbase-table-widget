@@ -47,7 +47,9 @@ export const TableToolbar = (props: TableToolbarProps): ReactElement => {
       tabs={tabs}
       activeTab={tab}
       onSelectTab={(id) => setTab(id as TabId)}
-      onDone={props.onDone}
+      onSave={props.onSave}
+      onClose={props.onClose}
+      dirty={props.dirty}
     />
   );
 };

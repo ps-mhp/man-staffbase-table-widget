@@ -33,6 +33,12 @@ export const IconSave = (): ReactElement => (
   </svg>
 );
 
+export const IconClose = (): ReactElement => (
+  <svg {...svgBase} aria-hidden>
+    <path d="M4 4l8 8M12 4l-8 8" />
+  </svg>
+);
+
 export const IconSuperscript = (): ReactElement => (
   <svg {...svgBase} aria-hidden>
     <path d="M2 13L8 5M8 13L2 5" />

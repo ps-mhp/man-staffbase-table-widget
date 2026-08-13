@@ -51,7 +51,7 @@ describe("startTableEditorInjector", () => {
     });
   });
 
-  it("writes editor changes back into the textarea so RJSF picks them up on submit", async () => {
+  it("writes saved editor changes back into the textarea so RJSF picks them up on submit", async () => {
     const onSubmit = jest.fn();
     const { container } = render(
       <Form schema={configurationSchema} uiSchema={uiSchema} validator={validator} onSubmit={onSubmit} />,
@@ -66,6 +66,11 @@ describe("startTableEditorInjector", () => {
     await act(async () => {
       cell.innerHTML = "Geänderte Zeile";
       cell.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+
+    // Edits stay in the modal's draft until they are saved.
+    await act(async () => {
+      (document.body.querySelector('[data-testid="toolbar-done"]') as HTMLButtonElement).click();
     });
 
     const submitBtn = container.querySelector('button[type="submit"]') as HTMLButtonElement;

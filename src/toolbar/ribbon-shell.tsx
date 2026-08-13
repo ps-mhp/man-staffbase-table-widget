@@ -14,7 +14,7 @@
 import * as React from "react";
 import { ReactElement } from "react";
 
-import { IconSave } from "./icons";
+import { IconClose, IconSave } from "./icons";
 import { RIBBON_CSS } from "./ribbon-css";
 
 export interface RibbonTab {
@@ -28,18 +28,26 @@ export interface RibbonShellProps {
   activeTab: string;
   onSelectTab: (id: string) => void;
   /** Omitted where the editor is not shown in a dialog that can be saved. */
-  onDone?: () => void;
+  onSave?: () => void;
+  /** Omitted with `onSave`; closing is the dialog's business, not the grid's. */
+  onClose?: () => void;
+  /** Shows that the draft holds edits the form field has not seen yet. */
+  dirty?: boolean;
 }
 
 /**
- * The toolbar's frame: the save button on the left, the tab strip above the
- * active tab's panel on the right.
+ * The toolbar's frame: a control bar with the dialog's buttons, the tab strip
+ * below it, and the active tab's panel underneath.
+ *
+ * Nothing here writes to the widget's configuration: "Speichern" hands the
+ * draft over, "Schließen" leaves it be. The note beside them is the only
+ * clue that the two differ, so it stays visible for as long as they do.
  *
  * Only the active panel is rendered. Keeping the inactive ones mounted but
  * hidden would leave their buttons in the tab order, so a keyboard user would
  * walk through controls they cannot see.
  */
-export function RibbonShell({ tabs, activeTab, onSelectTab, onDone }: RibbonShellProps): ReactElement {
+export function RibbonShell({ tabs, activeTab, onSelectTab, onSave, onClose, dirty }: RibbonShellProps): ReactElement {
   const active = tabs.find((tab) => tab.id === activeTab) ?? tabs[0];
 
   const onKeyDown = (event: React.KeyboardEvent): void => {
@@ -54,17 +62,34 @@ export function RibbonShell({ tabs, activeTab, onSelectTab, onDone }: RibbonShel
     <div className="tw-rb" data-testid="table-toolbar">
       <style>{RIBBON_CSS}</style>
 
-      {onDone && (
-        <button
-          type="button"
-          className="tw-rb__big tw-rb__big--primary tw-rb__save"
-          data-testid="toolbar-done"
-          title="Speichern"
-          onClick={onDone}
-        >
-          <IconSave />
-          <span>Speichern</span>
-        </button>
+      {onSave && (
+        <div className="tw-rb__controls">
+          <button
+            type="button"
+            className="tw-rb__ctl tw-rb__ctl--primary"
+            data-testid="toolbar-done"
+            title="Speichern"
+            onClick={onSave}
+          >
+            <IconSave />
+            <span>Speichern</span>
+          </button>
+          <button
+            type="button"
+            className="tw-rb__ctl"
+            data-testid="toolbar-close"
+            title="Schließen"
+            onClick={onClose}
+          >
+            <IconClose />
+            <span>Schließen</span>
+          </button>
+          {dirty && (
+            <span className="tw-rb__dirty" data-testid="toolbar-dirty">
+              Ungespeicherte Änderungen
+            </span>
+          )}
+        </div>
       )}
 
       <div className="tw-rb__tabs">

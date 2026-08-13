@@ -41,6 +41,10 @@ export function startTableEditorInjector(root: ParentNode = document): () => voi
     reopenTestId: "table-editor-reopen",
     parse: parseTableModel,
     serialize: encodeTableAttribute,
-    render: ({ value, onChange, onDone }) => React.createElement(TableEditor, { value, onChange, onDone }),
+    // The editor draws its own frame — toolbar and grid share an edge — so the
+    // panel's form-style padding would only push that frame away from it.
+    panelStyle: { padding: "12px" },
+    render: ({ value, onChange, onSave, onClose, dirty }) =>
+      React.createElement(TableEditor, { value, onChange, onSave, onClose, dirty }),
   });
 }

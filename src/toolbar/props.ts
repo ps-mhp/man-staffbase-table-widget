@@ -79,5 +79,7 @@ export interface TableToolbarProps {
   onClearFormatting: (scope: ClearScope) => void;
   /** True while a selection limits the reset to part of the table. */
   hasClearTarget: boolean;
-  onDone?: () => void;
+  onSave?: () => void;
+  onClose?: () => void;
+  dirty?: boolean;
 }
