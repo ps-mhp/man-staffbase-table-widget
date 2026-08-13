@@ -82,7 +82,7 @@ export function DataTab({
         )}
       </Dropdown>
 
-      <button type="button" className="tw-rb__big" data-testid="toolbar-painter" title="Format kopieren" disabled={disabled && !painterActive} onClick={onCopyFormat} style={painterActive ? { color: "#0a6ec4", background: "#e4f0fb" } : undefined}>
+      <button type="button" className="tw-rb__big" data-testid="toolbar-painter" title="Format kopieren" disabled={disabled && !painterActive} onClick={onCopyFormat} style={painterActive ? { color: "#0a63b0", background: "#e8f2fc", borderColor: "#9ecbf0" } : undefined}>
         <IconPainter />
         <span>Format</span>
       </button>

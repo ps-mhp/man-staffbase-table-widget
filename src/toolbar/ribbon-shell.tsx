@@ -72,7 +72,6 @@ export function RibbonShell({ tabs, activeTab, onSelectTab, onSave, onClose, dir
             onClick={onSave}
           >
             <IconSave />
-            <span>Speichern</span>
           </button>
           <button
             type="button"
@@ -82,7 +81,6 @@ export function RibbonShell({ tabs, activeTab, onSelectTab, onSave, onClose, dir
             onClick={onClose}
           >
             <IconClose />
-            <span>Schließen</span>
           </button>
           {dirty && (
             <span className="tw-rb__dirty" data-testid="toolbar-dirty">

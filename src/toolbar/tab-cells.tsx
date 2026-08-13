@@ -56,18 +56,13 @@ export function CellsTab({
 
   return (
     <>
-      <div className="tw-rb__rows">
-        <div className="tw-rb__row" style={{ width: "100%" }} >
-          <RibbonButton testId="toolbar-merge" variant="block" title="Zellen verbinden" disabled={disabled} onClick={onMerge}>
-            Verbinden
-          </RibbonButton>
-        </div>
-        <div className="tw-rb__row" style={{ width: "100%" }} >
-          <RibbonButton testId="toolbar-unmerge" variant="block" title="Verbindung aufheben" disabled={!canUnmerge} onClick={onUnmerge}>
-            Lösen
-          </RibbonButton>
-        </div>
-      </div>
+      <RibbonButton testId="toolbar-merge" title="Zellen verbinden" disabled={disabled} onClick={onMerge}>
+        Verbinden
+      </RibbonButton>
+      <RibbonButton testId="toolbar-unmerge" title="Verbindung aufheben" disabled={!canUnmerge} onClick={onUnmerge}>
+        Lösen
+      </RibbonButton>
+
       <Dropdown
         testId="toolbar-insert-menu"
         trigger={(toggle) => (

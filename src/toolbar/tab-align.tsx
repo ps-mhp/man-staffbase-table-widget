@@ -40,27 +40,25 @@ export function AlignTab({
   const disabled = !hasSelection;
 
   return (
-    <div className="tw-rb__rows">
-      <div className="tw-rb__row">
-        <RibbonButton testId="toolbar-align-left" variant="icon" title="Linksbündig" disabled={disabled} active={activeFormat.align === "left"} onClick={() => onAlign("left")}>
-          <IconAlignLeft />
-        </RibbonButton>
-        <RibbonButton testId="toolbar-align-center" variant="icon" title="Zentriert" disabled={disabled} active={activeFormat.align === "center"} onClick={() => onAlign("center")}>
-          <IconAlignCenter />
-        </RibbonButton>
-        <RibbonButton testId="toolbar-align-right" variant="icon" title="Rechtsbündig" disabled={disabled} active={activeFormat.align === "right"} onClick={() => onAlign("right")}>
-          <IconAlignRight />
-        </RibbonButton>
-        <RibbonButton testId="toolbar-valign-top" variant="icon" title="Oben ausrichten" disabled={disabled} active={activeFormat.valign === "top"} onClick={() => onVerticalAlign("top")}>
-          <IconVAlignTop />
-        </RibbonButton>
-        <RibbonButton testId="toolbar-valign-middle" variant="icon" title="Mittig ausrichten" disabled={disabled} active={activeFormat.valign === "middle"} onClick={() => onVerticalAlign("middle")}>
-          <IconVAlignMiddle />
-        </RibbonButton>
-        <RibbonButton testId="toolbar-valign-bottom" variant="icon" title="Unten ausrichten" disabled={disabled} active={activeFormat.valign === "bottom"} onClick={() => onVerticalAlign("bottom")}>
-          <IconVAlignBottom />
-        </RibbonButton>
-      </div>
-    </div>
+    <>
+      <RibbonButton testId="toolbar-align-left" variant="icon" title="Linksbündig" disabled={disabled} active={activeFormat.align === "left"} onClick={() => onAlign("left")}>
+        <IconAlignLeft />
+      </RibbonButton>
+      <RibbonButton testId="toolbar-align-center" variant="icon" title="Zentriert" disabled={disabled} active={activeFormat.align === "center"} onClick={() => onAlign("center")}>
+        <IconAlignCenter />
+      </RibbonButton>
+      <RibbonButton testId="toolbar-align-right" variant="icon" title="Rechtsbündig" disabled={disabled} active={activeFormat.align === "right"} onClick={() => onAlign("right")}>
+        <IconAlignRight />
+      </RibbonButton>
+      <RibbonButton testId="toolbar-valign-top" variant="icon" title="Oben ausrichten" disabled={disabled} active={activeFormat.valign === "top"} onClick={() => onVerticalAlign("top")}>
+        <IconVAlignTop />
+      </RibbonButton>
+      <RibbonButton testId="toolbar-valign-middle" variant="icon" title="Mittig ausrichten" disabled={disabled} active={activeFormat.valign === "middle"} onClick={() => onVerticalAlign("middle")}>
+        <IconVAlignMiddle />
+      </RibbonButton>
+      <RibbonButton testId="toolbar-valign-bottom" variant="icon" title="Unten ausrichten" disabled={disabled} active={activeFormat.valign === "bottom"} onClick={() => onVerticalAlign("bottom")}>
+        <IconVAlignBottom />
+      </RibbonButton>
+    </>
   );
 }

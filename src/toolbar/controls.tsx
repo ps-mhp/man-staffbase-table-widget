@@ -34,14 +34,13 @@ export function RibbonButton({
   disabled?: boolean;
   title: string;
   testId: string;
-  variant?: "icon" | "step" | "block";
+  variant?: "icon" | "step";
   children: React.ReactNode;
 }): ReactElement {
   const className = [
     "tw-rb__btn",
     variant === "icon" ? "tw-rb__btn--icon" : "",
     variant === "step" ? "tw-rb__btn--step" : "",
-    variant === "block" ? "tw-rb__btn--block" : "",
     active ? "tw-rb__btn--active" : "",
   ]
     .filter(Boolean)
