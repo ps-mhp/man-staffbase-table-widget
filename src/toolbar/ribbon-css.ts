@@ -288,4 +288,26 @@ export const RIBBON_CSS = `
 .tw-rb__menu-item:hover:not(:disabled) { background: #eef3f8; }
 .tw-rb__menu-item:disabled { opacity: 0.45; cursor: not-allowed; }
 .tw-rb__swatch { width: 16px; height: 16px; border: 1px solid #cfd4da; border-radius: 3px; flex: 0 0 auto; }
+.tw-rb__save { height: auto; align-self: stretch; margin-right: 10px; flex: 0 0 auto; }
+.tw-rb__tabs { display: flex; flex-direction: column; flex: 1 1 auto; min-width: 0; }
+.tw-rb__tablist { display: flex; gap: 2px; border-bottom: 1px solid #e6e9ed; margin-bottom: 6px; }
+.tw-rb__tab {
+  border: none;
+  background: transparent;
+  padding: 6px 12px;
+  border-radius: 6px 6px 0 0;
+  font: inherit;
+  font-size: 13px;
+  color: #5b6672;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.tw-rb__tab:hover { background: #f2f6fa; color: #1f2d3a; }
+.tw-rb__tab:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(0, 116, 217, 0.4); }
+.tw-rb__tab--active { color: #0a6ec4; border-bottom-color: #0074d9; font-weight: 600; }
+/* Tabs differ in height. Reserving the tallest one keeps the grid below from
+   jumping every time the user switches. */
+.tw-rb__panel { display: flex; align-items: stretch; gap: 4px; min-height: 72px; padding: 2px 0; }
 `;
+
