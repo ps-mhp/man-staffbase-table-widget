@@ -2,6 +2,17 @@
 
 Staffbase-Widget zum Einbetten und Bearbeiten von Tabellen.
 
+Die Werkzeugleiste des Editors besteht aus dem Button **Speichern** und den
+Tabs **Schrift**, **Ausrichtung**, **Zellen**, **Bilder** und **Daten**. Der
+gewählte Tab bleibt beim Wechsel der Zellauswahl bestehen.
+
+Der Umschalter **Versalien aufheben** (Tab *Schrift*) setzt auf den markierten
+Text — ohne Textmarkierung auf den Inhalt der ausgewählten Zellen — die Klasse
+`text-lowercase`, die die globale Versalien-Regel des Hosts außer Kraft setzt.
+Im Editor wird der so ausgezeichnete Text geriffelt orange unterstrichen; im
+Frontend erscheint nur die Klasse. „Formatierung löschen“ entfernt die
+Auszeichnung mit.
+
 Dieses Repository enthält nur Quellcode und das gebaute Bundle. Es ist **nicht
 eigenständig baubar** — Toolchain und geteilter Code liegen im Meta-Repo:
 
