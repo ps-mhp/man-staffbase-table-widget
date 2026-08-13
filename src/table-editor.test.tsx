@@ -458,11 +458,11 @@ describe("TableEditor", () => {
       expect(wrap).toHaveClass(IMAGE_NO_FIT_CLASS);
     });
 
-    it("keeps the container query off the shrink-to-fit frame", () => {
+    it("keeps the container query off the grid frame", () => {
       // `container-type: inline-size` contains the inline axis, so a box
-      // carrying it cannot derive its own width from its contents. On the
-      // shrink-to-fit grid frame that collapsed the whole editor to zero
-      // width, so the two responsibilities have to stay on separate elements.
+      // carrying it cannot derive its own width from its contents. Keeping it
+      // off the grid frame leaves that frame free to size and scroll itself,
+      // so the two responsibilities stay on separate elements.
       const { container } = render(
         <TableEditor value={withImages()} onChange={jest.fn()} measure={measure} />,
       );
@@ -471,9 +471,7 @@ describe("TableEditor", () => {
       const frame = container.querySelector<HTMLElement>(".table-editor__grid-wrap");
 
       expect(scope?.style.containerType).toBe("inline-size");
-      expect(scope?.style.alignSelf).toBe("");
       expect(frame?.style.containerType).toBe("");
-      expect(frame?.style.alignSelf).toBe("flex-start");
       expect(scope?.contains(frame)).toBe(true);
     });
 
@@ -732,4 +730,10 @@ describe("row limit", () => {
     expect(screen.queryByTestId("table-rows-toggle")).toBeNull();
   });
 });
+
+  it("lets the grid frame fill the available width", () => {
+    render(<TableEditor value={model([["a"]])} onChange={jest.fn()} />);
+    const frame = screen.getByTestId("table-editor-grid-wrap");
+    expect(frame.style.alignSelf).toBe("");
+  });
 });

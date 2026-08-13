@@ -866,14 +866,14 @@ export const TableEditor = ({
         <ContextMenu.Trigger asChild>
           <div
             className="table-editor__grid-wrap"
+            data-testid="table-editor-grid-wrap"
             onMouseUp={handleCellMouseUp}
             style={{
-              // The only scrolling area of the editor. `alignSelf` keeps the
-              // shrink-to-fit width the old `inline-block` gave it, so the
-              // frame hugs a narrow table instead of stretching.
+              // The only scrolling area of the editor. It fills the width it
+              // is given — inside the config modal that is the full panel —
+              // and a narrower table simply leaves space to its right.
               flex: "1 1 auto",
               minHeight: 0,
-              alignSelf: "flex-start",
               maxWidth: "100%",
               overflow: "auto",
               border: "1px solid #d9dee3",
