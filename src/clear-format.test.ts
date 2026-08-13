@@ -51,6 +51,14 @@ describe("stripTextMarkup", () => {
     expect(stripTextMarkup("")).toBe("");
     expect(stripTextMarkup(undefined)).toBe("");
   });
+
+  it("removes the lowercase mark", () => {
+    expect(stripTextMarkup('a<span class="text-lowercase">Bc</span>')).toBe("aBc");
+  });
+
+  it("removes the lowercase mark from a superscript it unwraps", () => {
+    expect(stripTextMarkup('m<sup class="text-lowercase">2</sup>')).toBe("m2");
+  });
 });
 
 describe("stripImageWidths", () => {
