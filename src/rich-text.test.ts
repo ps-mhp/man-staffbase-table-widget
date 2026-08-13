@@ -103,6 +103,30 @@ describe("sanitizeRichText", () => {
     expect(sanitizeRichText(undefined)).toBe("");
     expect(sanitizeRichText("")).toBe("");
   });
+
+  it("keeps a span carrying only the lowercase class", () => {
+    expect(sanitizeRichText('a<span class="text-lowercase">Bc</span>')).toBe(
+      'a<span class="text-lowercase">Bc</span>',
+    );
+  });
+
+  it("unwraps a span without that class", () => {
+    expect(sanitizeRichText("a<span>Bc</span>")).toBe("aBc");
+    expect(sanitizeRichText('a<span class="evil">Bc</span>')).toBe("aBc");
+  });
+
+  it("drops every other attribute from a marked span", () => {
+    expect(
+      sanitizeRichText('<span class="text-lowercase" onclick="x()" style="color:red">a</span>'),
+    ).toBe('<span class="text-lowercase">a</span>');
+  });
+
+  it("keeps the lowercase class on sup and sub", () => {
+    expect(sanitizeRichText('m<sup class="text-lowercase">Xy</sup>')).toBe(
+      'm<sup class="text-lowercase">Xy</sup>',
+    );
+    expect(sanitizeRichText('<sup class="other">x</sup>')).toBe("<sup>x</sup>");
+  });
 });
 
 describe("richTextToPlain", () => {

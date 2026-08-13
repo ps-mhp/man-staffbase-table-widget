@@ -35,6 +35,20 @@ const MIN_IMAGE_WIDTH = 8;
  */
 const BLOCK_TAGS = new Set(["DIV", "P"]);
 
+/**
+ * The one class a cell may carry. It cancels the host's global uppercase rule
+ * for the text it wraps. It is not tied to a particular element — `<span>` is
+ * just the neutral carrier the editor writes — so it is also honoured on the
+ * inline tags this module already keeps.
+ */
+export const LOWERCASE_CLASS = "text-lowercase";
+
+const isLowercaseMarked = (el: HTMLElement): boolean => el.classList.contains(LOWERCASE_CLASS);
+
+/** Re-emits an allowed tag, carrying the lowercase class when it had it. */
+const openTag = (tag: string, marked: boolean): string =>
+  marked ? `<${tag} class="${LOWERCASE_CLASS}">` : `<${tag}>`;
+
 const escapeText = (text: string): string =>
   text
     .replace(/&/g, "&amp;")
@@ -103,7 +117,11 @@ const serializeChildren = (node: Node): string => {
         out += serializeImage(el);
       } else if (ALLOWED_TAGS.has(el.tagName)) {
         const tag = el.tagName.toLowerCase();
-        out += `<${tag}>${serializeChildren(el)}</${tag}>`;
+        out += `${openTag(tag, isLowercaseMarked(el))}${serializeChildren(el)}</${tag}>`;
+      } else if (el.tagName === "SPAN" && isLowercaseMarked(el)) {
+        // A span survives only as the carrier of that one class; every other
+        // span (and every other attribute) is dropped, keeping the text.
+        out += `<span class="${LOWERCASE_CLASS}">${serializeChildren(el)}</span>`;
       } else if (BLOCK_TAGS.has(el.tagName)) {
         // A block element starts a new line: emit a break before its content
         // unless it's the very first thing (leading blank line is dropped).
