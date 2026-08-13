@@ -818,6 +818,8 @@ export const TableEditor = ({
         onFontSizeStep={stepFontSize}
         onSuperscript={() => applyVertAlign("superscript")}
         onSubscript={() => applyVertAlign("subscript")}
+        onToggleLowercase={() => undefined}
+        lowercaseActive={false}
         onInsertRowAbove={insertRowAbove}
         onInsertRowBelow={insertRowBelow}
         onInsertColLeft={insertColLeft}
