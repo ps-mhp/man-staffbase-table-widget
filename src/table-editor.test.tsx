@@ -780,3 +780,36 @@ describe("row limit", () => {
     expect(frame.style.alignSelf).toBe("");
   });
 });
+
+  it("marks a whole selected cell as lowercase", () => {
+    const onChange = jest.fn();
+    render(<TableEditor value={model([["MAN", "b"]])} onChange={onChange} />);
+    fireEvent.mouseDown(cellTd("Zeile 1, Spalte 1"));
+    fireEvent.click(toolbar("toolbar-lowercase"));
+
+    expect(onChange).toHaveBeenCalled();
+    const next = onChange.mock.calls[0][0] as TableModel;
+    expect(next.data[0][0]).toBe('<span class="text-lowercase">MAN</span>');
+  });
+
+  it("clears the mark again on a second click", () => {
+    const onChange = jest.fn();
+    render(
+      <TableEditor
+        value={model([['<span class="text-lowercase">MAN</span>', "b"]])}
+        onChange={onChange}
+      />,
+    );
+    fireEvent.mouseDown(cellTd("Zeile 1, Spalte 1"));
+    fireEvent.click(toolbar("toolbar-lowercase"));
+
+    expect((onChange.mock.calls[0][0] as TableModel).data[0][0]).toBe("MAN");
+  });
+
+  it("shows the button as active for a fully marked cell", () => {
+    render(
+      <TableEditor value={model([['<span class="text-lowercase">MAN</span>']])} onChange={jest.fn()} />,
+    );
+    fireEvent.mouseDown(cellTd("Zeile 1, Spalte 1"));
+    expect(toolbar("toolbar-lowercase")).toHaveAttribute("aria-pressed", "true");
+  });
