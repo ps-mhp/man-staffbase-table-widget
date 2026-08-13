@@ -11,7 +11,12 @@
  * limitations under the License.
  */
 
-declare module "*.svg" {
-    const content: string;
-    export default content;
+/**
+ * Ein `.scss`-Import liefert das kompilierte Stylesheet als String
+ * (`css-loader` mit `exportType: "string"`), damit die Komponente ihn selbst
+ * als `<style>` rendern kann.
+ */
+declare module "*.scss" {
+    const css: string;
+    export default css;
 }

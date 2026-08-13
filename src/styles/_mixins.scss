@@ -1,0 +1,55 @@
+// Copyright 2026, MHP Management und IT-Beratung GmbH and contributors.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//     http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+@use "tokens" as *;
+
+/// Der Grundkörper aller Bedienelemente der Leiste: eine Pille fester Höhe.
+/// Buttons, Schalter und Auswahlfelder sehen absichtlich gleich aus, damit sie
+/// auf einer Linie liegen — deshalb eine gemeinsame Quelle statt kopierter
+/// Deklarationsblöcke.
+@mixin control-pill($height: $control-height) {
+  height: $height;
+  width: auto;
+  margin: 0;
+  border: 1px solid $border;
+  border-radius: $radius-control;
+  background: $surface;
+  color: $text;
+  line-height: 1;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+/// Der Fokusring. Nie `outline`, weil die Wirtsseite eigene Outline-Regeln
+/// mitbringt; der Ring wird deshalb als Schatten gezeichnet.
+@mixin focus-ring {
+  &:focus-visible {
+    outline: none;
+    box-shadow: $focus-ring;
+  }
+}
+
+/// Gedämpfter, nicht klickbarer Zustand.
+@mixin disabled {
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+/// Hover, der den deaktivierten Zustand ausspart.
+@mixin hover-lift {
+  &:hover:not(:disabled) {
+    background: $surface-hover;
+    border-color: $border-hover;
+    color: $text-strong;
+  }
+}

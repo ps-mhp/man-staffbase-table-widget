@@ -1,5 +1,5 @@
 /*!
- * Copyright 2026, Staffbase SE and contributors.
+ * Copyright 2026, MHP Management und IT-Beratung GmbH and contributors.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,17 +27,6 @@
  */
 
 import { LOWERCASE_CLASS, sanitizeRichText } from "./rich-text";
-
-/** Editor-only affordance: marked text gets a wavy orange underline, the way
- * a spell checker flags a word. The published widget emits the class alone and
- * draws nothing — the uppercase rule this cancels belongs to the host. */
-export const LOWERCASE_MARK_CSS = `
-.table-editor .${LOWERCASE_CLASS} {
-  text-transform: none;
-  text-decoration: underline wavy #f97316;
-  text-decoration-skip-ink: none;
-}
-`;
 
 const parseBody = (html: string): HTMLElement =>
   new DOMParser().parseFromString(`<body>${html}</body>`, "text/html").body;

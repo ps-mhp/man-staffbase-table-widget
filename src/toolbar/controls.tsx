@@ -1,5 +1,5 @@
 /*!
- * Copyright 2026, Staffbase SE and contributors.
+ * Copyright 2026, MHP Management und IT-Beratung GmbH and contributors.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -90,7 +90,7 @@ export function Dropdown({
   }, [open]);
 
   return (
-    <div ref={ref} className="tw-rb__dropdown" style={{ position: "relative", display: "flex" }}>
+    <div ref={ref} className="tw-rb__dropdown">
       {trigger(() => setOpen((o) => !o), open)}
       {open && (
         <div className="tw-rb__menu" data-testid={testId}>
@@ -122,7 +122,7 @@ export function ColorButton({
   const inputRef = useRef<HTMLInputElement>(null);
   const isStandard = !value;
   return (
-    <div style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
+    <div className="tw-rb__color-wrap">
       <button
         type="button"
         className="tw-rb__color"
@@ -147,7 +147,7 @@ export function ColorButton({
         disabled={disabled}
         value={value ?? "#233848"}
         onChange={(e) => onChange(e.target.value)}
-        style={{ position: "absolute", left: 0, bottom: 0, width: 1, height: 1, opacity: 0, pointerEvents: "none" }}
+        className="tw-rb__color-input"
       />
       <Dropdown
         testId={`${testId}-menu`}

@@ -1,0 +1,114 @@
+// Copyright 2026, MHP Management und IT-Beratung GmbH and contributors.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//     http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// Die veröffentlichte Tabelle. Alles hier ist statisch; was aus dem Modell
+// kommt (Farben, Ausrichtung, Formatierung einer einzelnen Zelle), bleibt
+// bewusst ein Inline-Style — der gewinnt gegen diese Regeln und braucht deshalb
+// keine Klasse pro Kombination.
+
+@use "tokens" as *;
+
+.table-widget {
+  // Absichtlich kein `&__scroll`: die Klasse `table-widget-scroll` steht seit
+  // jeher im ausgelieferten Markup und kann von Wirtsseiten angesprochen
+  // werden, deshalb bleibt ihr Name unverändert.
+  &-scroll {
+    // Keine Höhenbegrenzung, damit `overflow` vertikal nie greift und das
+    // Widget einer ohnehin scrollenden Seite keine zweite Bildlaufleiste
+    // hinzufügt. Breite Tabellen scrollen weiterhin seitlich.
+    overflow: auto;
+    width: 100%;
+    max-width: 100%;
+    // Bezugsgröße für `cqw` — die Bilddeckelung und die erste Spalte messen
+    // diesen Container, nicht ihre Zelle.
+    container-type: inline-size;
+    background: transparent;
+  }
+
+  &__table {
+    border-collapse: separate;
+    border-spacing: 8px 0;
+    table-layout: auto;
+    width: 100%;
+    // Der 8px-Abstand zwischen den Spalten zeigt den Tabellenhintergrund. Er
+    // ist transparent, damit die Lücke eine echte Lücke ist (die Seite
+    // dahinter scheint durch) und kein weißer Streifen.
+    background: transparent;
+  }
+
+  &__cell {
+    padding: 8px 12px;
+    white-space: nowrap;
+    border-bottom: 1px solid $border-table;
+    text-align: center;
+  }
+
+  &__cell--head {
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 2px solid $border-table-head;
+    background: $surface;
+  }
+
+  // Die erste Spalte trägt die (oft langen) Zeilentitel. Sie wird gedeckelt,
+  // damit sie nie mehr als 75% der *sichtbaren* Containerbreite einnimmt
+  // (über die Container-Query-Einheit `cqw`); sonst schöbe ein sehr langer
+  // Titel die Datenspalten aus dem Blick und seitliches Scrollen wäre
+  // nutzlos. Gedeckelt bricht der Titel an Wortgrenzen um. `break-word` (nicht
+  // `anywhere`) ist Absicht: es bricht nur ein Wort, das für sich zu lang ist,
+  // sodass normale Titel nicht in einzelne Buchstaben zerfallen, während das
+  // automatische Tabellenlayout die Spalte zusammenschiebt.
+  &__cell--first {
+    max-width: 75cqw;
+    white-space: normal;
+    overflow-wrap: break-word;
+    text-align: left;
+  }
+
+  // Zeilentitel im Rumpf. Nur die erste Spalte klebt; eine klebende Kopfzeile
+  // hätte nichts, woran sie kleben könnte: der Wrapper scrollt nicht mehr
+  // vertikal, stattdessen klappen Zeilen ein.
+  &__cell--rowhead {
+    font-weight: bold;
+    background: $surface;
+    position: sticky;
+    left: 0;
+    z-index: 1;
+  }
+
+  &__cell--head.table-widget__cell--first {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+  }
+
+  // Luft zwischen Kopf- und erster Rumpfzeile.
+  &__cell--gap {
+    padding-top: 16px;
+  }
+
+  // Der Umschalter für eingeklappte Zeilen. Bewusst zurückhaltend — er ist ein
+  // Bedienelement auf fremder Seite und borgt sich deshalb die Textfarbe der
+  // Umgebung, statt eine eigene Markenfarbe einzuführen.
+  &__toggle {
+    display: block;
+    margin: 12px auto 0;
+    padding: 8px 16px;
+    font: inherit;
+    font-size: 0.9em;
+    color: inherit;
+    background: transparent;
+    border: 1px solid $border-table;
+    border-radius: $radius-small;
+    cursor: pointer;
+  }
+}

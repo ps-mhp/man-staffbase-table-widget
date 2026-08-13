@@ -1,5 +1,5 @@
 /*!
- * Copyright 2026, Staffbase SE and contributors.
+ * Copyright 2026, MHP Management und IT-Beratung GmbH and contributors.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -73,10 +73,12 @@ export function FontTab({
         ))}
       </select>
       <RibbonButton testId="toolbar-fontsize-inc" variant="step" title="Schrift vergrößern" disabled={disabled} onClick={() => onFontSizeStep(1)}>
-        <span style={{ fontSize: "14px" }}>A</span><span style={{ fontSize: "9px" }}>▲</span>
+        <span className="tw-rb__glyph tw-rb__glyph--lg">A</span>
+        <span className="tw-rb__glyph tw-rb__glyph--arrow">▲</span>
       </RibbonButton>
       <RibbonButton testId="toolbar-fontsize-dec" variant="step" title="Schrift verkleinern" disabled={disabled} onClick={() => onFontSizeStep(-1)}>
-        <span style={{ fontSize: "11px" }}>A</span><span style={{ fontSize: "9px" }}>▼</span>
+        <span className="tw-rb__glyph tw-rb__glyph--sm">A</span>
+        <span className="tw-rb__glyph tw-rb__glyph--arrow">▼</span>
       </RibbonButton>
       <RibbonButton testId="toolbar-bold" variant="icon" title="Fett" disabled={disabled} active={activeFormat.bold} onClick={() => onToggle("bold")}>
         <strong>F</strong>
@@ -85,10 +87,10 @@ export function FontTab({
         <em>K</em>
       </RibbonButton>
       <RibbonButton testId="toolbar-underline" variant="icon" title="Unterstrichen" disabled={disabled} active={activeFormat.underline} onClick={() => onToggle("underline")}>
-        <span style={{ textDecoration: "underline" }}>U</span>
+        <span className="tw-rb__glyph tw-rb__glyph--underline">U</span>
       </RibbonButton>
       <RibbonButton testId="toolbar-strike" variant="icon" title="Durchgestrichen" disabled={disabled} active={activeFormat.strikethrough} onClick={() => onToggle("strikethrough")}>
-        <span style={{ textDecoration: "line-through" }}>S</span>
+        <span className="tw-rb__glyph tw-rb__glyph--strike">S</span>
       </RibbonButton>
       <RibbonButton testId="toolbar-superscript" variant="icon" title="Hochstellen" disabled={disabled} onClick={onSuperscript}>
         <IconSuperscript />
@@ -104,7 +106,7 @@ export function FontTab({
         active={lowercaseActive}
         onClick={onToggleLowercase}
       >
-        <span style={{ fontSize: "13px", textTransform: "lowercase" }}>aa</span>
+        <span className="tw-rb__glyph tw-rb__glyph--lowercase">aa</span>
       </RibbonButton>
       <ColorButton
         testId="toolbar-bg"
@@ -114,7 +116,7 @@ export function FontTab({
         onChange={onBackground}
         onClear={onClearBackground}
         glyph={
-          <span aria-hidden style={{ display: "inline-flex" }}>
+          <span aria-hidden className="tw-rb__glyph tw-rb__glyph--icon">
             <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden>
               <rect x="2" y="2" width="12" height="12" rx="2" fill="currentColor" />
             </svg>
@@ -128,7 +130,7 @@ export function FontTab({
         value={activeFormat.color}
         onChange={onColor}
         onClear={onClearColor}
-        glyph={<span aria-hidden style={{ fontSize: "14px", fontWeight: 700 }}>A</span>}
+        glyph={<span aria-hidden className="tw-rb__glyph tw-rb__glyph--bold">A</span>}
       />
     </>
   );

@@ -1,0 +1,187 @@
+// Copyright 2026, MHP Management und IT-Beratung GmbH and contributors.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//     http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// Der Gitter-Editor im Konfigurationsdialog. Wie beim veröffentlichten Widget
+// gilt: alles Statische steht hier, alles aus dem Modell (Zellformat, Auswahl-
+// zustand) bleibt inline und gewinnt damit gegen diese Regeln.
+
+@use "tokens" as *;
+
+.table-editor {
+  // Spaltenlayout, damit die Leiste oben ihren festen Platz behält und nur das
+  // Gitter darunter scrollt — bei einer langen Tabelle bleiben die
+  // Bedienelemente erreichbar. Setzt einen Elternteil voraus, der eine Höhe
+  // durchreicht (der eingehängte Dialog tut das); wo nicht, löst `height: 100%`
+  // zu `auto` auf und der Editor wächst wie zuvor mit seinem Inhalt.
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 0;
+  max-width: 100%;
+
+  // Die Container-Query-Box muss ein eigenes, gestrecktes Element sein:
+  // `container-type: inline-size` schließt die Inline-Achse ein, sodass die
+  // Breite der Box nicht mehr aus ihrem Inhalt folgen kann — auf dem
+  // schrumpfenden Rahmen darunter ließ das den Rahmen auf null zusammenfallen.
+  &__fit-scope {
+    flex: 1 1 auto;
+    min-height: 0;
+    // In der Zeile aus `&__grid-area` muss auch die Inline-Achse schrumpfen
+    // dürfen — ohne das bliebe das Gitter bei seiner Inhaltsbreite und würde
+    // den Drawer aus dem Editor herausdrücken statt ihm Platz zu machen.
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    container-type: inline-size;
+  }
+
+  // Rahmen für den Hilfe-Drawer: eine Flex-Reihe, in der das Gitter (`flex: 1
+  // 1 auto`) und der Drawer sich die Breite teilen. Öffnet der Drawer,
+  // schrumpft das Gitter automatisch mit — kein Overlay, die Tabelle bleibt
+  // bedienbar.
+  &__grid-area {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  &__footer-area {
+    border-radius: 0 0 8px 8px;
+    background: $surface-header;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    padding: 6px 10px;
+
+    .table-editor__footer-item {
+      font-size: 12px;
+      color: $text-muted;
+
+      &--version {
+        background: $surface-handle;
+        border-radius: 20px;
+        padding: 4px 8px;
+      }
+    }
+  }
+
+  // Der einzige scrollende Bereich des Editors. Er füllt die Breite, die er
+  // bekommt — im Konfigurationsdialog die volle Panelbreite —, eine schmalere
+  // Tabelle lässt daneben einfach Platz.
+  &__grid-wrap {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-width: 100%;
+    overflow: auto;
+    // Sitzt bündig unter der Leiste: die geteilte Kante bleibt gerade, nur die
+    // freien Ecken unten sind gerundet.
+    background: $surface;
+    padding: 10px;
+  }
+
+  &__grid {
+    border-collapse: collapse;
+  }
+
+  // Die Griffe am Rand, über die ganze Zeilen und Spalten ausgewählt werden.
+  &__handle {
+    background: $surface-handle;
+    cursor: pointer;
+    padding: 6px;
+    font-size: 11px;
+    color: $text-handle;
+    text-align: center;
+    user-select: none;
+
+    &.__selectAll {
+      border-top-left-radius: 20px;
+      border-right: 1px solid $border-menu;
+      border-bottom: 1px solid $border-menu;
+    }
+  }
+
+  &__cell {
+    border: 1px solid $border-grid;
+    padding: 0;
+    position: relative;
+    min-width: 70px;
+  }
+
+  // Auswahl. Als Innenschatten gezeichnet, damit die Zelle dabei nicht um die
+  // Rahmenbreite springt.
+  &__cell--selected {
+    background: $accent-selection;
+  }
+
+  &__editable {
+    min-width: 70px;
+    min-height: 20px;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    outline: none;
+    font: inherit;
+    white-space: pre-wrap;
+    cursor: default;
+
+    &--editing {
+      cursor: text;
+    }
+  }
+
+  // Bezugsrahmen für den Anfasser am ausgewählten Bild; dessen Position hängt
+  // vom Bild ab und bleibt deshalb inline.
+  &__cell-box {
+    position: relative;
+  }
+
+  &__image-handle {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: $accent;
+    border: 2px solid $surface;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+    cursor: nwse-resize;
+    z-index: 5;
+  }
+
+  &__menu {
+    min-width: 220px;
+    background: $surface;
+    border-radius: $radius-menu;
+    padding: 4px;
+    box-shadow: $shadow-context-menu;
+    font-size: 13px;
+    z-index: 2000;
+  }
+
+  &__menu-item {
+    padding: 6px 10px;
+    border-radius: $radius-small;
+    cursor: pointer;
+    outline: none;
+    user-select: none;
+
+    &--disabled {
+      opacity: 0.4;
+    }
+  }
+
+  &__menu-separator {
+    height: 1px;
+    background: $border-soft;
+    margin: 4px 0;
+  }
+}

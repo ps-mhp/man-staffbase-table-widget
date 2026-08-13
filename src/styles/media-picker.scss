@@ -1,0 +1,165 @@
+// Copyright 2026, Staffbase SE and contributors.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//     http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// Der Medien-Explorer. Er wird über die Oberfläche der Wirtsseite gelegt und
+// setzt deshalb Farbe, Schrift und Flex-Verhalten ausdrücklich: die Seite bringt
+// eigene Regeln für `button` und `input` mit, gegen die sich das Fenster
+// behaupten muss.
+
+@use "tokens" as *;
+
+.tw-mp {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2147483647;
+
+  &__panel {
+    background: $surface;
+    border-radius: 8px;
+    width: min(880px, 92vw);
+    height: min(640px, 88vh);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    box-shadow: $shadow-dialog;
+    overflow: hidden;
+    color: $text-body;
+    font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+      sans-serif;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 18px;
+    border-bottom: 1px solid $border-soft;
+  }
+
+  &__search {
+    // Wächst mit; `min-width: 0` lässt es im Flex-Zeilenkontext tatsächlich
+    // schrumpfen und wachsen, statt auf seiner Eigenbreite festzukleben.
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid $border-input;
+    border-radius: $radius-menu;
+    outline: none;
+    color: $text-body;
+    background: $surface;
+    box-sizing: border-box;
+  }
+
+  // Kopfzeilen-Buttons nur mit Symbol: so breit wie nötig und vor allem
+  // `flex: 0 0 auto`, damit die `button { flex: … }`-Regeln der Wirtsseite sie
+  // nicht in die Länge ziehen.
+  &__icon-button {
+    flex: 0 0 auto;
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid $border-input;
+    border-radius: $radius-menu;
+    background: $surface-muted;
+    color: $text-body;
+    cursor: pointer;
+  }
+
+  &__button {
+    padding: 8px 14px;
+    font-size: 13px;
+    border: 1px solid $border-input;
+    border-radius: $radius-menu;
+    background: $surface-muted;
+    color: $text-body;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  &__body {
+    flex: 1;
+    overflow: auto;
+    padding: 16px 18px;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+
+  &__tile {
+    border: 1px solid $border-tile;
+    border-radius: $radius-menu;
+    background: $surface;
+    color: $text-body;
+    padding: 6px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: stretch;
+    font: inherit;
+  }
+
+  &__thumb {
+    width: 100%;
+    height: 104px;
+    object-fit: contain;
+    // Schachbrett, damit ein transparentes Bild als transparent zu erkennen ist.
+    background: repeating-conic-gradient(#f2f4f6 0% 25%, #ffffff 0% 50%) 50%/16px 16px;
+    border-radius: $radius-small;
+  }
+
+  &__caption {
+    font-size: 12px;
+    color: $text-caption;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  // Ladehinweis, Leermeldung und Fehlerbanner teilen sich eine Form.
+  &__state {
+    padding: 40px 0;
+    text-align: center;
+    color: $text-state;
+    font-size: 14px;
+
+    &--error {
+      color: #b42318;
+    }
+  }
+
+  &__more {
+    text-align: center;
+    margin-top: 16px;
+  }
+
+  // Wartet auf eine Antwort des Servers: sichtbar, aber gedämpft.
+  &__busy {
+    opacity: 0.5;
+  }
+
+  // Das Dateifeld hinter dem Upload-Button.
+  &__file-input {
+    display: none;
+  }
+}

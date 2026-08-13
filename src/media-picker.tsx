@@ -1,5 +1,5 @@
 /*!
- * Copyright 2026, Staffbase SE and contributors.
+ * Copyright 2026, MHP Management und IT-Beratung GmbH and contributors.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,8 @@
 import * as React from "react";
 import { ReactElement, useCallback, useEffect, useRef, useState } from "react";
 import { MediaClient, MediaItem } from "./media-client";
+import mediaPickerCss from "./styles/media-picker.scss";
+import { useHotStyle } from "@shared/hot-style";
 
 /** The image an author picked/uploaded, ready to embed in a cell. */
 export interface PickedImage {
@@ -29,131 +31,8 @@ export interface MediaPickerProps {
   onClose: () => void;
 }
 
-const overlayStyle: React.CSSProperties = {
-  position: "fixed",
-  inset: 0,
-  background: "rgba(0, 0, 0, 0.45)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  zIndex: 2147483647,
-};
-
-const panelStyle: React.CSSProperties = {
-  background: "#fff",
-  borderRadius: "8px",
-  width: "min(880px, 92vw)",
-  height: "min(640px, 88vh)",
-  display: "flex",
-  flexDirection: "column",
-  boxSizing: "border-box",
-  boxShadow: "0 8px 40px rgba(0, 0, 0, 0.35)",
-  overflow: "hidden",
-  color: "#1f2933",
-  font: "14px/1.4 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-};
-
-const headerStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: "8px",
-  padding: "14px 18px",
-  borderBottom: "1px solid #e5e8ec",
-};
-
-const searchInputStyle: React.CSSProperties = {
-  // Grow to fill; `minWidth: 0` lets it actually shrink/grow inside the flex row
-  // instead of being pinned to its intrinsic width.
-  flex: "1 1 auto",
-  minWidth: 0,
-  width: "100%",
-  padding: "8px 12px",
-  fontSize: "14px",
-  border: "1px solid #cfd4da",
-  borderRadius: "6px",
-  outline: "none",
-  color: "#1f2933",
-  background: "#fff",
-  boxSizing: "border-box",
-};
-
-// Icon-only header buttons: only as wide as needed and, crucially, `flex: 0 0
-// auto` so the host page's own `button { flex: … }` rules can't stretch them.
-const iconButtonStyle: React.CSSProperties = {
-  flex: "0 0 auto",
-  width: "38px",
-  height: "38px",
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  padding: 0,
-  border: "1px solid #cfd4da",
-  borderRadius: "6px",
-  background: "#fafbfc",
-  color: "#1f2933",
-  cursor: "pointer",
-};
-
-const buttonStyle: React.CSSProperties = {
-  padding: "8px 14px",
-  fontSize: "13px",
-  border: "1px solid #cfd4da",
-  borderRadius: "6px",
-  background: "#fafbfc",
-  color: "#1f2933",
-  cursor: "pointer",
-  whiteSpace: "nowrap",
-};
-
-const bodyStyle: React.CSSProperties = {
-  flex: 1,
-  overflow: "auto",
-  padding: "16px 18px",
-};
-
-const gridStyle: React.CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
-  gap: "12px",
-};
-
-const tileStyle: React.CSSProperties = {
-  border: "1px solid #e0e4e8",
-  borderRadius: "6px",
-  background: "#fff",
-  color: "#1f2933",
-  padding: "6px",
-  cursor: "pointer",
-  display: "flex",
-  flexDirection: "column",
-  gap: "6px",
-  alignItems: "stretch",
-  font: "inherit",
-};
-
-const thumbStyle: React.CSSProperties = {
-  width: "100%",
-  height: "104px",
-  objectFit: "contain",
-  background:
-    "repeating-conic-gradient(#f2f4f6 0% 25%, #ffffff 0% 50%) 50% / 16px 16px",
-  borderRadius: "4px",
-};
-
-const captionStyle: React.CSSProperties = {
-  fontSize: "12px",
-  color: "#4a525b",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-  whiteSpace: "nowrap",
-};
-
-const stateStyle: React.CSSProperties = {
-  padding: "40px 0",
-  textAlign: "center",
-  color: "#6b7480",
-  fontSize: "14px",
-};
+/** Marks a control that is waiting on the server; see `styles/media-picker.scss`. */
+const busyClass = (busy: boolean): string => (busy ? " tw-mp__busy" : "");
 
 const DEBOUNCE_MS = 300;
 const IMAGE_ACCEPT = "image/*";
@@ -196,6 +75,7 @@ const IconClose = (): ReactElement => (
  * exercised outside a real Staffbase instance.
  */
 export function MediaPicker({ client, onSelect, onClose }: MediaPickerProps): ReactElement {
+  const hotMediaPickerCss = useHotStyle(mediaPickerCss, "table-widget", "styles/media-picker.scss");
   const [query, setQuery] = useState("");
   const [items, setItems] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -301,26 +181,29 @@ export function MediaPicker({ client, onSelect, onClose }: MediaPickerProps): Re
 
   return (
     <div
-      style={overlayStyle}
+      className="tw-mp"
       data-testid="media-picker"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div style={panelStyle} role="dialog" aria-label="Staffbase Medien">
-        <div style={headerStyle}>
+      {/* The picker brings its own stylesheet: it is mounted into the host's
+          dialog and should leave nothing behind in `document.head`. */}
+      <style>{hotMediaPickerCss}</style>
+      <div className="tw-mp__panel" role="dialog" aria-label="Staffbase Medien">
+        <div className="tw-mp__header">
           <input
             type="search"
             value={query}
             placeholder="Medien durchsuchen…"
             aria-label="Medien durchsuchen"
             data-testid="media-picker-search"
-            style={searchInputStyle}
+            className="tw-mp__search"
             onChange={(e) => setQuery(e.target.value)}
           />
           <button
             type="button"
-            style={{ ...iconButtonStyle, opacity: uploading ? 0.5 : 1 }}
+            className={`tw-mp__icon-button${busyClass(uploading)}`}
             data-testid="media-picker-upload"
             title="Bild hochladen"
             aria-label="Bild hochladen"
@@ -335,7 +218,7 @@ export function MediaPicker({ client, onSelect, onClose }: MediaPickerProps): Re
             accept={IMAGE_ACCEPT}
             data-testid="media-picker-upload-input"
             aria-label="Bild hochladen"
-            style={{ display: "none" }}
+            className="tw-mp__file-input"
             onChange={(e) => {
               const file = e.target.files?.[0];
               e.target.value = "";
@@ -344,7 +227,7 @@ export function MediaPicker({ client, onSelect, onClose }: MediaPickerProps): Re
           />
           <button
             type="button"
-            style={iconButtonStyle}
+            className="tw-mp__icon-button"
             data-testid="media-picker-close"
             title="Schließen"
             aria-label="Schließen"
@@ -354,49 +237,54 @@ export function MediaPicker({ client, onSelect, onClose }: MediaPickerProps): Re
           </button>
         </div>
 
-        <div style={bodyStyle}>
+        <div className="tw-mp__body">
           {error !== null && (
-            <div style={{ ...stateStyle, color: "#b42318" }} data-testid="media-picker-error">
+            <div className="tw-mp__state tw-mp__state--error" data-testid="media-picker-error">
               {error}
             </div>
           )}
 
           {items.length > 0 && (
-            <div style={gridStyle}>
+            <div className="tw-mp__grid">
               {items.map((item) => (
                 <button
                   key={item.id}
                   type="button"
-                  style={{ ...tileStyle, opacity: busyId === item.id ? 0.5 : 1 }}
+                  className={`tw-mp__tile${busyClass(busyId === item.id)}`}
                   data-testid={`media-picker-item-${item.id}`}
                   title={item.fileName}
                   disabled={busy}
                   onClick={() => void selectItem(item)}
                 >
-                  <img src={item.previewUrl} alt={item.fileName} style={thumbStyle} loading="lazy" />
-                  <span style={captionStyle}>{item.fileName}</span>
+                  <img
+                    src={item.previewUrl}
+                    alt={item.fileName}
+                    className="tw-mp__thumb"
+                    loading="lazy"
+                  />
+                  <span className="tw-mp__caption">{item.fileName}</span>
                 </button>
               ))}
             </div>
           )}
 
           {loading && items.length === 0 && (
-            <div style={stateStyle} data-testid="media-picker-loading">
+            <div className="tw-mp__state" data-testid="media-picker-loading">
               Medien werden geladen…
             </div>
           )}
 
           {!loading && error === null && items.length === 0 && (
-            <div style={stateStyle} data-testid="media-picker-empty">
+            <div className="tw-mp__state" data-testid="media-picker-empty">
               Keine Medien gefunden.
             </div>
           )}
 
           {hasMore && items.length > 0 && (
-            <div style={{ textAlign: "center", marginTop: "16px" }}>
+            <div className="tw-mp__more">
               <button
                 type="button"
-                style={buttonStyle}
+                className="tw-mp__button"
                 data-testid="media-picker-more"
                 disabled={busy}
                 onClick={() => void loadMore()}

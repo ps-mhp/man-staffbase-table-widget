@@ -1,5 +1,5 @@
 /*!
- * Copyright 2026, Staffbase SE and contributors.
+ * Copyright 2026, MHP Management und IT-Beratung GmbH and contributors.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -63,7 +63,7 @@ export function DataTab({
         trigger={(toggle) => (
           <button type="button" className="tw-rb__big" data-testid="toolbar-sort" title="Sortierung" disabled={disabled} onClick={toggle}>
             <IconSort />
-            <span style={{ display: "inline-flex", alignItems: "center", gap: "2px" }}>Sortieren <IconChevron /></span>
+            <span className="tw-rb__label">Sortieren <IconChevron /></span>
           </button>
         )}
       >
@@ -123,7 +123,7 @@ export function DataTab({
             onClick={toggle}
           >
             <IconClearFormat />
-            <span style={{ display: "inline-flex", alignItems: "center", gap: "2px" }}>Formatierung <IconChevron /></span>
+            <span className="tw-rb__label">Formatierung <IconChevron /></span>
           </button>
         )}
       >
@@ -156,7 +156,7 @@ export function DataTab({
         data-testid="toolbar-upload"
         aria-label="Tabelle hochladen"
         onChange={handleFile}
-        style={{ display: "none" }}
+        className="tw-rb__file-input"
       />
     </>
   );

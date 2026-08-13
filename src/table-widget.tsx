@@ -1,5 +1,5 @@
 /*!
- * Copyright 2026, Staffbase SE and contributors.
+ * Copyright 2026, MHP Management und IT-Beratung GmbH and contributors.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,11 @@ import {
 } from "./table-model";
 import { formatToStyle, formatToCellStyle } from "./cell-style";
 import { sanitizeRichText, richTextToPlain } from "./rich-text";
-import { IMAGE_FIT_CLASS, IMAGE_FIT_CSS, IMAGE_NO_FIT_CLASS, IMAGE_NO_FIT_CSS } from "./image-fit";
+import { IMAGE_FIT_CLASS, IMAGE_NO_FIT_CLASS } from "./image-fit";
+import imageFitCss from "./styles/image-fit.scss";
+import imageNoFitCss from "./styles/image-no-fit.scss";
+import tableWidgetCss from "./styles/table-widget.scss";
+import { useHotStyle } from "@shared/hot-style";
 import {
   clampRowSpan,
   collapseToggleLabel,
@@ -37,56 +41,18 @@ export type TableWidgetProps = BlockAttributes & {
   tabledata?: string;
 };
 
-const baseCellStyle: React.CSSProperties = {
-  padding: "8px 12px",
-  whiteSpace: "nowrap",
-  borderBottom: "1px solid #3e3b3b",
-};
-
-const headerCellStyle: React.CSSProperties = {
-  ...baseCellStyle,
-  fontWeight: "bold",
-  cursor: "pointer",
-  userSelect: "none",
-  borderBottom: "2px solid #233848",
-};
-
-const alignFor = (colIndex: number): React.CSSProperties["textAlign"] =>
-  colIndex === 0 ? "left" : "center";
-
 /**
- * The first column carries the (often long) row labels. Cap it so it can
- * never take more than 75% of the *visible* container width (via the `cqw`
- * container-query unit — see the `container-type` on the scroll wrapper),
- * otherwise a very long label could push the data columns out of view and
- * make horizontal scrolling useless. When capped, the label wraps at word
- * boundaries. `break-word` (not `anywhere`) is deliberate: it only breaks a
- * word that is itself too long, so normal labels don't shatter into single
- * characters as auto table-layout squeezes the column.
+ * Class names of `styles/table-widget.scss`. They are collected here so a
+ * rename shows up as a compile error rather than as silently unstyled markup.
  */
-const firstColumnStyle: React.CSSProperties = {
-  maxWidth: "75cqw",
-  whiteSpace: "normal",
-  overflowWrap: "break-word",
-};
+const CELL = "table-widget__cell";
+const CELL_HEAD = `${CELL} ${CELL}--head`;
+const CELL_ROWHEAD = `${CELL} ${CELL}--rowhead`;
+const CELL_FIRST = `${CELL}--first`;
+const CELL_GAP = `${CELL}--gap`;
 
-/**
- * The row-collapse toggle. Deliberately unassuming — it is a control on
- * someone else's page, so it borrows the surrounding text colour rather than
- * introducing a brand colour of its own.
- */
-const toggleStyle: React.CSSProperties = {
-  display: "block",
-  margin: "12px auto 0",
-  padding: "8px 16px",
-  font: "inherit",
-  fontSize: "0.9em",
-  color: "inherit",
-  background: "transparent",
-  border: "1px solid #3e3b3b",
-  borderRadius: "4px",
-  cursor: "pointer",
-};
+/** The extra top padding that separates the first body row from the header. */
+const gapClass = (displayIndex: number): string => (displayIndex === 0 ? ` ${CELL_GAP}` : "");
 
 /** Renders a cell's (possibly super-/sub-scripted) content as safe markup. */
 const CellContent = ({ value }: { value: string }): ReactElement => (
@@ -102,6 +68,10 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
   const model = useMemo(() => parseTableModel(tabledata), [tabledata]);
   const { data } = model;
   const headerRow = data[0] ?? [];
+
+  const hotTableWidgetCss = useHotStyle(tableWidgetCss, "table-widget", "styles/table-widget.scss");
+  const hotImageFitCss = useHotStyle(imageFitCss, "table-widget", "styles/image-fit.scss");
+  const hotImageNoFitCss = useHotStyle(imageNoFitCss, "table-widget", "styles/image-no-fit.scss");
 
   // Whether the reader has revealed the hidden rows. This is a viewing
   // decision, not content, so it stays out of the model and leaves nothing
@@ -163,30 +133,14 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
 
   return (
     <div className="table-widget">
-    <div
-      className={`table-widget-scroll ${model.fitImages ? IMAGE_FIT_CLASS : IMAGE_NO_FIT_CLASS}`}
-      // No height cap, so `overflow` never triggers vertically and the widget
-      // adds no second scrollbar to a page that already scrolls. Wide tables
-      // still scroll sideways, which the page itself does not do.
-      style={{ overflow: "auto", width: "100%", maxWidth: "100%", containerType: "inline-size", background: "transparent" }}
-    >
-      {/* Both states need a stylesheet: the host page styles article images
-          too, so "off" is an explicit rule rather than the absence of one. */}
-      <style>{model.fitImages ? IMAGE_FIT_CSS : IMAGE_NO_FIT_CSS}</style>
-      <table
-        style={{
-          borderCollapse: "separate",
-          borderSpacing: "8px 0",
-          tableLayout: "auto",
-          width: "100%",
-          // The 8px horizontal border-spacing between columns paints the
-          // table's own background. Force it transparent so the gap is a real
-          // gap (whatever sits behind the table shows through) rather than a
-          // white/coloured stripe — the columns are separated without any
-          // coloured border.
-          background: "transparent",
-        }}
-      >
+    <div className={`table-widget-scroll ${model.fitImages ? IMAGE_FIT_CLASS : IMAGE_NO_FIT_CLASS}`}>
+      {/* The widget carries its own stylesheet instead of writing to
+          `document.head`, so it comes and goes with the component. The image
+          rules are part of it in both states: the host page styles article
+          images too, so "off" is an explicit rule rather than the absence of
+          one. */}
+      <style>{`${hotTableWidgetCss}\n${model.fitImages ? hotImageFitCss : hotImageNoFitCss}`}</style>
+      <table className="table-widget__table">
         <thead>
           <tr>
             {headerRow.map((cell, colIndex) => {
@@ -198,19 +152,13 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
                   scope="col"
                   onClick={() => toggleSort(colIndex)}
                   {...spanProps(0, colIndex, 0)}
+                  className={`${CELL_HEAD}${colIndex === 0 ? ` ${CELL_FIRST}` : ""}`}
+                  // Only what the model says about this one cell stays inline;
+                  // an inline style beats the stylesheet, which is exactly the
+                  // precedence a per-cell format needs.
                   style={{
-                    ...headerCellStyle,
-                    textAlign: alignFor(colIndex),
-                    ...(colIndex === 0 ? firstColumnStyle : {}),
                     ...formatToStyle(headerFormat),
                     ...formatToCellStyle(headerFormat),
-                    background: "#fff",
-                    // Only the first column sticks. A sticky header would
-                    // have nothing to stick to: the wrapper no longer
-                    // scrolls vertically, rows collapse instead.
-                    ...(colIndex === 0
-                      ? { position: "sticky", left: 0, zIndex: 3 }
-                      : {}),
                   }}
                 >
                   <CellContent value={cell} />
@@ -222,7 +170,6 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
         <tbody id={bodyId}>
           {shownOrder.map((rowIndex, displayIndex) => {
             const row = data[rowIndex];
-            const gapStyle: React.CSSProperties = displayIndex === 0 ? { paddingTop: "16px" } : {};
             return (
               <tr key={rowIndex}>
                 {row.map((cell, colIndex) => {
@@ -235,18 +182,8 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
                       key={colIndex}
                       scope="row"
                       {...spans}
-                      style={{
-                        ...baseCellStyle,
-                        textAlign: alignFor(colIndex),
-                        ...firstColumnStyle,
-                        fontWeight: "bold",
-                        background: "#fff",
-                        position: "sticky",
-                        left: 0,
-                        zIndex: 1,
-                        ...format,
-                        ...gapStyle,
-                      }}
+                      className={`${CELL_ROWHEAD} ${CELL_FIRST}${gapClass(displayIndex)}`}
+                      style={format}
                     >
                       <CellContent value={cell} />
                     </th>
@@ -254,12 +191,8 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
                     <td
                       key={colIndex}
                       {...spans}
-                      style={{
-                        ...baseCellStyle,
-                        textAlign: alignFor(colIndex),
-                        ...format,
-                        ...gapStyle,
-                      }}
+                      className={`${CELL}${gapClass(displayIndex)}`}
+                      style={format}
                     >
                       <CellContent value={cell} />
                     </td>
@@ -281,7 +214,7 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
           onClick={() => setExpanded((open) => !open)}
           aria-expanded={expanded}
           aria-controls={bodyId}
-          style={toggleStyle}
+          className="table-widget__toggle"
         >
           {collapseToggleLabel(hidden, expanded)}
         </button>

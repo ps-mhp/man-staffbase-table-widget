@@ -1,5 +1,5 @@
 /*!
- * Copyright 2026, Staffbase SE and contributors.
+ * Copyright 2026, MHP Management und IT-Beratung GmbH and contributors.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,22 @@ import {
   stripLowercaseMarks,
   unmarkLowercase,
 } from "./lowercase-mark";
+import { LOWERCASE_CLASS } from "./rich-text";
+import lowercaseMarkCss from "./styles/lowercase-mark.scss";
+
+describe("lowercase-mark.scss", () => {
+  it("styles the class the marker actually writes", () => {
+    // Das Stylesheet kann die Klasse nicht importieren; dieser Test hält beide
+    // Seiten deckungsgleich, falls sie umbenannt wird.
+    expect(lowercaseMarkCss).toContain(`.${LOWERCASE_CLASS}`);
+  });
+
+  it("only paints inside the editor", () => {
+    // Im veröffentlichten Widget trägt der Text nur die Klasse; gezeichnet wird
+    // dort nichts.
+    expect(lowercaseMarkCss).toContain(".table-editor ");
+  });
+});
 
 describe("markLowercase", () => {
   it("wraps the requested character range", () => {

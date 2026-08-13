@@ -1,0 +1,782 @@
+// Copyright 2026, MHP Management und IT-Beratung GmbH and contributors.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//     http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// Die Bedienleiste im Stil eines Office-Ribbons. Alles liegt unter `.tw-rb`,
+// damit nichts auf die Wirtsseite ausstrahlt; die Komponente rendert das
+// kompilierte Stylesheet selbst als `<style>` in ihr eigenes Markup, sodass es
+// mit ihr kommt und geht und `document.head` unberührt bleibt.
+
+@use "tokens" as *;
+@use "mixins" as *;
+
+.tw-rb {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  // Schrumpft in der Flex-Spalte des Editors nie weg und bleibt oben hängen,
+  // falls der Editor doch einmal in einem scrollenden Container sitzt.
+  flex: 0 0 auto;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  padding: 0 0 7px;
+  // Das Gitter beginnt bündig darunter, deshalb bleiben die unteren Ecken
+  // eckig und die Kante wird geteilt statt schwebend gerundet.
+  border-radius: $radius-panel $radius-panel 0 0;
+  border: none;
+  background: $surface-panel;
+  margin-bottom: 0;
+  font-size: 13px;
+  color: $text-strong;
+  box-sizing: border-box;
+
+  &__title {
+    color: $accent-border;
+    font-weight: $text-strong;
+  }
+
+  // Jedes Bedienelement ist eine Pille gleicher Höhe in einer Zeile. Früher
+  // wurde vertikal gruppiert (gestapelt wie in Excel); bei einer Handvoll
+  // Elemente pro Reiter liest sich eine flache Reihe schneller und macht die
+  // Leiste halb so hoch.
+  &__rows,
+  &__row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &__btn {
+    @include control-pill;
+    @include hover-lift;
+    @include focus-ring;
+    @include disabled;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-width: $control-height;
+    padding: 0 10px;
+    cursor: pointer;
+    border: 0;
+    font-size: 13px;
+    transition:
+      background $transition,
+      border-color $transition,
+      color $transition,
+      box-shadow $transition;
+
+    &:active:not(:disabled) {
+      background: $surface-pressed;
+    }
+
+    &--active,
+    &--active:hover:not(:disabled) {
+      background: $accent-surface;
+      border-color: $accent-border;
+      color: $accent-text;
+    }
+
+    &--icon {
+      width: $control-height;
+      min-width: $control-height;
+      padding: 0;
+    }
+
+    &--step {
+      width: 34px;
+      min-width: 34px;
+      padding: 0;
+      gap: 1px;
+    }
+  }
+
+  // Früher der gestapelte „große“ Button mit Beschriftung unter dem Symbol.
+  // Er ist jetzt so hoch wie die kleinen Buttons und setzt die Beschriftung
+  // daneben, sodass beschriftete und unbeschriftete Elemente auf einer
+  // Grundlinie sitzen.
+  &__big {
+    @include control-pill;
+    @include hover-lift;
+    @include focus-ring;
+    @include disabled;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 10px;
+    cursor: pointer;
+    border: 0;
+    font-size: 13px;
+    transition:
+      background $transition,
+      border-color $transition,
+      color $transition,
+      box-shadow $transition;
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    &:active:not(:disabled),
+    &:focus {
+      background: $surface-pressed;
+    }
+  }
+
+  // Schalter für tabellenweite Optionen. Anders als die Aktionsbuttons zeigt er
+  // einen Zustand, deshalb ein Kippschalter statt eines gedrückten Buttons.
+  &__switch {
+    @include control-pill;
+    @include focus-ring;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 10px;
+    cursor: pointer;
+    font-size: 12px;
+    border: 0;
+    transition:
+      background $transition,
+      border-color $transition;
+
+    &:hover:not(:disabled) {
+      background: $surface-hover;
+      border-color: $border-hover;
+    }
+
+    &[aria-checked="true"] {
+      border-color: $accent-border;
+      background: $accent-surface-soft;
+      color: $accent-text;
+
+      .tw-rb__switch-track {
+        background: $accent;
+
+        &::after {
+          transform: translateX(12px);
+        }
+      }
+    }
+  }
+
+  &__switch-track {
+    position: relative;
+    width: 28px;
+    height: 16px;
+    border-radius: 999px;
+    background: #ccd4dc;
+    transition: background $transition-slow;
+    flex: 0 0 auto;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: $surface;
+      box-shadow: $shadow-switch-knob;
+      transition: transform $transition-slow;
+    }
+  }
+
+  &__rows-limit {
+    @include control-pill;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 10px;
+    font-size: 12px;
+
+    input {
+      width: 46px;
+      height: 22px;
+      padding: 0 4px;
+      border: 1px solid $border;
+      border-radius: $radius-input;
+      font: inherit;
+      font-size: 12px;
+      text-align: center;
+      color: inherit;
+      background: $surface;
+      box-sizing: border-box;
+
+      @include focus-ring;
+    }
+  }
+
+  &__select {
+    @include control-pill;
+    @include focus-ring;
+    @include disabled;
+
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: $surface;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none' stroke='%236b7684' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 4.5L6 8l3-3.5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 11px;
+    padding: 0 26px 0 10px;
+    font-size: 13px;
+    cursor: pointer;
+    min-width: 92px;
+    border: 0;
+    transition:
+      border-color $transition,
+      box-shadow $transition;
+
+    &:hover:not(:disabled) {
+      border-color: $border-hover;
+    }
+  }
+
+  // Farbwähler und sein Aufklappmenü lesen sich als ein Element, teilen sich
+  // deshalb eine Pillenkontur; nur die Naht dazwischen wird gezeichnet.
+  &__color {
+    @include control-pill;
+    @include disabled;
+
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    min-width: 32px;
+    padding: 3px 0 0;
+    border-top: 0;
+    border-left: 0;
+    border-bottom: 0;
+    border-right: 1px solid $border;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    cursor: pointer;
+    transition: background $transition;
+
+    &:hover:not(:disabled) {
+      background: $surface-hover;
+    }
+  }
+
+  &__color-bar {
+    width: 18px;
+    height: 4px;
+    margin-top: 3px;
+    border-radius: 2px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    box-sizing: border-box;
+  }
+
+  &__caret {
+    @include control-pill;
+    @include disabled;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    padding: 0;
+    border: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    color: $text-muted-icon;
+    cursor: pointer;
+    transition:
+      background $transition,
+      border-color $transition;
+
+    &:hover:not(:disabled) {
+      background: $surface-hover;
+      border-color: $border-hover;
+    }
+  }
+
+  &__menu {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    min-width: 194px;
+    background: $surface;
+    border: 1px solid $border-menu;
+    border-radius: $radius-panel;
+    box-shadow: $shadow-menu;
+    padding: 5px;
+    z-index: 20;
+  }
+
+  &__menu-item {
+    @include disabled;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: transparent;
+    padding: 8px 10px;
+    border-radius: $radius-control;
+    cursor: pointer;
+    font-size: 13px;
+    color: $text;
+    transition: background $transition-fast;
+
+    &:hover:not(:disabled) {
+      background: $surface-hover;
+    }
+
+    &:focus-visible {
+      outline: none;
+      background: $accent-surface;
+    }
+  }
+
+  &__swatch {
+    width: 16px;
+    height: 16px;
+    border: 1px solid $border-input;
+    border-radius: $radius-small;
+    flex: 0 0 auto;
+  }
+
+  &__controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: $accent;
+    border-top-right-radius: $radius-control;
+    border-top-left-radius: $radius-control;
+
+    > .tw-rb__ctl {
+      margin: 6px 10px;
+    }
+  }
+
+  &__ctl {
+    @include control-pill($control-height-sm);
+    @include focus-ring;
+
+    padding: 0 12px;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    color: $surface;
+    transition:
+      background $transition,
+      box-shadow $transition;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    &:hover:not(:disabled) {
+      background: $accent-strong;
+    }
+
+    // Schließen sitzt am rechten Rand der Leiste, abgesetzt von den übrigen
+    // Aktionen. Hilfe steht direkt davor, damit beide zusammen als rechte
+    // Gruppe lesen — der Rand-Abstand sitzt deshalb auf Hilfe, wenn sie da
+    // ist, sonst übernimmt Schließen ihn.
+    &.tw-rb__ctl-help {
+      margin-left: auto;
+    }
+
+    &.tw-rb__ctl-close {
+      margin-left: auto;
+
+      .tw-rb__ctl-help ~ & {
+        margin-left: 0;
+      }
+    }
+  }
+
+  &__dirty {
+    font-size: 11px;
+    color: $text-warning;
+    white-space: nowrap;
+  }
+
+  &__tabs {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  // Die Reiter nehmen nur den Platz ihrer Beschriftung ein; die Linie der
+  // Leiste läuft nach rechts weiter, sodass die Zeile als eine Kante liest und
+  // nicht als fünf gedehnte Buttons.
+  &__tablist {
+    display: flex;
+    justify-content: flex-start;
+    gap: 2px;
+    margin-bottom: 6px;
+    padding: 0 10px;
+    height: $control-height;
+  }
+
+  &__tab {
+    flex: 0 0 auto;
+    width: auto;
+    border: none;
+    background: transparent;
+    padding: 5px 12px;
+    border-radius: $radius-control $radius-control 0 0;
+    font: inherit;
+    font-size: 12px;
+    color: $text-muted;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition:
+      background $transition-fast,
+      color $transition-fast;
+    margin: 0;
+
+    // `!important`, weil die Wirtsseite eigene Hover-Hintergründe für Buttons
+    // mitbringt und später geladen wird.
+    &:hover {
+      background-color: $surface-hover-soft !important;
+      color: $text-strong;
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: $focus-ring;
+    }
+
+    &--active {
+      color: $accent-text;
+      border-bottom-color: $accent;
+      font-weight: 600;
+    }
+  }
+
+
+  // Beschriftung mit nachgestelltem Pfeil bei aufklappbaren Buttons.
+  &__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  // Buchstaben-Piktogramme der Schrift-Buttons. Sie tragen die Auszeichnung,
+  // die sie beschreiben, damit der Button zeigt, was er tut.
+  &__glyph {
+    &--lg {
+      font-size: 14px;
+    }
+
+    &--md {
+      font-size: 13px;
+    }
+
+    &--sm {
+      font-size: 11px;
+    }
+
+    &--arrow {
+      font-size: 9px;
+    }
+
+    &--underline {
+      text-decoration: underline;
+    }
+
+    &--strike {
+      text-decoration: line-through;
+    }
+
+    &--lowercase {
+      font-size: 13px;
+      text-transform: lowercase;
+    }
+
+    &--bold {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    &--icon {
+      display: inline-flex;
+    }
+  }
+
+  &__dropdown {
+    position: relative;
+    display: flex;
+    border: 0;
+  }
+
+  &__color-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  // Das native Farbfeld. Es bleibt bedienbar (der Klick auf den Button löst es
+  // aus) und wird deshalb nicht ausgeblendet, sondern auf einen Punkt gelegt:
+  // `display: none` nähme manchen Browsern die Möglichkeit, den Farbdialog zu
+  // öffnen.
+  &__color-input {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  // Das Dateifeld hinter dem Importieren-Button.
+  &__file-input {
+    display: none;
+  }
+
+  // Eine Zeile Bedienelemente, die nur umbricht, wenn es wirklich zu eng wird.
+  &__panel {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    min-height: $control-height;
+    padding: 0 10px;
+  }
+
+  // Einspaltige Drilldown-Navigation: Suche und Breadcrumbs stehen fest oben,
+  // darunter wechselt eine einzelne Seite zwischen Startmenü, Themenseite und
+  // Suchergebnissen. Ersetzt das frühere zweispaltige Tab-Layout.
+  &__help {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+  }
+
+  &__help-search {
+    @include control-pill;
+    @include focus-ring;
+
+    flex: 0 0 auto;
+    width: 100%;
+    height: $control-height;
+    padding: 0 10px;
+    font: inherit;
+    font-size: 13px;
+    color: inherit;
+    background: $surface;
+    box-sizing: border-box;
+  }
+
+  &__help-breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 0 0 auto;
+    font-size: 12px;
+    color: $text-muted;
+    height: 15px;
+    margin-left: 8px;
+  }
+
+  &__help-crumb {
+    border: none;
+    background: transparent;
+    padding: 5px 4px;
+    margin: -2px -4px;
+    border-radius: $radius-small;
+    font: inherit;
+    font-size: 12px;
+    color: $accent-text;
+    cursor: pointer;
+    width: auto;
+
+    &:hover {
+      background-color: transparent !important;
+      font-weight: $text-strong;
+    }
+
+    &:focus,
+    &:active {
+      color: $text-muted;
+      background-color: transparent !important;
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: $focus-ring;
+    }
+
+    &--current {
+      color: $text-muted;
+      cursor: default;
+      padding: 2px 0;
+      margin: 0;
+
+      &:hover {
+        background: none;
+      }
+    }
+  }
+
+  &__help-crumb-sep {
+    color: $text-muted-icon;
+  }
+
+  &__help-content {
+    min-width: 0;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 0 8px;
+  }
+
+  // Die Kategorieliste der Startseite: eine Zeile pro Thema, in derselben
+  // Reihenfolge wie die Ribbon-Reiter.
+  &__help-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__help-menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: transparent;
+    padding: 10px 10px;
+    border-radius: $radius-control;
+    font: inherit;
+    font-size: 13px;
+    color: $text;
+    cursor: pointer;
+    transition: background $transition-fast;
+
+    &:hover,
+    &:focus {
+      background: $surface-hover !important;
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: $focus-ring;
+    }
+  }
+
+  &__help-menu-chevron {
+    color: $text-muted-icon;
+  }
+
+  &__help-heading {
+    margin: 0 0 8px;
+    font-size: 15px;
+    color: $text-strong;
+  }
+
+  &__help-entry {
+    margin-bottom: 12px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__help-entry-title {
+    display: block;
+    margin: 0 0 2px;
+    font-size: 13px;
+    font-weight: 600;
+    color: $text-strong;
+  }
+
+  &__help-entry-text {
+    display: block;
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: $text-body;
+  }
+
+  &__help-empty {
+    margin: 0;
+    font-size: 13px;
+    color: $text-muted;
+  }
+
+  &__help-mark {
+    background: $accent-surface;
+    color: $accent-text;
+    border-radius: 2px;
+    padding: 0 1px;
+  }
+
+  // Suchergebnisse: wie die Startseite eine Liste, aber jeder Eintrag zeigt
+  // zusätzlich sein Thema und den passenden Textausschnitt, damit ein Treffer
+  // sich von einer bloßen Kategorie unterscheidet.
+  &__help-results {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__help-result {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: transparent;
+    padding: 8px 10px;
+    border-radius: $radius-control;
+    cursor: pointer;
+    transition: background $transition-fast;
+
+    &:hover {
+      background: $surface-hover;
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: $focus-ring;
+    }
+  }
+
+  &__help-result-topic {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: $accent-text;
+  }
+}

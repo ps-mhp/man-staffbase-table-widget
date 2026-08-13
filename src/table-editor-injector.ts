@@ -1,5 +1,5 @@
 /*!
- * Copyright 2026, Staffbase SE and contributors.
+ * Copyright 2026, MHP Management und IT-Beratung GmbH and contributors.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,7 +43,7 @@ export function startTableEditorInjector(root: ParentNode = document): () => voi
     serialize: encodeTableAttribute,
     // The editor draws its own frame — toolbar and grid share an edge — so the
     // panel's form-style padding would only push that frame away from it.
-    panelStyle: { padding: "12px" },
+    panelStyle: { padding: "0px" },
     render: ({ value, onChange, onSave, onClose, dirty }) =>
       React.createElement(TableEditor, { value, onChange, onSave, onClose, dirty }),
   });

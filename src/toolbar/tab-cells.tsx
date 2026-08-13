@@ -1,5 +1,5 @@
 /*!
- * Copyright 2026, Staffbase SE and contributors.
+ * Copyright 2026, MHP Management und IT-Beratung GmbH and contributors.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -68,7 +68,7 @@ export function CellsTab({
         trigger={(toggle) => (
           <button type="button" className="tw-rb__big" data-testid="toolbar-insert" title="Einfügen" onClick={toggle}>
             <IconInsert />
-            <span style={{ display: "inline-flex", alignItems: "center", gap: "2px" }}>Einfügen <IconChevron /></span>
+            <span className="tw-rb__label">Einfügen <IconChevron /></span>
           </button>
         )}
       >
@@ -103,7 +103,7 @@ export function CellsTab({
         trigger={(toggle) => (
           <button type="button" className="tw-rb__big" data-testid="toolbar-delete" title="Löschen" disabled={disabled} onClick={toggle}>
             <IconDelete />
-            <span style={{ display: "inline-flex", alignItems: "center", gap: "2px" }}>Löschen <IconChevron /></span>
+            <span className="tw-rb__label">Löschen <IconChevron /></span>
           </button>
         )}
       >

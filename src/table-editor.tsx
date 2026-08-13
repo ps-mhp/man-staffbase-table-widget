@@ -1,5 +1,5 @@
 /*!
- * Copyright 2026, Staffbase SE and contributors.
+ * Copyright 2026, MHP Management und IT-Beratung GmbH and contributors.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,7 +38,6 @@ import {
 import { updateCell, parsePastedText, pasteBlock } from "./grid-operations";
 import { richTextToPlain, sanitizeRichText } from "./rich-text";
 import {
-  LOWERCASE_MARK_CSS,
   hasLowercaseMark,
   markLowercase,
   selectionOffsets,
@@ -46,6 +45,7 @@ import {
 } from "./lowercase-mark";
 import { formatToStyle, formatToCellStyle } from "./cell-style";
 import { TableToolbar } from "./table-toolbar";
+import { HelpDrawer } from "./toolbar/help-drawer";
 import { importTableFile } from "./table-import";
 import { MediaClient, createMediaClient } from "./media-client";
 import { MediaPicker, PickedImage } from "./media-picker";
@@ -59,8 +59,21 @@ import {
   DEFAULT_IMAGE_WIDTH,
 } from "./cell-image";
 import { MeasureImage, measureImage } from "./image-measure";
-import { IMAGE_FIT_CLASS, IMAGE_FIT_CSS, IMAGE_NO_FIT_CLASS, IMAGE_NO_FIT_CSS } from "./image-fit";
+import { IMAGE_FIT_CLASS, IMAGE_NO_FIT_CLASS } from "./image-fit";
+import imageFitCss from "./styles/image-fit.scss";
+import imageNoFitCss from "./styles/image-no-fit.scss";
 import { ClearScope, clearFormatting } from "./clear-format";
+import lowercaseMarkCss from "./styles/lowercase-mark.scss";
+import tableEditorCss from "./styles/table-editor.scss";
+import { useHotStyle } from "@shared/hot-style";
+
+/**
+ * The widget's own `version` from its `package.json`, injected by
+ * `webpack.DefinePlugin` in `webpack.common.ts`. `release.sh` bumps
+ * `package.json` before building, so the value baked in here is always the
+ * version the resulting bundle gets tagged and released under.
+ */
+declare const __WIDGET_VERSION__: string;
 
 export interface TableEditorProps {
   value: TableModel;
@@ -84,82 +97,11 @@ export interface TableEditorProps {
 }
 
 /**
- * Column layout so the toolbar keeps a fixed spot at the top and only the
- * grid below it scrolls — with a long table the controls stay reachable
- * instead of scrolling out of view. Needs a parent that hands down a height
- * (the injected modal does); where it doesn't, `height: 100%` resolves to
- * auto and the editor simply grows with its content as before.
+ * Class names of `styles/table-editor.scss`. Collected here so a rename shows
+ * up as a compile error rather than as silently unstyled markup.
  */
-const editorRootStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  flex: "1 1 auto",
-  height: "100%",
-  minHeight: 0,
-  maxWidth: "100%",
-};
-
-const cellBoxStyle: React.CSSProperties = {
-  border: "1px solid #d5d9dd",
-  padding: "0",
-  position: "relative",
-  minWidth: "70px",
-};
-
-const headerCellBoxStyle: React.CSSProperties = {
-  ...cellBoxStyle,
-  background: "#f5f6f7",
-};
-
-const selectedCellStyle: React.CSSProperties = {
-  boxShadow: "inset 0 0 0 2px #0074d9",
-  background: "#eaf4ff",
-};
-
-const editableStyle: React.CSSProperties = {
-  minWidth: "70px",
-  minHeight: "20px",
-  boxSizing: "border-box",
-  padding: "6px 8px",
-  outline: "none",
-  font: "inherit",
-  whiteSpace: "pre-wrap",
-};
-
-const handleStyle: React.CSSProperties = {
-  background: "#eceff2",
-  border: "1px solid #d5d9dd",
-  cursor: "pointer",
-  padding: "2px 6px",
-  fontSize: "11px",
-  color: "#5b6470",
-  textAlign: "center",
-  userSelect: "none",
-};
-
-const menuContentStyle: React.CSSProperties = {
-  minWidth: "220px",
-  background: "#fff",
-  borderRadius: "6px",
-  padding: "4px",
-  boxShadow: "0 2px 12px rgba(0,0,0,0.2)",
-  fontSize: "13px",
-  zIndex: 2000,
-};
-
-const menuItemStyle: React.CSSProperties = {
-  padding: "6px 10px",
-  borderRadius: "4px",
-  cursor: "pointer",
-  outline: "none",
-  userSelect: "none",
-};
-
-const separatorStyle: React.CSSProperties = {
-  height: "1px",
-  background: "#e5e8ec",
-  margin: "4px 0",
-};
+const CELL = "table-editor__cell";
+const MENU_ITEM = "table-editor__menu-item";
 
 const cellsInRange = (range: CellRange): Array<[number, number]> => {
   const cells: Array<[number, number]> = [];
@@ -315,14 +257,15 @@ function EditableCell({
   })();
 
   return (
-    <div ref={containerRef} style={{ position: "relative" }}>
+    <div ref={containerRef} className="table-editor__cell-box">
       <div
         ref={ref}
         role="textbox"
         contentEditable={editing}
         suppressContentEditableWarning
         aria-label={ariaLabel}
-        style={{ ...editableStyle, ...format, cursor: editing ? "text" : "default" }}
+        className={`table-editor__editable${editing ? " table-editor__editable--editing" : ""}`}
+        style={format}
         onPaste={onPaste}
         onBlur={onStopEdit}
         onInput={() => onInput(sanitizeRichText(ref.current?.innerHTML ?? ""))}
@@ -336,19 +279,9 @@ function EditableCell({
           data-testid="image-resize-handle"
           aria-label="Bildgröße ändern"
           onMouseDown={startResize}
-          style={{
-            position: "absolute",
-            left: handlePos.left - 6,
-            top: handlePos.top - 6,
-            width: "12px",
-            height: "12px",
-            background: "#0074d9",
-            border: "2px solid #fff",
-            borderRadius: "2px",
-            boxShadow: "0 0 0 1px rgba(0,0,0,0.25)",
-            cursor: "nwse-resize",
-            zIndex: 5,
-          }}
+          className="table-editor__image-handle"
+          // Follows the image it belongs to, so its position is data, not style.
+          style={{ left: handlePos.left - 6, top: handlePos.top - 6 }}
         />
       )}
     </div>
@@ -371,7 +304,7 @@ function MenuItem({
     <ContextMenu.Item
       disabled={disabled}
       data-testid={testId}
-      style={{ ...menuItemStyle, opacity: disabled ? 0.4 : 1 }}
+      className={`${MENU_ITEM}${disabled ? ` ${MENU_ITEM}--disabled` : ""}`}
       onSelect={onSelect}
     >
       {children}
@@ -399,6 +332,10 @@ export const TableEditor = ({
   mediaClient,
   measure = measureImage,
 }: TableEditorProps): ReactElement => {
+  const hotTableEditorCss = useHotStyle(tableEditorCss, "table-widget", "styles/table-editor.scss");
+  const hotLowercaseMarkCss = useHotStyle(lowercaseMarkCss, "table-widget", "styles/lowercase-mark.scss");
+  const hotImageFitCss = useHotStyle(imageFitCss, "table-widget", "styles/image-fit.scss");
+  const hotImageNoFitCss = useHotStyle(imageNoFitCss, "table-widget", "styles/image-no-fit.scss");
   const data = value.data;
   const rowCount = data.length;
   const colCount = data[0]?.length ?? 0;
@@ -419,6 +356,7 @@ export const TableEditor = ({
   const isDragging = useRef(false);
   // The cell an inserted/pasted/uploaded image lands in, and picker visibility.
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const imageTarget = useRef<[number, number] | null>(null);
   const [copiedPattern, setCopiedPattern] = useState<{
     rows: number;
@@ -873,8 +811,11 @@ export const TableEditor = ({
     );
 
   return (
-    <div className="table-editor" data-testid="table-editor" style={editorRootStyle}>
-      <style>{LOWERCASE_MARK_CSS}</style>
+    <div className="table-editor" data-testid="table-editor">
+      {/* The editor carries its own stylesheet rather than writing to
+          `document.head`: it is mounted into someone else's dialog and should
+          leave nothing behind when it goes. */}
+      <style>{`${hotTableEditorCss}\n${hotLowercaseMarkCss}`}</style>
       <TableToolbar
         hasSelection={selection !== null}
         activeFormat={anchorFormat}
@@ -922,51 +863,34 @@ export const TableEditor = ({
         onSave={onSave}
         onClose={onClose}
         dirty={dirty}
+        onOpenHelp={() => setHelpOpen(true)}
       />
 
+      {/* Bounds the help drawer to the grid: it slides in over this box and
+          nothing above it, so the wrapper only needs `position: relative`
+          around the grid's own container-query box. */}
+      <div className="table-editor__grid-area">
       {/* The container query box has to be a separate, stretched element.
           `container-type: inline-size` contains the inline axis, so the box's
           own width can no longer be derived from its contents — putting it on
           the shrink-to-fit frame below collapsed that frame to zero width. */}
       <div
         className={`table-editor__fit-scope ${value.fitImages ? IMAGE_FIT_CLASS : IMAGE_NO_FIT_CLASS}`}
-        style={{
-          flex: "1 1 auto",
-          minHeight: 0,
-          display: "flex",
-          flexDirection: "column",
-          containerType: "inline-size",
-        }}
       >
-        {value.fitImages ? <style>{IMAGE_FIT_CSS}</style> : <style>{IMAGE_NO_FIT_CSS}</style>}
+        {value.fitImages ? <style>{hotImageFitCss}</style> : <style>{hotImageNoFitCss}</style>}
         <ContextMenu.Root>
         <ContextMenu.Trigger asChild>
           <div
             className="table-editor__grid-wrap"
             data-testid="table-editor-grid-wrap"
             onMouseUp={handleCellMouseUp}
-            style={{
-              // The only scrolling area of the editor. It fills the width it
-              // is given — inside the config modal that is the full panel —
-              // and a narrower table simply leaves space to its right.
-              flex: "1 1 auto",
-              minHeight: 0,
-              maxWidth: "100%",
-              overflow: "auto",
-              border: "1px solid #d9dee3",
-              // Sits flush under the toolbar: the shared edge stays straight,
-              // only the free corners at the bottom are rounded.
-              borderRadius: "0 0 8px 8px",
-              boxShadow: "0 1px 3px rgba(16, 24, 40, 0.06)",
-              background: "#fff",
-            }}
           >
-            <table style={{ borderCollapse: "collapse" }} data-testid="table-editor-grid">
+            <table className="table-editor__grid" data-testid="table-editor-grid">
             <thead>
               <tr>
-                <th style={handleStyle} data-testid="select-all" onClick={selectAll} aria-label="Alles auswählen" />
+                <th className="table-editor__handle __selectAll" data-testid="select-all" onClick={selectAll} aria-label="Alles auswählen" />
                 {Array.from({ length: colCount }, (_, col) => (
-                  <th key={col} style={handleStyle} data-testid={`col-handle-${col}`} aria-label={`Spalte ${col + 1} auswählen`} onClick={() => selectColumn(col)}>
+                  <th key={col} className="table-editor__handle" data-testid={`col-handle-${col}`} aria-label={`Spalte ${col + 1} auswählen`} onClick={() => selectColumn(col)}>
                     ▽
                   </th>
                 ))}
@@ -975,7 +899,7 @@ export const TableEditor = ({
             <tbody>
               {data.map((row, rowIndex) => (
                 <tr key={rowIndex}>
-                  <th style={handleStyle} data-testid={`row-handle-${rowIndex}`} aria-label={`Zeile ${rowIndex + 1} auswählen`} onClick={() => selectRow(rowIndex)}>
+                  <th className="table-editor__handle" data-testid={`row-handle-${rowIndex}`} aria-label={`Zeile ${rowIndex + 1} auswählen`} onClick={() => selectRow(rowIndex)}>
                     ▷
                   </th>
                   {row.map((cell, colIndex) => {
@@ -987,11 +911,14 @@ export const TableEditor = ({
                         key={colIndex}
                         colSpan={merge && merge.colSpan > 1 ? merge.colSpan : undefined}
                         rowSpan={merge && merge.rowSpan > 1 ? merge.rowSpan : undefined}
-                        style={{
-                          ...(isHeader ? headerCellBoxStyle : cellBoxStyle),
-                          ...formatToCellStyle(cellFormat(value, rowIndex, colIndex)),
-                          ...(isSelected(rowIndex, colIndex) ? selectedCellStyle : {}),
-                        }}
+                        className={[
+                          CELL,
+                          isHeader ? `${CELL}--head` : "",
+                          isSelected(rowIndex, colIndex) ? `${CELL}--selected` : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
+                        style={formatToCellStyle(cellFormat(value, rowIndex, colIndex))}
                         onMouseDown={(e) => handleCellMouseDown(e, rowIndex, colIndex)}
                         onMouseEnter={() => handleCellMouseEnter(rowIndex, colIndex)}
                         onDoubleClick={() => handleCellDoubleClick(rowIndex, colIndex)}
@@ -1017,33 +944,33 @@ export const TableEditor = ({
         </ContextMenu.Trigger>
 
         <ContextMenu.Portal>
-          <ContextMenu.Content style={menuContentStyle} data-testid="table-editor-menu">
+          <ContextMenu.Content className="table-editor__menu" data-testid="table-editor-menu">
             <MenuItem testId="insert-row-above" onSelect={insertRowAbove} disabled={selection === null}>Zeile oberhalb einfügen</MenuItem>
             <MenuItem testId="insert-row-below" onSelect={insertRowBelow} disabled={selection === null}>Zeile unterhalb einfügen</MenuItem>
             <MenuItem testId="insert-col-left" onSelect={insertColLeft} disabled={selection === null}>Spalte links einfügen</MenuItem>
             <MenuItem testId="insert-col-right" onSelect={insertColRight} disabled={selection === null}>Spalte rechts einfügen</MenuItem>
-            <ContextMenu.Separator style={separatorStyle} />
+            <ContextMenu.Separator className="table-editor__menu-separator" />
             <MenuItem testId="delete-rows" onSelect={doDeleteRows} disabled={selection === null}>Zeile(n) löschen</MenuItem>
             <MenuItem testId="delete-cols" onSelect={doDeleteCols} disabled={selection === null}>Spalte(n) löschen</MenuItem>
-            <ContextMenu.Separator style={separatorStyle} />
+            <ContextMenu.Separator className="table-editor__menu-separator" />
             <MenuItem testId="merge-cells" onSelect={doMerge} disabled={selection === null}>Zellen verbinden</MenuItem>
             <MenuItem testId="unmerge-cells" onSelect={doUnmerge} disabled={selection === null}>Verbindung aufheben</MenuItem>
-            <ContextMenu.Separator style={separatorStyle} />
+            <ContextMenu.Separator className="table-editor__menu-separator" />
             <MenuItem testId="insert-image" onSelect={openImagePicker} disabled={selection === null}>Bild einfügen…</MenuItem>
-            <ContextMenu.Separator style={separatorStyle} />
+            <ContextMenu.Separator className="table-editor__menu-separator" />
             <ContextMenu.Sub>
-              <ContextMenu.SubTrigger style={menuItemStyle} data-testid="text-options">Textoptionen ▸</ContextMenu.SubTrigger>
+              <ContextMenu.SubTrigger className="table-editor__menu-item" data-testid="text-options">Textoptionen ▸</ContextMenu.SubTrigger>
               <ContextMenu.Portal>
-                <ContextMenu.SubContent style={menuContentStyle}>
+                <ContextMenu.SubContent className="table-editor__menu">
                   <MenuItem testId="fmt-bold" onSelect={() => toggleKey("bold")}>Fett</MenuItem>
                   <MenuItem testId="fmt-italic" onSelect={() => toggleKey("italic")}>Kursiv</MenuItem>
                   <MenuItem testId="fmt-underline" onSelect={() => toggleKey("underline")}>Unterstrichen</MenuItem>
                   <MenuItem testId="fmt-strike" onSelect={() => toggleKey("strikethrough")}>Durchgestrichen</MenuItem>
-                  <ContextMenu.Separator style={separatorStyle} />
+                  <ContextMenu.Separator className="table-editor__menu-separator" />
                   <MenuItem testId="align-left" onSelect={() => applyFormat({ align: "left" })}>Linksbündig</MenuItem>
                   <MenuItem testId="align-center" onSelect={() => applyFormat({ align: "center" })}>Zentriert</MenuItem>
                   <MenuItem testId="align-right" onSelect={() => applyFormat({ align: "right" })}>Rechtsbündig</MenuItem>
-                  <ContextMenu.Separator style={separatorStyle} />
+                  <ContextMenu.Separator className="table-editor__menu-separator" />
                   <MenuItem testId="valign-top" onSelect={() => applyFormat({ valign: "top" })}>Oben ausrichten</MenuItem>
                   <MenuItem testId="valign-middle" onSelect={() => applyFormat({ valign: "middle" })}>Mittig ausrichten</MenuItem>
                   <MenuItem testId="valign-bottom" onSelect={() => applyFormat({ valign: "bottom" })}>Unten ausrichten</MenuItem>
@@ -1051,9 +978,9 @@ export const TableEditor = ({
               </ContextMenu.Portal>
             </ContextMenu.Sub>
             <ContextMenu.Sub>
-              <ContextMenu.SubTrigger style={menuItemStyle} data-testid="sort-options">Sortierung ▸</ContextMenu.SubTrigger>
+              <ContextMenu.SubTrigger className="table-editor__menu-item" data-testid="sort-options">Sortierung ▸</ContextMenu.SubTrigger>
               <ContextMenu.Portal>
-                <ContextMenu.SubContent style={menuContentStyle}>
+                <ContextMenu.SubContent className="table-editor__menu">
                   <MenuItem testId="sort-asc" onSelect={doSort("asc")} disabled={selection === null}>Aufsteigend (diese Spalte)</MenuItem>
                   <MenuItem testId="sort-desc" onSelect={doSort("desc")} disabled={selection === null}>Absteigend (diese Spalte)</MenuItem>
                   <MenuItem testId="sort-clear" onSelect={clearSort}>Sortierung entfernen</MenuItem>
@@ -1063,6 +990,15 @@ export const TableEditor = ({
           </ContextMenu.Content>
         </ContextMenu.Portal>
       </ContextMenu.Root>
+      </div>
+
+      <HelpDrawer open={helpOpen} onClose={() => setHelpOpen(false)} />
+      </div>
+
+      <div className="table-editor__footer-area">
+        <div className="table-editor__footer-item table-editor__footer-item--version">
+          v{__WIDGET_VERSION__}
+        </div>
       </div>
 
       {pickerOpen && (

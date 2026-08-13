@@ -1,0 +1,26 @@
+// Copyright 2026, MHP Management und IT-Beratung GmbH and contributors.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//     http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// Reine Editor-Hilfe: markierter Text bekommt eine orange Wellenlinie, so wie
+// eine Rechtschreibprüfung ein Wort anstreicht. Das veröffentlichte Widget gibt
+// nur die Klasse aus und zeichnet nichts — die Großschreibungsregel, die hier
+// aufgehoben wird, gehört der Wirtsseite.
+//
+// Die Klasse ist `LOWERCASE_CLASS` aus `rich-text.ts`; ein Test hält beide
+// Seiten deckungsgleich.
+
+@use "tokens" as *;
+
+.table-editor .text-lowercase {
+  text-transform: none;
+  text-decoration: underline wavy $mark-lowercase;
+  text-decoration-skip-ink: none;
+}

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2026, Staffbase SE and contributors.
+ * Copyright 2026, MHP Management und IT-Beratung GmbH and contributors.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,6 +36,14 @@ export const IconSave = (): ReactElement => (
 export const IconClose = (): ReactElement => (
   <svg {...svgBase} aria-hidden>
     <path d="M4 4l8 8M12 4l-8 8" />
+  </svg>
+);
+
+export const IconHelp = (): ReactElement => (
+  <svg {...svgBase} aria-hidden>
+    <circle cx="8" cy="8" r="6.3" />
+    <path d="M6 6.2c.2-1 1-1.6 2-1.6 1.1 0 2 .7 2 1.7 0 .9-.6 1.3-1.4 1.8-.6.4-.9.7-.9 1.4" />
+    <circle cx="7.8" cy="11.4" r="0.15" fill="currentColor" stroke="none" />
   </svg>
 );
 

@@ -1,0 +1,61 @@
+// Copyright 2026, MHP Management und IT-Beratung GmbH and contributors.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//     http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// Die Deckelung, die eingebettete Bilder das Tabellenlayout nicht sprengen
+// lässt. Sie steht rein in CSS, damit die gespeicherte Bildbreite unangetastet
+// bleibt und die Option abgeschaltet werden kann, ohne etwas zu verlieren.
+//
+// Gemessen wird bewusst der **Container der Tabelle**, nicht die Zelle: eine
+// prozentuale `max-width` auf einer Zelle löst gegen eine Breite auf, die das
+// automatische Tabellenlayout aus dem Inhalt ableitet; Browser brechen diesen
+// Zirkel, indem sie das Bild schrumpfen — genau das ließ ein Bild in einer
+// Spalte ohne Kopfzelle zusammenfallen. Container-Query-Einheiten (`cqw`) lösen
+// gegen den Scroll-Wrapper auf, der eine eigene Breite hat.
+//
+// Die Stufen entsprechen `IMAGE_FIT_STEPS` in `image-fit.ts`; dort stehen sie
+// als Zahlen für Aufrufer, die rechnen statt zeichnen. Ein Test hält beide
+// Seiten deckungsgleich.
+
+@use "sass:map";
+@use "image-scope" as *;
+
+// Deckel unterhalb der ersten Schwelle. Er ist die Grundregel und keine Stufe,
+// weil eine Container-Query nur nach einer *Mindest*breite fragen kann.
+$base-max-width: 160px;
+
+// Container-Breite -> größte gerenderte Bildbreite. Jeder Deckel ist etwa halb
+// so groß wie sein Container: ein Bild darf seine Spalte beherrschen, nie aber
+// die ganze Zeile — so bleibt Platz für die übrigen Spalten.
+$steps: (
+  480px: 240px,
+  640px: 320px,
+  1024px: 480px,
+  1280px: 640px,
+);
+
+// `min()` fasst beide Regeln zusammen — nie breiter als der Container und nie
+// breiter als die Stufe —, sodass die Container-Queries nur noch den
+// Pixelanteil senken müssen.
+//
+// `height: auto` ist es, was die Deckelung das Seitenverhältnis wahren lässt:
+// das Markup speichert nur eine Breite, die Höhe folgt daraus.
+@include image-scope($fit-class) {
+  max-width: min(100cqw, $base-max-width) !important;
+  height: auto;
+}
+
+@each $from, $max-width in $steps {
+  @container (min-width: #{$from}) {
+    @include image-scope($fit-class) {
+      max-width: min(100cqw, $max-width) !important;
+    }
+  }
+}

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2026, Staffbase SE and contributors.
+ * Copyright 2026, MHP Management und IT-Beratung GmbH and contributors.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,9 @@
 
 /**
  * The optional cap that keeps inline images from blowing up the table's
- * layout, expressed purely in CSS so the stored image width stays untouched
- * and the option can be switched off without losing anything.
+ * layout. The rules themselves live in `styles/image-fit.scss` and
+ * `styles/image-no-fit.scss`; what remains here are the class names and the
+ * numbers, for callers that need the cap as a value rather than as a rule.
  *
  * The cap deliberately measures the **table's own container**, not the cell:
  * a percentage `max-width` on a cell resolves against a width that auto table
@@ -22,15 +23,6 @@
  * shrinking the image — which is what made an image in a header-less column
  * collapse. Container query units (`cqw`) resolve against the scroll wrapper,
  * which has a width of its own, so no such cycle exists.
- *
- * Both rule sets have to win against the host page. Staffbase ships article
- * styles like `.content img { max-width: 100% }`, which have the same
- * specificity as a single class of ours and are loaded after the widget, so
- * they would otherwise take over — and being a percentage, they reintroduce
- * exactly the cell-derived shrinking described above: two identical images
- * end up different sizes because their columns hold different amounts of
- * text. The selectors therefore repeat the class (raising specificity
- * without inventing markup) and mark `max-width` as `!important`.
  */
 
 /**
@@ -82,29 +74,6 @@ export const IMAGE_FIT_CLASS = "tw-fit-images";
  * option is supposed to turn off.
  */
 export const IMAGE_NO_FIT_CLASS = "tw-unfit-images";
-
-/** Repeated class, so a single-class host rule cannot outrank ours. */
-const scope = (className: string): string => `.${className}.${className} img`;
-
-/**
- * Scoped stylesheet implementing the cap. `min()` combines the two rules —
- * never wider than the container, and never wider than the step — so a single
- * declaration covers both; the container queries then only have to lower the
- * pixel half of it.
- *
- * `height:auto` is what makes the width cap keep the aspect ratio: the
- * markup only ever stores a width, so the height follows.
- */
-export const IMAGE_FIT_CSS = [
-  `${scope(IMAGE_FIT_CLASS)} { max-width: min(100cqw, ${IMAGE_FIT_BASE_MAX_WIDTH}px) !important; height: auto; }`,
-  ...IMAGE_FIT_STEPS.map(
-    ({ from, maxWidth }) =>
-      `@container (min-width: ${from}px) { ${scope(IMAGE_FIT_CLASS)} { max-width: min(100cqw, ${maxWidth}px) !important; } }`,
-  ),
-].join("\n");
-
-/** Stylesheet for the option switched off: render at the stored size. */
-export const IMAGE_NO_FIT_CSS = `${scope(IMAGE_NO_FIT_CLASS)} { max-width: none !important; height: auto; }`;
 
 /**
  * The cap that applies at a given container width — the same value the

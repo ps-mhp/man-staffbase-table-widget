@@ -29,6 +29,13 @@ scripts/sync.sh table-widget
 
 Der Quellcode liegt danach unter `src/widgets/table-widget/`.
 
+Die Styles stehen als SCSS unter `src/styles/`: `tokens`/`mixins` als gemeinsame
+Grundlage, dazu je ein Stylesheet für Werkzeugleiste (`ribbon`), Editor
+(`table-editor`), veröffentlichte Tabelle (`table-widget`), Medienauswahl
+(`media-picker`), Bilddeckelung (`image-fit`/`image-no-fit`) und die
+Kleinschreibungs-Markierung (`lowercase-mark`). Jede Komponente importiert ihr
+Stylesheet als String und rendert es selbst als `<style>`.
+
 ```bash
 npm run build -- --env widget=table-widget
 npm test -- src/widgets/table-widget

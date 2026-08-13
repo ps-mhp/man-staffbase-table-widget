@@ -502,9 +502,13 @@ describe("TableEditor", () => {
 
       const scope = container.querySelector<HTMLElement>(".table-editor__fit-scope");
       const frame = container.querySelector<HTMLElement>(".table-editor__grid-wrap");
+      const css = container.querySelector("style")?.textContent ?? "";
 
-      expect(scope?.style.containerType).toBe("inline-size");
-      expect(frame?.style.containerType).toBe("");
+      // The rule lives in the stylesheet, so the check reads it there: exactly
+      // one selector declares the containment, and it is the scope's.
+      expect(css).toMatch(/\.table-editor__fit-scope\s*\{[^}]*container-type:\s*inline-size/);
+      expect(css.match(/container-type/g)).toHaveLength(1);
+      expect(frame?.className).not.toContain("fit-scope");
       expect(scope?.contains(frame)).toBe(true);
     });
 

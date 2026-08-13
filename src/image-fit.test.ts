@@ -1,5 +1,5 @@
 /*!
- * Copyright 2026, Staffbase SE and contributors.
+ * Copyright 2026, MHP Management und IT-Beratung GmbH and contributors.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,12 +14,14 @@
 import {
   IMAGE_FIT_BASE_MAX_WIDTH,
   IMAGE_FIT_CLASS,
-  IMAGE_FIT_CSS,
   IMAGE_FIT_STEPS,
   IMAGE_NO_FIT_CLASS,
-  IMAGE_NO_FIT_CSS,
   imageFitMaxWidth,
 } from "./image-fit";
+// Die kompilierten Stylesheets, nicht ein Stub: die Zusicherungen unten halten
+// die Zahlen in `styles/image-fit.scss` und die hier exportierten deckungsgleich.
+import IMAGE_FIT_CSS from "./styles/image-fit.scss";
+import IMAGE_NO_FIT_CSS from "./styles/image-no-fit.scss";
 
 describe("imageFitMaxWidth", () => {
   it("caps below the first breakpoint too", () => {
@@ -70,7 +72,7 @@ describe("imageFitMaxWidth", () => {
   });
 });
 
-describe("IMAGE_FIT_CSS", () => {
+describe("image-fit.scss", () => {
   it("scopes every rule to the fit class", () => {
     const selectors = IMAGE_FIT_CSS.match(/\.[a-z.-]+ img/g) ?? [];
     expect(selectors.length).toBeGreaterThan(0);
@@ -106,7 +108,7 @@ describe("IMAGE_FIT_CSS", () => {
   });
 });
 
-describe("IMAGE_NO_FIT_CSS", () => {
+describe("image-no-fit.scss", () => {
   it("lifts any cap the host page would impose", () => {
     expect(IMAGE_NO_FIT_CSS).toContain(`.${IMAGE_NO_FIT_CLASS}.${IMAGE_NO_FIT_CLASS} img`);
     expect(IMAGE_NO_FIT_CSS).toContain("max-width: none !important");

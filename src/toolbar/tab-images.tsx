@@ -1,5 +1,5 @@
 /*!
- * Copyright 2026, Staffbase SE and contributors.
+ * Copyright 2026, MHP Management und IT-Beratung GmbH and contributors.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -47,7 +47,7 @@ export function ImagesTab({
 
   return (
     <>
-      <button type="button" className="tw-rb__big" data-testid="toolbar-image-button" title="Bild in Zelle einfügen" disabled={disabled} onClick={onInsertImage}>
+      <button type="button" className="tw-rb__btn" data-testid="toolbar-image-button" title="Bild in Zelle einfügen" disabled={disabled} onClick={onInsertImage}>
         <IconImage />
         <span>Bild</span>
       </button>
@@ -58,14 +58,14 @@ export function ImagesTab({
         trigger={(toggle) => (
           <button
             type="button"
-            className="tw-rb__big"
+            className="tw-rb__btn"
             data-testid="toolbar-image-size"
             title="Größe der markierten Bilder angleichen (Maßstab ist das zuerst markierte Bild)"
             disabled={!hasSelectedImages}
             onClick={toggle}
           >
             <IconImageSize />
-            <span style={{ display: "inline-flex", alignItems: "center", gap: "2px" }}>Bildgröße <IconChevron /></span>
+            <span className="tw-rb__label">Bildgröße <IconChevron /></span>
           </button>
         )}
       >
