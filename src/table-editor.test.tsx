@@ -58,6 +58,39 @@ const openMenuOnCell = (label: string): HTMLElement => {
   return screen.getByTestId("table-editor-menu");
 };
 
+const TOOLBAR_TAB: Record<string, string> = {
+  "toolbar-fontsize": "Schrift",
+  "toolbar-bold": "Schrift",
+  "toolbar-bg": "Schrift",
+  "toolbar-lowercase": "Schrift",
+  "toolbar-valign-bottom": "Ausrichtung",
+  "toolbar-unmerge": "Zellen",
+  "toolbar-insert": "Zellen",
+  "toolbar-insert-menu": "Zellen",
+  "toolbar-insert-row-above": "Zellen",
+  "toolbar-insert-col-left": "Zellen",
+  "toolbar-image-button": "Bilder",
+  "toolbar-image-size": "Bilder",
+  "toolbar-image-equal-height": "Bilder",
+  "toolbar-image-equal-width": "Bilder",
+  "toolbar-image-reset-size": "Bilder",
+  "toolbar-image-fit": "Bilder",
+  "toolbar-painter": "Daten",
+  "toolbar-visible-rows": "Daten",
+  "toolbar-upload": "Daten",
+  "toolbar-clear-format": "Daten",
+  "toolbar-clear-format-all": "Daten",
+  "toolbar-clear-format-text": "Daten",
+  "toolbar-clear-format-images": "Daten",
+};
+
+/** Opens the tab holding `testId` (if any) and returns the control. */
+function toolbar(testId: string): HTMLElement {
+  const label = TOOLBAR_TAB[testId];
+  if (label) fireEvent.click(screen.getByRole("tab", { name: label }));
+  return screen.getByTestId(testId);
+}
+
 describe("TableEditor", () => {
   it("renders an editable cell for every value", () => {
     render(<TableEditor value={sample()} onChange={jest.fn()} />);
@@ -132,9 +165,9 @@ describe("TableEditor", () => {
 
   it("toolbar controls are disabled until a cell is selected", () => {
     render(<TableEditor value={sample()} onChange={jest.fn()} />);
-    expect(screen.getByTestId("toolbar-bold")).toBeDisabled();
+    expect(toolbar("toolbar-bold")).toBeDisabled();
     fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
-    expect(screen.getByTestId("toolbar-bold")).not.toBeDisabled();
+    expect(toolbar("toolbar-bold")).not.toBeDisabled();
   });
 
   it("reflects a cell's formatting visually in the editor", () => {
@@ -162,7 +195,7 @@ describe("TableEditor", () => {
     const onChange = jest.fn();
     render(<TableEditor value={sample()} onChange={onChange} />);
     fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
-    fireEvent.click(screen.getByTestId("toolbar-valign-bottom"));
+    fireEvent.click(toolbar("toolbar-valign-bottom"));
     const arg = onChange.mock.calls[0][0] as TableModel;
     expect(arg.formats["1,1"]).toEqual({ valign: "bottom" });
   });
@@ -183,18 +216,18 @@ describe("TableEditor", () => {
 
     // A plain header cell without a merge -> unmerge disabled.
     fireEvent.mouseDown(cellTd("Zeile 1, Spalte 2"));
-    expect(screen.getByTestId("toolbar-unmerge")).toBeDisabled();
+    expect(toolbar("toolbar-unmerge")).toBeDisabled();
 
     // The merged cell -> unmerge enabled.
     fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
-    expect(screen.getByTestId("toolbar-unmerge")).not.toBeDisabled();
+    expect(toolbar("toolbar-unmerge")).not.toBeDisabled();
   });
 
   it("applies bold via the toolbar to the selection", () => {
     const onChange = jest.fn();
     render(<TableEditor value={sample()} onChange={onChange} />);
     fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
-    fireEvent.click(screen.getByTestId("toolbar-bold"));
+    fireEvent.click(toolbar("toolbar-bold"));
     const arg = onChange.mock.calls[0][0] as TableModel;
     expect(arg.formats["1,1"]).toEqual({ bold: true });
   });
@@ -203,7 +236,7 @@ describe("TableEditor", () => {
     const onChange = jest.fn();
     render(<TableEditor value={sample()} onChange={onChange} />);
     fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
-    fireEvent.change(screen.getByTestId("toolbar-bg"), { target: { value: "#ffff00" } });
+    fireEvent.change(toolbar("toolbar-bg"), { target: { value: "#ffff00" } });
     const arg = onChange.mock.calls[0][0] as TableModel;
     expect(arg.formats["1,1"]).toEqual({ background: "#ffff00" });
   });
@@ -212,7 +245,7 @@ describe("TableEditor", () => {
     const onChange = jest.fn();
     render(<TableEditor value={sample()} onChange={onChange} />);
     fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
-    fireEvent.change(screen.getByTestId("toolbar-fontsize"), { target: { value: "20" } });
+    fireEvent.change(toolbar("toolbar-fontsize"), { target: { value: "20" } });
     const arg = onChange.mock.calls[0][0] as TableModel;
     expect(arg.formats["1,1"]).toEqual({ fontSize: 20 });
   });
@@ -220,22 +253,22 @@ describe("TableEditor", () => {
   it("shows contextual insert (only column) when a full column is selected", () => {
     render(<TableEditor value={sample()} onChange={jest.fn()} />);
     fireEvent.click(screen.getByTestId("col-handle-1"));
-    fireEvent.click(screen.getByTestId("toolbar-insert"));
-    expect(screen.getByTestId("toolbar-insert-col-left")).toBeInTheDocument();
+    fireEvent.click(toolbar("toolbar-insert"));
+    expect(toolbar("toolbar-insert-col-left")).toBeInTheDocument();
     expect(screen.queryByTestId("toolbar-insert-row-above")).not.toBeInTheDocument();
   });
 
   it("shows both insert options when nothing is selected", () => {
     render(<TableEditor value={sample()} onChange={jest.fn()} />);
-    fireEvent.click(screen.getByTestId("toolbar-insert"));
-    expect(screen.getByTestId("toolbar-insert-row-above")).toBeInTheDocument();
-    expect(screen.getByTestId("toolbar-insert-col-left")).toBeInTheDocument();
+    fireEvent.click(toolbar("toolbar-insert"));
+    expect(toolbar("toolbar-insert-row-above")).toBeInTheDocument();
+    expect(toolbar("toolbar-insert-col-left")).toBeInTheDocument();
   });
 
   it("closes a toolbar dropdown when clicking outside it", () => {
     render(<TableEditor value={sample()} onChange={jest.fn()} />);
-    fireEvent.click(screen.getByTestId("toolbar-insert"));
-    expect(screen.getByTestId("toolbar-insert-menu")).toBeInTheDocument();
+    fireEvent.click(toolbar("toolbar-insert"));
+    expect(toolbar("toolbar-insert-menu")).toBeInTheDocument();
 
     // A mousedown anywhere outside the dropdown closes it.
     fireEvent.mouseDown(document.body);
@@ -251,7 +284,7 @@ describe("TableEditor", () => {
     render(<TableEditor value={withFormat} onChange={onChange} />);
     // Select the formatted source cell, arm the painter.
     fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
-    fireEvent.click(screen.getByTestId("toolbar-painter"));
+    fireEvent.click(toolbar("toolbar-painter"));
     // Select a target cell and release -> format is applied.
     const target = cellTd("Zeile 2, Spalte 3");
     fireEvent.mouseDown(target);
@@ -268,7 +301,7 @@ describe("TableEditor", () => {
     render(<TableEditor value={sample()} onChange={onChange} />);
 
     const file = new File(["a,b\n1,2"], "table.csv", { type: "text/csv" });
-    fireEvent.change(screen.getByTestId("toolbar-upload"), { target: { files: [file] } });
+    fireEvent.change(toolbar("toolbar-upload"), { target: { files: [file] } });
 
     await waitFor(() => expect(onChange).toHaveBeenCalled());
     const arg = onChange.mock.calls.at(-1)![0] as TableModel;
@@ -291,7 +324,7 @@ describe("TableEditor", () => {
       const client = stubMediaClient();
       render(<TableEditor value={sample()} onChange={jest.fn()} mediaClient={client} />);
       fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
-      fireEvent.click(screen.getByTestId("toolbar-image-button"));
+      fireEvent.click(toolbar("toolbar-image-button"));
       expect(screen.getByTestId("media-picker")).toBeInTheDocument();
     });
 
@@ -301,7 +334,7 @@ describe("TableEditor", () => {
       render(<TableEditor value={sample()} onChange={onChange} mediaClient={client} />);
 
       fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
-      fireEvent.click(screen.getByTestId("toolbar-image-button"));
+      fireEvent.click(toolbar("toolbar-image-button"));
       fireEvent.click(await screen.findByTestId("media-picker-item-a"));
 
       await waitFor(() => expect(onChange).toHaveBeenCalled());
@@ -418,7 +451,7 @@ describe("TableEditor", () => {
       render(<TableEditor value={withImages()} onChange={onChange} measure={measure} />);
       fireEvent.mouseDown(cellTd("Zeile 1, Spalte 2"));
       addToSelection("Zeile 2, Spalte 3");
-      fireEvent.click(screen.getByTestId("toolbar-bold"));
+      fireEvent.click(toolbar("toolbar-bold"));
 
       const arg = onChange.mock.calls.at(-1)![0] as TableModel;
       expect(arg.formats["0,1"]).toEqual({ bold: true });
@@ -427,13 +460,13 @@ describe("TableEditor", () => {
 
     it("enables the image size button as soon as one image is selected", () => {
       render(<TableEditor value={withImages()} onChange={jest.fn()} measure={measure} />);
-      expect(screen.getByTestId("toolbar-image-size")).toBeDisabled();
+      expect(toolbar("toolbar-image-size")).toBeDisabled();
 
       fireEvent.mouseDown(cellTd("Zeile 1, Spalte 2"));
-      expect(screen.getByTestId("toolbar-image-size")).toBeDisabled();
+      expect(toolbar("toolbar-image-size")).toBeDisabled();
 
       fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
-      expect(screen.getByTestId("toolbar-image-size")).not.toBeDisabled();
+      expect(toolbar("toolbar-image-size")).not.toBeDisabled();
     });
 
     it("caps images in the preview while the fit option is on", () => {
@@ -479,7 +512,7 @@ describe("TableEditor", () => {
       const onChange = jest.fn();
       render(<TableEditor value={withImages()} onChange={onChange} measure={measure} />);
 
-      const toggle = screen.getByTestId("toolbar-image-fit");
+      const toggle = toolbar("toolbar-image-fit");
       expect(toggle).toHaveAttribute("aria-checked", "true");
       // Table-wide, so it works without a selection.
       fireEvent.click(toggle);
@@ -499,7 +532,7 @@ describe("TableEditor", () => {
         />,
       );
 
-      const toggle = screen.getByTestId("toolbar-image-fit");
+      const toggle = toolbar("toolbar-image-fit");
       expect(toggle).toHaveAttribute("aria-checked", "false");
       fireEvent.click(toggle);
 
@@ -509,11 +542,11 @@ describe("TableEditor", () => {
     it("offers only the reset option while a single image is selected", () => {
       render(<TableEditor value={withImages()} onChange={jest.fn()} measure={measure} />);
       fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
-      fireEvent.click(screen.getByTestId("toolbar-image-size"));
+      fireEvent.click(toolbar("toolbar-image-size"));
 
-      expect(screen.getByTestId("toolbar-image-equal-height")).toBeDisabled();
-      expect(screen.getByTestId("toolbar-image-equal-width")).toBeDisabled();
-      expect(screen.getByTestId("toolbar-image-reset-size")).not.toBeDisabled();
+      expect(toolbar("toolbar-image-equal-height")).toBeDisabled();
+      expect(toolbar("toolbar-image-equal-width")).toBeDisabled();
+      expect(toolbar("toolbar-image-reset-size")).not.toBeDisabled();
     });
 
     it("scales the other images to the height of the first selected one", async () => {
@@ -522,8 +555,8 @@ describe("TableEditor", () => {
       // "a" first: 300px wide at 2:1 -> 150px high. "b" is 1:1, so 150px wide.
       fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
       addToSelection("Zeile 2, Spalte 3");
-      fireEvent.click(screen.getByTestId("toolbar-image-size"));
-      fireEvent.click(screen.getByTestId("toolbar-image-equal-height"));
+      fireEvent.click(toolbar("toolbar-image-size"));
+      fireEvent.click(toolbar("toolbar-image-equal-height"));
 
       await waitFor(() => expect(onChange).toHaveBeenCalled());
       const arg = onChange.mock.calls.at(-1)![0] as TableModel;
@@ -537,8 +570,8 @@ describe("TableEditor", () => {
       // "b" first (40px wide): every image ends up 40px wide.
       fireEvent.mouseDown(cellTd("Zeile 2, Spalte 3"));
       addToSelection("Zeile 2, Spalte 2");
-      fireEvent.click(screen.getByTestId("toolbar-image-size"));
-      fireEvent.click(screen.getByTestId("toolbar-image-equal-width"));
+      fireEvent.click(toolbar("toolbar-image-size"));
+      fireEvent.click(toolbar("toolbar-image-equal-width"));
 
       await waitFor(() => expect(onChange).toHaveBeenCalled());
       const arg = onChange.mock.calls.at(-1)![0] as TableModel;
@@ -551,8 +584,8 @@ describe("TableEditor", () => {
       render(<TableEditor value={withImages()} onChange={onChange} measure={measure} />);
       fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
       fireEvent.mouseDown(cellTd("Zeile 2, Spalte 3"), { shiftKey: true });
-      fireEvent.click(screen.getByTestId("toolbar-image-size"));
-      fireEvent.click(screen.getByTestId("toolbar-image-equal-width"));
+      fireEvent.click(toolbar("toolbar-image-size"));
+      fireEvent.click(toolbar("toolbar-image-equal-width"));
 
       await waitFor(() => expect(onChange).toHaveBeenCalled());
       const arg = onChange.mock.calls.at(-1)![0] as TableModel;
@@ -565,8 +598,8 @@ describe("TableEditor", () => {
       render(<TableEditor value={withImages()} onChange={onChange} measure={measureSpy} />);
       fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
       addToSelection("Zeile 2, Spalte 3");
-      fireEvent.click(screen.getByTestId("toolbar-image-size"));
-      fireEvent.click(screen.getByTestId("toolbar-image-reset-size"));
+      fireEvent.click(toolbar("toolbar-image-size"));
+      fireEvent.click(toolbar("toolbar-image-reset-size"));
 
       await waitFor(() => expect(onChange).toHaveBeenCalled());
       const arg = onChange.mock.calls.at(-1)![0] as TableModel;
@@ -579,8 +612,8 @@ describe("TableEditor", () => {
       const onChange = jest.fn();
       render(<TableEditor value={withImages()} onChange={onChange} measure={measure} />);
       fireEvent.mouseDown(cellTd("Zeile 2, Spalte 3"));
-      fireEvent.click(screen.getByTestId("toolbar-image-size"));
-      fireEvent.click(screen.getByTestId("toolbar-image-reset-size"));
+      fireEvent.click(toolbar("toolbar-image-size"));
+      fireEvent.click(toolbar("toolbar-image-reset-size"));
 
       await waitFor(() => expect(onChange).toHaveBeenCalled());
       const arg = onChange.mock.calls.at(-1)![0] as TableModel;
@@ -597,8 +630,8 @@ describe("TableEditor", () => {
       );
       fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
       addToSelection("Zeile 2, Spalte 3");
-      fireEvent.click(screen.getByTestId("toolbar-image-size"));
-      fireEvent.click(screen.getByTestId("toolbar-image-equal-height"));
+      fireEvent.click(toolbar("toolbar-image-size"));
+      fireEvent.click(toolbar("toolbar-image-equal-height"));
 
       await waitFor(() => expect(alert).toHaveBeenCalled());
       expect(onChange).not.toHaveBeenCalled();
@@ -619,7 +652,7 @@ describe("TableEditor", () => {
     const clearVia = (testId: string, value: TableModel): jest.Mock => {
       const onChange = jest.fn();
       render(<TableEditor value={value} onChange={onChange} />);
-      fireEvent.click(screen.getByTestId("toolbar-clear-format"));
+      fireEvent.click(toolbar("toolbar-clear-format"));
       fireEvent.click(screen.getByTestId(testId));
       return onChange;
     };
@@ -655,8 +688,8 @@ describe("TableEditor", () => {
       render(<TableEditor value={formatted()} onChange={onChange} />);
 
       fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
-      fireEvent.click(screen.getByTestId("toolbar-clear-format"));
-      fireEvent.click(screen.getByTestId("toolbar-clear-format-all"));
+      fireEvent.click(toolbar("toolbar-clear-format"));
+      fireEvent.click(toolbar("toolbar-clear-format-all"));
 
       const arg = onChange.mock.calls.at(-1)![0] as TableModel;
       expect(arg.formats).toEqual({ "0,1": { bold: true } });
@@ -665,7 +698,7 @@ describe("TableEditor", () => {
 
     it("stays available without a selection", () => {
       render(<TableEditor value={formatted()} onChange={jest.fn()} />);
-      expect(screen.getByTestId("toolbar-clear-format")).not.toBeDisabled();
+      expect(toolbar("toolbar-clear-format")).not.toBeDisabled();
     });
   });
 
@@ -693,14 +726,14 @@ describe("row limit", () => {
       />,
     );
 
-    expect(screen.getByTestId("toolbar-visible-rows")).toHaveValue(3);
+    expect(toolbar("toolbar-visible-rows")).toHaveValue(3);
   });
 
   it("reports a changed limit", () => {
     const onChange = jest.fn();
     render(<TableEditor value={longModel(10)} onChange={onChange} measure={measure} />);
 
-    fireEvent.change(screen.getByTestId("toolbar-visible-rows"), { target: { value: "2" } });
+    fireEvent.change(toolbar("toolbar-visible-rows"), { target: { value: "2" } });
 
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ visibleRows: 2 }));
   });
@@ -710,7 +743,7 @@ describe("row limit", () => {
     const onChange = jest.fn();
     render(<TableEditor value={longModel(10)} onChange={onChange} measure={measure} />);
 
-    fireEvent.change(screen.getByTestId("toolbar-visible-rows"), { target: { value: "" } });
+    fireEvent.change(toolbar("toolbar-visible-rows"), { target: { value: "" } });
 
     expect(onChange).not.toHaveBeenCalled();
   });
@@ -730,6 +763,16 @@ describe("row limit", () => {
     expect(screen.queryByTestId("table-rows-toggle")).toBeNull();
   });
 });
+
+  it("keeps the chosen toolbar tab when the cell selection changes", () => {
+    render(<TableEditor value={sample()} onChange={jest.fn()} />);
+    fireEvent.click(screen.getByRole("tab", { name: "Bilder" }));
+    expect(toolbar("toolbar-image-button")).toBeInTheDocument();
+
+    fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
+    expect(toolbar("toolbar-image-button")).toBeInTheDocument();
+    expect(screen.queryByTestId("toolbar-bold")).not.toBeInTheDocument();
+  });
 
   it("lets the grid frame fill the available width", () => {
     render(<TableEditor value={model([["a"]])} onChange={jest.fn()} />);

@@ -40,16 +40,6 @@ export const RIBBON_CSS = `
   color: #1f2d3a;
   box-sizing: border-box;
 }
-.tw-rb__section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 3px 10px 2px;
-  box-sizing: border-box;
-}
-.tw-rb__section + .tw-rb__section { border-left: 1px solid #e6e9ed; }
-.tw-rb__body { display: flex; align-items: stretch; gap: 4px; flex: 1 1 auto; }
-.tw-rb__label { font-size: 10px; color: #7a838e; margin-top: 4px; line-height: 1; text-align: center; letter-spacing: 0.2px; }
 .tw-rb__rows { display: flex; flex-direction: column; justify-content: center; gap: 4px; align-items: flex-start; }
 .tw-rb__row { display: flex; align-items: stretch; gap: 3px; }
 .tw-rb__btn {
