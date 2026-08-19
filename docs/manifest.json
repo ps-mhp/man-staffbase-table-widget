@@ -1,0 +1,18 @@
+{
+  "title": "Tabelle",
+  "summary": "Bettet eine formatierbare, editierbare Tabelle mit eigenem Grid-Editor in eine Seite ein.",
+  "icon": "📊",
+  "pages": [
+    { "id": "overview", "title": "Übersicht", "file": "overview.md" },
+    { "id": "settings", "title": "Einstellungen", "file": "settings.md" },
+    { "id": "faq", "title": "FAQ", "file": "faq.md" }
+  ],
+  "examples": [
+    {
+      "title": "Einfache Tabelle",
+      "attributes": {
+        "tabledata": "[[\"\",\"Name\",\"Ort\"],[\"1\",\"Anna Kaiser\",\"Berlin\"],[\"2\",\"Ben Vogel\",\"München\"]]"
+      }
+    }
+  ]
+}
