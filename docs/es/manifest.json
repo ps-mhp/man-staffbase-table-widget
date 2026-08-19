@@ -1,7 +1,6 @@
 {
   "title": "Tabla",
   "summary": "Incorpora en una página una tabla que se puede formatear y editar, con su propio editor de cuadrícula.",
-  "icon": "📊",
   "pages": [
     {
       "id": "overview",

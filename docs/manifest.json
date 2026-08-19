@@ -1,11 +1,22 @@
 {
   "title": "Tabelle",
   "summary": "Bettet eine formatierbare, editierbare Tabelle mit eigenem Grid-Editor in eine Seite ein.",
-  "icon": "📊",
   "pages": [
-    { "id": "overview", "title": "Übersicht", "file": "overview.md" },
-    { "id": "settings", "title": "Einstellungen", "file": "settings.md" },
-    { "id": "faq", "title": "FAQ", "file": "faq.md" }
+    {
+      "id": "overview",
+      "title": "Übersicht",
+      "file": "overview.md"
+    },
+    {
+      "id": "settings",
+      "title": "Einstellungen",
+      "file": "settings.md"
+    },
+    {
+      "id": "faq",
+      "title": "FAQ",
+      "file": "faq.md"
+    }
   ],
   "examples": [
     {

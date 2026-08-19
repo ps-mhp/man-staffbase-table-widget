@@ -1,7 +1,6 @@
 {
   "title": "Table",
   "summary": "Embed a formattable, editable table with its own grid editor into a page.",
-  "icon": "📊",
   "pages": [
     {
       "id": "overview",

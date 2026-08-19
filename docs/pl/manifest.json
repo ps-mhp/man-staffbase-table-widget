@@ -1,7 +1,6 @@
 {
   "title": "Tabela",
   "summary": "Osadza na stronie tabelę z możliwością formatowania i edycji, wyposażoną we własny edytor siatki.",
-  "icon": "📊",
   "pages": [
     {
       "id": "overview",

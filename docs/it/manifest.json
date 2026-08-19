@@ -1,7 +1,6 @@
 {
   "title": "Tabella",
   "summary": "Inserisce in una pagina una tabella formattabile e modificabile con un editor di griglia dedicato.",
-  "icon": "📊",
   "pages": [
     {
       "id": "overview",

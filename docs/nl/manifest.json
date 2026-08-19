@@ -1,7 +1,6 @@
 {
   "title": "Tabel",
   "summary": "Voeg een opmaakbare, bewerkbare tabel met een eigen raster-editor in op een pagina.",
-  "icon": "📊",
   "pages": [
     {
       "id": "overview",

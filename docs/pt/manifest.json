@@ -1,7 +1,6 @@
 {
   "title": "Tabela",
   "summary": "Incorpora uma tabela formatável e editável, com o seu próprio editor de grelha, numa página.",
-  "icon": "📊",
   "pages": [
     {
       "id": "overview",
