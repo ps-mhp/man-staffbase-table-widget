@@ -1,11 +1,16 @@
 {
   "title": "Tabla",
-  "summary": "Incorpora en una página una tabla que se puede formatear y editar, con su propio editor de cuadrícula.",
+  "summary": "Incorpora una tabla con opciones de formato, con su propio editor, importación de Excel y CSV, e imágenes en las celdas.",
   "pages": [
     {
       "id": "overview",
       "title": "Resumen",
       "file": "overview.md"
+    },
+    {
+      "id": "usage",
+      "title": "Paso a paso",
+      "file": "usage.md"
     },
     {
       "id": "settings",

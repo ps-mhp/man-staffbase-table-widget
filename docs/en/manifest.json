@@ -1,11 +1,16 @@
 {
   "title": "Table",
-  "summary": "Embed a formattable, editable table with its own grid editor into a page.",
+  "summary": "Embed a formattable table—with its own editor, Excel/CSV import, and images in cells.",
   "pages": [
     {
       "id": "overview",
       "title": "Overview",
       "file": "overview.md"
+    },
+    {
+      "id": "usage",
+      "title": "Step by step",
+      "file": "usage.md"
     },
     {
       "id": "settings",

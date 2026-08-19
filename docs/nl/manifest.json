@@ -1,11 +1,16 @@
 {
   "title": "Tabel",
-  "summary": "Voeg een opmaakbare, bewerkbare tabel met een eigen raster-editor in op een pagina.",
+  "summary": "Voeg een opmaakbare tabel in — met een eigen editor, Excel-/CSV-import en afbeeldingen in cellen.",
   "pages": [
     {
       "id": "overview",
       "title": "Overzicht",
       "file": "overview.md"
+    },
+    {
+      "id": "usage",
+      "title": "Stap voor stap",
+      "file": "usage.md"
     },
     {
       "id": "settings",

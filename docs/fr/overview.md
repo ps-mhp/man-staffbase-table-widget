@@ -1,17 +1,34 @@
 # Tableau
 
-Le widget « Tableau » intègre un tableau doté de son propre éditeur de grille dans une page
-. Contrairement à un simple tableau de texte, il permet de formater les cellules
-(gras, italique, couleurs, alignement…), fusionner, remplir d’images et
-trier — directement dans la boîte de dialogue de configuration, sans aucune connaissance en HTML ou
-en tableaux.
+Le widget « Tableau » permet d’insérer un véritable tableau sur la page — grâce à un
+éditeur de tableau dédié qui fonctionne comme un petit logiciel de création de tableaux.
+Les cellules peuvent être formatées, fusionnées, remplies d’images et triées,
+sans aucune connaissance en HTML.
 
-Ce widget convient à tout ce qui doit être présenté sous forme de tableau :
-tableaux comparatifs, listes de contacts, indicateurs clés, emplois du temps ou
-barèmes de prix. Le bouton « Importer » permet d’importer un fichier `.csv`
-ou `.xlsx`/`.xls` existant, plutôt que de créer le tableau à la main.
+Idéal pour tout ce qui se présente sous forme de tableau : tableaux comparatifs, listes de contacts,
+indicateurs clés, horaires d'ouverture, plannings de service, barèmes de prix.
 
-Par défaut, les tableaux très longs n’affichent que
-les premières lignes sur la page publiée et peuvent être déployés à l’aide d’un bouton « Tout afficher »
-: le tableau reste ainsi clair, sans perte de contenu
-.
+## Structure d'un tableau
+
+- La **première ligne** est l'en-tête. Elle est mise en évidence
+  et reste toujours en haut lors du tri.
+- La **première colonne** correspond à l’en-tête et est également
+  mise en évidence.
+- La **cellule en haut à gauche** se trouve à l’angle entre les deux et reste généralement
+  vide. C’est normal, ce n’est pas une erreur.
+- L’en-tête et la première colonne ne peuvent pas être supprimés. Si vous n’en avez pas besoin,
+  laissez-les vides.
+
+## Ce que voient les lecteurs et lectrices
+
+Le tableau final. S’il est plus large que l’écran, il peut être
+défilé latéralement. Si elle est plus longue que le nombre de lignes défini,
+seules les premières lignes sont visibles au départ et un bouton situé en dessous permet d’afficher le
+reste. Un clic sur un en-tête de colonne trie le tableau pour le
+lecteur — cela ne modifie en rien le tableau enregistré.
+
+## Où vous travaillez
+
+Non pas dans le champ **Données du tableau**, mais dans l’**éditeur de tableau** qui s’
+ouvre au-dessus. Le champ situé en dessous ne contient que la forme techniquement enregistrée
+du tableau et n’est jamais modifié manuellement.

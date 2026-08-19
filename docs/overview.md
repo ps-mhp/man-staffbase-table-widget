@@ -1,17 +1,34 @@
 # Tabelle
 
-Das Tabellen-Widget bettet eine Tabelle mit eigenem Grid-Editor in eine Seite
-ein. Anders als eine einfache Textabelle lassen sich Zellen formatieren
-(fett, kursiv, Farben, Ausrichtung …), verbinden, mit Bildern befüllen und
-sortieren — direkt im Konfigurationsdialog, ganz ohne HTML- oder
-Tabellen-Kenntnisse.
+Das Tabellen-Widget bringt eine echte Tabelle auf die Seite — mit einem
+eigenen Tabellen-Editor, der wie ein kleines Tabellenprogramm funktioniert.
+Zellen lassen sich formatieren, verbinden, mit Bildern füllen und sortieren,
+ganz ohne HTML-Kenntnisse.
 
-Das Widget eignet sich für alles, was tabellarisch dargestellt werden soll:
-Vergleichstabellen, Ansprechpartner-Listen, Kennzahlen, Stundenpläne oder
-Preisübersichten. Über den Import-Button lässt sich eine bestehende `.csv`-
-oder `.xlsx`/`.xls`-Datei einlesen, statt die Tabelle von Hand aufzubauen.
+Geeignet für alles Tabellarische: Vergleichstabellen, Ansprechpartner-Listen,
+Kennzahlen, Öffnungszeiten, Schichtpläne, Preisübersichten.
 
-Sehr lange Tabellen zeigen auf der veröffentlichten Seite standardmäßig nur
-die ersten Zeilen und lassen sich über einen „Alle anzeigen“-Button
-aufklappen — die Tabelle bleibt so übersichtlich, ohne dass Inhalte
-verloren gehen.
+## So ist eine Tabelle aufgebaut
+
+- Die **erste Zeile** ist die Kopfzeile. Sie wird hervorgehoben dargestellt
+  und bleibt beim Sortieren immer oben.
+- Die **erste Spalte** ist die Zeilenbeschriftung und wird ebenfalls
+  hervorgehoben.
+- Die **linke obere Zelle** ist die Ecke zwischen beiden und bleibt meist
+  leer. Das ist normal, kein Fehler.
+- Kopfzeile und erste Spalte lassen sich nicht löschen. Wer sie nicht braucht,
+  lässt sie leer.
+
+## Was Leser:innen sehen
+
+Die fertige Tabelle. Ist sie breiter als der Bildschirm, lässt sie sich
+seitwärts schieben. Ist sie länger als die eingestellte Zeilenzahl, sind
+zunächst nur die ersten Zeilen sichtbar und ein Button darunter blendet den
+Rest ein. Ein Klick auf eine Spaltenüberschrift sortiert die Tabelle für die
+lesende Person — das ändert nichts an der gespeicherten Tabelle.
+
+## Wo Sie arbeiten
+
+Nicht im Feld **Tabellendaten**, sondern im **Tabellen-Editor**, der sich
+darüber öffnet. Das Feld darunter enthält nur die technisch gespeicherte Form
+der Tabelle und wird nie von Hand bearbeitet.

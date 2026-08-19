@@ -1,11 +1,16 @@
 {
   "title": "Tabela",
-  "summary": "Incorpora uma tabela formatável e editável, com o seu próprio editor de grelha, numa página.",
+  "summary": "Incorpora uma tabela formatável — com editor próprio, importação de ficheiros Excel/CSV e imagens nas células.",
   "pages": [
     {
       "id": "overview",
       "title": "Visão geral",
       "file": "overview.md"
+    },
+    {
+      "id": "usage",
+      "title": "Passo a passo",
+      "file": "usage.md"
     },
     {
       "id": "settings",

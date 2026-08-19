@@ -1,11 +1,16 @@
 {
   "title": "Tabelle",
-  "summary": "Bettet eine formatierbare, editierbare Tabelle mit eigenem Grid-Editor in eine Seite ein.",
+  "summary": "Bettet eine formatierbare Tabelle ein — mit eigenem Editor, Excel-/CSV-Import und Bildern in Zellen.",
   "pages": [
     {
       "id": "overview",
       "title": "Übersicht",
       "file": "overview.md"
+    },
+    {
+      "id": "usage",
+      "title": "Schritt für Schritt",
+      "file": "usage.md"
     },
     {
       "id": "settings",

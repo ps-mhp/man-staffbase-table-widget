@@ -1,17 +1,34 @@
 # Tabela
 
-O widget de tabela incorpora uma tabela com o seu próprio editor de grelha numa página
-. Ao contrário de uma tabela de texto simples, é possível formatar as células
-(negrito, itálico, cores, alinhamento…), unidas, preenchidas com imagens e
-ordenadas — diretamente na caixa de diálogo de configuração, sem qualquer necessidade de conhecimentos de HTML ou
-de tabelas.
+O widget de tabela insere uma tabela real na página — com um
+editor de tabelas próprio, que funciona como um pequeno programa de tabelas.
+É possível formatar, unir, preencher com imagens e ordenar as células,
+sem qualquer conhecimento de HTML.
 
-O widget é adequado para tudo o que deva ser apresentado em forma de tabela:
-tabelas comparativas, listas de contactos, indicadores, horários ou
-tabelas de preços. Através do botão «Importar», é possível importar um ficheiro `.csv`
-ou `.xlsx`/`.xls` já existente, em vez de criar a tabela manualmente.
+Adequado para tudo o que seja apresentado em tabela: tabelas comparativas, listas de contactos,
+indicadores, horários de funcionamento, horários de turnos, tabelas de preços.
 
-Por predefinição, as tabelas muito longas mostram apenas
-as primeiras linhas na página publicada e podem ser expandidas através de um botão «Mostrar tudo»
-— assim, a tabela mantém-se organizada, sem que o conteúdo
-se perca.
+## Como está estruturada uma tabela
+
+- A **primeira linha** é o cabeçalho. É apresentada em destaque
+  e permanece sempre no topo quando se ordena.
+- A **primeira coluna** é o título da linha e também é
+  destacada.
+- A **célula superior esquerda** é o canto entre ambas e fica normalmente
+  em branco. Isto é normal, não é um erro.
+- O cabeçalho e a primeira coluna não podem ser eliminados. Quem não precisar deles,
+  deve deixá-los em branco.
+
+## O que os leitores veem
+
+A tabela finalizada. Se for mais larga do que o ecrã, pode ser
+deslocada lateralmente. Se for mais comprida do que o número de linhas definido,
+inicialmente apenas as primeiras linhas ficam visíveis e um botão por baixo mostra o
+resto. Um clique num título de coluna ordena a tabela para o
+leitor — isso não altera a tabela guardada.
+
+## Onde trabalhar
+
+Não no campo **Dados da tabela**, mas sim no **Editor de tabelas**, que se
+abre por cima. O campo abaixo contém apenas a forma tecnicamente guardada
+da tabela e nunca é editado manualmente.

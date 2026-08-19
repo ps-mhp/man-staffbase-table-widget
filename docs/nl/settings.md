@@ -1,26 +1,35 @@
 # Instellingen
 
-Technisch gezien heeft de widget in het configuratievenster slechts één veld
-(“Tabelgegevens”), waarin de volledige inhoud van de tabel wordt opgeslagen. Dit veld
-wordt echter nooit rechtstreeks als tekst bewerkt, maar via de tabel-editor, die
-automatisch boven dit veld wordt geopend. De eigenlijke instellingen bevinden zich
-in de werkbalk daarvan:
+In het configuratievenster is er technisch gezien slechts één veld: **Tabelgegevens**.
+Daarin staat de tabel in opgeslagen vorm; deze wordt
+uitsluitend bewerkt via de **tabeleditor**, die automatisch erboven
+wordt geopend. Als de editor eenmaal is gesloten, kunt u deze met de knop **Tabel
+bewerken** weer openen.
 
-| Tabblad | Wat het doet |
+## Bovenbalk van de editor
+
+| Knop | Functie |
 | --- | --- |
-| Lettertype | Lettergrootte, vet/cursief/onderstreept/doorgestreept, superscript/subscript, tekst- en achtergrondkleur en „Hoofdletters opheffen“ (heft de automatische hoofdletterweergave van de pagina voor de markering op). |
-| Uitlijning | Horizontale (links/gecentreerd/rechts) en verticale (boven/midden/onder) uitlijning van de celinhoud. |
-| Cellen | Cellen samenvoegen/losmaken, rijen en kolommen invoegen of verwijderen. |
-| Afbeeldingen | Afbeelding in de gemarkeerde cel invoegen, afbeeldingsgroottes van meerdere gemarkeerde afbeeldingen gelijkmaken of resetten. |
-| Gegevens | Sorteren op kolom, opmaakpenseel, aantal zichtbare rijen, opmaak verwijderen, tabel importeren uit `.csv`/`.xlsx`/`.xls`. |
+| Opslaan | Geeft de huidige status door aan de widget. Zonder hierop te klikken gaat alles verloren. |
+| Help | Opent de korte helptekst bij elke functie direct in de editor. |
+| Sluiten | Sluit de editor af, **zonder** op te slaan. |
+| „Niet-opgeslagen wijzigingen“ | Informatietekst naast de knoppen: er zijn nog wijzigingen die niet zijn opgeslagen. |
 
-Extra instelling buiten de werkbalk:
+## Tabbladen van de werkbalk
+
+| Tabblad | Wat erin staat |
+| --- | --- |
+| Lettertype | Lettergrootte (standaard, 10–32), lettertype vergroten/verkleinen, vet, cursief, onderstreept, doorgestreept, superscript, subscript, hoofdletters uitschakelen, letterkleur, achtergrondkleur. |
+| Uitlijning | Links uitgelijnd, gecentreerd, rechts uitgelijnd, evenals boven, midden, onder. |
+| Cellen | Samenvoegen, splitsen, invoegen (rij boven/onder, kolom links/rechts), verwijderen (rij(en), kolom(men)). |
+| Afbeeldingen | Afbeelding in cel invoegen, afbeeldingsgroottes aanpassen (zelfde hoogte/breedte als eerste afbeelding, standaardgrootte), schakelaar „Afbeeldingen aanpassen“. |
+| Gegevens | Sorteren (oplopend, aflopend, sortering verwijderen), opmaak kopiëren, zichtbare rijen, opmaak verwijderen, importeren. |
+
+## Instellingen met neveneffecten
 
 | Instelling | Beschrijving |
 | --- | --- |
-| Zichtbare rijen | Bepaalt hoeveel gegevensrijen op de gepubliceerde pagina worden weergegeven voordat de tabel wordt verborgen achter een knop „Alles weergeven“. `0` toont altijd alle rijen. In te stellen via het tabblad „Gegevens“. |
-
-„Opslaan“ geeft de huidige status door aan de widget, „Sluiten“ gooit
-niets automatisch weg, maar sluit het dialoogvenster zonder op te slaan —
-niet-opgeslagen wijzigingen worden aangegeven door een melding naast de twee knoppen. Een
-apart tabblad ‘Help’ in de editor legt elke functie nogmaals in detail uit.
+| Zichtbare rijen (tabblad „Gegevens“) | Aantal gegevensrijen dat direct op de pagina te zien is; de rest is verborgen achter een knop om weer te geven. Standaardinstelling 5, `0` betekent „altijd alle rijen“. De kopregel telt niet mee. |
+| Afbeeldingen aanpassen (tabblad „Afbeeldingen“) | Indien ingeschakeld blijven alle afbeeldingen binnen de tabelbreedte. Indien uitgeschakeld verschijnt elke afbeelding in zijn oorspronkelijke grootte — en kan de tabel uit zijn kanten lopen. |
+| Hoofdletters uitschakelen (tabblad „Lettertype“) | Oplossing wanneer de pagina tekst automatisch in hoofdletters weergeeft: voor de geselecteerde cellen wordt deze hoofdletterweergave geneutraliseerd. De tekst zelf blijft ongewijzigd. |
+| Opmaak kopiëren (tabblad „Gegevens“) | Past de opmaak van de huidige selectie toe op de volgende geselecteerde cellen. |

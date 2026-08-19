@@ -1,11 +1,16 @@
 {
   "title": "Tabella",
-  "summary": "Inserisce in una pagina una tabella formattabile e modificabile con un editor di griglia dedicato.",
+  "summary": "Inserisce una tabella modificabile, con un editor dedicato, importazione da Excel/CSV e immagini nelle celle.",
   "pages": [
     {
       "id": "overview",
       "title": "Panoramica",
       "file": "overview.md"
+    },
+    {
+      "id": "usage",
+      "title": "Passo dopo passo",
+      "file": "usage.md"
     },
     {
       "id": "settings",

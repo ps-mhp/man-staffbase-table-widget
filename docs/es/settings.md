@@ -1,26 +1,35 @@
 # Ajustes
 
-Técnicamente, el widget solo tiene un campo en el cuadro de diálogo de configuración
-(«Datos de la tabla»), que almacena todo el contenido de la tabla. Sin embargo,
-nunca se edita directamente como texto, sino a través del editor de tablas, que
-se abre automáticamente sobre este campo. Los ajustes propiamente dichos se encuentran
-en su barra de herramientas:
+En el cuadro de diálogo de configuración solo hay un campo, técnicamente: **Datos de la tabla**.
+En él aparece la tabla tal y como se ha guardado; su edición se realiza
+exclusivamente a través del **editor de tablas**, que se abre automáticamente
+encima de ella. Una vez cerrado el editor, el botón **Editar tabla**
+lo vuelve a abrir.
 
-| Pestaña | Función |
+## Barra de herramientas del editor
+
+| Botón | Función |
 | --- | --- |
-| Fuente | Tamaño de fuente, negrita/cursiva/subrayado/tachado, superíndice/subíndice, color del texto y del fondo, así como «Desactivar mayúsculas» (desactiva el uso automático de mayúsculas de la página para el resaltado). |
-| Alineación | Alineación horizontal (izquierda/centrada/derecha) y vertical (arriba/centrada/abajo) del contenido de la celda. |
-| Celdas | Unir/separar celdas, insertar o eliminar filas y columnas. |
-| Imágenes | Insertar una imagen en la celda seleccionada, ajustar o restablecer el tamaño de varias imágenes seleccionadas. |
-| Datos | Ordenar por columna, pincel de formato, número de filas visibles, eliminar formato, importar tabla desde `.csv`/`.xlsx`/`.xls`. |
+| Guardar | Transfiere el estado actual al widget. Si no se hace clic aquí, se perderá todo. |
+| Ayuda | Abre la ayuda rápida de cada función directamente en el editor. |
+| Cerrar | Sale del editor **sin** guardar. |
+| «Cambios no guardados» | Texto informativo junto a los botones: aún hay cambios pendientes. |
 
-Configuración adicional fuera de la barra de herramientas:
+## Pestañas de la barra de herramientas
 
-| Configuración | Descripción |
+| Pestaña | Qué contiene |
 | --- | --- |
-| Líneas visibles | Establece cuántas líneas de datos se muestran en la página publicada antes de que la tabla se oculte tras un botón «Mostrar todo». `0` muestra siempre todas las líneas. Se puede configurar en la pestaña «Datos». |
+| Fuente | Tamaño de fuente (predeterminado, 10–32), aumentar/reducir el tamaño de la fuente, negrita, cursiva, subrayado, tachado, superíndice, subíndice, quitar mayúsculas, color de fuente, color de fondo. |
+| Alineación | Alineado a la izquierda, centrado, alineado a la derecha, así como arriba, en el centro y abajo. |
+| Celdas | Unir, separar, insertar (fila superior/inferior, columna izquierda/derecha), eliminar (fila(s), columna(s)). |
+| Imágenes | Insertar imagen en celda, ajustar el tamaño de las imágenes (misma altura/anchura que la primera imagen, tamaño predeterminado), botón «Ajustar imágenes». |
+| Datos | Ordenar (ascendente, descendente, eliminar ordenación), copiar formato, filas visibles, eliminar formato, importar. |
 
-«Guardar» transfiere el estado actual al widget; «Cerrar» no descarta
-nada por sí mismo, pero sale del cuadro de diálogo sin guardar;
-los cambios no guardados se indican mediante una nota junto a ambos botones. Una
-pestaña de ayuda específica en el editor explica cada función de nuevo con detalle.
+## Ajustes con efectos secundarios
+
+| Ajuste | Descripción |
+| --- | --- |
+| Filas visibles (pestaña «Datos») | Número de filas de datos que se ven inmediatamente en la página; el resto se oculta tras un botón de visualización. El valor predeterminado es 5; `0` significa «siempre todas las filas». La fila de encabezado no cuenta. |
+| Ajustar imágenes (pestaña «Imágenes») | Si está activada, todas las imágenes se ajustan al ancho de la tabla. Si está desactivada, cada imagen aparece en su tamaño original, lo que puede hacer que la tabla se salga de los límites. |
+| Eliminar mayúsculas (pestaña «Fuente») | Solución si la página muestra automáticamente el texto en mayúsculas: se neutraliza el uso de mayúsculas en las celdas seleccionadas. El texto en sí permanece sin cambios. |
+| Copiar formato (pestaña «Datos») | Aplica el formato de la selección actual a las siguientes celdas seleccionadas. |

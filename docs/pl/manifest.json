@@ -1,11 +1,16 @@
 {
   "title": "Tabela",
-  "summary": "Osadza na stronie tabelę z możliwością formatowania i edycji, wyposażoną we własny edytor siatki.",
+  "summary": "Osadza tabelę z możliwością formatowania — z własnym edytorem, funkcją importu z Excela i plików CSV oraz obrazami w komórkach.",
   "pages": [
     {
       "id": "overview",
       "title": "Przegląd",
       "file": "overview.md"
+    },
+    {
+      "id": "usage",
+      "title": "Krok po kroku",
+      "file": "usage.md"
     },
     {
       "id": "settings",

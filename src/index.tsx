@@ -11,6 +11,7 @@
  * limitations under the License.
  */
 
+import { startWidget } from "@shared/dev-mode/start-widget";
 import { setPublicPathFromBundle } from "@shared/public-path";
 
 // Muss vor jedem dynamischen `import()` laufen (ExcelJS beim .xlsx-Upload),
@@ -128,6 +129,16 @@ const externalBlockDefinition: ExternalBlockDefinition = {
 };
 
 /**
- * This call is mandatory to register the block in the hosting application.
+ * Registers the block with the hosting application.
+ *
+ * The call goes through `startWidget`, which first asks whether a local
+ * development server serves this widget. On virtually every browser the answer
+ * is no and this registers immediately; on the developer's machine the local
+ * bundle takes over and registers instead. Only ever one of the two, a block
+ * name cannot be claimed twice.
  */
-window.defineBlock(externalBlockDefinition);
+void startWidget({
+  name: "table-widget",
+  version: pkg.version,
+  register: () => window.defineBlock(externalBlockDefinition),
+});

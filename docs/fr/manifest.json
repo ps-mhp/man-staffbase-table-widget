@@ -1,11 +1,16 @@
 {
   "title": "Tableau",
-  "summary": "Intègre dans une page un tableau formatable et modifiable, doté de son propre éditeur de grille.",
+  "summary": "Intègre un tableau formatable — avec son propre éditeur, l'importation de fichiers Excel/CSV et des images dans les cellules.",
   "pages": [
     {
       "id": "overview",
       "title": "Aperçu",
       "file": "overview.md"
+    },
+    {
+      "id": "usage",
+      "title": "Étape par étape",
+      "file": "usage.md"
     },
     {
       "id": "settings",

@@ -1,26 +1,35 @@
 # Impostazioni
 
-Dal punto di vista tecnico, il widget presenta nella finestra di dialogo di configurazione un solo campo
-(“Dati della tabella”), che memorizza l’intero contenuto della tabella. Tuttavia,
-non viene mai modificato direttamente come testo, ma tramite l’editor della tabella, che
-si apre automaticamente sopra questo campo. Le impostazioni vere e proprie si trovano
-nella sua barra degli strumenti:
+Nella finestra di dialogo di configurazione è presente, tecnicamente, un solo campo: **Dati tabella**.
+In esso è presente la tabella nella forma salvata; la modifica avviene
+esclusivamente tramite l’**editor di tabelle**, che si apre automaticamente
+sopra di essa. Una volta chiuso l’editor, il pulsante **Modifica tabella**
+lo riporta in primo piano.
 
-| Scheda | Funzione |
+## Barra superiore dell’editor
+
+| Pulsante | Funzione |
 | --- | --- |
-| Carattere | Dimensione del carattere, grassetto/corsivo/sottolineato/barrato, apice/pedice, colore del testo e dello sfondo, nonché «Disattiva maiuscole» (annulla la conversione automatica in maiuscolo della pagina per l’evidenziazione). |
-| Allineamento | Allineamento orizzontale (a sinistra/centrato/a destra) e verticale (in alto/al centro/in basso) del contenuto della cella. |
-| Celle | Unire/separare celle, inserire o eliminare righe e colonne. |
-| Immagini | Inserire un’immagine nella cella selezionata, uniformare o ripristinare le dimensioni di più immagini selezionate. |
-| Dati | Ordina per colonna, pennello di formattazione, numero di righe visibili, rimuovi formattazione, importa tabella da `.csv`/`.xlsx`/`.xls`. |
+| Salva | Trasferisce lo stato attuale al widget. Se non si clicca qui, tutto andrà perso. |
+| Aiuto | Apre la guida rapida per ogni funzione direttamente nell’editor. |
+| Chiudi | Esce dall’editor **senza** salvare. |
+| «Modifiche non salvate» | Testo di avviso accanto ai pulsanti: ci sono ancora delle modifiche in sospeso. |
 
-Impostazioni aggiuntive al di fuori della barra degli strumenti:
+## Schede della barra degli strumenti
+
+| Scheda | Cosa contiene |
+| --- | --- |
+| Carattere | Dimensione carattere (predefinita, 10–32), ingrandisci/riduci carattere, grassetto, corsivo, sottolineato, barrato, apice, pedice, rimuovi maiuscole, colore carattere, colore sfondo. |
+| Allineamento | Allineamento a sinistra, centrato, allineamento a destra, nonché in alto, al centro, in basso. |
+| Celle | Unire, separare, inserire (riga sopra/sotto, colonna a sinistra/a destra), eliminare (riga/e, colonna/e). |
+| Immagini | Inserisci immagine nella cella, Adegua dimensioni immagine (stessa altezza/larghezza della prima immagine, dimensione predefinita), pulsante «Adatta immagini». |
+| Dati | Ordina (in ordine crescente, decrescente, rimuovi ordinamento), copia formato, righe visibili, rimuovi formattazione, importa. |
+
+## Impostazioni con effetti collaterali
 
 | Impostazione | Descrizione |
 | --- | --- |
-| Righe visibili | Determina quante righe di dati vengono mostrate nella pagina pubblicata prima che la tabella venga nascosta dietro un pulsante «Mostra tutto». `0` mostra sempre tutte le righe. Configurabile dalla scheda «Dati». |
-
-«Salva» trasferisce lo stato attuale al widget, «Chiudi» non
-cancella nulla di propria iniziativa, ma chiude la finestra di dialogo senza salvare —
-le modifiche non salvate sono indicate da un avviso accanto ai due pulsanti. Una
-scheda di aiuto dedicata nell’editor spiega nuovamente ogni funzione in dettaglio.
+| Righe visibili (scheda «Dati») | Numero di righe di dati immediatamente visibili sulla pagina; il resto è nascosto dietro un pulsante di visualizzazione. Impostazione predefinita 5, `0` significa «sempre tutte le righe». L’intestazione non viene conteggiata. |
+| Adatta immagini (scheda «Immagini») | Se attivata, tutte le immagini rimangono entro la larghezza della tabella. Se disattivata, ogni immagine appare nelle sue dimensioni originali — e può superare i limiti della tabella. |
+| Rimuovi maiuscole (scheda «Carattere») | Rimedio nel caso in cui la pagina visualizzi automaticamente il testo in maiuscolo: per le celle selezionate, questa impostazione viene neutralizzata. Il testo stesso rimane invariato. |
+| Copia formato (scheda «Dati») | Applica il formato della selezione corrente alle celle selezionate successivamente. |

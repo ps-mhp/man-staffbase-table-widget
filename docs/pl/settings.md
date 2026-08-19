@@ -1,26 +1,35 @@
 # Ustawienia
 
-W oknie dialogowym konfiguracji widżet posiada technicznie tylko jedno pole
-(„Dane tabeli”), które przechowuje całą zawartość tabeli. Nie edytuje się
-go jednak nigdy bezpośrednio jako tekstu, lecz za pomocą edytora tabel, który
-otwiera się automatycznie nad tym polem. Rzeczywiste ustawienia znajdują się
-na jego pasku narzędzi:
+W oknie dialogowym konfiguracji znajduje się technicznie tylko jedno pole — **Dane tabeli**.
+Zawiera ona tabelę w zapisanej postaci; edycja odbywa się
+wyłącznie za pomocą **edytora tabel**, który otwiera się automatycznie
+nad nią. Po zamknięciu edytora przycisk **Edytuj tabelę**
+przywraca go.
 
-| Zakładka | Funkcja |
+## Pasek górny edytora
+
+| Przycisk | Działanie |
 | --- | --- |
-| Czcionka | Rozmiar czcionki, pogrubienie/kursywa/podkreślenie/przekreślenie, indeks górny/dolny, kolor tekstu i tła oraz „Wyłącz wielkie litery” (wyłącza automatyczne stosowanie wielkich liter na stronie w celu wyróżnienia). |
-| Wyrównanie | Wyrównanie poziome (do lewej/do środka/do prawej) i pionowe (do góry/do środka/do dołu) zawartości komórki. |
-| Komórki | Łączenie/rozłączanie komórek, wstawianie lub usuwanie wierszy i kolumn. |
-| Obrazy | Wstawianie obrazu do zaznaczonej komórki, dostosowywanie rozmiarów wielu zaznaczonych obrazów lub ich resetowanie. |
-| Dane | Sortowanie według kolumny, pędzelek formatowania, liczba widocznych wierszy, usuwanie formatowania, importowanie tabeli z plików `.csv`/`.xlsx`/`.xls`. |
+| Zapisz | Przekazuje aktualny stan do widżetu. Bez kliknięcia tego przycisku wszystko zostanie utracone. |
+| Pomoc | Otwiera skróconą pomoc dotyczącą każdej funkcji bezpośrednio w edytorze. |
+| Zamknij | Zamyka edytor **bez** zapisywania. |
+| „Niezapisane zmiany” | Tekst informacyjny obok przycisków: pozostały jeszcze niezapisane zmiany. |
 
-Dodatkowe ustawienia poza paskiem narzędzi:
+## Zakładki paska narzędzi
+
+| Zakładka | Co zawiera |
+| --- | --- |
+| Czcionka | Rozmiar czcionki (domyślny, 10–32), powiększanie/zmniejszanie czcionki, pogrubienie, kursywa, podkreślenie, przekreślenie, indeks górny, indeks dolny, wyłączanie wielkich liter, kolor czcionki, kolor tła. |
+| Wyrównanie | Wyrównanie do lewej, wyśrodkowanie, wyrównanie do prawej, a także do góry, do środka, do dołu. |
+| Komórki | Łączenie, rozdzielanie, wstawianie (wiersz powyżej/poniżej, kolumna po lewej/prawej), usuwanie (wiersz(e), kolumna(y)). |
+| Obrazy | Wstawianie obrazu do komórki, dopasowywanie rozmiarów obrazów (ta sama wysokość/szerokość co pierwszy obraz, rozmiar domyślny), przycisk „Dopasuj obrazy”. |
+| Dane | Sortowanie (rosnąco, malejąco, usuń sortowanie), skopiuj format, widoczne wiersze, usuń formatowanie, importuj. |
+
+## Ustawienia mające skutki uboczne
 
 | Ustawienie | Opis |
 | --- | --- |
-| Widoczne wiersze | Określa, ile wierszy danych będzie wyświetlanych na opublikowanej stronie, zanim tabela zostanie zwinięta za przyciskiem „Pokaż wszystko”. Wartość `0` powoduje zawsze wyświetlanie wszystkich wierszy. Ustawienie dostępne w zakładce „Dane”. |
-
-Przycisk „Zapisz” zapisuje aktualny stan w widżecie, przycisk „Zamknij” nie powoduje
-utraty danych, ale zamyka okno dialogowe bez zapisywania —
-niezapisane zmiany są sygnalizowane przez komunikat obok obu przycisków. Osobna
-zakładka pomocy w edytorze zawiera szczegółowe wyjaśnienia dotyczące każdej funkcji.
+| Widoczne wiersze (zakładka „Dane”) | Liczba wierszy danych, które są od razu widoczne na stronie; pozostałe są ukryte za przyciskiem wyświetlania. Ustawienie domyślne to 5, `0` oznacza „zawsze wszystkie wiersze”. Nagłówek nie jest wliczany. |
+| Dopasuj obrazy (zakładka „Obrazy”) | Gdy opcja jest włączona, wszystkie obrazy mieszczą się w szerokości tabeli. Gdy jest wyłączona, każdy obraz wyświetla się w oryginalnym rozmiarze — co może spowodować, że tabela wykroczy poza obszar strony. |
+| Usuń wielkie litery (zakładka „Czcionka”) | Rozwiązanie, gdy strona automatycznie wyświetla tekst wielkimi literami: w zaznaczonych komórkach ta wielka litera jest neutralizowana. Sam tekst pozostaje niezmieniony. |
+| Kopiuj format (zakładka „Dane”) | Przenosi format aktualnie zaznaczonego obszaru na kolejne zaznaczone komórki. |

@@ -1,26 +1,35 @@
 # Definições
 
-Tecnicamente, o widget tem apenas um campo na caixa de diálogo de configuração
-(«Dados da tabela»), que armazena todo o conteúdo da tabela. No entanto,
-este nunca é editado diretamente como texto, mas sim através do editor de tabelas, que
-se abre automaticamente sobre este campo. As definições propriamente ditas encontram-se
-na barra de ferramentas deste:
+Na caixa de diálogo de configuração, existe, tecnicamente, apenas um campo — **Dados da tabela**.
+Nele encontra-se a tabela na sua forma guardada; a sua edição é feita
+exclusivamente através do **Editor de tabelas**, que se abre automaticamente
+por cima. Se o editor for fechado, o botão **Editar tabela**
+reabre-o.
 
-| Separador | Função |
+## Barra de ferramentas do editor
+
+| Botão | Efeito |
 | --- | --- |
-| Tipo de letra | Tamanho da letra, negrito/itálico/sublinhado/riscado, sobrescrito/subscrito, cor do texto e do fundo, bem como «Desativar maiúsculas» (desativa a conversão automática em maiúsculas da página para a seleção). |
-| Alinhamento | Alinhamento horizontal (à esquerda/centrado/à direita) e vertical (em cima/ao centro/em baixo) do conteúdo da célula. |
-| Células | Unir/separar células, inserir ou eliminar linhas e colunas. |
-| Imagens | Inserir uma imagem na célula selecionada, ajustar ou repor as dimensões de várias imagens selecionadas. |
-| Dados | Ordenar por coluna, pincel de formatação, número de linhas visíveis, remover formatação, importar tabela a partir de `.csv`/`.xlsx`/`.xls`. |
+| Guardar | Transfere o estado atual para o widget. Se não clicar aqui, tudo se perde. |
+| Ajuda | Abre a ajuda rápida para cada função diretamente no editor. |
+| Fechar | Sai do editor, **sem** guardar. |
+| «Alterações não guardadas» | Texto informativo ao lado dos botões: ainda há algo por fazer. |
 
-Configurações adicionais fora da barra de ferramentas:
+## Separadores da barra de ferramentas
 
-| Configuração | Descrição |
+| Separador | O que contém |
 | --- | --- |
-| Linhas visíveis | Define quantas linhas de dados são apresentadas na página publicada antes de a tabela ser recolhida por trás de um botão «Mostrar tudo». `0` mostra sempre todas as linhas. Configurável através do separador «Dados». |
+| Tipo de letra | Tamanho da letra (padrão, 10–32), aumentar/diminuir o tamanho da letra, negrito, itálico, sublinhado, riscado, sobrescrito, subscrito, remover maiúsculas, cor da letra, cor de fundo. |
+| Alinhamento | Alinhado à esquerda, centralizado, alinhado à direita, bem como alinhado à parte superior, ao centro e à parte inferior. |
+| Células | Unir, separar, inserir (linha acima/abaixo, coluna à esquerda/direita), apagar (linha(s), coluna(s)). |
+| Imagens | Inserir imagem na célula, ajustar o tamanho das imagens (mesma altura/largura que a primeira imagem, tamanho padrão), botão «Ajustar imagens». |
+| Dados | Ordenar (por ordem crescente, decrescente, remover ordenação), copiar formato, linhas visíveis, remover formatação, importar. |
 
-«Guardar» transfere o estado atual para o widget; «Fechar» não
-desfaz nada por si só, mas sai da caixa de diálogo sem guardar —
-as alterações não guardadas são indicadas por uma nota ao lado dos dois botões. Um
-separador de ajuda específico no editor explica cada função novamente em pormenor.
+## Definições com efeitos secundários
+
+| Definição | Descrição |
+| --- | --- |
+| Linhas visíveis (separador «Dados») | Número de linhas de dados que são imediatamente visíveis na página; o restante fica atrás de um botão para mostrar. Predefinição 5, `0` significa «sempre todas as linhas». O cabeçalho não é contabilizado. |
+| Ajustar imagens (separador «Imagens») | Quando ativada, todas as imagens mantêm-se dentro da largura da tabela. Quando desativada, cada imagem aparece no seu tamanho original — e pode ultrapassar os limites da tabela. |
+| Desativar maiúsculas (separador «Fontes») | Solução caso a página apresente automaticamente o texto em maiúsculas: esta formatação em maiúsculas é neutralizada nas células selecionadas. O texto em si permanece inalterado. |
+| Copiar formato (separador «Dados») | Aplica o formato da seleção atual às células selecionadas a seguir. |
