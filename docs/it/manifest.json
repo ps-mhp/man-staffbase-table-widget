@@ -1,0 +1,30 @@
+{
+  "title": "Tabella",
+  "summary": "Inserisce in una pagina una tabella formattabile e modificabile con un editor di griglia dedicato.",
+  "icon": "📊",
+  "pages": [
+    {
+      "id": "overview",
+      "title": "Panoramica",
+      "file": "overview.md"
+    },
+    {
+      "id": "settings",
+      "title": "Impostazioni",
+      "file": "settings.md"
+    },
+    {
+      "id": "faq",
+      "title": "Domande frequenti",
+      "file": "faq.md"
+    }
+  ],
+  "examples": [
+    {
+      "title": "Tabella semplice",
+      "attributes": {
+        "tabledata": "[[\"\",\"Name\",\"Ort\"],[\"1\",\"Anna Kaiser\",\"Berlin\"],[\"2\",\"Ben Vogel\",\"München\"]]"
+      }
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "title": "Tabela",
+  "summary": "Incorpora uma tabela formatável e editável, com o seu próprio editor de grelha, numa página.",
+  "icon": "📊",
+  "pages": [
+    {
+      "id": "overview",
+      "title": "Visão geral",
+      "file": "overview.md"
+    },
+    {
+      "id": "settings",
+      "title": "Definições",
+      "file": "settings.md"
+    },
+    {
+      "id": "faq",
+      "title": "Perguntas frequentes",
+      "file": "faq.md"
+    }
+  ],
+  "examples": [
+    {
+      "title": "Tabela simples",
+      "attributes": {
+        "tabledata": "[[\"\",\"Name\",\"Ort\"],[\"1\",\"Anna Kaiser\",\"Berlin\"],[\"2\",\"Ben Vogel\",\"München\"]]"
+      }
+    }
+  ]
+}

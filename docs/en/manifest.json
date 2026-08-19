@@ -1,0 +1,30 @@
+{
+  "title": "Table",
+  "summary": "Embed a formattable, editable table with its own grid editor into a page.",
+  "icon": "📊",
+  "pages": [
+    {
+      "id": "overview",
+      "title": "Overview",
+      "file": "overview.md"
+    },
+    {
+      "id": "settings",
+      "title": "Settings",
+      "file": "settings.md"
+    },
+    {
+      "id": "faq",
+      "title": "FAQ",
+      "file": "faq.md"
+    }
+  ],
+  "examples": [
+    {
+      "title": "Simple Table",
+      "attributes": {
+        "tabledata": "[[\"\",\"Name\",\"Ort\"],[\"1\",\"Anna Kaiser\",\"Berlin\"],[\"2\",\"Ben Vogel\",\"München\"]]"
+      }
+    }
+  ]
+}

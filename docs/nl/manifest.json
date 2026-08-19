@@ -1,0 +1,30 @@
+{
+  "title": "Tabel",
+  "summary": "Voeg een opmaakbare, bewerkbare tabel met een eigen raster-editor in op een pagina.",
+  "icon": "📊",
+  "pages": [
+    {
+      "id": "overview",
+      "title": "Overzicht",
+      "file": "overview.md"
+    },
+    {
+      "id": "settings",
+      "title": "Instellingen",
+      "file": "settings.md"
+    },
+    {
+      "id": "faq",
+      "title": "Veelgestelde vragen",
+      "file": "faq.md"
+    }
+  ],
+  "examples": [
+    {
+      "title": "Eenvoudige tabel",
+      "attributes": {
+        "tabledata": "[[\"\",\"Name\",\"Ort\"],[\"1\",\"Anna Kaiser\",\"Berlin\"],[\"2\",\"Ben Vogel\",\"München\"]]"
+      }
+    }
+  ]
+}

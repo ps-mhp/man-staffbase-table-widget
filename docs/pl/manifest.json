@@ -1,0 +1,30 @@
+{
+  "title": "Tabela",
+  "summary": "Osadza na stronie tabelę z możliwością formatowania i edycji, wyposażoną we własny edytor siatki.",
+  "icon": "📊",
+  "pages": [
+    {
+      "id": "overview",
+      "title": "Przegląd",
+      "file": "overview.md"
+    },
+    {
+      "id": "settings",
+      "title": "Ustawienia",
+      "file": "settings.md"
+    },
+    {
+      "id": "faq",
+      "title": "Najczęściej zadawane pytania",
+      "file": "faq.md"
+    }
+  ],
+  "examples": [
+    {
+      "title": "Prosta tabela",
+      "attributes": {
+        "tabledata": "[[\"\",\"Name\",\"Ort\"],[\"1\",\"Anna Kaiser\",\"Berlin\"],[\"2\",\"Ben Vogel\",\"München\"]]"
+      }
+    }
+  ]
+}

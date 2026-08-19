@@ -1,0 +1,30 @@
+{
+  "title": "Tabla",
+  "summary": "Incorpora en una página una tabla que se puede formatear y editar, con su propio editor de cuadrícula.",
+  "icon": "📊",
+  "pages": [
+    {
+      "id": "overview",
+      "title": "Resumen",
+      "file": "overview.md"
+    },
+    {
+      "id": "settings",
+      "title": "Configuración",
+      "file": "settings.md"
+    },
+    {
+      "id": "faq",
+      "title": "Preguntas frecuentes",
+      "file": "faq.md"
+    }
+  ],
+  "examples": [
+    {
+      "title": "Tabla sencilla",
+      "attributes": {
+        "tabledata": "[[\"\",\"Name\",\"Ort\"],[\"1\",\"Anna Kaiser\",\"Berlin\"],[\"2\",\"Ben Vogel\",\"München\"]]"
+      }
+    }
+  ]
+}
