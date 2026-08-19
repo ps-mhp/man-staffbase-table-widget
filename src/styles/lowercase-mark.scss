@@ -10,9 +10,11 @@
 // limitations under the License.
 
 // Reine Editor-Hilfe: markierter Text bekommt eine orange Wellenlinie, so wie
-// eine Rechtschreibprüfung ein Wort anstreicht. Das veröffentlichte Widget gibt
-// nur die Klasse aus und zeichnet nichts — die Großschreibungsregel, die hier
-// aufgehoben wird, gehört der Wirtsseite.
+// eine Rechtschreibprüfung ein Wort anstreicht. Das veröffentlichte Widget
+// setzt die eigentliche `text-transform: lowercase` selbst (siehe
+// `table-widget.scss`s `.text-lowercase`) — hier im Editor wird sie bewusst
+// wieder auf `none` gesetzt, weil die Wellenlinie sonst am bereits
+// kleingeschriebenen Text nicht auffiele.
 //
 // Die Klasse ist `LOWERCASE_CLASS` aus `rich-text.ts`; ein Test hält beide
 // Seiten deckungsgleich.

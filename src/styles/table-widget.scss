@@ -14,12 +14,15 @@
 // bewusst ein Inline-Style — der gewinnt gegen diese Regeln und braucht deshalb
 // keine Klasse pro Kombination.
 //
-// Look und Werte kommen aus dem MAN-CI (übernommen aus dem Tabelle-Abschnitt
-// von `onetruck-css/src/app/06-richtext.scss` und `.../designer/06-richtext.scss`,
-// dort jetzt entfernt): durchgezogener Rahmen statt Spaltenlücke, MAN-Radius,
-// `tabular-nums` für Zahlenspalten, Zebra-Streifen und ein dunkler
-// Versal-Kopf. Farben/Radius/Abstände laufen über `man(...)`, damit sich ein
-// MAN-Token-Update hier automatisch nachzieht.
+// Look und Werte kommen aus dem MAN-CI: keine Außenkontur (kein Rahmen, kein
+// Radius, kein Flächenfüllton) — nur dünne, helle Trennlinien unter allen
+// gewöhnlichen Zellen (inkl. der Zeilentitel-Spalte im Rumpf) und eine
+// dicke, dunkle Linie ausschließlich unter der Kopfzeile (`thead > th`),
+// dazu `tabular-nums` für Zahlenspalten. Kein Zebra-Streifen, keine dunkle
+// Kopf-Fläche — beides sind keine MAN-CI-Muster. Die Kopfzelle läuft als
+// einzige Abweichung in Versalien, wie eine Überschrift. Farben/Abstände
+// laufen über `man(...)`, damit sich ein MAN-Token-Update hier automatisch
+// nachzieht.
 
 @use "@shared/stylings/man-tokens" as *;
 
@@ -42,26 +45,13 @@
   }
 
   &__table {
-    border: man("border-width") solid man("border");
-    border-radius: man("radius");
     border-collapse: collapse;
     table-layout: auto;
     width: 100%;
     // Zahlenspalten sollen tabellarisch (gleich breite Ziffern) laufen, damit
     // Werte untereinander bündig stehen.
     font-variant-numeric: tabular-nums;
-    background: man("surface");
-  }
-
-  // Zebra-Streifen für den Tabellenkörper. Greift auf `<tr>`-Ebene für die
-  // gewöhnlichen Zellen; die klebende `&__cell--rowhead` setzt ihren eigenen
-  // Hintergrund (siehe unten) und wird deshalb hier extra mitgestreift.
-  tbody tr:nth-child(even) {
-    background: man("surface-sunken");
-
-    .table-widget__cell--rowhead {
-      background: man("surface-sunken");
-    }
+    background: transparent;
   }
 
   &__cell {
@@ -74,12 +64,11 @@
   &__cell--head {
     cursor: pointer;
     user-select: none;
-    background: man("slate");
-    color: man("white");
+    color: man("text");
     text-transform: uppercase;
     letter-spacing: man("track-label");
     border-bottom: man("border-width-strong") solid man("border-strong");
-    @include man-type("label");
+    @include man-type("h4");
   }
 
   // Die erste Spalte trägt die (oft langen) Zeilentitel. Sie wird gedeckelt,
@@ -99,9 +88,13 @@
 
   // Zeilentitel im Rumpf. Nur die erste Spalte klebt; eine klebende Kopfzeile
   // hätte nichts, woran sie kleben könnte: der Wrapper scrollt nicht mehr
-  // vertikal, stattdessen klappen Zeilen ein.
+  // vertikal, stattdessen klappen Zeilen ein. Die dicke Trennlinie bleibt
+  // exklusiv der Kopfzeile vorbehalten (`thead > th`) — hier gilt die
+  // gewöhnliche dünne `&__cell`-Linie.
   &__cell--rowhead {
     font-weight: 600;
+    // Deckend, nicht farbig: rein damit die klebende Spalte beim seitlichen
+    // Scrollen nichts durchscheinen lässt, keine eigene Markenfläche.
     background: man("surface");
     position: sticky;
     left: 0;
@@ -117,6 +110,18 @@
   // Luft zwischen Kopf- und erster Rumpfzeile.
   &__cell--gap {
     padding-top: 16px;
+  }
+
+  // `.text-lowercase`: hebt die Versal-Regel der Kopfzelle für markierten
+  // Text auf (z. B. Markennamen wie "iPhone" innerhalb einer sonst
+  // grossgeschriebenen Kopfzeile). Diese Klasse wird auch von
+  // `onetruck-css/src/app/00-base.scss` global definiert (`.page
+  // .text-lowercase`); eine eigene Kopie hier stellt sicher, dass sie auch
+  // ohne geladenes Custom CSS (Vorschau, anderer Tenant, CDN-Ausfall) wirkt —
+  // `LOWERCASE_CLASS` in `rich-text.ts` und `lowercase-mark.ts` erzeugen
+  // genau diese Klasse, unabhängig von der Wirtsseite.
+  .text-lowercase {
+    text-transform: lowercase !important;
   }
 
   // Der Umschalter für eingeklappte Zeilen. Bewusst zurückhaltend — er ist ein

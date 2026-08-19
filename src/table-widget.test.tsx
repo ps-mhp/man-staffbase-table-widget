@@ -78,14 +78,28 @@ describe("TableWidget", () => {
     expect(screen.getByRole("table")).toHaveStyle({ width: "100%" });
   });
 
-  it("renders a collapsed, MAN-CI bordered table (no transparent column gap)", () => {
+  it("renders a collapsed table with no outer MAN-CI border/fill (no transparent column gap)", () => {
     render(<TableWidget contentLanguage="de_DE" />);
 
     const table = screen.getByRole("table");
     expect(table).toHaveStyle({
       borderCollapse: "collapse",
-      background: "var(--man-surface, #ffffff)",
+      background: "transparent",
     });
+  });
+
+  it("ships its own `.text-lowercase` rule so the lowercase mark (see lowercase-mark.ts) still works without onetruck-css loaded", () => {
+    // The header row is uppercase (MAN-CI); marking part of a header's text
+    // with `.text-lowercase` (the class `rich-text.ts`/`lowercase-mark.ts`
+    // emit) must undo that locally, e.g. for a brand name like "iPhone".
+    // This used to only be defined globally in onetruck-css's Custom CSS,
+    // so it silently did nothing in a preview/other tenant.
+    const data = [["<span class=\"text-lowercase\">iPhone</span>", "Q1"]];
+
+    render(<TableWidget contentLanguage="de_DE" tabledata={serializeTableData(data)} />);
+
+    const marked = screen.getByText("iPhone");
+    expect(marked).toHaveStyle({ textTransform: "lowercase" });
   });
 
   it("renders merged cells with colSpan and skips covered cells", () => {
