@@ -78,14 +78,13 @@ describe("TableWidget", () => {
     expect(screen.getByRole("table")).toHaveStyle({ width: "100%" });
   });
 
-  it("separates columns with a transparent 8px gap (no coloured border)", () => {
+  it("renders a collapsed, MAN-CI bordered table (no transparent column gap)", () => {
     render(<TableWidget contentLanguage="de_DE" />);
 
     const table = screen.getByRole("table");
     expect(table).toHaveStyle({
-      borderCollapse: "separate",
-      borderSpacing: "8px 0",
-      background: "transparent",
+      borderCollapse: "collapse",
+      background: "var(--man-surface, #ffffff)",
     });
   });
 

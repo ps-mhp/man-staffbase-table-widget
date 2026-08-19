@@ -13,8 +13,15 @@
 // kommt (Farben, Ausrichtung, Formatierung einer einzelnen Zelle), bleibt
 // bewusst ein Inline-Style — der gewinnt gegen diese Regeln und braucht deshalb
 // keine Klasse pro Kombination.
+//
+// Look und Werte kommen aus dem MAN-CI (übernommen aus dem Tabelle-Abschnitt
+// von `onetruck-css/src/app/06-richtext.scss` und `.../designer/06-richtext.scss`,
+// dort jetzt entfernt): durchgezogener Rahmen statt Spaltenlücke, MAN-Radius,
+// `tabular-nums` für Zahlenspalten, Zebra-Streifen und ein dunkler
+// Versal-Kopf. Farben/Radius/Abstände laufen über `man(...)`, damit sich ein
+// MAN-Token-Update hier automatisch nachzieht.
 
-@use "tokens" as *;
+@use "@shared/stylings/man-tokens" as *;
 
 .table-widget {
   // Absichtlich kein `&__scroll`: die Klasse `table-widget-scroll` steht seit
@@ -23,7 +30,8 @@
   &-scroll {
     // Keine Höhenbegrenzung, damit `overflow` vertikal nie greift und das
     // Widget einer ohnehin scrollenden Seite keine zweite Bildlaufleiste
-    // hinzufügt. Breite Tabellen scrollen weiterhin seitlich.
+    // hinzufügt. Breite Tabellen scrollen weiterhin seitlich (mobil wie
+    // desktop).
     overflow: auto;
     width: 100%;
     max-width: 100%;
@@ -34,29 +42,44 @@
   }
 
   &__table {
-    border-collapse: separate;
-    border-spacing: 8px 0;
+    border: man("border-width") solid man("border");
+    border-radius: man("radius");
+    border-collapse: collapse;
     table-layout: auto;
     width: 100%;
-    // Der 8px-Abstand zwischen den Spalten zeigt den Tabellenhintergrund. Er
-    // ist transparent, damit die Lücke eine echte Lücke ist (die Seite
-    // dahinter scheint durch) und kein weißer Streifen.
-    background: transparent;
+    // Zahlenspalten sollen tabellarisch (gleich breite Ziffern) laufen, damit
+    // Werte untereinander bündig stehen.
+    font-variant-numeric: tabular-nums;
+    background: man("surface");
+  }
+
+  // Zebra-Streifen für den Tabellenkörper. Greift auf `<tr>`-Ebene für die
+  // gewöhnlichen Zellen; die klebende `&__cell--rowhead` setzt ihren eigenen
+  // Hintergrund (siehe unten) und wird deshalb hier extra mitgestreift.
+  tbody tr:nth-child(even) {
+    background: man("surface-sunken");
+
+    .table-widget__cell--rowhead {
+      background: man("surface-sunken");
+    }
   }
 
   &__cell {
-    padding: 8px 12px;
+    padding: man("space-3") man("space-4");
     white-space: nowrap;
-    border-bottom: 1px solid $border-table;
+    border-bottom: man("border-width") solid man("border");
     text-align: center;
   }
 
   &__cell--head {
-    font-weight: bold;
     cursor: pointer;
     user-select: none;
-    border-bottom: 2px solid $border-table-head;
-    background: $surface;
+    background: man("slate");
+    color: man("white");
+    text-transform: uppercase;
+    letter-spacing: man("track-label");
+    border-bottom: man("border-width-strong") solid man("border-strong");
+    @include man-type("label");
   }
 
   // Die erste Spalte trägt die (oft langen) Zeilentitel. Sie wird gedeckelt,
@@ -78,8 +101,8 @@
   // hätte nichts, woran sie kleben könnte: der Wrapper scrollt nicht mehr
   // vertikal, stattdessen klappen Zeilen ein.
   &__cell--rowhead {
-    font-weight: bold;
-    background: $surface;
+    font-weight: 600;
+    background: man("surface");
     position: sticky;
     left: 0;
     z-index: 1;
@@ -107,8 +130,8 @@
     font-size: 0.9em;
     color: inherit;
     background: transparent;
-    border: 1px solid $border-table;
-    border-radius: $radius-small;
+    border: man("border-width") solid man("border");
+    border-radius: man("radius");
     cursor: pointer;
   }
 }
