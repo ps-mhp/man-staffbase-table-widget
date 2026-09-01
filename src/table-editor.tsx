@@ -47,8 +47,8 @@ import { formatToStyle, formatToCellStyle } from "./cell-style";
 import { TableToolbar } from "./table-toolbar";
 import { HelpDrawer } from "./toolbar/help-drawer";
 import { importTableFile } from "./table-import";
-import { MediaClient, createMediaClient } from "./media-client";
-import { MediaPicker, PickedImage } from "./media-picker";
+import { MediaClient, createMediaClient } from "@shared/media/media-client";
+import { MediaPicker, PickedImage } from "@shared/media/media-picker";
 import {
   buildImageMarkup,
   clampImageWidth,

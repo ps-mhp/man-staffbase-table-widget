@@ -4,7 +4,7 @@ import { screen, render, fireEvent, waitFor } from "@testing-library/react";
 import { TableEditor } from "./table-editor";
 import { TableModel } from "./table-model";
 import * as tableImport from "./table-import";
-import { MediaClient, MediaItem } from "./media-client";
+import { MediaClient, MediaItem } from "@shared/media/media-client";
 import { DEFAULT_IMAGE_WIDTH } from "./cell-image";
 import { IMAGE_FIT_CLASS, IMAGE_NO_FIT_CLASS } from "./image-fit";
 
