@@ -27,6 +27,7 @@ const stubMediaClient = (overrides: Partial<MediaClient> = {}): MediaClient =>
     searchMedia: jest.fn(async () => ({ items: [], nextCursor: null })),
     uploadMedia: jest.fn(async () => mediaItem("up")),
     ensurePublicImageUrl: jest.fn(async (m: MediaItem) => `${m.url}?public=1`),
+    currentUserId: jest.fn(async () => null),
     ...overrides,
   }) as unknown as MediaClient;
 
