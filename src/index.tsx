@@ -36,22 +36,20 @@ const widgetAttributes: string[] = [
   'tabledata',
 ];
 
+let stopInjector: (() => void) | null = null;
+
 /**
- * Starts watching the whole document for the RJSF-rendered `tabledata`
- * textarea (config dialog) so the custom grid editor can be mounted next to
- * it. There is no official Staffbase SDK hook for the config dialog, so this
- * widget bundle's own module load is the only place to install this side
- * effect (see `table-editor-injector.ts`). Safe to run unconditionally: it
- * is a no-op (beyond the cheap `MutationObserver`) in any context where the
- * config dialog never appears, e.g. when the bundle only renders the
- * read-only widget on a live page.
+ * Stops watching the config dialog for the RJSF-rendered `tabledata` textarea.
  *
  * Exported only so tests can dispose of the observer on teardown (jsdom
  * tears down its own `window` between test files, which would otherwise
  * cause a lingering `MutationObserver` callback to throw); production code
  * never needs to call this.
  */
-export const stopTableEditorInjector = startTableEditorInjector();
+export function stopTableEditorInjector(): void {
+  stopInjector?.();
+  stopInjector = null;
+}
 
 /**
  * Installed unconditionally at module load: on a live content page the
@@ -140,5 +138,13 @@ const externalBlockDefinition: ExternalBlockDefinition = {
 void startWidget({
   name: "table-widget",
   version: pkg.version,
-  register: () => window.defineBlock(externalBlockDefinition),
+  // The editor belongs to whoever registers, not to whoever loads. Started at
+  // module level, the installed bundle's observer claimed the `tabledata`
+  // field before it even asked whether a local server takes over — dev mode
+  // then served the view but the published editor. Measured on 02.09.2026: a
+  // mark planted in the locally served bundle never reached the dialog.
+  register: () => {
+    stopInjector = startTableEditorInjector();
+    window.defineBlock(externalBlockDefinition);
+  },
 });
