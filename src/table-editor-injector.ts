@@ -42,8 +42,9 @@ export function startTableEditorInjector(root: ParentNode = document): () => voi
     parse: parseTableModel,
     serialize: encodeTableAttribute,
     // The editor draws its own frame — toolbar and grid share an edge — so the
-    // panel's form-style padding would only push that frame away from it.
-    panelStyle: { padding: "0px" },
+    // panel's form-style padding would only push that frame away from it. The
+    // `editor-flush` variant is exactly that: full-viewport, no inner padding.
+    variant: "editor-flush",
     render: ({ value, onChange, onSave, onClose, dirty }) =>
       React.createElement(TableEditor, { value, onChange, onSave, onClose, dirty }),
   });
