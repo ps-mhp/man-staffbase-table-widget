@@ -109,8 +109,29 @@
       }
     }
 
-    &--active,
-    &--active:hover:not(:disabled) {
+    // `--active` bildet einen echten Editor-Zustand ab (z. B. „Fett" aktiv)
+    // und muss deshalb für *beide* Sorten Knöpfe gelten — anders als der
+    // Grundblock oben lässt sich dieser hier nicht hinter `:not(.man-ed-
+    // button)` verstecken. Geprüft: die Primitive kennt aktuell keinen
+    // gedrückten Zustand (`aria-pressed` wird zwar gesetzt, `button.scss`
+    // hat aber keine `[aria-pressed]`-Regel) — sie kann den Zustand also
+    // nicht selbst zeichnen. `RibbonButton` benutzt außerdem ausschließlich
+    // `variant="ghost"`, daher kollidiert `--active` nur mit
+    // `.man-ed-button--ghost`, nicht mit den anderen Varianten.
+    //
+    // Beide Regelsätze haben ohne Gegenmaßnahme dieselbe Spezifität (je eine
+    // Klasse) und setzen dieselben drei Eigenschaften — wer gewinnt, hinge
+    // nur an der zufälligen Ladereihenfolge der beiden Stylesheets
+    // (`ribbon.scss` lokal, `Button`s Stylesheet asynchron in
+    // `document.head`). Der Doppelklassen-Selektor unten (zwei Klassen aus
+    // derselben Regel, `.tw-rb__btn.tw-rb__btn--active`) hebt die Spezifität
+    // bewusst über die der Primitive, damit der aktive Zustand unabhängig
+    // von der Ladereihenfolge sichtbar bleibt. Das ist ein gezielter Stich
+    // gegen die Ebene, kein Versehen — er kann entfallen, sobald `Button`/
+    // `IconButton` selbst einen gedrückten Zustand zeichnen (z. B. über
+    // `[aria-pressed="true"]` in `button.scss`).
+    &.tw-rb__btn--active,
+    &.tw-rb__btn--active:hover:not(:disabled) {
       background: $accent-surface;
       border-color: $accent-border;
       color: $accent-text;

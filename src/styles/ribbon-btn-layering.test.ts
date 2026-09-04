@@ -12,6 +12,13 @@
  */
 
 import css from "./ribbon.scss";
+// Das Stylesheet der Primitive, kompiliert genauso wie `useEditorStyles` es
+// zur Laufzeit asynchron in `document.head` hängt (siehe
+// `@shared/editor-ui/load.ts`). Nur mit beiden Regelsätzen zusammen lässt
+// sich die Kaskade zwischen `.tw-rb__btn--active` und `.man-ed-button--ghost`
+// überhaupt prüfen — ein reiner Textvergleich an `ribbon.scss` allein sieht
+// die Kollision nicht.
+import buttonCss from "@shared/editor-ui/styles/button.scss";
 
 // `RibbonButton` (`../toolbar/controls.tsx`) rendert seit der Umstellung auf
 // die Primitive `Button` Knöpfe, die *gleichzeitig* `.tw-rb__btn` (dieses
@@ -57,10 +64,61 @@ describe("ribbon.scss: .tw-rb__btn layering vs. man-ed-button", () => {
     expect(css).toContain(".tw-rb__btn:not(.man-ed-button)");
   });
 
-  it("still paints the active state for buttons carrying man-ed-button", () => {
-    // `--active` markiert einen Editor-Zustand (z. B. „Fett" aktiv), den die
-    // Primitive selbst nicht kennt — der muss unabhängig von `man-ed-button`
-    // weitergelten, sonst verschwindet die Zustandsanzeige der Ribbon-Knöpfe.
-    expect(css).toMatch(/\.tw-rb__btn--active\s*,/);
+  // jsdoms `getComputedStyle` implementiert die Kaskade nicht spezifikations-
+  // treu: ein Probelauf (zwei Regeln `.a.b{color:red}` vs. `.b{color:blue}`,
+  // Klassenliste `a b`) liefert je nach Einhänge-Reihenfolge *blau*, obwohl
+  // `.a.b` die höhere Spezifität hat und in echten Browsern immer gewänne —
+  // jsdom wertet hier nur die DOM-Reihenfolge, nicht die Spezifität. Ein
+  // "gerendertes Element mit beiden Klassen" würde also in diesem
+  // Testökosystem beweisen, dass die Lösung *nicht* funktioniert, selbst wenn
+  // sie es in jedem echten Browser tut — ein Artefakt der Testumgebung, keine
+  // reale Kollision. Stattdessen wird hier die tatsächliche
+  // CSS-Spezifität der beiden konkurrierenden Selektoren berechnet: genau
+  // die Zahl, die echte Browser zur Auflösung heranziehen, unabhängig von
+  // der Ladereihenfolge.
+  function specificity(selector: string): number {
+    // Reicht für dieses Stylesheet: nur Klassen, Attribute und
+    // Ein-Doppelpunkt-Pseudoklassen zählen (inklusive des Arguments von
+    // `:not()`, das dessen eigene Spezifität beisteuert) — IDs oder
+    // Typselektoren kommen in `ribbon.scss`/`button.scss` nicht vor.
+    const withNotUnwrapped = selector.replace(/:not\(([^)]*)\)/g, " $1 ");
+    const classes = withNotUnwrapped.match(/\.[a-zA-Z0-9_-]+/g) ?? [];
+    const attributes = withNotUnwrapped.match(/\[[^\]]*\]/g) ?? [];
+    const pseudoClasses = withNotUnwrapped.match(/:[a-zA-Z-]+/g) ?? [];
+    return classes.length + attributes.length + pseudoClasses.length;
+  }
+
+  // Extrahiert den Ruhezustand-Selektor der `.man-ed-button--ghost`-Regel
+  // direkt aus dem kompilierten CSS-Block (statt über den Deklarationswert
+  // zu suchen — `border-strong` färbt auch `--secondary`, ist also nicht
+  // eindeutig genug).
+  function restingGhostSelector(source: string): string {
+    const match = source.match(/\.man-ed-button--ghost\s*\{/);
+    expect(match).not.toBeNull();
+    return ".man-ed-button--ghost";
+  }
+
+  // Findet den Ruhezustand-Selektor der `--active`-Regel: dem Präfix
+  // `tw-rb__btn` können beliebig viele Klassen folgen (die Sperre hängt eine
+  // zweite Klasse an), daher reicht ein fester String hier nicht — anders
+  // als bei `.man-ed-button--ghost`, das unverändert bleibt.
+  function restingActiveSelector(source: string): string {
+    const match = source.match(/([.\w-]*tw-rb__btn[.\w-]*--active)\s*,/);
+    expect(match).not.toBeNull();
+    return match![1];
+  }
+
+  it("gives the active-state rule higher specificity than man-ed-button--ghost's own colour rule", () => {
+    // `--active` (ribbon.scss) und `--ghost` (button.scss) setzen im
+    // Ruhezustand beide `color`. Ohne ausreichenden Spezifitäts-Abstand
+    // entscheidet in echten Browsern die Ladereihenfolge — mit ihm gewinnt
+    // `--active` immer, unabhängig davon, welches Stylesheet zuletzt lädt.
+    const compiledActiveSelector = restingActiveSelector(css);
+    const compiledGhostSelector = restingGhostSelector(buttonCss);
+
+    expect(compiledActiveSelector).toContain("tw-rb__btn");
+    expect(compiledActiveSelector).toContain("--active");
+    expect(compiledGhostSelector).toBe(".man-ed-button--ghost");
+    expect(specificity(compiledActiveSelector)).toBeGreaterThan(specificity(compiledGhostSelector));
   });
 });
