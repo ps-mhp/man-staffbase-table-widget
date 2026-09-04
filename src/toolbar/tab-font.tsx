@@ -14,11 +14,19 @@
 import * as React from "react";
 import { ReactElement } from "react";
 
+import { Select, SelectOption, useEditorStyles } from "@shared/editor-ui";
 import { ColorButton, RibbonButton } from "./controls";
 import { IconSubscript, IconSuperscript } from "./icons";
 import { TableToolbarProps } from "./props";
 
 const FONT_SIZES = [10, 12, 14, 16, 18, 20, 24, 28, 32];
+
+// Der Leereintrag ist eine reguläre Option mit `value: ""` — `Select.placeholder`
+// ist gesperrt (siehe Kopfkommentar von `Select.tsx`).
+const FONT_SIZE_OPTIONS: readonly SelectOption[] = [
+  { value: "", label: "Standard" },
+  ...FONT_SIZES.map((size) => ({ value: String(size), label: String(size) })),
+];
 
 export type FontTabProps = Pick<
   TableToolbarProps,
@@ -53,25 +61,23 @@ export function FontTab({
   onToggleLowercase,
   lowercaseActive,
 }: FontTabProps): ReactElement {
+  // Lädt das Stylesheet der Redaktionsebene (`Select`), referenzgezählt in
+  // `document.head` — siehe RibbonShell für dieselbe Begründung.
+  useEditorStyles();
   const disabled = !hasSelection;
 
   return (
     <>
-      <select
+      <Select
         className="tw-rb__select"
         data-testid="toolbar-fontsize"
         aria-label="Schriftgröße"
+        size="sm"
         disabled={disabled}
-        value={activeFormat.fontSize ?? ""}
+        value={activeFormat.fontSize?.toString() ?? ""}
         onChange={(e) => onFontSize(e.target.value === "" ? null : Number(e.target.value))}
-      >
-        <option value="">Standard</option>
-        {FONT_SIZES.map((size) => (
-          <option key={size} value={size}>
-            {size}
-          </option>
-        ))}
-      </select>
+        options={FONT_SIZE_OPTIONS}
+      />
       <RibbonButton testId="toolbar-fontsize-inc" variant="step" title="Schrift vergrößern" disabled={disabled} onClick={() => onFontSizeStep(1)}>
         <span className="tw-rb__glyph tw-rb__glyph--lg">A</span>
         <span className="tw-rb__glyph tw-rb__glyph--arrow">▲</span>

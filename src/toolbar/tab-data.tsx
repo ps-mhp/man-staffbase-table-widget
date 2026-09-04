@@ -14,7 +14,7 @@
 import * as React from "react";
 import { ReactElement, useRef } from "react";
 
-import { Menu, MenuItem, useEditorStyles } from "@shared/editor-ui";
+import { Input, Menu, MenuItem, useEditorStyles } from "@shared/editor-ui";
 import { IconChevron, IconClearFormat, IconPainter, IconSort, IconUpload } from "./icons";
 import { TableToolbarProps } from "./props";
 
@@ -90,10 +90,11 @@ export function DataTab({
         className="tw-rb__rows-limit"
         title="Zeilen, die die veröffentlichte Tabelle zeigt, bevor sie hinter einem Button einklappt. 0 zeigt alle Zeilen."
       >
-        <input
+        <Input
           type="number"
           min={0}
           step={1}
+          size="sm"
           data-testid="toolbar-visible-rows"
           value={visibleRows}
           onChange={(event) => {

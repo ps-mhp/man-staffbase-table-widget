@@ -74,7 +74,6 @@ const TOOLBAR_TAB: Record<string, string> = {
   "toolbar-image-equal-height": "Bilder",
   "toolbar-image-equal-width": "Bilder",
   "toolbar-image-reset-size": "Bilder",
-  "toolbar-image-fit": "Bilder",
   "toolbar-painter": "Daten",
   "toolbar-visible-rows": "Daten",
   "toolbar-upload": "Daten",
@@ -89,6 +88,16 @@ function toolbar(testId: string): HTMLElement {
   const label = TOOLBAR_TAB[testId];
   if (label) fireEvent.click(screen.getByRole("tab", { name: label }));
   return screen.getByTestId(testId);
+}
+
+// `<Switch>` (`@shared/editor-ui`) does not accept `data-testid` — it
+// destructures its props individually instead of spreading `...rest`. The
+// image-fit toggle is found by its accessible name instead, which is the
+// same move already made for the ribbon menus. The tab still has to be
+// opened first, exactly like `toolbar()` does via `TOOLBAR_TAB`.
+function imageFitSwitch(): HTMLElement {
+  fireEvent.click(screen.getByRole("tab", { name: "Bilder" }));
+  return screen.getByRole("switch", { name: "Bilder anpassen" });
 }
 
 describe("TableEditor", () => {
@@ -526,7 +535,7 @@ describe("TableEditor", () => {
       const onChange = jest.fn();
       render(<TableEditor value={withImages()} onChange={onChange} measure={measure} />);
 
-      const toggle = toolbar("toolbar-image-fit");
+      const toggle = imageFitSwitch();
       expect(toggle).toHaveAttribute("aria-checked", "true");
       // Table-wide, so it works without a selection.
       fireEvent.click(toggle);
@@ -546,7 +555,7 @@ describe("TableEditor", () => {
         />,
       );
 
-      const toggle = toolbar("toolbar-image-fit");
+      const toggle = imageFitSwitch();
       expect(toggle).toHaveAttribute("aria-checked", "false");
       fireEvent.click(toggle);
 

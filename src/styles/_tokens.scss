@@ -116,11 +116,6 @@ $shadow-context-menu: tokens.man-editor(shadow-overlay);
 // Schattenton für Ziehgriffe, und ein zweiter Name für denselben Wert wäre
 // unnötig.
 $shadow-overlay: tokens.man-editor(shadow-overlay);
-// Der Knauf des Ein/Aus-Schalters trägt in der CI **keinen** Schatten:
-// `../onetruck-css/src/03-elements/switch/_app.scss` zeichnet `.handle` ohne
-// `box-shadow`. Der Overlay-Schatten (0 8px 24px) wäre für einen 16px-Knauf
-// grotesk. Der Name verschwindet in Aufgabe 8 mit dem `Switch`-Primitiv.
-$shadow-switch-knob: none;
 
 // Bewegung ---------------------------------------------------------------
 // Die Ebene führt bewusst keinen Bewegungs-Token — Bewegung ist keine

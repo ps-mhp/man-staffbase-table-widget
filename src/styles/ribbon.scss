@@ -187,66 +187,13 @@
     }
   }
 
-  // Schalter für tabellenweite Optionen. Anders als die Aktionsbuttons zeigt er
-  // einen Zustand, deshalb ein Kippschalter statt eines gedrückten Buttons.
-  &__switch {
-    @include control-pill;
-    @include focus-ring;
-
+  // Umschlag um `<Switch>` (`src/shared/editor-ui`): die Primitive selbst
+  // zeichnet Bahn, Knauf und Zustandsfarben (`man-ed-switch*` in
+  // `@shared/editor-ui/styles/choice.scss`) — hier bleibt nur, was die
+  // Primitive nicht kennt: die Einreihung in die waagerechte Werkzeugleiste.
+  &__switch-wrap {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
-    padding: 0 10px;
-    cursor: pointer;
-    // Kippschalter-Beschriftung, ebenfalls Werkzeugleiste: `dense` statt der
-    // alten `12px`.
-    @include type.man-editor-type(dense);
-    border: 0;
-    transition:
-      background $transition,
-      border-color $transition;
-
-    &:hover:not(:disabled) {
-      background: $surface-hover;
-      border-color: $border-hover;
-    }
-
-    &[aria-checked="true"] {
-      border-color: $accent-border;
-      background: $accent-surface-soft;
-      color: $accent-text;
-
-      .tw-rb__switch-track {
-        background: $accent;
-
-        &::after {
-          transform: translateX(12px);
-        }
-      }
-    }
-  }
-
-  &__switch-track {
-    position: relative;
-    width: 28px;
-    height: 16px;
-    border-radius: 0;
-    background: $switch-off;
-    transition: background $transition-slow;
-    flex: 0 0 auto;
-
-    &::after {
-      content: "";
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      width: 12px;
-      height: 12px;
-      border-radius: 0;
-      background: $surface;
-      box-shadow: $shadow-switch-knob;
-      transition: transform $transition-slow;
-    }
   }
 
   &__rows-limit {
@@ -261,52 +208,24 @@
     // Aktionsbuttons der Leiste (die tragen `dense`, siehe `&__btn`).
     @include type.man-editor-type(label);
 
+    // `<Input size="sm">` bringt Rahmen, Hintergrund, Fokusring und die
+    // `dense`-Schriftrolle für den Zahlenwert bereits mit
+    // (`@shared/editor-ui/styles/input.scss`). Hier bleibt nur die
+    // Breite — eine Anordnungsfrage der schmalen Werkzeugleiste, keine
+    // Optik, die die Primitive schon träfe.
     input {
       width: 46px;
-      height: 22px;
-      padding: 0 4px;
-      border: 1px solid $border;
-      border-radius: 0;
-      // Der Zahlenwert selbst ist Werkzeugleisten-Inhalt, keine Beschriftung:
-      // `dense`, bewusst abweichend vom `label` des umschließenden `<label>`.
-      // Die Rolle setzt Familie/Gewicht/Zeilenhöhe explizit, das alte
-      // `font: inherit;` (Reset des Browser-Defaults für `<input>`) wird
-      // dadurch gegenstandslos.
-      @include type.man-editor-type(dense);
-      text-align: center;
-      color: inherit;
-      background: $surface;
-      box-sizing: border-box;
-
-      @include focus-ring;
     }
   }
 
+  // `<Select>` (`@shared/editor-ui`) bringt Rahmen, Hintergrund, Aufklapppfeil,
+  // Fokusring und die gedämpfte `disabled`-Optik bereits mit
+  // (`@shared/editor-ui/styles/choice.scss`) — die frühere eigene Pillenkontur,
+  // der gezeichnete Pfeil und die Übergänge entfallen deshalb hier. Nur die
+  // Mindestbreite bleibt: reine Anordnung in der schmalen Werkzeugleiste,
+  // damit das Feld bei kurzen Werten ("10") nicht auf Textbreite schrumpft.
   &__select {
-    @include control-pill;
-    @include focus-ring;
-    @include disabled;
-
-    -webkit-appearance: none;
-    appearance: none;
-    background-color: $surface;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none' stroke='%236b7684' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 4.5L6 8l3-3.5'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 8px center;
-    background-size: 11px;
-    padding: 0 26px 0 10px;
-    // Auswahlfeld-Wert, Werkzeugleisten-Inhalt: `dense`.
-    @include type.man-editor-type(dense);
-    cursor: pointer;
     min-width: 92px;
-    border: 0;
-    transition:
-      border-color $transition,
-      box-shadow $transition;
-
-    &:hover:not(:disabled) {
-      border-color: $border-hover;
-    }
   }
 
   // Farbwähler und sein Aufklappmenü (jetzt `<Button>`-Primitiven) lesen sich

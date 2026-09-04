@@ -14,7 +14,7 @@
 import * as React from "react";
 import { ReactElement } from "react";
 
-import { Menu, MenuItem, useEditorStyles } from "@shared/editor-ui";
+import { Menu, MenuItem, Switch, useEditorStyles } from "@shared/editor-ui";
 import { IconChevron, IconImage, IconImageSize } from "./icons";
 import { TableToolbarProps } from "./props";
 
@@ -92,18 +92,20 @@ export function ImagesTab({
         </MenuItem>
       </Menu>
 
-      <button
-        type="button"
-        role="switch"
-        aria-checked={fitImages}
-        className="tw-rb__switch"
-        data-testid="toolbar-image-fit"
+      {/*
+        `Switch` zerlegt seine Props einzeln (kein `...rest`) und nimmt daher
+        weder `data-testid` noch `title` an. Der `title` ist echter Hilfetext
+        für die Redaktion und wandert deshalb auf diese umschließende Hülle —
+        `title` an einem Element wirkt auch für dessen Inhalt. Das verlorene
+        `data-testid="toolbar-image-fit"` wird in `table-editor.test.tsx`
+        durch `getByRole("switch", { name: "Bilder anpassen" })` ersetzt.
+      */}
+      <span
+        className="tw-rb__switch-wrap"
         title="Bilder auf die Breite der Tabelle begrenzen. Ausgeschaltet werden sie immer in ihrer eigenen Größe angezeigt."
-        onClick={onToggleFitImages}
       >
-        <span className="tw-rb__switch-track" aria-hidden="true" />
-        <span>Bilder anpassen</span>
-      </button>
+        <Switch checked={fitImages} onCheckedChange={onToggleFitImages} label="Bilder anpassen" />
+      </span>
     </>
   );
 }
