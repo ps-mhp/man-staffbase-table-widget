@@ -12,9 +12,9 @@
  */
 
 import * as React from "react";
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { ReactElement, useRef } from "react";
 
-import { Button, useEditorStyles } from "@shared/editor-ui";
+import { Button, Menu, MenuItem, useEditorStyles } from "@shared/editor-ui";
 import { IconChevron } from "./icons";
 
 /** White box with a red diagonal slash — the "no colour set" (Standard) look. */
@@ -90,45 +90,6 @@ export function RibbonButton({
   );
 }
 
-/** A closable dropdown menu anchored to a trigger, used for Insert/Delete/Sort. */
-export function Dropdown({
-  trigger,
-  children,
-  testId,
-}: {
-  trigger: (toggle: () => void, open: boolean) => React.ReactNode;
-  children: (close: () => void) => React.ReactNode;
-  testId: string;
-}): ReactElement {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    // Use the capture phase: the injected editor can live inside a modal that
-    // stops propagation of bubble-phase pointer events at document.body (to
-    // avoid dismissing the host popover). A capture-phase listener on
-    // document still fires before that, so an outside click reliably closes
-    // this dropdown.
-    const onDoc = (e: MouseEvent): void => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", onDoc, true);
-    return () => document.removeEventListener("mousedown", onDoc, true);
-  }, [open]);
-
-  return (
-    <div ref={ref} className="tw-rb__dropdown">
-      {trigger(() => setOpen((o) => !o), open)}
-      {open && (
-        <div className="tw-rb__menu" data-testid={testId}>
-          {children(() => setOpen(false))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 /** Excel-style colour button: glyph over a colour bar, chevron opens options. */
 export function ColorButton({
   value,
@@ -147,16 +108,23 @@ export function ColorButton({
   testId: string;
   glyph: React.ReactNode;
 }): ReactElement {
+  // Lädt das Stylesheet der Redaktionsebene (`Button`, `Menu`), referenzgezählt
+  // in `document.head` — siehe RibbonShell für dieselbe Begründung.
+  useEditorStyles();
   const inputRef = useRef<HTMLInputElement>(null);
   const isStandard = !value;
   return (
     <div className="tw-rb__color-wrap">
-      <button
-        type="button"
+      <Button
+        variant="ghost"
+        size="sm"
         className="tw-rb__color"
         title={title}
         aria-label={title}
         disabled={disabled}
+        // Verhindert, dass ein Klick auf den Farbknopf die Textauswahl der
+        // gerade bearbeiteten `contenteditable`-Zelle verliert — siehe
+        // `RibbonButton` für dieselbe Begründung.
         onMouseDown={(e) => e.preventDefault()}
         onClick={() => inputRef.current?.click()}
       >
@@ -166,7 +134,7 @@ export function ColorButton({
           aria-hidden
           style={{ background: isStandard ? STANDARD_BAR : value }}
         />
-      </button>
+      </Button>
       <input
         ref={inputRef}
         type="color"
@@ -177,48 +145,29 @@ export function ColorButton({
         onChange={(e) => onChange(e.target.value)}
         className="tw-rb__color-input"
       />
-      <Dropdown
-        testId={`${testId}-menu`}
-        trigger={(toggle) => (
-          <button
-            type="button"
+      <Menu
+        label={`${title}: Optionen`}
+        trigger={
+          <Button
+            variant="ghost"
+            size="sm"
             className="tw-rb__caret"
             title={`${title}: Optionen`}
             aria-label={`${title}: Optionen`}
             disabled={disabled}
             onMouseDown={(e) => e.preventDefault()}
-            onClick={toggle}
           >
             <IconChevron />
-          </button>
-        )}
+          </Button>
+        }
       >
-        {(close) => (
-          <>
-            <button
-              type="button"
-              className="tw-rb__menu-item"
-              data-testid={`${testId}-reset`}
-              onClick={() => {
-                onClear();
-                close();
-              }}
-            >
-              <span className="tw-rb__swatch" style={{ background: STANDARD_BAR }} /> Standard
-            </button>
-            <button
-              type="button"
-              className="tw-rb__menu-item"
-              onClick={() => {
-                close();
-                inputRef.current?.click();
-              }}
-            >
-              <span className="tw-rb__swatch" style={{ background: value ?? "#233848" }} /> Farbe wählen…
-            </button>
-          </>
-        )}
-      </Dropdown>
+        <MenuItem data-testid={`${testId}-reset`} onClick={onClear}>
+          <span className="tw-rb__swatch" style={{ background: STANDARD_BAR }} /> Standard
+        </MenuItem>
+        <MenuItem onClick={() => inputRef.current?.click()}>
+          <span className="tw-rb__swatch" style={{ background: value ?? "#233848" }} /> Farbe wählen…
+        </MenuItem>
+      </Menu>
     </div>
   );
 }

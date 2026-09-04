@@ -108,8 +108,9 @@ $control-height-sm: tokens.man-editor(control-h-sm);
 
 // Schatten ---------------------------------------------------------------
 // Die Ebene führt **einen** Schatten für schwebende Flächen; die beiden alten
-// Menüschatten fallen darauf zusammen.
-$shadow-menu: tokens.man-editor(shadow-overlay);
+// Menüschatten fallen darauf zusammen. `$shadow-menu` selbst ist mit dieser
+// Aufgabe entfallen: das Farbwähler-Menü zeichnet seinen Schatten jetzt über
+// `Menu`s eigenes Stylesheet, keine lokale Regel greift mehr darauf zu.
 $shadow-context-menu: tokens.man-editor(shadow-overlay);
 // Derselbe Overlay-Schatten für den Bildgriff: die CI kennt keinen eigenen
 // Schattenton für Ziehgriffe, und ein zweiter Name für denselben Wert wäre

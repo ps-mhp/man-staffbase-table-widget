@@ -14,7 +14,7 @@
 import * as React from "react";
 import { ReactElement } from "react";
 
-import { Dropdown } from "./controls";
+import { Menu, MenuItem, useEditorStyles } from "@shared/editor-ui";
 import { IconChevron, IconImage, IconImageSize } from "./icons";
 import { TableToolbarProps } from "./props";
 
@@ -43,6 +43,9 @@ export function ImagesTab({
   fitImages,
   onToggleFitImages,
 }: ImagesTabProps): ReactElement {
+  // Lädt das Stylesheet der Redaktionsebene (`Menu`), referenzgezählt in
+  // `document.head` — siehe RibbonShell für dieselbe Begründung.
+  useEditorStyles();
   const disabled = !hasSelection;
 
   return (
@@ -53,36 +56,41 @@ export function ImagesTab({
       </button>
 
 
-      <Dropdown
-        testId="toolbar-image-size-menu"
-        trigger={(toggle) => (
+      <Menu
+        label="Bildgröße"
+        trigger={
           <button
             type="button"
             className="tw-rb__btn"
             data-testid="toolbar-image-size"
             title="Größe der markierten Bilder angleichen (Maßstab ist das zuerst markierte Bild)"
             disabled={!hasSelectedImages}
-            onClick={toggle}
           >
             <IconImageSize />
             <span className="tw-rb__label">Bildgröße <IconChevron /></span>
           </button>
-        )}
+        }
       >
-        {(close) => (
-          <>
-            <button type="button" className="tw-rb__menu-item" data-testid="toolbar-image-equal-height" disabled={!canEqualizeImages} title={canEqualizeImages ? undefined : "Mindestens zwei markierte Bilder nötig"} onClick={() => { onEqualizeImageHeight(); close(); }}>
-              Gleiche Höhe wie erstes Bild
-            </button>
-            <button type="button" className="tw-rb__menu-item" data-testid="toolbar-image-equal-width" disabled={!canEqualizeImages} title={canEqualizeImages ? undefined : "Mindestens zwei markierte Bilder nötig"} onClick={() => { onEqualizeImageWidth(); close(); }}>
-              Gleiche Breite wie erstes Bild
-            </button>
-            <button type="button" className="tw-rb__menu-item" data-testid="toolbar-image-reset-size" onClick={() => { onResetImageSize(); close(); }}>
-              Standardgröße
-            </button>
-          </>
-        )}
-      </Dropdown>
+        <MenuItem
+          data-testid="toolbar-image-equal-height"
+          disabled={!canEqualizeImages}
+          title={canEqualizeImages ? undefined : "Mindestens zwei markierte Bilder nötig"}
+          onClick={onEqualizeImageHeight}
+        >
+          Gleiche Höhe wie erstes Bild
+        </MenuItem>
+        <MenuItem
+          data-testid="toolbar-image-equal-width"
+          disabled={!canEqualizeImages}
+          title={canEqualizeImages ? undefined : "Mindestens zwei markierte Bilder nötig"}
+          onClick={onEqualizeImageWidth}
+        >
+          Gleiche Breite wie erstes Bild
+        </MenuItem>
+        <MenuItem data-testid="toolbar-image-reset-size" onClick={onResetImageSize}>
+          Standardgröße
+        </MenuItem>
+      </Menu>
 
       <button
         type="button"

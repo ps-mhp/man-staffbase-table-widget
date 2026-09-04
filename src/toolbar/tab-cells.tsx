@@ -14,7 +14,8 @@
 import * as React from "react";
 import { ReactElement } from "react";
 
-import { Dropdown, RibbonButton } from "./controls";
+import { Menu, MenuItem, useEditorStyles } from "@shared/editor-ui";
+import { RibbonButton } from "./controls";
 import { IconChevron, IconDelete, IconInsert } from "./icons";
 import { TableToolbarProps } from "./props";
 
@@ -47,6 +48,9 @@ export function CellsTab({
   onUnmerge,
   canUnmerge,
 }: CellsTabProps): ReactElement {
+  // Lädt das Stylesheet der Redaktionsebene (`Menu`), referenzgezählt in
+  // `document.head` — siehe RibbonShell für dieselbe Begründung.
+  useEditorStyles();
   const disabled = !hasSelection;
 
   // With a full row or column selected the menu offers only what fits that
@@ -63,61 +67,53 @@ export function CellsTab({
         Lösen
       </RibbonButton>
 
-      <Dropdown
-        testId="toolbar-insert-menu"
-        trigger={(toggle) => (
-          <button type="button" className="tw-rb__big" data-testid="toolbar-insert" title="Einfügen" onClick={toggle}>
+      <Menu
+        label="Einfügen"
+        trigger={
+          <button type="button" className="tw-rb__big" data-testid="toolbar-insert" title="Einfügen">
             <IconInsert />
             <span className="tw-rb__label">Einfügen <IconChevron /></span>
           </button>
-        )}
+        }
       >
-        {(close) => (
+        {showRow && (
           <>
-            {showRow && (
-              <>
-                <button type="button" className="tw-rb__menu-item" data-testid="toolbar-insert-row-above" onClick={() => { onInsertRowAbove(); close(); }}>
-                  Zeile oberhalb
-                </button>
-                <button type="button" className="tw-rb__menu-item" data-testid="toolbar-insert-row-below" onClick={() => { onInsertRowBelow(); close(); }}>
-                  Zeile unterhalb
-                </button>
-              </>
-            )}
-            {showCol && (
-              <>
-                <button type="button" className="tw-rb__menu-item" data-testid="toolbar-insert-col-left" onClick={() => { onInsertColLeft(); close(); }}>
-                  Spalte links
-                </button>
-                <button type="button" className="tw-rb__menu-item" data-testid="toolbar-insert-col-right" onClick={() => { onInsertColRight(); close(); }}>
-                  Spalte rechts
-                </button>
-              </>
-            )}
+            <MenuItem data-testid="toolbar-insert-row-above" onClick={onInsertRowAbove}>
+              Zeile oberhalb
+            </MenuItem>
+            <MenuItem data-testid="toolbar-insert-row-below" onClick={onInsertRowBelow}>
+              Zeile unterhalb
+            </MenuItem>
           </>
         )}
-      </Dropdown>
+        {showCol && (
+          <>
+            <MenuItem data-testid="toolbar-insert-col-left" onClick={onInsertColLeft}>
+              Spalte links
+            </MenuItem>
+            <MenuItem data-testid="toolbar-insert-col-right" onClick={onInsertColRight}>
+              Spalte rechts
+            </MenuItem>
+          </>
+        )}
+      </Menu>
 
-      <Dropdown
-        testId="toolbar-delete-menu"
-        trigger={(toggle) => (
-          <button type="button" className="tw-rb__big" data-testid="toolbar-delete" title="Löschen" disabled={disabled} onClick={toggle}>
+      <Menu
+        label="Löschen"
+        trigger={
+          <button type="button" className="tw-rb__big" data-testid="toolbar-delete" title="Löschen" disabled={disabled}>
             <IconDelete />
             <span className="tw-rb__label">Löschen <IconChevron /></span>
           </button>
-        )}
+        }
       >
-        {(close) => (
-          <>
-            <button type="button" className="tw-rb__menu-item" data-testid="toolbar-delete-rows" onClick={() => { onDeleteRows(); close(); }}>
-              Zeile(n) löschen
-            </button>
-            <button type="button" className="tw-rb__menu-item" data-testid="toolbar-delete-cols" onClick={() => { onDeleteCols(); close(); }}>
-              Spalte(n) löschen
-            </button>
-          </>
-        )}
-      </Dropdown>
+        <MenuItem data-testid="toolbar-delete-rows" onClick={onDeleteRows}>
+          Zeile(n) löschen
+        </MenuItem>
+        <MenuItem data-testid="toolbar-delete-cols" onClick={onDeleteCols}>
+          Spalte(n) löschen
+        </MenuItem>
+      </Menu>
     </>
   );
 }

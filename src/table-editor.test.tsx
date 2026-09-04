@@ -67,7 +67,6 @@ const TOOLBAR_TAB: Record<string, string> = {
   "toolbar-valign-bottom": "Ausrichtung",
   "toolbar-unmerge": "Zellen",
   "toolbar-insert": "Zellen",
-  "toolbar-insert-menu": "Zellen",
   "toolbar-insert-row-above": "Zellen",
   "toolbar-insert-col-left": "Zellen",
   "toolbar-image-button": "Bilder",
@@ -271,12 +270,18 @@ describe("TableEditor", () => {
 
   it("closes a toolbar dropdown when clicking outside it", () => {
     render(<TableEditor value={sample()} onChange={jest.fn()} />);
-    fireEvent.click(toolbar("toolbar-insert"));
-    expect(toolbar("toolbar-insert-menu")).toBeInTheDocument();
+    const insertTrigger = toolbar("toolbar-insert");
+    fireEvent.click(insertTrigger);
+    // "Menü ist offen": Semantik statt Testmarke (`<Menu>` reicht kein
+    // `data-testid` an die Menüfläche durch) — `role="menu"` und
+    // `aria-expanded` am Auslöser sind die zugängliche Zusicherung.
+    expect(screen.getByRole("menu", { name: "Einfügen" })).toBeInTheDocument();
+    expect(insertTrigger).toHaveAttribute("aria-expanded", "true");
 
     // A mousedown anywhere outside the dropdown closes it.
     fireEvent.mouseDown(document.body);
-    expect(screen.queryByTestId("toolbar-insert-menu")).not.toBeInTheDocument();
+    expect(screen.queryByRole("menu", { name: "Einfügen" })).not.toBeInTheDocument();
+    expect(insertTrigger).toHaveAttribute("aria-expanded", "false");
   });
 
   it("copies a format with the painter and applies it to the next selection", () => {

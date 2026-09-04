@@ -14,7 +14,7 @@
 import * as React from "react";
 import { ReactElement, useRef } from "react";
 
-import { Dropdown } from "./controls";
+import { Menu, MenuItem, useEditorStyles } from "@shared/editor-ui";
 import { IconChevron, IconClearFormat, IconPainter, IconSort, IconUpload } from "./icons";
 import { TableToolbarProps } from "./props";
 
@@ -47,6 +47,9 @@ export function DataTab({
   onClearFormatting,
   hasClearTarget,
 }: DataTabProps): ReactElement {
+  // Lädt das Stylesheet der Redaktionsebene (`Menu`), referenzgezählt in
+  // `document.head` — siehe RibbonShell für dieselbe Begründung.
+  useEditorStyles();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const disabled = !hasSelection;
 
@@ -58,29 +61,25 @@ export function DataTab({
 
   return (
     <>
-      <Dropdown
-        testId="toolbar-sort-menu"
-        trigger={(toggle) => (
-          <button type="button" className="tw-rb__big" data-testid="toolbar-sort" title="Sortierung" disabled={disabled} onClick={toggle}>
+      <Menu
+        label="Sortieren"
+        trigger={
+          <button type="button" className="tw-rb__big" data-testid="toolbar-sort" title="Sortierung" disabled={disabled}>
             <IconSort />
             <span className="tw-rb__label">Sortieren <IconChevron /></span>
           </button>
-        )}
+        }
       >
-        {(close) => (
-          <>
-            <button type="button" className="tw-rb__menu-item" data-testid="toolbar-sort-asc" onClick={() => { onSortAsc(); close(); }}>
-              Aufsteigend (diese Spalte)
-            </button>
-            <button type="button" className="tw-rb__menu-item" data-testid="toolbar-sort-desc" onClick={() => { onSortDesc(); close(); }}>
-              Absteigend (diese Spalte)
-            </button>
-            <button type="button" className="tw-rb__menu-item" data-testid="toolbar-sort-clear" onClick={() => { onClearSort(); close(); }}>
-              Sortierung entfernen
-            </button>
-          </>
-        )}
-      </Dropdown>
+        <MenuItem data-testid="toolbar-sort-asc" onClick={onSortAsc}>
+          Aufsteigend (diese Spalte)
+        </MenuItem>
+        <MenuItem data-testid="toolbar-sort-desc" onClick={onSortDesc}>
+          Absteigend (diese Spalte)
+        </MenuItem>
+        <MenuItem data-testid="toolbar-sort-clear" onClick={onClearSort}>
+          Sortierung entfernen
+        </MenuItem>
+      </Menu>
 
       <button type="button" className="tw-rb__big" data-testid="toolbar-painter" title="Format kopieren" disabled={disabled && !painterActive} onClick={onCopyFormat} style={painterActive ? { color: "#0a63b0", background: "#e8f2fc", borderColor: "#9ecbf0" } : undefined}>
         <IconPainter />
@@ -108,9 +107,9 @@ export function DataTab({
         <span>Sichtbare Zeilen</span>
       </label>
 
-      <Dropdown
-        testId="toolbar-clear-format-menu"
-        trigger={(toggle) => (
+      <Menu
+        label="Formatierung"
+        trigger={
           <button
             type="button"
             className="tw-rb__big"
@@ -120,30 +119,22 @@ export function DataTab({
                 ? "Formatierung der Markierung entfernen"
                 : "Formatierung der ganzen Tabelle entfernen (nichts markiert)"
             }
-            onClick={toggle}
           >
             <IconClearFormat />
             <span className="tw-rb__label">Formatierung <IconChevron /></span>
           </button>
-        )}
+        }
       >
-        {(close) => {
-          const suffix = hasClearTarget ? "der Markierung" : "der ganzen Tabelle";
-          return (
-            <>
-              <button type="button" className="tw-rb__menu-item" data-testid="toolbar-clear-format-all" onClick={() => { onClearFormatting("all"); close(); }}>
-                {`Alles entfernen (${suffix})`}
-              </button>
-              <button type="button" className="tw-rb__menu-item" data-testid="toolbar-clear-format-text" onClick={() => { onClearFormatting("text"); close(); }}>
-                Nur Textformatierung entfernen
-              </button>
-              <button type="button" className="tw-rb__menu-item" data-testid="toolbar-clear-format-images" onClick={() => { onClearFormatting("images"); close(); }}>
-                Nur Bildgrößen zurücksetzen
-              </button>
-            </>
-          );
-        }}
-      </Dropdown>
+        <MenuItem data-testid="toolbar-clear-format-all" onClick={() => onClearFormatting("all")}>
+          {`Alles entfernen (${hasClearTarget ? "der Markierung" : "der ganzen Tabelle"})`}
+        </MenuItem>
+        <MenuItem data-testid="toolbar-clear-format-text" onClick={() => onClearFormatting("text")}>
+          Nur Textformatierung entfernen
+        </MenuItem>
+        <MenuItem data-testid="toolbar-clear-format-images" onClick={() => onClearFormatting("images")}>
+          Nur Bildgrößen zurücksetzen
+        </MenuItem>
+      </Menu>
 
       <button type="button" className="tw-rb__big" data-testid="toolbar-upload-button" title="Tabelle hochladen (.csv, .xlsx)" onClick={() => fileInputRef.current?.click()}>
         <IconUpload />
