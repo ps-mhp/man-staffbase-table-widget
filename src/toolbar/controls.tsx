@@ -14,6 +14,7 @@
 import * as React from "react";
 import { ReactElement, useEffect, useRef, useState } from "react";
 
+import { Button, useEditorStyles } from "@shared/editor-ui";
 import { IconChevron } from "./icons";
 
 /** White box with a red diagonal slash — the "no colour set" (Standard) look. */
@@ -37,7 +38,13 @@ export function RibbonButton({
   variant?: "icon" | "step";
   children: React.ReactNode;
 }): ReactElement {
-  const className = [
+  // Lädt das Stylesheet der Redaktionsebene (`Button`), referenzgezählt in
+  // `document.head` — siehe RibbonShell für dieselbe Begründung.
+  useEditorStyles();
+  // `tw-rb__btn` bleibt das Vokabular des Ribbons: es platziert den Knopf im
+  // Raster der Zeile (Breite, Fluchtlinien). `--icon`/`--step` markieren nur
+  // noch die Rasterplätze, ihre alte Optik liefert jetzt `Button`.
+  const layoutClassName = [
     "tw-rb__btn",
     variant === "icon" ? "tw-rb__btn--icon" : "",
     variant === "step" ? "tw-rb__btn--step" : "",
@@ -45,20 +52,41 @@ export function RibbonButton({
   ]
     .filter(Boolean)
     .join(" ");
+  // `IconButton` passt hier nicht: sie verlangt `icon: IconName` und schließt
+  // `children` aus, die Ribbon-Symbole sind aber freie JSX-Knoten (fettes
+  // „B“, kursives „I“ usw.) ohne Namen im MAN-Katalog — und bleiben das laut
+  // Plan dauerhaft. Der Icon-Fall baut deshalb auf `Button` und holt sich
+  // `IconButton`s eigene Optik über deren Klasse `man-ed-button--icon`.
+  const className =
+    variant === "icon"
+      ? ["man-ed-button--icon", layoutClassName].filter(Boolean).join(" ")
+      : layoutClassName;
   return (
-    <button
-      type="button"
+    <Button
+      variant="ghost"
+      size="sm"
       className={className}
+      // `title` bleibt die Kurzhilfe beim Überfahren, `aria-label` der
+      // zugängliche Name — beide werden gebraucht, `Button` liefert keinen
+      // von beiden automatisch für einen reinen Symbol-Knopf.
       title={title}
       aria-label={title}
+      // Unverändert durchgereicht, nicht `!!active`/`active ?? false`: ein
+      // einfacher Auslöser (Hoch-/Tiefstellen, Schritt-Knöpfe) hat `active`
+      // gar nicht gesetzt und soll auch kein `aria-pressed` tragen — nur ein
+      // echter Umschalter (Fett, Kursiv, …) bekommt `"true"`/`"false"`.
       aria-pressed={active}
       data-testid={testId}
       disabled={disabled}
+      // Verhindert, dass ein Klick auf den Ribbon-Knopf der gerade
+      // bearbeiteten `contenteditable`-Zelle den Fokus (und damit die
+      // Textauswahl) nimmt. Ohne das würde z. B. "Fett" ins Leere formatieren,
+      // weil die Auswahl beim Mousedown schon verloren wäre.
       onMouseDown={(e) => e.preventDefault()}
       onClick={onClick}
     >
       {children}
-    </button>
+    </Button>
   );
 }
 

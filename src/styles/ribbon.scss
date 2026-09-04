@@ -99,11 +99,11 @@
       color: $accent-text;
     }
 
-    &--icon {
-      width: $control-height;
-      min-width: $control-height;
-      padding: 0;
-    }
+    // `&--icon` fällt weg: `Button` trägt jetzt selbst `man-ed-button--icon`
+    // (Padding 0, `aspect-ratio: 1`) — dieselbe Quadratur wie hier vorher,
+    // weil `$control-height` bereits auf `control-h-sm` zeigt (Aufgabe der
+    // ersten Welle). `.tw-rb__btn--icon` bleibt trotzdem in der Klassenliste:
+    // sie markiert weiterhin den Rasterplatz, nur ihre Optik ist umgezogen.
 
     &--step {
       width: 34px;
