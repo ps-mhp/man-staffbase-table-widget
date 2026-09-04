@@ -66,11 +66,10 @@
   }
 
   &__btn {
-    @include control-pill;
-    @include hover-lift;
-    @include focus-ring;
-    @include disabled;
-
+    // Nur Rasterplatz: Fläche im Raster, Breite, Abstände, Fluchtlinien.
+    // Das gilt unverändert für beide Sorten Knöpfe — die mit der Primitive
+    // `Button` (trägt zusätzlich `man-ed-button`) genauso wie die zwei rohen
+    // `<button>` in `tab-images.tsx`.
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -78,7 +77,6 @@
     min-width: $control-height;
     padding: 0 10px;
     cursor: pointer;
-    border: 0;
     // Aktionsbeschriftung eines Werkzeugleisten-Buttons: gescannt, nicht
     // gelesen — `dense` statt der pixel-näheren `body`.
     @include type.man-editor-type(dense);
@@ -88,8 +86,27 @@
       color $transition,
       box-shadow $transition;
 
-    &:active:not(:disabled) {
-      background: $surface-pressed;
+    // Seit `RibbonButton` auf die Primitive `Button` umgestellt ist, tragen
+    // ihre Knöpfe gleichzeitig diese Klasse (hier, statisch gebündelt) *und*
+    // `man-ed-button`/`--ghost` (Redaktionsebene, asynchron nachgeladen) —
+    // zwei Regelsätze gleicher Spezifität um dieselben Eigenschaften
+    // (Fläche, Rahmen, Fokusring, Deckkraft im disabled-Zustand). Wer
+    // gewinnt, hinge dann nur an der zufälligen Ladereihenfolge. Deshalb
+    // gestaltet dieser Block die Optik nur noch für Knöpfe *ohne*
+    // `man-ed-button` — bei denen zeichnet allein die Ghost-Variante der
+    // Primitive. Die Klasse selbst bleibt trotzdem stehen: `tab-images.tsx`
+    // benutzt `.tw-rb__btn` noch roh an zwei eigenen `<button>`-Elementen
+    // ohne die Primitive, die weiterhin genau diese Optik brauchen.
+    &:not(.man-ed-button) {
+      @include control-pill;
+      @include hover-lift;
+      @include focus-ring;
+      @include disabled;
+      border: 0;
+
+      &:active:not(:disabled) {
+        background: $surface-pressed;
+      }
     }
 
     &--active,
