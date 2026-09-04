@@ -16,6 +16,7 @@
 
 @use "tokens" as *;
 @use "mixins" as *;
+@use "@shared/editor-ui/styles/type" as type;
 
 .tw-rb {
   display: flex;
@@ -34,13 +35,22 @@
   border: none;
   background: $surface-panel;
   margin-bottom: 0;
-  font-size: 13px;
+  // Grundschrift der ganzen Leiste: `dense`, weil ein Ribbon eine
+  // Werkzeugleiste ist (gescannt, nicht gelesen) — siehe Kopfkommentar von
+  // `_type.scss`. Setzt nebenbei erstmals eine echte Font-Family für die
+  // Leiste; vorher fiel nicht überschriebener Text auf die Schrift der
+  // Wirtsseite zurück, weil hier nur `font-size` stand.
+  @include type.man-editor-type(dense);
   color: $text-strong;
   box-sizing: border-box;
 
   &__title {
     color: $accent-border;
-    font-weight: $text-strong;
+    // War `font-weight: $text-strong` — eine Farbe als Gewicht, die der
+    // Browser stillschweigend verwirft. Die Leiste zeigt hier den Namen des
+    // Editors als kurze, fette Kennung, keinen Fließtext: `label` trägt genau
+    // das (13/16/700, Head-Familie) und ersetzt die verunglückte Deklaration.
+    @include type.man-editor-type(label);
   }
 
   // Jedes Bedienelement ist eine Pille gleicher Höhe in einer Zeile. Früher
@@ -69,7 +79,9 @@
     padding: 0 10px;
     cursor: pointer;
     border: 0;
-    font-size: 13px;
+    // Aktionsbeschriftung eines Werkzeugleisten-Buttons: gescannt, nicht
+    // gelesen — `dense` statt der pixel-näheren `body`.
+    @include type.man-editor-type(dense);
     transition:
       background $transition,
       border-color $transition,
@@ -118,7 +130,8 @@
     padding: 0 10px;
     cursor: pointer;
     border: 0;
-    font-size: 13px;
+    // Wie `&__btn`: eine Werkzeugleisten-Beschriftung, `dense`.
+    @include type.man-editor-type(dense);
     transition:
       background $transition,
       border-color $transition,
@@ -147,7 +160,9 @@
     gap: 7px;
     padding: 0 10px;
     cursor: pointer;
-    font-size: 12px;
+    // Kippschalter-Beschriftung, ebenfalls Werkzeugleiste: `dense` statt der
+    // alten `12px`.
+    @include type.man-editor-type(dense);
     border: 0;
     transition:
       background $transition,
@@ -203,7 +218,10 @@
     align-items: center;
     gap: 7px;
     padding: 0 10px;
-    font-size: 12px;
+    // Ein echtes `<label>`-Element für das Zahlenfeld daneben — die
+    // Beschriftungsrolle trifft hier wörtlich zu, anders als bei den
+    // Aktionsbuttons der Leiste (die tragen `dense`, siehe `&__btn`).
+    @include type.man-editor-type(label);
 
     input {
       width: 46px;
@@ -211,8 +229,12 @@
       padding: 0 4px;
       border: 1px solid $border;
       border-radius: 0;
-      font: inherit;
-      font-size: 12px;
+      // Der Zahlenwert selbst ist Werkzeugleisten-Inhalt, keine Beschriftung:
+      // `dense`, bewusst abweichend vom `label` des umschließenden `<label>`.
+      // Die Rolle setzt Familie/Gewicht/Zeilenhöhe explizit, das alte
+      // `font: inherit;` (Reset des Browser-Defaults für `<input>`) wird
+      // dadurch gegenstandslos.
+      @include type.man-editor-type(dense);
       text-align: center;
       color: inherit;
       background: $surface;
@@ -235,7 +257,8 @@
     background-position: right 8px center;
     background-size: 11px;
     padding: 0 26px 0 10px;
-    font-size: 13px;
+    // Auswahlfeld-Wert, Werkzeugleisten-Inhalt: `dense`.
+    @include type.man-editor-type(dense);
     cursor: pointer;
     min-width: 92px;
     border: 0;
@@ -335,7 +358,9 @@
     padding: 8px 10px;
     border-radius: 0;
     cursor: pointer;
-    font-size: 13px;
+    // Menüzeile im Farbwähler-Dropdown, eine Liste: `dense` (gescannt, siehe
+    // Kopfkommentar `_type.scss`).
+    @include type.man-editor-type(dense);
     color: $text;
     transition: background $transition-fast;
 
@@ -375,8 +400,10 @@
     @include focus-ring;
 
     padding: 0 12px;
-    font: inherit;
-    font-size: 12px;
+    // Trägt aktuell nur ein `<svg>`-Icon (Speichern/Hilfe/Schließen), keinen
+    // sichtbaren Text — die Rolle wirkt also erst, sollte hier je ein
+    // Textlabel dazukommen. `dense` passt zur übrigen Werkzeugleiste.
+    @include type.man-editor-type(dense);
     cursor: pointer;
     background: transparent;
     border: 0;
@@ -412,7 +439,10 @@
   }
 
   &__dirty {
-    font-size: 11px;
+    // Gedämpfter Statushinweis, kein Steuerelement: `caption` (nächstgelegen
+    // an den alten 11px, Body-Light-Familie passt zum „gelesen"-Charakter
+    // eines Hinweistexts — vgl. `entity-picker.scss` `.man-ep__notice`).
+    @include type.man-editor-type(caption);
     color: $text-warning;
     white-space: nowrap;
   }
@@ -442,8 +472,10 @@
     background: transparent;
     padding: 5px 12px;
     border-radius: 0;
-    font: inherit;
-    font-size: 12px;
+    // Reiter-Beschriftung der Werkzeugleiste: `dense`. Das alte
+    // `font: inherit;` (Reset des Browser-Button-Defaults) wird durch die
+    // Rolle gegenstandslos, sie setzt die Familie ausdrücklich.
+    @include type.man-editor-type(dense);
     color: $text-muted;
     cursor: pointer;
     border-bottom: 2px solid transparent;
@@ -480,22 +512,28 @@
   }
 
   // Buchstaben-Piktogramme der Schrift-Buttons. Sie tragen die Auszeichnung,
-  // die sie beschreiben, damit der Button zeigt, was er tut.
+  // die sie beschreiben, damit der Button zeigt, was er tut. Jede Variante
+  // demonstriert einen Größenunterschied (großes/kleines „A" für die
+  // Schriftgrößen-Stepper); die Rollen bringen dabei je nach Sprungweite eine
+  // eigene Familie mit, das ist hier gewollt Nebensache gegenüber der Größe.
   &__glyph {
     &--lg {
-      font-size: 14px;
+      @include type.man-editor-type(body);
     }
 
     &--md {
-      font-size: 13px;
+      @include type.man-editor-type(dense);
     }
 
     &--sm {
-      font-size: 11px;
+      // Nächstgelegene Rolle zu den alten 11px; nicht exakt, siehe Bericht.
+      @include type.man-editor-type(caption);
     }
 
     &--arrow {
-      font-size: 9px;
+      // War 9px — kleiner als jede Rolle (kleinste ist `caption` mit 12px).
+      // Springt damit sichtbar; Befund und Risikoeinschätzung im Bericht.
+      @include type.man-editor-type(caption);
     }
 
     &--underline {
@@ -507,12 +545,15 @@
     }
 
     &--lowercase {
-      font-size: 13px;
+      @include type.man-editor-type(dense);
       text-transform: lowercase;
     }
 
     &--bold {
-      font-size: 14px;
+      // Demonstriert die Fett-Auszeichnung selbst: `body` liefert die Größe
+      // (14px trifft genau), das Gewicht bleibt bewusst explizit 700 statt
+      // der Rollen-Vorgabe (300) — sonst zeigte der Fett-Knopf ein dünnes „A".
+      @include type.man-editor-type(body);
       font-weight: 700;
     }
 
@@ -582,8 +623,11 @@
     width: 100%;
     height: $control-height;
     padding: 0 10px;
-    font: inherit;
-    font-size: 13px;
+    // Die Hilfe-Schublade ist Fließtext (siehe Kopfkommentar `_type.scss`);
+    // eine Suchanfrage wird hier getippt und gelesen wie der übrige Inhalt,
+    // deshalb `body` statt der Werkzeugleisten-`dense`. Ersetzt das alte
+    // `font: inherit;` (die Rolle setzt die Familie jetzt selbst).
+    @include type.man-editor-type(body);
     color: inherit;
     background: $surface;
     box-sizing: border-box;
@@ -594,7 +638,9 @@
     align-items: center;
     gap: 6px;
     flex: 0 0 auto;
-    font-size: 12px;
+    // Kleine Navigationszeile, kein Fließtext: `caption` trifft die alten
+    // 12px genau.
+    @include type.man-editor-type(caption);
     color: $text-muted;
     height: 15px;
     margin-left: 8px;
@@ -606,15 +652,20 @@
     padding: 5px 4px;
     margin: -2px -4px;
     border-radius: 0;
-    font: inherit;
-    font-size: 12px;
+    // Wie `&__help-breadcrumbs`: `caption`, exakt die alten 12px. Das alte
+    // `font: inherit;` wird durch die Rolle gegenstandslos.
+    @include type.man-editor-type(caption);
     color: $accent-text;
     cursor: pointer;
     width: auto;
 
     &:hover {
       background-color: transparent !important;
-      font-weight: $text-strong;
+      // War `font-weight: $text-strong` — eine Farbe als Gewicht, verworfen
+      // vom Browser. Der Hover-Zustand färbt hier sonst immer per `color`
+      // nach (vgl. `&__tab:hover`), nie per Gewicht: das war der gemeinte
+      // Effekt, jetzt als Farbe.
+      color: $text-strong;
     }
 
     &:focus,
@@ -673,8 +724,11 @@
     background: transparent;
     padding: 10px 10px;
     border-radius: 0;
-    font: inherit;
-    font-size: 13px;
+    // Kategorieliste: eine Zeile pro Thema, gescannt, keine Beschriftung —
+    // `dense` (Listen sind laut Kopfkommentar `_type.scss` Dense-Fall, auch
+    // innerhalb der sonst Fließtext-geprägten Hilfe-Schublade). Das alte
+    // `font: inherit;` wird durch die Rolle gegenstandslos.
+    @include type.man-editor-type(dense);
     color: $text;
     cursor: pointer;
     transition: background $transition-fast;
@@ -696,7 +750,9 @@
 
   &__help-heading {
     margin: 0 0 8px;
-    font-size: 15px;
+    // Überschrift einer Hilfe-Themenseite (`<h3>`): `section`, trifft die
+    // alten 15px exakt.
+    @include type.man-editor-type(section);
     color: $text-strong;
   }
 
@@ -711,22 +767,25 @@
   &__help-entry-title {
     display: block;
     margin: 0 0 2px;
-    font-size: 13px;
-    font-weight: 600;
+    // Fetter, kurzer Eintragsname — eine Beschriftung, keine Fließtext:
+    // `label` (13/16/700, Head-Familie). Ersetzt `600` durch die
+    // Rollen-Vorgabe `700`.
+    @include type.man-editor-type(label);
     color: $text-strong;
   }
 
   &__help-entry-text {
     display: block;
     margin: 0;
-    font-size: 13px;
-    line-height: 1.45;
+    // Die eigentliche Beschreibung: echter Fließtext der Hilfe, `body`.
+    @include type.man-editor-type(body);
     color: $text-body;
   }
 
   &__help-empty {
     margin: 0;
-    font-size: 13px;
+    // „Keine Treffer." ist ein ganzer Satz, kein Listeneintrag: `body`.
+    @include type.man-editor-type(body);
     color: $text-muted;
   }
 
@@ -773,8 +832,12 @@
   }
 
   &__help-result-topic {
-    font-size: 11px;
-    font-weight: 600;
+    // Kleines, fettes Themen-Tag über dem Treffer. Nächstgelegene Rolle ist
+    // `caption` (12px), die aber 300/Light vorgibt — für ein fettes
+    // Versal-Tag falsch. Größe/Familie kommen aus der Rolle, das Gewicht
+    // bleibt bewusst explizit 700 (Head-Familien-Gewicht), siehe Bericht.
+    @include type.man-editor-type(caption);
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.02em;
     color: $accent-text;
