@@ -453,54 +453,13 @@
     min-width: 0;
   }
 
-  // Die Reiter nehmen nur den Platz ihrer Beschriftung ein; die Linie der
-  // Leiste läuft nach rechts weiter, sodass die Zeile als eine Kante liest und
-  // nicht als fünf gedehnte Buttons.
+  // Die Reiterleiste selbst (Rollen, Zustände, Fokus) kommt jetzt von der
+  // Primitive `Tabs` (`man-ed-tabs`, siehe `editor-ui/styles/tabs.scss`).
+  // Diese Klasse trägt nur noch die Anordnung: Abstand zur Kontrollleiste
+  // darüber und die horizontale Flucht mit dem übrigen Ribbon-Raster.
   &__tablist {
-    display: flex;
-    justify-content: flex-start;
-    gap: 2px;
     margin-bottom: 6px;
     padding: 0 10px;
-    height: $control-height;
-  }
-
-  &__tab {
-    flex: 0 0 auto;
-    width: auto;
-    border: none;
-    background: transparent;
-    padding: 5px 12px;
-    border-radius: 0;
-    // Reiter-Beschriftung der Werkzeugleiste: `dense`. Das alte
-    // `font: inherit;` (Reset des Browser-Button-Defaults) wird durch die
-    // Rolle gegenstandslos, sie setzt die Familie ausdrücklich.
-    @include type.man-editor-type(dense);
-    color: $text-muted;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition:
-      background $transition-fast,
-      color $transition-fast;
-    margin: 0;
-
-    // `!important`, weil die Wirtsseite eigene Hover-Hintergründe für Buttons
-    // mitbringt und später geladen wird.
-    &:hover {
-      background-color: $surface-hover-soft !important;
-      color: $text-strong;
-    }
-
-    &:focus-visible {
-      outline: none;
-      box-shadow: $focus-ring;
-    }
-
-    &--active {
-      color: $accent-text;
-      border-bottom-color: $accent;
-      font-weight: 600;
-    }
   }
 
 

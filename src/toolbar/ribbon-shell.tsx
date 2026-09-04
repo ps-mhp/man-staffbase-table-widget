@@ -17,6 +17,7 @@ import { ReactElement } from "react";
 import { IconClose, IconHelp, IconSave } from "./icons";
 import ribbonCss from "../styles/ribbon.scss";
 import { useHotStyle } from "@shared/hot-style";
+import { Tabs, TabItem, useEditorStyles } from "@shared/editor-ui";
 
 export interface RibbonTab {
   id: string;
@@ -52,15 +53,16 @@ export interface RibbonShellProps {
  */
 export function RibbonShell({ tabs, activeTab, onSelectTab, onSave, onClose, dirty, onOpenHelp }: RibbonShellProps): ReactElement {
   const hotRibbonCss = useHotStyle(ribbonCss, "table-widget", "styles/ribbon.scss");
+  // Lädt das Stylesheet der Redaktionsebene (`Tabs` u.a.) referenzgezählt in
+  // `document.head`. Das kollidiert nicht mit dem eigenen `<style>`-Blatt des
+  // Editors weiter unten im Baum (siehe `table-editor.tsx`): jenes vermeidet
+  // `document.head` nur, um beim Aushängen nichts im fremden Wirtsdokument zu
+  // hinterlassen — genau das leistet `useEditorStyles()` selbst, durch seine
+  // Referenzzählung.
+  useEditorStyles();
   const active = tabs.find((tab) => tab.id === activeTab) ?? tabs[0];
 
-  const onKeyDown = (event: React.KeyboardEvent): void => {
-    const step = event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
-    if (step === 0) return;
-    event.preventDefault();
-    const index = tabs.findIndex((tab) => tab.id === active.id);
-    onSelectTab(tabs[(index + step + tabs.length) % tabs.length].id);
-  };
+  const tabItems: readonly TabItem[] = tabs.map((tab) => ({ id: tab.id, label: tab.label }));
 
   return (
     <div className="tw-rb" data-testid="table-toolbar">
@@ -113,33 +115,14 @@ export function RibbonShell({ tabs, activeTab, onSelectTab, onSave, onClose, dir
       )}
 
       <div className="tw-rb__tabs">
-        <div className="tw-rb__tablist" role="tablist" aria-label="Werkzeuggruppen" onKeyDown={onKeyDown}>
-          {tabs.map((tab) => {
-            const selected = tab.id === active.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                role="tab"
-                id={`tw-rb-tab-${tab.id}`}
-                aria-selected={selected}
-                aria-controls={`tw-rb-panel-${tab.id}`}
-                tabIndex={selected ? 0 : -1}
-                className={`tw-rb__tab${selected ? " tw-rb__tab--active" : ""}`}
-                data-testid={`toolbar-tab-${tab.id}`}
-                onMouseDown={(event) => event.preventDefault()}
-                onClick={() => onSelectTab(tab.id)}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
+        <div className="tw-rb__tablist">
+          <Tabs items={tabItems} activeId={active.id} onActiveIdChange={onSelectTab} label="Werkzeuggruppen" />
         </div>
 
         <div
           role="tabpanel"
-          id={`tw-rb-panel-${active.id}`}
-          aria-labelledby={`tw-rb-tab-${active.id}`}
+          id={`${active.id}-panel`}
+          aria-labelledby={`${active.id}-tab`}
           className="tw-rb__panel"
           data-testid="toolbar-panel"
         >
