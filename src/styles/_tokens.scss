@@ -9,20 +9,124 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Die Werte, die sich durch die Oberfläche des Widgets ziehen. Sie stehen an
-// einer Stelle, damit ein Farbton einmal geändert wird und nicht dreißigmal —
-// vorher war jeder dieser Werte mehrfach in TypeScript-Stringliteralen kopiert.
+// Die Werte, die sich durch die **Redaktionsoberfläche** dieses Widgets ziehen
+// — Ribbon, Tabellenraster, Hilfe-Schublade. Sie kamen bis hierher aus
+// `@shared/stylings/editor-chrome`, der Staffbase-Palette, und stammen jetzt
+// aus der MAN-Editor-Ebene `@shared/editor-ui/styles/tokens`.
 //
-// Der weitaus größte Teil beschreibt nichts Tabellenspezifisches, sondern die
-// Redaktionsoberfläche überhaupt. Er liegt seit dem Umzug der Bildauswahl in
-// `@shared/stylings/editor-chrome` und wird von dort weitergereicht, damit
-// `@use "tokens" as *` in den Stylesheets dieses Widgets unverändert alles
-// findet. Hier bleibt nur, was ausschließlich die Tabelle betrifft.
+// Die Namen bleiben, weil `ribbon.scss`, `table-editor.scss` und
+// `help-drawer.scss` sie an über 200 Stellen benutzen; ein Umbenennen wäre eine
+// zweite Änderung im selben Schritt. Dass mehrere alte Namen jetzt denselben
+// Wert tragen, ist **Absicht**: die Staffbase-Palette führte über dreißig
+// Grautöne, die CI führt zwölf Farben. Die Zusammenlegung ist der Zweck, nicht
+// eine Nachlässigkeit.
+//
+// Angelegt sind nur die **tatsächlich benutzten** Namen. `editor-chrome` war
+// eine Obermenge; `$surface-muted`, `$border-tile`, `$text-caption`,
+// `$text-state`, `$focus-border` und `$accent-stronger` kommen in keinem
+// Stylesheet dieses Widgets vor und wandern deshalb nicht mit.
+//
+// Die Stylesheets schreiben weiterhin `$name` (sie ziehen `@use "tokens" as *`);
+// `tokens.man-editor(...)` steht ausschließlich hier. Ein Direktzugriff auf die
+// Ebene wäre dort mehrdeutig.
 
-@forward "@shared/stylings/editor-chrome";
+@use "@shared/editor-ui/styles/tokens" as tokens;
+
+// Flächen ----------------------------------------------------------------
+// Fünf der sechs alten Flächentöne fallen auf `surface-muted` zusammen. Auch
+// `$surface-hover`: die CI drückt Hover als **gesenkte Fläche** aus (siehe
+// `src/shared/editor-ui/styles/menu.scss`, `tabs.scss`), nicht als eigenen Ton.
+$surface: tokens.man-editor(surface);
+$surface-panel: tokens.man-editor(surface-muted);
+$surface-header: tokens.man-editor(surface-muted);
+$surface-handle: tokens.man-editor(surface-muted);
+$surface-hover: tokens.man-editor(surface-muted);
+$surface-hover-soft: tokens.man-editor(surface-muted);
+// Die CI kennt **keine** gedrückte Fläche: `aria-pressed='true'` wird in
+// `../onetruck-css/src/03-elements/feed/_app.scss:647-651` über Rahmen und
+// Glyphe in Rot ausgedrückt. `accent-surface` (die blasse Rotfläche) ist die
+// nächstliegende Entsprechung für einen gefüllten Umschalter.
+$surface-pressed: tokens.man-editor(accent-surface);
+
+// Rahmen -----------------------------------------------------------------
+// Die CI kennt **einen** Rahmenton; die sechs alten Grautöne fallen zusammen.
+$border: tokens.man-editor(border);
+$border-soft: tokens.man-editor(border);
+$border-menu: tokens.man-editor(border);
+$border-grid: tokens.man-editor(border);
+$border-input: tokens.man-editor(border);
+// Der einzige dunklere Rahmenton der Palette.
+$border-hover: tokens.man-editor(border-strong);
+
+// Text -------------------------------------------------------------------
+// Ein Textton und ein gedämpfter Ton — mehr führt die CI nicht.
+$text: tokens.man-editor(text);
+$text-strong: tokens.man-editor(text);
+$text-body: tokens.man-editor(text);
+$text-muted: tokens.man-editor(text-muted);
+$text-muted-icon: tokens.man-editor(text-muted);
+$text-handle: tokens.man-editor(text-muted);
+// Fester Wert mit Quellenangabe: `../onetruck-css/src/lib/_tokens.scss:54`
+// führt `--man-warning-ink: #8a6d00`, den Warn-**Text**ton der CI. Der
+// Ebenen-Token `warning` (#ffcd00) ist die zugehörige **Fläche**; gelber Text
+// auf Weiß wäre unlesbar. Die Editor-Ebene führt für den Textton noch keinen
+// Token — die Lücke ist für Aufgabe 12 gemeldet, hier wird bewusst keiner
+// angelegt (Randbedingung: keine Primitiven ändern).
+$text-warning: #8a6d00;
+
+// Akzent -----------------------------------------------------------------
+// Der sichtbarste Bruch dieses Umbaus: Staffbase-Blau wird MAN-Rot.
+$accent: tokens.man-editor(primary);
+$accent-text: tokens.man-editor(primary);
+$accent-border: tokens.man-editor(primary);
+$accent-strong: tokens.man-editor(primary-hover);
+$accent-surface: tokens.man-editor(accent-surface);
+$accent-surface-soft: tokens.man-editor(accent-surface);
+$accent-selection: tokens.man-editor(accent-surface);
+
+// Fokus ------------------------------------------------------------------
+// Die `box-shadow`-Form bleibt absichtlich erhalten (nicht `outline`): die
+// Wirtsseite bringt eigene Outline-Regeln mit, die den Ring sonst überschreiben
+// — siehe den Kommentar an `_mixins.scss`. Nur Farbe und Breite kommen jetzt
+// aus der Ebene.
+$focus-ring: 0 0 0 tokens.man-editor(focus-width) tokens.man-editor(focus);
+
+// Maße -------------------------------------------------------------------
+// Beide alten Höhen fallen auf die kleine Kontrollhöhe (28px) zusammen. Der
+// Ribbon ist eine dichte Werkzeugleiste; die nächste Stufe (`control-h-md`,
+// 36px) würde ihn auseinanderziehen.
+$control-height: tokens.man-editor(control-h-sm);
+$control-height-sm: tokens.man-editor(control-h-sm);
+
+// Radius: überall 0. Diese Namen sind eine **Zwischenstufe** — sie halten die
+// Stylesheets in dieser Aufgabe übersetzbar, ohne sie gleichzeitig umschreiben
+// zu müssen. Aufgabe 3 ersetzt jede Verwendung durch eine glatte `0` und
+// löscht die Namen dann hier. `$radius-table-control` wandert nicht mit: es
+// war toter Code, in keinem Stylesheet benutzt.
+$radius-control: 0;
+$radius-panel: 0;
+$radius-small: 0;
+$radius-input: 0;
+$radius-menu: 0;
+
+// Schatten ---------------------------------------------------------------
+// Die Ebene führt **einen** Schatten für schwebende Flächen; die beiden alten
+// Menüschatten fallen darauf zusammen.
+$shadow-menu: tokens.man-editor(shadow-overlay);
+$shadow-context-menu: tokens.man-editor(shadow-overlay);
+// Der Knauf des Ein/Aus-Schalters trägt in der CI **keinen** Schatten:
+// `../onetruck-css/src/03-elements/switch/_app.scss` zeichnet `.handle` ohne
+// `box-shadow`. Der Overlay-Schatten (0 8px 24px) wäre für einen 16px-Knauf
+// grotesk. Der Name verschwindet in Aufgabe 8 mit dem `Switch`-Primitiv.
+$shadow-switch-knob: none;
+
+// Bewegung ---------------------------------------------------------------
+// Die Ebene führt bewusst keinen Bewegungs-Token — Bewegung ist keine
+// CI-Frage, und der Wächter prüft sie nicht. Die Werte bleiben deshalb hier,
+// an einer Stelle.
+$transition-fast: 110ms ease;
+$transition: 120ms ease;
+$transition-slow: 140ms ease;
 
 // Markierung für Kleinschreibung (Editor-Hinweis, kein Markenton)
 $mark-lowercase: #f97316;
-
-// Die runde Schaltfläche an der Tabellenkante — es gibt sie nur hier.
-$radius-table-control: 20px;

@@ -113,14 +113,17 @@ describe("TableEditor", () => {
     render(<TableEditor value={sample()} onChange={jest.fn()} />);
     const td = cellTd("Zeile 2, Spalte 2");
     fireEvent.mouseDown(td);
-    expect(td).toHaveStyle({ background: "#eaf4ff" });
+    // Die Auswahlfläche kommt jetzt aus `man-editor(accent-surface)` und damit
+    // aus einer CSS-Variablen, die jsdom nicht auflöst. Geprüft wird deshalb
+    // die Klasse, die sie trägt.
+    expect(td).toHaveClass("table-editor__cell--selected");
   });
 
   it("selects a whole column via the column handle", () => {
     render(<TableEditor value={sample()} onChange={jest.fn()} />);
     fireEvent.click(screen.getByTestId("col-handle-1"));
-    expect(cellTd("Zeile 1, Spalte 2")).toHaveStyle({ background: "#eaf4ff" });
-    expect(cellTd("Zeile 2, Spalte 2")).toHaveStyle({ background: "#eaf4ff" });
+    expect(cellTd("Zeile 1, Spalte 2")).toHaveClass("table-editor__cell--selected");
+    expect(cellTd("Zeile 2, Spalte 2")).toHaveClass("table-editor__cell--selected");
   });
 
   it("inserts a row below via the context menu", () => {
@@ -443,8 +446,9 @@ describe("TableEditor", () => {
       fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
       addToSelection("Zeile 2, Spalte 3");
 
-      expect(cellTd("Zeile 2, Spalte 2")).toHaveStyle({ background: "#eaf4ff" });
-      expect(cellTd("Zeile 2, Spalte 3")).toHaveStyle({ background: "#eaf4ff" });
+      // Siehe oben: auf die Klasse gepinnt, weil jsdom `var()` nicht auflöst.
+      expect(cellTd("Zeile 2, Spalte 2")).toHaveClass("table-editor__cell--selected");
+      expect(cellTd("Zeile 2, Spalte 3")).toHaveClass("table-editor__cell--selected");
     });
 
     it("applies a format to every cell of a multi-cell selection", () => {
