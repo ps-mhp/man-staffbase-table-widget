@@ -30,7 +30,7 @@
   padding: 0 0 7px;
   // Das Gitter beginnt bündig darunter, deshalb bleiben die unteren Ecken
   // eckig und die Kante wird geteilt statt schwebend gerundet.
-  border-radius: $radius-panel $radius-panel 0 0;
+  border-radius: 0;
   border: none;
   background: $surface-panel;
   margin-bottom: 0;
@@ -177,8 +177,8 @@
     position: relative;
     width: 28px;
     height: 16px;
-    border-radius: 999px;
-    background: #ccd4dc;
+    border-radius: 0;
+    background: $switch-off;
     transition: background $transition-slow;
     flex: 0 0 auto;
 
@@ -189,7 +189,7 @@
       left: 2px;
       width: 12px;
       height: 12px;
-      border-radius: 50%;
+      border-radius: 0;
       background: $surface;
       box-shadow: $shadow-switch-knob;
       transition: transform $transition-slow;
@@ -210,7 +210,7 @@
       height: 22px;
       padding: 0 4px;
       border: 1px solid $border;
-      border-radius: $radius-input;
+      border-radius: 0;
       font: inherit;
       font-size: 12px;
       text-align: center;
@@ -280,8 +280,8 @@
     width: 18px;
     height: 4px;
     margin-top: 3px;
-    border-radius: 2px;
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 0;
+    border: 1px solid $border;
     box-sizing: border-box;
   }
 
@@ -316,7 +316,7 @@
     min-width: 194px;
     background: $surface;
     border: 1px solid $border-menu;
-    border-radius: $radius-panel;
+    border-radius: 0;
     box-shadow: $shadow-menu;
     padding: 5px;
     z-index: 20;
@@ -333,7 +333,7 @@
     border: none;
     background: transparent;
     padding: 8px 10px;
-    border-radius: $radius-control;
+    border-radius: 0;
     cursor: pointer;
     font-size: 13px;
     color: $text;
@@ -353,7 +353,7 @@
     width: 16px;
     height: 16px;
     border: 1px solid $border-input;
-    border-radius: $radius-small;
+    border-radius: 0;
     flex: 0 0 auto;
   }
 
@@ -362,8 +362,8 @@
     align-items: center;
     gap: 6px;
     background: $accent;
-    border-top-right-radius: $radius-control;
-    border-top-left-radius: $radius-control;
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
 
     > .tw-rb__ctl {
       margin: 6px 10px;
@@ -441,7 +441,7 @@
     border: none;
     background: transparent;
     padding: 5px 12px;
-    border-radius: $radius-control $radius-control 0 0;
+    border-radius: 0;
     font: inherit;
     font-size: 12px;
     color: $text-muted;
@@ -605,7 +605,7 @@
     background: transparent;
     padding: 5px 4px;
     margin: -2px -4px;
-    border-radius: $radius-small;
+    border-radius: 0;
     font: inherit;
     font-size: 12px;
     color: $accent-text;
@@ -672,7 +672,7 @@
     border: none;
     background: transparent;
     padding: 10px 10px;
-    border-radius: $radius-control;
+    border-radius: 0;
     font: inherit;
     font-size: 13px;
     color: $text;
@@ -733,7 +733,7 @@
   &__help-mark {
     background: $accent-surface;
     color: $accent-text;
-    border-radius: 2px;
+    border-radius: 0;
     padding: 0 1px;
   }
 
@@ -758,7 +758,7 @@
     border: none;
     background: transparent;
     padding: 8px 10px;
-    border-radius: $radius-control;
+    border-radius: 0;
     cursor: pointer;
     transition: background $transition-fast;
 

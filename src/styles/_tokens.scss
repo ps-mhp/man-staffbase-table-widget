@@ -47,6 +47,9 @@ $surface-hover-soft: tokens.man-editor(surface-muted);
 // Glyphe in Rot ausgedrückt. `accent-surface` (die blasse Rotfläche) ist die
 // nächstliegende Entsprechung für einen gefüllten Umschalter.
 $surface-pressed: tokens.man-editor(accent-surface);
+// Die Bahn des Ein/Aus-Schalters im ausgeschalteten Zustand. Die Ebene führt
+// dafür einen eigenen Ton, keinen Grauton der alten Palette.
+$switch-off: tokens.man-editor(switch-off);
 
 // Rahmen -----------------------------------------------------------------
 // Die CI kennt **einen** Rahmenton; die sechs alten Grautöne fallen zusammen.
@@ -98,22 +101,20 @@ $focus-ring: 0 0 0 tokens.man-editor(focus-width) tokens.man-editor(focus);
 $control-height: tokens.man-editor(control-h-sm);
 $control-height-sm: tokens.man-editor(control-h-sm);
 
-// Radius: überall 0. Diese Namen sind eine **Zwischenstufe** — sie halten die
-// Stylesheets in dieser Aufgabe übersetzbar, ohne sie gleichzeitig umschreiben
-// zu müssen. Aufgabe 3 ersetzt jede Verwendung durch eine glatte `0` und
-// löscht die Namen dann hier. `$radius-table-control` wandert nicht mit: es
-// war toter Code, in keinem Stylesheet benutzt.
-$radius-control: 0;
-$radius-panel: 0;
-$radius-small: 0;
-$radius-input: 0;
-$radius-menu: 0;
+// Radius: überall 0. Die Zwischenstufen-Variablen (`$radius-control` u. a.)
+// sind mit Aufgabe 3 gegenstandslos geworden — jede Verwendung schreibt jetzt
+// die glatte `0` selbst, eine Variable, die nur noch `0` bedeutet, hielte die
+// Frage offen, obwohl es nur eine Antwort gibt. Deshalb keine Namen mehr hier.
 
 // Schatten ---------------------------------------------------------------
 // Die Ebene führt **einen** Schatten für schwebende Flächen; die beiden alten
 // Menüschatten fallen darauf zusammen.
 $shadow-menu: tokens.man-editor(shadow-overlay);
 $shadow-context-menu: tokens.man-editor(shadow-overlay);
+// Derselbe Overlay-Schatten für den Bildgriff: die CI kennt keinen eigenen
+// Schattenton für Ziehgriffe, und ein zweiter Name für denselben Wert wäre
+// unnötig.
+$shadow-overlay: tokens.man-editor(shadow-overlay);
 // Der Knauf des Ein/Aus-Schalters trägt in der CI **keinen** Schatten:
 // `../onetruck-css/src/03-elements/switch/_app.scss` zeichnet `.handle` ohne
 // `box-shadow`. Der Overlay-Schatten (0 8px 24px) wäre für einen 16px-Knauf

@@ -57,7 +57,7 @@
   }
 
   &__footer-area {
-    border-radius: 0 0 8px 8px;
+    border-radius: 0;
     background: $surface-header;
     display: flex;
     align-items: center;
@@ -70,7 +70,7 @@
 
       &--version {
         background: $surface-handle;
-        border-radius: 20px;
+        border-radius: 0;
         padding: 4px 8px;
       }
     }
@@ -105,7 +105,7 @@
     user-select: none;
 
     &.__selectAll {
-      border-top-left-radius: 20px;
+      border-top-left-radius: 0;
       border-right: 1px solid $border-menu;
       border-bottom: 1px solid $border-menu;
     }
@@ -151,8 +151,8 @@
     height: 12px;
     background: $accent;
     border: 2px solid $surface;
-    border-radius: 2px;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+    border-radius: 0;
+    box-shadow: $shadow-overlay;
     cursor: nwse-resize;
     z-index: 5;
   }
@@ -160,7 +160,7 @@
   &__menu {
     min-width: 220px;
     background: $surface;
-    border-radius: $radius-menu;
+    border-radius: 0;
     padding: 4px;
     box-shadow: $shadow-context-menu;
     font-size: 13px;
@@ -169,7 +169,7 @@
 
   &__menu-item {
     padding: 6px 10px;
-    border-radius: $radius-small;
+    border-radius: 0;
     cursor: pointer;
     outline: none;
     user-select: none;
