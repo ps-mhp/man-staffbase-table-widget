@@ -164,6 +164,22 @@ describe("TableEditor", () => {
     expect(arg.merges).toEqual([{ row: 1, col: 1, rowSpan: 1, colSpan: 2 }]);
   });
 
+  it("keeps a locked context-menu item visibly dimmed", () => {
+    // Right-clicking the wrap itself (not a cell) opens the menu without
+    // `handleCellContextMenu` ever running, so `selection` stays `null` and
+    // every selection-gated item renders `disabled`. Radix's `ContextMenu.Item`
+    // expresses that as `data-disabled`/`aria-disabled`, never the native
+    // `disabled` attribute (see N3) -- this asserts both markers the
+    // stylesheet's `&--disabled, &[data-disabled]` selector relies on are
+    // really there, and that the resulting computed style is dimmed.
+    render(<TableEditor value={sample()} onChange={jest.fn()} />);
+    fireEvent.contextMenu(screen.getByTestId("table-editor-grid-wrap"));
+    const item = screen.getByTestId("insert-row-above");
+    expect(item).toHaveClass("table-editor__menu-item--disabled");
+    expect(item).toHaveAttribute("data-disabled");
+    expect(getComputedStyle(item).opacity).toBe("0.4");
+  });
+
   it("does not render the covered cell of a merge", () => {
     const merged = model([["", "Q1", "Q2"], ["Umsatz", "100", "200"]], {
       merges: [{ row: 1, col: 1, rowSpan: 1, colSpan: 2 }],

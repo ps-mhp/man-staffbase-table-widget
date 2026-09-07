@@ -122,6 +122,14 @@ $focus-ring: 0 0 0 tokens.man-editor(focus-width) tokens.man-editor(focus);
 $control-height: tokens.man-editor(control-h-sm);
 $control-height-sm: tokens.man-editor(control-h-sm);
 
+// Abstände (Aufgabe 10). Angelegt, weil das Kontextmenü im Raster
+// (`table-editor.scss`) seine Innenabstände jetzt aus der Abstandsskala der
+// Ebene zieht statt aus abgeschriebenen Pixelzahlen — siehe `menu.scss`, das
+// dieselben drei Stufen für Fläche, Zeile und Eintrag benutzt.
+$space-1: tokens.man-editor(space-1);
+$space-2: tokens.man-editor(space-2);
+$space-4: tokens.man-editor(space-4);
+
 // Radius: überall 0. Die Zwischenstufen-Variablen (`$radius-control` u. a.)
 // sind mit Aufgabe 3 gegenstandslos geworden — jede Verwendung schreibt jetzt
 // die glatte `0` selbst, eine Variable, die nur noch `0` bedeutet, hielte die
