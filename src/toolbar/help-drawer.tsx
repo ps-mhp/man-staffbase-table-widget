@@ -15,9 +15,9 @@ import * as React from "react";
 import { ReactElement, useEffect } from "react";
 
 import helpDrawerCss from "../styles/help-drawer.scss";
-import { IconClose } from "./icons";
 import { HelpTab } from "./tab-help";
 import { useHotStyle } from "@shared/hot-style";
+import { IconButton, useEditorStyles } from "@shared/editor-ui";
 
 export interface HelpDrawerProps {
   open: boolean;
@@ -34,6 +34,9 @@ export interface HelpDrawerProps {
  * than unmounted, so the open/close transition has something to animate.
  */
 export function HelpDrawer({ open, onClose }: HelpDrawerProps): ReactElement {
+  // Lädt das Stylesheet der Redaktionsebene (`IconButton`), referenzgezählt
+  // in `document.head` — siehe RibbonShell für dieselbe Begründung.
+  useEditorStyles();
   const hotHelpDrawerCss = useHotStyle(helpDrawerCss, "table-widget", "styles/help-drawer.scss");
   useEffect(() => {
     if (!open) return;
@@ -56,15 +59,16 @@ export function HelpDrawer({ open, onClose }: HelpDrawerProps): ReactElement {
       >
         <div className="tw-rb__help-drawer-header">
           <h2 className="tw-rb__help-drawer-title">Hilfe</h2>
-          <button
-            type="button"
+          <IconButton
+            icon="close"
+            label="Hilfe schließen"
+            variant="ghost"
+            size="sm"
             className="tw-rb__help-drawer-close"
             data-testid="help-drawer-close"
             title="Hilfe schließen"
             onClick={onClose}
-          >
-            <IconClose />
-          </button>
+          />
         </div>
         <div className="tw-rb__help-drawer-body">
           <HelpTab />

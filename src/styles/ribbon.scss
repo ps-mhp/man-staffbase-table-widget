@@ -474,23 +474,13 @@
     box-sizing: border-box;
   }
 
-  &__help-search {
-    @include control-pill;
-    @include focus-ring;
-
-    flex: 0 0 auto;
-    width: 100%;
-    height: $control-height;
-    padding: 0 10px;
-    // Die Hilfe-Schublade ist Fließtext (siehe Kopfkommentar `_type.scss`);
-    // eine Suchanfrage wird hier getippt und gelesen wie der übrige Inhalt,
-    // deshalb `body` statt der Werkzeugleisten-`dense`. Ersetzt das alte
-    // `font: inherit;` (die Rolle setzt die Familie jetzt selbst).
-    @include type.man-editor-type(body);
-    color: inherit;
-    background: $surface;
-    box-sizing: border-box;
-  }
+  // `&__help-search` entfällt vollständig: die Klasse sitzt jetzt auf dem
+  // `<input>` **innerhalb** von `<SearchField>` (`man-ed-search__input`), das
+  // Feldkästchen selbst — Rahmen, Höhe, Fokusring, Fläche — trägt seither die
+  // Hülle der Primitive (`.man-ed-search` in `search.scss`). `flex: 0 0 auto`
+  // hier hätte sogar geschadet: das `<input>` ist kein Flex-Kind von
+  // `&__help` mehr, sondern eins der Hülle, wo `man-ed-search__input` es mit
+  // `flex: 1` zwischen Lupe und Löschknopf strecken lassen will.
 
   &__help-breadcrumbs {
     display: flex;
@@ -641,16 +631,18 @@
     color: $text-body;
   }
 
-  &__help-empty {
-    margin: 0;
-    // „Keine Treffer." ist ein ganzer Satz, kein Listeneintrag: `body`.
-    @include type.man-editor-type(body);
-    color: $text-muted;
-  }
+  // `&__help-empty` entfällt: `EmptyState` legt den Text jetzt in ein eigenes
+  // Kind-`<p class="man-ed-empty__title">` (Rolle `section`, siehe
+  // `surface.scss`), die Klasse hier sitzt seit dem Umbau auf der Wurzel-Hülle
+  // und träfe dort niemanden mehr.
 
   &__help-mark {
     background: $accent-surface;
-    color: $accent-text;
+    // War `$accent-text` (`#e40045`) — auf `$accent-surface` (`#fde7ee`) nur
+    // 4,07:1, unter der WCAG-Schwelle für Fließtext. `$text-mark` (siehe
+    // `_tokens.scss`) ist derselbe Ton in Dunkelrot (`danger`, `#9e002f`,
+    // belegt in `../onetruck-css`) mit 7,15:1.
+    color: $text-mark;
     border-radius: 0;
     padding: 0 1px;
   }

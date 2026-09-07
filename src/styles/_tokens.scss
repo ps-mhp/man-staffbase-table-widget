@@ -77,6 +77,19 @@ $text-handle: tokens.man-editor(text-muted);
 // angelegt (Randbedingung: keine Primitiven ändern).
 $text-warning: #8a6d00;
 
+// Feste Textfarbe für die Trefferhervorhebung (`&__help-mark` in
+// `ribbon.scss`) auf ihrer eigenen blassen Fläche `$accent-surface`
+// (`#fde7ee`). Der naheliegende Textton `$accent-text` (`primary`, `#e40045`)
+// ergibt dort nur **4,07:1** — unter der WCAG-Schwelle für Fließtext
+// (4,5:1), gemessen mit der Standardformel relativer Luminanz. Der Ebenen-
+// Token `danger` (`#9e002f`) besteht mit **7,15:1**; belegt in
+// `../onetruck-css/src/lib/_tokens.scss:12` (`--man-red-active: #9e002f`)
+// bzw. Zeile 24 (`--man-red-700`, derselbe Wert). MAN-Gelb (`#ffcd00`, vom
+// Plan als Fläche vorgeschlagen) entfällt: die CI führt diesen Ton als
+// `--man-warning` (Zeile 53) — eine Warnfarbe, keine Hervorhebung, und selbst
+// mit `$accent-text` darauf nur 3,19:1.
+$text-mark: tokens.man-editor(danger);
+
 // Akzent -----------------------------------------------------------------
 // Der sichtbarste Bruch dieses Umbaus: Staffbase-Blau wird MAN-Rot.
 $accent: tokens.man-editor(primary);
