@@ -183,6 +183,27 @@
     &:focus {
       background: $surface-pressed;
     }
+
+    // Gedrückter Zustand des Format-übertragen-Knopfes (Aufgabe 13a): stand
+    // bisher als inline gesetztes Staffbase-Blau (`#0a63b0`/`#e8f2fc`/
+    // `#9ecbf0`) am Element — der letzte sichtbare Rest der alten
+    // Oberfläche. `.tw-rb__big` ist keine `Button`-Primitive (anders als
+    // `&__btn`/`RibbonButton` oben), sonst würde `button.scss`s eigene
+    // `[aria-pressed="true"]`-Regel greifen; ein Umbau auf `Button` müsste
+    // `&__big` aber für alle vier Verbraucher dieser Klasse anfassen (siehe
+    // `tab-cells.tsx`, `tab-data.tsx`) und dabei deren Ruhe-Optik
+    // (Fläche/Rahmen aus `control-pill`) durch die Sekundär-/Ghost-Variante
+    // ersetzen — eine Änderung, die über diesen einen Knopf hinausgeht.
+    // Die engere Lösung: derselbe `aria-pressed`-Zustand (gesetzt in
+    // `tab-data.tsx`), aber mit einer lokalen, tokenbasierten Regel statt
+    // der Primitiven-Regel. `$accent-*` sind dieselben MAN-Rot-Token, die
+    // `button.scss` für den gedrückten Zustand von `--secondary`/`--ghost`
+    // benutzt.
+    &[aria-pressed="true"] {
+      color: $accent-text;
+      background: $accent-surface;
+      border-color: $accent-border;
+    }
   }
 
   // Umschlag um `<Switch>` (`src/shared/editor-ui`): die Primitive selbst

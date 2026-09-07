@@ -81,7 +81,12 @@ export function DataTab({
         </MenuItem>
       </Menu>
 
-      <button type="button" className="tw-rb__big" data-testid="toolbar-painter" title="Format kopieren" disabled={disabled && !painterActive} onClick={onCopyFormat} style={painterActive ? { color: "#0a63b0", background: "#e8f2fc", borderColor: "#9ecbf0" } : undefined}>
+      {/* Aufgabe 13a: Der aktive Zustand stand bisher nur als inline
+          gesetztes Staffbase-Blau da und meldete der Hilfstechnik nichts.
+          `aria-pressed` ist der Weg, den die anderen Umschalter des Ribbons
+          (`RibbonButton`, siehe `controls.tsx`) bereits gehen; die MAN-Farbe
+          dazu zeichnet `.tw-rb__big[aria-pressed="true"]` in `ribbon.scss`. */}
+      <button type="button" className="tw-rb__big" data-testid="toolbar-painter" title="Format kopieren" disabled={disabled && !painterActive} onClick={onCopyFormat} aria-pressed={painterActive}>
         <IconPainter />
         <span>Format</span>
       </button>

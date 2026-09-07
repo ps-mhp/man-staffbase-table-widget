@@ -17,9 +17,40 @@ import { ReactElement, useRef } from "react";
 import { Button, Menu, MenuItem, useEditorStyles } from "@shared/editor-ui";
 import { IconChevron } from "./icons";
 
-/** White box with a red diagonal slash — the "no colour set" (Standard) look. */
+/**
+ * White box with a red diagonal slash — the "no colour set" (Standard) look.
+ *
+ * Aufgabe 13a: Blieb beim Umbau auf `Menu` stehen (`#fff`/`#e53935`), obwohl
+ * er als Inline-Stil dieselbe Prüfung durchläuft wie ein Stylesheet-Wert.
+ * Die Fläche ist eine echte Gestaltungsentscheidung (`surface`, Weiß); der
+ * Schrägbalken ist dagegen eine **Bedeutungsdarstellung**: ein diagonaler
+ * roter Strich für "kein Wert" (wie das Verbotszeichen einer Beschilderung),
+ * keine Markenfarbe auf einer Fläche. Er zieht deshalb `red-700` — denselben
+ * Rot-Rampenschritt wie `danger` (`_tokens.scss:58` in
+ * `src/shared/editor-ui/styles/_tokens.scss`), aber unter seinem
+ * beschreibenden Namen, weil `danger` im übrigen Code zerstörerische
+ * Aktionen bedeutet (siehe Kommentar an `$text-mark` in der lokalen
+ * `_tokens.scss`) — das ist hier nicht gemeint.
+ */
 const STANDARD_BAR =
-  "linear-gradient(to top right, #fff 0 40%, #e53935 40% 60%, #fff 60% 100%)";
+  "linear-gradient(to top right, var(--man-editor-surface) 0 40%, var(--man-editor-red-700) 40% 60%, var(--man-editor-surface) 60% 100%)";
+
+/**
+ * Vorgabefarbe der Farbauswahl, solange keine Farbe gewählt ist.
+ *
+ * Aufgabe 13a: stand bisher als `#233848` da — gemessen gegen den Textton
+ * der Ebene (`tokens.man-editor(text)`, `src/shared/editor-ui/styles/_tokens.scss:92`,
+ * `#12171c`) ist das **nicht** derselbe Wert, also ein Rest der alten
+ * Staffbase-Oberfläche, kein Token. Der Wert zieht deshalb hier auf den
+ * tatsächlichen MAN-Textton.
+ *
+ * Bleibt trotzdem ein literaler Hex-String, nicht `var(--man-editor-text)`:
+ * er füllt einerseits das native `value`-Attribut von `<input type="color">`
+ * (Zeile weiter unten) — ein HTML-Attribut, kein CSS-Kontext, akzeptiert
+ * also keine Custom Property. Diese eine Stelle ist der Grund, warum
+ * `no-raw-values.test.ts` hier noch einen Eintrag in `ALLOWED` führt.
+ */
+const DEFAULT_SWATCH_COLOR = "#12171c";
 
 export function RibbonButton({
   onClick,
@@ -141,7 +172,7 @@ export function ColorButton({
         data-testid={testId}
         aria-label={title}
         disabled={disabled}
-        value={value ?? "#233848"}
+        value={value ?? DEFAULT_SWATCH_COLOR}
         onChange={(e) => onChange(e.target.value)}
         className="tw-rb__color-input"
       />
@@ -165,7 +196,10 @@ export function ColorButton({
           <span className="tw-rb__swatch" style={{ background: STANDARD_BAR }} /> Standard
         </MenuItem>
         <MenuItem onClick={() => inputRef.current?.click()}>
-          <span className="tw-rb__swatch" style={{ background: value ?? "#233848" }} /> Farbe wählen…
+          {/* Vorschau-Swatch in CSS-Kontext (anders als das native
+              `value`-Attribut oben): hier greift `var(--man-editor-text)`
+              direkt, kein literaler Hex-Wert nötig. */}
+          <span className="tw-rb__swatch" style={{ background: value ?? "var(--man-editor-text)" }} /> Farbe wählen…
         </MenuItem>
       </Menu>
     </div>
