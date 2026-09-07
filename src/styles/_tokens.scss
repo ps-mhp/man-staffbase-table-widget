@@ -81,13 +81,21 @@ $text-warning: #8a6d00;
 // `ribbon.scss`) auf ihrer eigenen blassen Fläche `$accent-surface`
 // (`#fde7ee`). Der naheliegende Textton `$accent-text` (`primary`, `#e40045`)
 // ergibt dort nur **4,07:1** — unter der WCAG-Schwelle für Fließtext
-// (4,5:1), gemessen mit der Standardformel relativer Luminanz. Der Ebenen-
-// Token `danger` (`#9e002f`) besteht mit **7,15:1**; belegt in
-// `../onetruck-css/src/lib/_tokens.scss:12` (`--man-red-active: #9e002f`)
-// bzw. Zeile 24 (`--man-red-700`, derselbe Wert). MAN-Gelb (`#ffcd00`, vom
-// Plan als Fläche vorgeschlagen) entfällt: die CI führt diesen Ton als
-// `--man-warning` (Zeile 53) — eine Warnfarbe, keine Hervorhebung, und selbst
-// mit `$accent-text` darauf nur 3,19:1.
+// (4,5:1), gemessen mit der Standardformel relativer Luminanz. Der hier
+// gezogene Ebenen-Token `danger` besteht mit **7,15:1**.
+//
+// Trotz des Namens ist hier keine Gefahr gemeint: In der CI
+// (`../onetruck-css/src/lib/_tokens.scss:12`) ist derselbe Wert `#9e002f`
+// als `--man-red-active` gefuehrt, Zeile 24 fuehrt ihn nochmal als
+// `--man-red-700` — also ein Schritt der Marken-Rot-Rampe, kein
+// Gefahren-Ton. Er steht hier nur, weil die geteilte Ebene
+// (`src/shared/editor-ui/styles/_tokens.scss:50`) diesen Rampenschritt unter
+// keinem anderen Namen fuehrt als `danger`; im uebrigen Code bedeutet
+// `danger` zerstoererische Aktionen (siehe `MenuItem`s `danger`-Prop), was
+// hier nicht gemeint ist. MAN-Gelb (`#ffcd00`, vom Plan als Fläche
+// vorgeschlagen) entfällt: die CI führt diesen Ton als `--man-warning`
+// (Zeile 53) — eine Warnfarbe, keine Hervorhebung, und selbst mit
+// `$accent-text` darauf nur 3,19:1.
 $text-mark: tokens.man-editor(danger);
 
 // Akzent -----------------------------------------------------------------

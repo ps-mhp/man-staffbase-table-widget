@@ -73,4 +73,19 @@ describe("HelpDrawer", () => {
     render(<HelpDrawer open onClose={jest.fn()} />);
     expect(screen.queryByTestId("help-drawer-backdrop")).not.toBeInTheDocument();
   });
+
+  // N1-Gegenprobe (Koordinator): Der Riegel in `tab-help.tsx` darf nur das
+  // Suchfeld abschirmen. Escape auf einem anderen Element *innerhalb* der
+  // offenen Schublade — hier die „Hilfe“-Breadcrumb — muss weiterhin bis zu
+  // `document` blubbern und die Schublade schließen. Anders als der Test
+  // oben, der `fireEvent.keyDown(document, ...)` direkt auf `document`
+  // feuert (und damit die Hülle umgeht), feuert dieser Test auf einem
+  // Kind-Knoten der Hülle — das ist der einzige Weg, zu prüfen, dass die
+  // Hülle nicht zu weit greift.
+  it("still closes on Escape fired on another element inside the open drawer", () => {
+    const onClose = jest.fn();
+    render(<HelpDrawer open onClose={onClose} />);
+    fireEvent.keyDown(screen.getByTestId("help-crumb-home"), { key: "Escape" });
+    expect(onClose).toHaveBeenCalled();
+  });
 });
