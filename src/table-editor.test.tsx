@@ -262,6 +262,20 @@ describe("TableEditor", () => {
     expect(arg.formats["1,1"]).toEqual({ fontSize: 20 });
   });
 
+  it("exposes the font size control as a combobox named 'Schriftgroesse'", () => {
+    // Befund 2: nur die Wegwerf-Datei aus der Umbau-Aufgabe prüfte den
+    // zugänglichen Namen; diese Datei wurde danach gelöscht. Dauerhaft
+    // gesichert wird hier über Rolle und Namen, nicht über die Testmarke — ein
+    // `<select>` ohne `multiple` bekommt die Rolle "combobox" (bestätigt durch
+    // Testing Library in dieser Suite), nicht "listbox".
+    render(<TableEditor value={sample()} onChange={jest.fn()} />);
+    fireEvent.click(screen.getByRole("tab", { name: "Schrift" }));
+
+    expect(
+      screen.getByRole("combobox", { name: "Schriftgröße" }),
+    ).toBe(screen.getByTestId("toolbar-fontsize"));
+  });
+
   it("shows contextual insert (only column) when a full column is selected", () => {
     render(<TableEditor value={sample()} onChange={jest.fn()} />);
     fireEvent.click(screen.getByTestId("col-handle-1"));
@@ -562,6 +576,28 @@ describe("TableEditor", () => {
       expect((onChange.mock.calls.at(-1)![0] as TableModel).fitImages).toBe(true);
     });
 
+    it("exposes the fit switch's help text to assistive tech, not just the mouse tooltip", () => {
+      // Befund 1: der Hilfetext saß nur als `title` auf der umschließenden
+      // Hülle, was einen Maus-Tooltip erzeugt, aber die Berechnung des
+      // zugänglichen Namens/der Beschreibung liest `title` nur am Element
+      // selbst (`role="switch"`), nicht an Vorfahren — für Screenreader war
+      // die Erklärung verloren. Beide Enden der Verdrahtung werden geprüft:
+      // das `aria-describedby` selbst *und* dass die referenzierte ID auf ein
+      // wirklich vorhandenes Element mit dem erwarteten Text zeigt — ein
+      // `aria-describedby` ins Leere wäre schlimmer als keines.
+      render(<TableEditor value={withImages()} onChange={jest.fn()} measure={measure} />);
+
+      const toggle = imageFitSwitch();
+      const describedById = toggle.getAttribute("aria-describedby");
+      expect(describedById).toBeTruthy();
+
+      const describedByEl = document.getElementById(describedById!);
+      expect(describedByEl).not.toBeNull();
+      expect(describedByEl).toHaveTextContent(
+        "Bilder auf die Breite der Tabelle begrenzen. Ausgeschaltet werden sie immer in ihrer eigenen Größe angezeigt.",
+      );
+    });
+
     it("offers only the reset option while a single image is selected", () => {
       render(<TableEditor value={withImages()} onChange={jest.fn()} measure={measure} />);
       fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
@@ -750,6 +786,21 @@ describe("row limit", () => {
     );
 
     expect(toolbar("toolbar-visible-rows")).toHaveValue(3);
+  });
+
+  it("exposes the visible-rows control as a spinbutton named via its enclosing label", () => {
+    // Befund 2: der zugängliche Name dieses Zahlenfelds kommt aus der
+    // umschließenden `<label>`, nicht aus einem `aria-label` — genau diese
+    // Verdrahtung ginge unbemerkt verloren, verschöbe man den Text aus dem
+    // `<label>` oder ersetzte es durch ein bloßes `<span>`. `<input
+    // type="number">` traegt die Rolle "spinbutton" (bestätigt durch Testing
+    // Library in dieser Suite), keine "textbox".
+    render(<TableEditor value={longModel(10)} onChange={jest.fn()} measure={measure} />);
+    fireEvent.click(screen.getByRole("tab", { name: "Daten" }));
+
+    expect(
+      screen.getByRole("spinbutton", { name: "Sichtbare Zeilen" }),
+    ).toBe(screen.getByTestId("toolbar-visible-rows"));
   });
 
   it("reports a changed limit", () => {

@@ -47,6 +47,12 @@ export function ImagesTab({
   // `document.head` — siehe RibbonShell für dieselbe Begründung.
   useEditorStyles();
   const disabled = !hasSelection;
+  // Kennung für den Hilfetext des Schalters. `useId` (wie `Field` in der
+  // Ebene) statt einer fest verdrahteten Zeichenkette: eine Zeichenkette
+  // kollidierte, sobald `ImagesTab` zweimal auf der Seite steht (z. B. zwei
+  // Tabellen-Widgets), und ein `aria-describedby` mit doppelt vergebener ID
+  // zeigte auf den ersten Treffer im DOM — unter Umständen den falschen Text.
+  const fitImagesHelpId = React.useId();
 
   return (
     <>
@@ -96,7 +102,15 @@ export function ImagesTab({
         `Switch` zerlegt seine Props einzeln (kein `...rest`) und nimmt daher
         weder `data-testid` noch `title` an. Der `title` ist echter Hilfetext
         für die Redaktion und wandert deshalb auf diese umschließende Hülle —
-        `title` an einem Element wirkt auch für dessen Inhalt. Das verlorene
+        `title` an einem Element wirkt auch für dessen Inhalt, das erhält den
+        Maus-Tooltip für sehende Redakteure. Für Screenreader trägt das allein
+        nichts bei: die Berechnung des zugänglichen Namens/der Beschreibung
+        liest `title` nur am Element selbst, nicht an Vorfahren (`role="switch"`
+        sitzt am `<button>` in `Switch`, nicht an dieser Hülle). Deshalb steht
+        derselbe Text zusätzlich als eigenes, aber visuell verstecktes Element
+        im DOM (`tw-rb__visually-hidden` — im Layout unsichtbar, für
+        Hilfstechnik aber vorhanden, anders als `display: none`), das `Switch`
+        über `aria-describedby` verdrahtet bekommt. Das verlorene
         `data-testid="toolbar-image-fit"` wird in `table-editor.test.tsx`
         durch `getByRole("switch", { name: "Bilder anpassen" })` ersetzt.
       */}
@@ -104,7 +118,15 @@ export function ImagesTab({
         className="tw-rb__switch-wrap"
         title="Bilder auf die Breite der Tabelle begrenzen. Ausgeschaltet werden sie immer in ihrer eigenen Größe angezeigt."
       >
-        <Switch checked={fitImages} onCheckedChange={onToggleFitImages} label="Bilder anpassen" />
+        <Switch
+          checked={fitImages}
+          onCheckedChange={onToggleFitImages}
+          label="Bilder anpassen"
+          aria-describedby={fitImagesHelpId}
+        />
+        <span id={fitImagesHelpId} className="tw-rb__visually-hidden">
+          Bilder auf die Breite der Tabelle begrenzen. Ausgeschaltet werden sie immer in ihrer eigenen Größe angezeigt.
+        </span>
       </span>
     </>
   );

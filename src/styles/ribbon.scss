@@ -196,6 +196,24 @@
     align-items: center;
   }
 
+  // Für Screenreader gedachter Text (etwa der Hilfetext eines Schalters, der
+  // per `aria-describedby` verdrahtet ist), der im Layout nicht erscheinen
+  // soll. Bewusst **nicht** `display: none` oder `visibility: hidden`: beide
+  // nehmen ein Element aus dem Zugänglichkeits-Baum, genau wie aus dem
+  // Layout — ein `aria-describedby` darauf zeigte dann ins Leere. Das
+  // Standard-Verklemmen auf 1x1 Pixel entfernt es nur optisch.
+  &__visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   &__rows-limit {
     @include control-pill;
 
