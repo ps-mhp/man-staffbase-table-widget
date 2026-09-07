@@ -156,4 +156,35 @@ describe("RibbonShell", () => {
     const glyph = screen.getByTestId("toolbar-help").querySelector("[data-icon]");
     expect(glyph).toHaveAttribute("data-icon", "info");
   });
+
+  // Die drei Kopfleisten-Knoepfe tragen ihr Symbol als `aria-hidden`; ohne
+  // eigenen `aria-label` bliebe nur der schwaechere Title-Fallback als
+  // zugaenglicher Name (bei Tastaturfokus und auf Touch nicht verlaesslich
+  // angekuendigt) - anders als bei jedem anderen symbolischen Knopf des
+  // Ribbons (`RibbonButton`, `controls.tsx`). `getByRole` allein wuerde
+  // hier nicht rot: jsdom berechnet den zugaenglichen Namen bereits aus
+  // `title`, wenn kein `aria-label` da ist. Der Zugriff ueber die Rolle
+  // findet darum das Element, die zusaetzliche Zusicherung auf das
+  // Attribut selbst prueft, dass es sich wirklich um `aria-label` handelt
+  // und nicht nur um den Title-Fallback.
+  it("exposes an accessible name for the save button", () => {
+    render(<Harness onSave={jest.fn()} />);
+    const button = screen.getByRole("button", { name: "Speichern" });
+    expect(button).toHaveAttribute("aria-label", "Speichern");
+  });
+
+  it("exposes an accessible name for the help button", () => {
+    render(<Harness onOpenHelp={jest.fn()} />);
+    const button = screen.getByRole("button", { name: "Hilfe" });
+    expect(button).toHaveAttribute("aria-label", "Hilfe");
+  });
+
+  it("exposes an accessible name for the close button", () => {
+    // Der Schließen-Knopf steckt im selben Kontrollleisten-Block wie
+    // Speichern/Hilfe (`onSave || onOpenHelp`) - ohne einen von beiden
+    // rendert `RibbonShell` die Leiste gar nicht erst.
+    render(<Harness onSave={jest.fn()} onClose={jest.fn()} />);
+    const button = screen.getByRole("button", { name: "Schließen" });
+    expect(button).toHaveAttribute("aria-label", "Schließen");
+  });
 });

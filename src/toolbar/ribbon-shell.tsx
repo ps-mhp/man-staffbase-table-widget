@@ -86,6 +86,13 @@ export function RibbonShell({ tabs, activeTab, onSelectTab, onSave, onClose, dir
               className="tw-rb__ctl tw-rb__ctl--primary"
               data-testid="toolbar-done"
               title="Speichern"
+              // `RibbonButton` (`controls.tsx`) setzt für jeden symbolischen
+              // Knopf sowohl `title` als auch `aria-label` — der Titel bleibt
+              // die Kurzhilfe beim Überfahren, `aria-label` der zugängliche
+              // Name selbst, der bei Tastaturfokus/Touch verlässlicher
+              // ankommt als der Title-Fallback. Die drei rohen Knöpfe hier
+              // (anders als `RibbonButton`) trugen bislang nur `title`.
+              aria-label="Speichern"
               onClick={onSave}
             >
               <IconSave />
@@ -100,6 +107,7 @@ export function RibbonShell({ tabs, activeTab, onSelectTab, onSave, onClose, dir
               className="tw-rb__ctl tw-rb__ctl-help"
               data-testid="toolbar-help"
               title="Hilfe"
+              aria-label="Hilfe"
               onClick={onOpenHelp}
             >
               <Icon name="info" size="md" />
@@ -111,6 +119,7 @@ export function RibbonShell({ tabs, activeTab, onSelectTab, onSave, onClose, dir
               className="tw-rb__ctl tw-rb__ctl-close"
               data-testid="toolbar-close"
               title="Schließen"
+              aria-label="Schließen"
               onClick={onClose}
             >
               <Icon name="close" size="md" />

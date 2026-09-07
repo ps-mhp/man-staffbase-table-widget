@@ -174,7 +174,16 @@
       color $transition,
       box-shadow $transition;
 
-    svg {
+    // Nur das direkte Knopf-Symbol (`Icon`/handgezeichnetes SVG als erstes
+    // Kind) soll 20px gross sein. Ein reiner Nachfahren-Selektor traf hier
+    // zusaetzlich den `IconChevron` im verschachtelten `.tw-rb__label`
+    // (`<button><svg/><span class="tw-rb__label">Text<svg/></span></button>`)
+    // und ueberschrieb dessen `width="10"`/`height="10"`-Attribut, obwohl
+    // `icons.tsx` (Kommentar bei `IconChevron`, siehe auch Commit
+    // 8043f18) den Chevron an allen fuenf Einsatzstellen bewusst klein
+    // haelt. `> svg` beschraenkt die Regel auf das direkte Kind und laesst
+    // den Chevron bei den vorgesehenen 10px.
+    > svg {
       width: 20px;
       height: 20px;
     }
@@ -190,7 +199,7 @@
     // Oberfläche. `.tw-rb__big` ist keine `Button`-Primitive (anders als
     // `&__btn`/`RibbonButton` oben), sonst würde `button.scss`s eigene
     // `[aria-pressed="true"]`-Regel greifen; ein Umbau auf `Button` müsste
-    // `&__big` aber für alle vier Verbraucher dieser Klasse anfassen (siehe
+    // `&__big` aber für alle sechs Verbraucher dieser Klasse anfassen (siehe
     // `tab-cells.tsx`, `tab-data.tsx`) und dabei deren Ruhe-Optik
     // (Fläche/Rahmen aus `control-pill`) durch die Sekundär-/Ghost-Variante
     // ersetzen — eine Änderung, die über diesen einen Knopf hinausgeht.
