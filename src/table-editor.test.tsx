@@ -880,6 +880,45 @@ describe("row limit", () => {
     const frame = screen.getByTestId("table-editor-grid-wrap");
     expect(frame.style.alignSelf).toBe("");
   });
+
+  // Ein vertauschter, aber gültiger Katalogname (z. B. "close" statt "image")
+  // faellt durch kein anderes Netz: `Icon` rendert nur eine leere Huelle,
+  // das sichtbare Glyph kommt allein aus dem CSS (`data-icon`), und
+  // `data-testid` prueft nur das Klickverhalten des umschliessenden Knopfs.
+  it("renders the image-insert button with the image catalog glyph", () => {
+    render(<TableEditor value={sample()} onChange={jest.fn()} />);
+    const glyph = toolbar("toolbar-image-button").querySelector("[data-icon]");
+    expect(glyph).toHaveAttribute("data-icon", "image");
+  });
+
+  it("renders the clear-format button with the reset catalog glyph", () => {
+    render(<TableEditor value={sample()} onChange={jest.fn()} />);
+    const glyph = toolbar("toolbar-clear-format").querySelector("[data-icon]");
+    expect(glyph).toHaveAttribute("data-icon", "reset");
+  });
+
+  // Der Auftrag verlangte, dass die handgezeichneten Symbole ihre Größe von
+  // der Ebene erben, statt sie selbst zu setzen (`width`/`height` als
+  // Attribut). `getComputedStyle` misst hier am real gerenderten `<svg>`,
+  // nicht nur am JSX-Quelltext -- ein `width="16"`-Attribut sähe im Quelltext
+  // harmlos aus, bliebe aber trotzdem eine selbst gesetzte, feste Größe.
+  it("sizes a hand-drawn ribbon icon from the button's font-size, not its own width/height", () => {
+    render(<TableEditor value={sample()} onChange={jest.fn()} />);
+    fireEvent.click(screen.getByRole("tab", { name: "Ausrichtung" }));
+    const button = screen.getByTestId("toolbar-align-left");
+    const svg = button.querySelector("svg")!;
+    // Die eigene Größe kommt jetzt aus `1em`, keiner Pixelzahl -- geprüft am
+    // Attribut, weil jsdom die SVG-Geometrieattribute nicht ins CSSOM
+    // abbildet (`getComputedStyle(svg).width` bliebe leer, unabhängig vom
+    // Attributwert).
+    expect(svg.getAttribute("width")).toBe("1em");
+    expect(svg.getAttribute("height")).toBe("1em");
+    // Die Ebene, von der `1em` erben soll, ist real gerendert und misst
+    // 16px (`icon-md`) -- nicht die 13px der Knopf-Beschriftung ("dense"),
+    // die das Symbol ohne die eigene `font-size`-Regel in `ribbon.scss`
+    // stattdessen geerbt hätte.
+    expect(getComputedStyle(svg).fontSize).toBe("16px");
+  });
 });
 
   it("marks a whole selected cell as lowercase", () => {

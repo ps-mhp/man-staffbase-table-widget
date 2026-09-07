@@ -162,3 +162,14 @@ $transition-slow: 140ms ease;
 
 // Markierung für Kleinschreibung (Editor-Hinweis, kein Markenton)
 $mark-lowercase: #f97316;
+
+// Symbolgröße ---------------------------------------------------------------
+// Die handgezeichneten SVGs in `toolbar/icons.tsx` setzen seit Aufgabe 12
+// `width="1em" height="1em"` (statt einer eigenen Pixelzahl), um der
+// `font-size` ihres Elternelements zu folgen — genau wie die Katalog-Symbole
+// über `man-ed-icon--md` (`@shared/editor-ui/styles/icon.scss:51-53`). Dort
+// führt die Ebene bereits `icon-md` (16px); dieser Name zieht ihn hierher,
+// damit `ribbon.scss` an Stellen ohne eigene `font-size` (z. B. `.tw-rb__btn`)
+// die bisherige 16px-Optik der Symbole aus einem Token statt einer rohen
+// Pixelzahl wiederherstellen kann.
+$icon-md: tokens.man-editor(icon-md);

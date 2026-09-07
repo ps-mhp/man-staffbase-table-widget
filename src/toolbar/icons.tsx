@@ -14,9 +14,17 @@
 import * as React from "react";
 import { ReactElement } from "react";
 
+// `width`/`height` sind bewusst `"1em"`: das SVG folgt damit der `font-size`
+// seines Elternelements, statt eine eigene Pixelzahl mitzubringen — dieselbe
+// Eigenschaft, über die auch die Katalog-Symbolschrift skaliert
+// (`man-ed-icon--md`/`--sm` in `@shared/editor-ui/styles/icon.scss`). Wo kein
+// Knopf schon eine passende `font-size` traegt, setzt `ribbon.scss` sie
+// gezielt aus dem Token `$icon-md` (`_tokens.scss`), damit die 16px-Groesse
+// erhalten bleibt statt auf die Knopf-Beschriftungsgroesse ("dense", 13px)
+// zurueckzufallen.
 const svgBase = {
-  width: 16,
-  height: 16,
+  width: "1em",
+  height: "1em",
   viewBox: "0 0 16 16",
   fill: "none",
   stroke: "currentColor",
@@ -25,6 +33,14 @@ const svgBase = {
   strokeLinejoin: "round" as const,
 };
 
+// Bleibt bei einer festen Pixelzahl statt `1em`: Der Speichern-Knopf der
+// Kopfleiste (`ribbon-shell.tsx`, Klasse `tw-rb__ctl--primary`) ist absichtlich
+// groesser als die uebrige, dichte Werkzeugleiste — eine eigene Größenstufe
+// dafür gibt es in der MAN-Editor-Ebene nicht (nur `icon-sm`/`icon-md`, 12/16px),
+// und `ribbon.scss` erzwingt an dieser Stelle ohnehin `width/height: 14px`
+// über eine eigene Regel (`.tw-rb__ctl svg`), unabhaengig vom hier gesetzten
+// Attribut. Eine erfundene Zwischenstufe waere kein Token, nur eine neue rohe
+// Pixelzahl unter anderem Namen — das feste Maß bleibt darum hier stehen.
 export const IconSave = (): ReactElement => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
     <path d="M5 3h11l3 3v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
@@ -105,7 +121,15 @@ export const IconImageSize = (): ReactElement => (
     <path d="M8 2.5v11" strokeWidth={1.1} strokeDasharray="1.5 1.5" />
   </svg>
 );
-export const IconChevron = (): ReactElement => (  <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+// Bleibt ebenfalls bei einer festen Pixelzahl: Der Chevron ist ein kleiner
+// Aufklapp-Anzeiger *innerhalb* einer Knopf-Beschriftung (`tw-rb__label`),
+// die selbst schon "dense" (13px) grosse Schrift traegt. `1em` erbte dort
+// die Textgroesse des Labels, nicht die 10px, die er heute hat — die Ebene
+// fuehrt zudem keine Groessenstufe zwischen `icon-sm` (12px) und keiner,
+// die kleiner waere. Eine erzwungene Stufe aenderte das sichtbare Bild, das
+// war nicht beauftragt; das feste Maß bleibt darum hier stehen.
+export const IconChevron = (): ReactElement => (
+  <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
     <path d="M3 4.5L6 8l3-3.5" />
   </svg>
 );

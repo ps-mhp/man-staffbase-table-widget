@@ -86,6 +86,17 @@
       color $transition,
       box-shadow $transition;
 
+    // Die handgezeichneten SVGs (`toolbar/icons.tsx`) setzen `width/height:
+    // 1em` und folgen damit dieser `font-size` statt einer eigenen Pixelzahl.
+    // Ohne diese Regel erbten sie die 13px der `dense`-Beschriftung oben statt
+    // der bisherigen 16px — die Knöpfe ohne eigene Größenregel (anders als
+    // `.tw-rb__big`/`.tw-rb__ctl`, die ihr `svg` schon selbst auf eine feste
+    // Pixelzahl setzen) brauchen darum diese eigene, aus dem Token gezogene
+    // Stufe.
+    svg {
+      font-size: $icon-md;
+    }
+
     // Seit `RibbonButton` auf die Primitive `Button` umgestellt ist, tragen
     // ihre Knöpfe gleichzeitig diese Klasse (hier, statisch gebündelt) *und*
     // `man-ed-button`/`--ghost` (Redaktionsebene, asynchron nachgeladen) —

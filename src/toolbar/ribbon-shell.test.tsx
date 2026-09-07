@@ -140,4 +140,20 @@ describe("RibbonShell", () => {
     expect(screen.queryByTestId("toolbar-done")).not.toBeInTheDocument();
     expect(screen.queryByTestId("toolbar-close")).not.toBeInTheDocument();
   });
+
+  // Ein falscher, aber gültiger Katalogname (etwa "close" statt "reset")
+  // faellt durch kein anderes Netz: `Icon` rendert nur eine leere Huelle,
+  // das sichtbare Glyph kommt aus dem CSS, und `data-testid` prueft nur das
+  // Klickverhalten, nicht das Symbol selbst.
+  it("renders the close button with the close catalog glyph", () => {
+    render(<Harness onSave={jest.fn()} onClose={jest.fn()} onOpenHelp={jest.fn()} />);
+    const glyph = screen.getByTestId("toolbar-close").querySelector("[data-icon]");
+    expect(glyph).toHaveAttribute("data-icon", "close");
+  });
+
+  it("renders the help button with the info catalog glyph", () => {
+    render(<Harness onSave={jest.fn()} onClose={jest.fn()} onOpenHelp={jest.fn()} />);
+    const glyph = screen.getByTestId("toolbar-help").querySelector("[data-icon]");
+    expect(glyph).toHaveAttribute("data-icon", "info");
+  });
 });
