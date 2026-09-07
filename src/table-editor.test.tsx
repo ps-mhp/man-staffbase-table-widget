@@ -180,6 +180,17 @@ describe("TableEditor", () => {
     expect(getComputedStyle(item).opacity).toBe("0.4");
   });
 
+  it("gives context-menu items the shared layer's menu-item min-height", () => {
+    // Aligns with `.man-ed-menu__item` in `menu.scss`, which sets
+    // `min-height: control-h-md` (36px) -- a context menu is not the dense
+    // ribbon (which deliberately stays at control-h-sm), so its items should
+    // match the shared `Menu` primitive's row height instead.
+    render(<TableEditor value={sample()} onChange={jest.fn()} />);
+    fireEvent.contextMenu(screen.getByTestId("table-editor-grid-wrap"));
+    const item = screen.getByTestId("insert-row-above");
+    expect(getComputedStyle(item).minHeight).toBe("36px");
+  });
+
   it("does not render the covered cell of a merge", () => {
     const merged = model([["", "Q1", "Q2"], ["Umsatz", "100", "200"]], {
       merges: [{ row: 1, col: 1, rowSpan: 1, colSpan: 2 }],

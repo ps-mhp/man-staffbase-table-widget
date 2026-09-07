@@ -192,6 +192,11 @@
     // Pixelzahlen (`6px 10px`) — dieselben zwei Stufen, die auch
     // `.man-ed-menu__item` zieht.
     padding: $space-2 $space-4;
+    // Mindesthoehe wie beim echten `Menu`-Primitiv (`menu.scss`,
+    // `control-h-md`): ein Kontextmenue ist keine dichte Werkzeugleiste (die
+    // oben mit `control-h-sm` bewusst enger sitzt), sondern ein Menue, und
+    // dafuer ist `menu.scss` das Vorbild dieser Ebene.
+    min-height: $control-height-md;
     border-radius: 0;
     cursor: pointer;
     outline: none;

@@ -122,6 +122,12 @@ $focus-ring: 0 0 0 tokens.man-editor(focus-width) tokens.man-editor(focus);
 $control-height: tokens.man-editor(control-h-sm);
 $control-height-sm: tokens.man-editor(control-h-sm);
 
+// Das Kontextmenü des Rasters ist keine dichte Werkzeugleiste, sondern ein
+// Menü — Vorbild ist `menu.scss` (`.man-ed-menu__item`), das seine Eintraege
+// mit `control-h-md` (36px) hoch macht. Deshalb hier die groessere Stufe statt
+// der Ribbon-Hoehe oben.
+$control-height-md: tokens.man-editor(control-h-md);
+
 // Abstände (Aufgabe 10). Angelegt, weil das Kontextmenü im Raster
 // (`table-editor.scss`) seine Innenabstände jetzt aus der Abstandsskala der
 // Ebene zieht statt aus abgeschriebenen Pixelzahlen — siehe `menu.scss`, das
