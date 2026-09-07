@@ -33,14 +33,16 @@ const svgBase = {
   strokeLinejoin: "round" as const,
 };
 
-// Bleibt bei einer festen Pixelzahl statt `1em`: Der Speichern-Knopf der
-// Kopfleiste (`ribbon-shell.tsx`, Klasse `tw-rb__ctl--primary`) ist absichtlich
-// groesser als die uebrige, dichte Werkzeugleiste — eine eigene Größenstufe
-// dafür gibt es in der MAN-Editor-Ebene nicht (nur `icon-sm`/`icon-md`, 12/16px),
-// und `ribbon.scss` erzwingt an dieser Stelle ohnehin `width/height: 14px`
-// über eine eigene Regel (`.tw-rb__ctl svg`), unabhaengig vom hier gesetzten
-// Attribut. Eine erfundene Zwischenstufe waere kein Token, nur eine neue rohe
-// Pixelzahl unter anderem Namen — das feste Maß bleibt darum hier stehen.
+// Bleibt als einziges Symbol neben `IconChevron` bei einer festen Pixelzahl
+// statt `1em` — und das Maß hier ist ohnehin wirkungslos: `ribbon.scss` setzt
+// für die Knöpfe der Kopfleiste `.tw-rb__ctl svg { width: 14px; height: 14px }`,
+// und eine CSS-Regel schlägt das Präsentationsattribut. Die Größe entscheidet
+// also das Stylesheet, nicht diese Zeile. Auf `1em` umzustellen brächte darum
+// nichts; sichtbar wäre der Knopf mit 14px sogar etwas kleiner als die 16px
+// der Ribbon-Symbole. Beide Pixelzahlen sind Reste, die eine Größenstufe der
+// Ebene bräuchten (dort gibt es nur `icon-sm`/`icon-md`, 12/16px); eine
+// erfundene Zwischenstufe wäre kein Token, nur eine rohe Zahl unter neuem
+// Namen. Gemeldet, nicht hier gebaut.
 export const IconSave = (): ReactElement => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
     <path d="M5 3h11l3 3v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
