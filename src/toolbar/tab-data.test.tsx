@@ -74,6 +74,18 @@ describe("DataTab: painter button reports its active state to assistive technolo
     // den vollen Wert inklusive Fallback fest — genau das reicht, um
     // Staffbase-Blau (`#0a63b0`) auszuschließen und die MAN-Akzentfarbe
     // (`primary`, `#e40045`) zu belegen.
+    //
+    // Grenze dieses Tests (bereits an mehreren Stellen im Projekt
+    // festgehalten, siehe `button.scss:23`): jsdoms `getComputedStyle` wertet
+    // die **Reihenfolge** der Regeln im Stylesheet aus, nicht ihre
+    // Spezifität. Hier gewinnt `[aria-pressed="true"]` nur, weil es als
+    // einziger Regelsatz überhaupt `color` an diesem Element setzt — es gibt
+    // keine konkurrierende Regel gleicher Spezifität, gegen die jsdom falsch
+    // entscheiden könnte. Würde `ribbon.scss` künftig umsortiert oder käme
+    // eine zweite, konkurrierende Regel hinzu, bliebe dieser Test grün, auch
+    // wenn die Kaskade in einem echten Browser bräche. Er beweist also nur,
+    // dass die Regel **greift**, nicht, dass sie sich gegen Konkurrenz
+    // **durchsetzt**.
     expect(computed.color).toBe("var(--man-editor-primary, #e40045)");
     expect(computed.color).not.toContain("0a63b0");
   });

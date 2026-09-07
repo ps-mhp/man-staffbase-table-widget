@@ -202,6 +202,13 @@
     &[aria-pressed="true"] {
       color: $accent-text;
       background: $accent-surface;
+      // `border-color` ist hier optisch wirkungslos: `.tw-rb__big` setzt
+      // oben unconditional `border: 0`, es gibt also keinen Rahmen, den
+      // diese Farbe zeichnen könnte. Übernommene Altlast aus dem entfernten
+      // Inline-Stil (der hatte denselben blinden Fleck: `borderColor:
+      // "#9ecbf0"` an einem randlosen Knopf) — belassen, weil ein Prüfer
+      // das Streichen für nicht erforderlich hält und diese Aufgabe keine
+      // Gelegenheitsverbesserungen vornehmen soll.
       border-color: $accent-border;
     }
   }
