@@ -14,6 +14,8 @@
 import * as React from "react";
 import { createEvent, fireEvent, render, screen } from "@testing-library/react";
 
+import buttonCss from "@shared/editor-ui/styles/button.scss";
+import ribbonCss from "../styles/ribbon.scss";
 import { RibbonButton } from "./controls";
 
 describe("RibbonButton", () => {
@@ -69,5 +71,62 @@ describe("RibbonButton", () => {
     const button = screen.getByTestId("t");
     expect(button).toHaveAttribute("title", "Fett");
     expect(button).toHaveAttribute("aria-label", "Fett");
+  });
+});
+
+// Befund C1 (Aufgabe 12, Bündel C), Nacharbeit: `ribbon.scss` stach früher
+// mit einem Doppelklassen-Selektor (`.tw-rb__btn.tw-rb__btn--active`) gegen
+// die Ebene, weil beide Regelsätze dieselben drei Eigenschaften am selben
+// Element setzten und die Ladereihenfolge der beiden Stylesheets zufällig
+// war (`ribbon.scss` lokal als `<style>`-Block, `button.scss` asynchron in
+// `document.head`, siehe `useEditorStyles`). Seit `button.scss` den
+// gedrückten Zustand selbst über `[aria-pressed="true"]` zeichnet, ist der
+// Stich entfallen (siehe `ribbon.scss`, Kommentar an der ehemaligen
+// `--active`-Regel). Dieser Test misst, dass der aktive Zustand danach
+// *wirklich* noch sichtbar ist — und zwar unabhängig davon, welches der
+// beiden Stylesheets zuerst im `document.head`/`<style>`-Block landet: ohne
+// den Stich gibt es keine zweite Regel mehr, die um dieselben Eigenschaften
+// konkurriert, also darf die Reihenfolge keinen Unterschied mehr machen.
+describe("RibbonButton: active state stays visible without the specificity stitch", () => {
+  const ACCENT_SURFACE = "var(--man-editor-accent-surface, #fde7ee)";
+  const PRIMARY = "var(--man-editor-primary, #e40045)";
+
+  function renderActiveButton(loadOrder: "ribbon-first" | "button-first"): HTMLElement {
+    const first = document.createElement("style");
+    const second = document.createElement("style");
+    if (loadOrder === "ribbon-first") {
+      first.textContent = ribbonCss;
+      second.textContent = buttonCss;
+    } else {
+      first.textContent = buttonCss;
+      second.textContent = ribbonCss;
+    }
+    document.head.appendChild(first);
+    document.head.appendChild(second);
+
+    render(
+      <RibbonButton testId="t" title="Fett" active onClick={jest.fn()}>
+        B
+      </RibbonButton>,
+    );
+    return screen.getByTestId("t");
+  }
+
+  afterEach(() => {
+    document.head.querySelectorAll("style").forEach((el) => el.remove());
+  });
+
+  it("paints the accent surface/text when ribbon.scss loads before button.scss", () => {
+    const button = renderActiveButton("ribbon-first");
+    const computed = getComputedStyle(button);
+    expect(computed.backgroundColor).toBe(ACCENT_SURFACE);
+    expect(computed.color).toBe(PRIMARY);
+  });
+
+  it("paints the accent surface/text when button.scss loads before ribbon.scss (the reversed, once-random order)", () => {
+    const button = renderActiveButton("button-first");
+    const computed = getComputedStyle(button);
+    expect(computed.backgroundColor).toBe(ACCENT_SURFACE);
+    expect(computed.color).toBe(PRIMARY);
   });
 });

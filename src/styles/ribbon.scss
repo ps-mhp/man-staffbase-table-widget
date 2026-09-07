@@ -120,33 +120,20 @@
       }
     }
 
-    // `--active` bildet einen echten Editor-Zustand ab (z. B. „Fett" aktiv)
-    // und muss deshalb für *beide* Sorten Knöpfe gelten — anders als der
-    // Grundblock oben lässt sich dieser hier nicht hinter `:not(.man-ed-
-    // button)` verstecken. Geprüft: die Primitive kennt aktuell keinen
-    // gedrückten Zustand (`aria-pressed` wird zwar gesetzt, `button.scss`
-    // hat aber keine `[aria-pressed]`-Regel) — sie kann den Zustand also
-    // nicht selbst zeichnen. `RibbonButton` benutzt außerdem ausschließlich
-    // `variant="ghost"`, daher kollidiert `--active` nur mit
-    // `.man-ed-button--ghost`, nicht mit den anderen Varianten.
-    //
-    // Beide Regelsätze haben ohne Gegenmaßnahme dieselbe Spezifität (je eine
-    // Klasse) und setzen dieselben drei Eigenschaften — wer gewinnt, hinge
-    // nur an der zufälligen Ladereihenfolge der beiden Stylesheets
-    // (`ribbon.scss` lokal, `Button`s Stylesheet asynchron in
-    // `document.head`). Der Doppelklassen-Selektor unten (zwei Klassen aus
-    // derselben Regel, `.tw-rb__btn.tw-rb__btn--active`) hebt die Spezifität
-    // bewusst über die der Primitive, damit der aktive Zustand unabhängig
-    // von der Ladereihenfolge sichtbar bleibt. Das ist ein gezielter Stich
-    // gegen die Ebene, kein Versehen — er kann entfallen, sobald `Button`/
-    // `IconButton` selbst einen gedrückten Zustand zeichnen (z. B. über
-    // `[aria-pressed="true"]` in `button.scss`).
-    &.tw-rb__btn--active,
-    &.tw-rb__btn--active:hover:not(:disabled) {
-      background: $accent-surface;
-      border-color: $accent-border;
-      color: $accent-text;
-    }
+    // `--active` trägt hier bewusst **keine** eigene Optik mehr (Befund C1,
+    // Aufgabe 12, Nacharbeit): `button.scss` zeichnet den gedrückten Zustand
+    // inzwischen selbst über `[aria-pressed="true"]`, für genau die
+    // Ghost-Variante, die `RibbonButton` ausschließlich benutzt — gemessen an
+    // einem gerenderten Knopf (`RibbonButton` setzt `--active` und
+    // `aria-pressed` immer gemeinsam, siehe `controls.tsx`). Der frühere
+    // Doppelklassen-Stich (`.tw-rb__btn.tw-rb__btn--active`) sicherte eine
+    // Spezifität über der der Primitive ab, weil beide Regelsätze dieselben
+    // Eigenschaften am selben Element setzten und die Ladereihenfolge der
+    // beiden Stylesheets zufällig war. Mit nur noch *einem* Regelsatz, der
+    // Fläche und Text färbt, gibt es diese Kollision nicht mehr — die
+    // Ladereihenfolge spielt keine Rolle, wenn nur eine Seite überhaupt malt.
+    // Die Klasse `--active` bleibt in der Klassenliste stehen (siehe
+    // `controls.tsx`), trägt hier aber keine Deklaration mehr.
 
     // `&--icon` fällt weg: `Button` trägt jetzt selbst `man-ed-button--icon`
     // (Padding 0, `aspect-ratio: 1`) — dieselbe Quadratur wie hier vorher,

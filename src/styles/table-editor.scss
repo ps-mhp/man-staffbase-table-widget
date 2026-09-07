@@ -225,6 +225,16 @@
     // (0.4) bleibt der widget-eigene, nicht der `menu.scss`-Wert (0.5): er ist
     // hier durchgehend derselbe wie bei jedem anderen deaktivierten Element
     // dieser Leiste (`_mixins.scss`, Mixin `disabled`).
+    //
+    // Bleibt lokal (Befund C2, Aufgabe 12): `menu.scss` kennt inzwischen
+    // selbst `[aria-disabled="true"]`/`[data-disabled]` (dieselbe Radix-Lücke,
+    // dort für das echte `<Menu>`-Primitiv geschlossen). Das ändert an dieser
+    // Stelle trotzdem nichts — dieser Eintrag trägt nie die Klasse
+    // `man-ed-menu__item`, weil `ContextMenu.Item` (Radix) sich nicht mit dem
+    // knopfbasierten `<MenuItem>` der Ebene bauen lässt; beide Klassenwelten
+    // laufen nebeneinander her, nie übereinander. Ohne diese Regel bliebe ein
+    // gesperrter Eintrag hier komplett undurchsichtig, nicht bloß anders
+    // gedämpft — gemessen, nicht angenommen.
     &--disabled,
     &[data-disabled] {
       opacity: 0.4;

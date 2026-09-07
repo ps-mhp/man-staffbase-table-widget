@@ -62,7 +62,17 @@ export function RibbonShell({ tabs, activeTab, onSelectTab, onSave, onClose, dir
   useEditorStyles();
   const active = tabs.find((tab) => tab.id === activeTab) ?? tabs[0];
 
-  const tabItems: readonly TabItem[] = tabs.map((tab) => ({ id: tab.id, label: tab.label }));
+  const tabItems: readonly TabItem[] = tabs.map((tab) => ({
+    id: tab.id,
+    label: tab.label,
+    // Ein Klick auf einen Reiter darf der gerade bearbeiteten
+    // `contenteditable`-Zelle nicht den Fokus (und damit die native
+    // Text-Selektion) nehmen — derselbe Grund wie bei `RibbonButton`
+    // (`controls.tsx`). Beim Umbau auf die Primitive `Tabs` ging das
+    // verloren; die Primitive trägt seither `TabItem.onMouseDown` genau für
+    // diesen Fall (siehe `@shared/editor-ui`, Befund C3, Aufgabe 12).
+    onMouseDown: (e) => e.preventDefault(),
+  }));
 
   return (
     <div className="tw-rb" data-testid="table-toolbar">

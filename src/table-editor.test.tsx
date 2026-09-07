@@ -1,5 +1,5 @@
 import React from "react";
-import { screen, render, fireEvent, waitFor } from "@testing-library/react";
+import { screen, render, fireEvent, waitFor, createEvent } from "@testing-library/react";
 
 import { TableEditor } from "./table-editor";
 import { TableModel } from "./table-model";
@@ -953,3 +953,40 @@ describe("row limit", () => {
     fireEvent.mouseDown(cellTd("Zeile 1, Spalte 1"));
     expect(toolbar("toolbar-lowercase")).toHaveAttribute("aria-pressed", "true");
   });
+
+// Nacharbeit zu C3 (Aufgabe 12, Bündel C): der Umbau der Reiterleiste auf die
+// Primitive `Tabs` (`ribbon-shell.tsx`) verlor `onMouseDown={e =>
+// e.preventDefault()}` an ihren Reitern. Ein Mausklick auf einen Reiter nahm
+// damit der gerade bearbeiteten `contenteditable`-Zelle den Fokus und mit ihm
+// die browsereigene Text-Selektion — nur die native Caret-Selektion bei
+// Mausklick ist betroffen, nicht die React-gehaltene Zellrahmen-Auswahl fürs
+// Formatieren und nicht der Tastaturweg (siehe `task-12b-report.md`).
+//
+// Anders als der ursprüngliche, zurückgewiesene Nachweis (eine selbstgebaute
+// `contenteditable`-Stellvertreterzelle) rendert dieser Test die **echte**
+// `TableEditor` mit ihrer echten `EditableCell` — beide sitzen im selben
+// Baum wie in Produktion (`table-editor.tsx` bindet `TableToolbar`, die
+// wiederum `RibbonShell` rendert).
+//
+// jsdom bildet Fokus und Text-Selektion nur teilweise ab (kein natives
+// "Mausklick verschiebt Fokus/Caret"-Standardverhalten wie im Browser) —
+// ein Test, der behauptete, die Selektion "bliebe erhalten", würde also
+// nichts Reales messen. Ehrlich messbar ist stattdessen, ob das
+// Standardverhalten des `mousedown`-Ereignisses unterbunden wird
+// (`event.preventDefault()`) — genau der Mechanismus, den `RibbonButton`
+// bereits für seine eigenen Knöpfe nutzt (`controls.test.tsx`) und den die
+// Primitive dafür extra bekommen hat (`Tabs.tsx`, `TabItem.onMouseDown`).
+describe("RibbonShell tabs: mousedown does not steal the editing cell's focus", () => {
+  it("prevents the default mousedown on a tab so the editing cell keeps its selection", () => {
+    render(<TableEditor value={sample()} onChange={jest.fn()} />);
+
+    // Zelle in den Bearbeitungsmodus versetzen — die echte `EditableCell`.
+    fireEvent.doubleClick(cellTd("Zeile 1, Spalte 2"));
+
+    const tab = screen.getByRole("tab", { name: "Ausrichtung" });
+    const event = createEvent.mouseDown(tab);
+    fireEvent(tab, event);
+
+    expect(event.defaultPrevented).toBe(true);
+  });
+});
