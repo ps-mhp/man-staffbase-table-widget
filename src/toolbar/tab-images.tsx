@@ -14,8 +14,8 @@
 import * as React from "react";
 import { ReactElement } from "react";
 
-import { Menu, MenuItem, Switch, useEditorStyles } from "@shared/editor-ui";
-import { IconChevron, IconImage, IconImageSize } from "./icons";
+import { Icon, Menu, MenuItem, Switch, useEditorStyles } from "@shared/editor-ui";
+import { IconChevron, IconImageSize } from "./icons";
 import { TableToolbarProps } from "./props";
 
 export type ImagesTabProps = Pick<
@@ -57,7 +57,7 @@ export function ImagesTab({
   return (
     <>
       <button type="button" className="tw-rb__btn" data-testid="toolbar-image-button" title="Bild in Zelle einfügen" disabled={disabled} onClick={onInsertImage}>
-        <IconImage />
+        <Icon name="image" size="md" />
         <span>Bild</span>
       </button>
 

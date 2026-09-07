@@ -14,8 +14,8 @@
 import * as React from "react";
 import { ReactElement, useRef } from "react";
 
-import { Input, Menu, MenuItem, useEditorStyles } from "@shared/editor-ui";
-import { IconChevron, IconClearFormat, IconPainter, IconSort, IconUpload } from "./icons";
+import { Icon, Input, Menu, MenuItem, useEditorStyles } from "@shared/editor-ui";
+import { IconChevron, IconPainter, IconSort, IconUpload } from "./icons";
 import { TableToolbarProps } from "./props";
 
 export type DataTabProps = Pick<
@@ -121,7 +121,7 @@ export function DataTab({
                 : "Formatierung der ganzen Tabelle entfernen (nichts markiert)"
             }
           >
-            <IconClearFormat />
+            <Icon name="reset" size="md" />
             <span className="tw-rb__label">Formatierung <IconChevron /></span>
           </button>
         }

@@ -14,10 +14,10 @@
 import * as React from "react";
 import { ReactElement } from "react";
 
-import { IconClose, IconHelp, IconSave } from "./icons";
+import { IconSave } from "./icons";
 import ribbonCss from "../styles/ribbon.scss";
 import { useHotStyle } from "@shared/hot-style";
-import { Tabs, TabItem, useEditorStyles } from "@shared/editor-ui";
+import { Icon, Tabs, TabItem, useEditorStyles } from "@shared/editor-ui";
 
 export interface RibbonTab {
   id: string;
@@ -92,7 +92,7 @@ export function RibbonShell({ tabs, activeTab, onSelectTab, onSave, onClose, dir
               title="Hilfe"
               onClick={onOpenHelp}
             >
-              <IconHelp />
+              <Icon name="info" size="md" />
             </button>
           )}
           {onClose && (
@@ -103,7 +103,7 @@ export function RibbonShell({ tabs, activeTab, onSelectTab, onSave, onClose, dir
               title="Schließen"
               onClick={onClose}
             >
-              <IconClose />
+              <Icon name="close" size="md" />
             </button>
           )}
           {dirty && (
