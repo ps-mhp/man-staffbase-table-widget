@@ -14,7 +14,6 @@
 import * as React from "react";
 import { ReactElement, useMemo, useState } from "react";
 
-import { EmptyState, SearchField, useEditorStyles } from "@shared/editor-ui";
 import { HELP_TOPICS, HelpEntry, HelpTopic } from "./help-content";
 import { highlightMatches } from "./help-highlight";
 
@@ -53,24 +52,8 @@ function searchEntries(query: string): SearchHit[] {
  * The search itself ignores the current page: it always looks across every
  * topic's entries, and a hit is a link straight to its topic rather than a
  * filter on whatever page happens to be open.
- *
- * `MenuItem` (`@shared/editor-ui`) passt nicht auf die Knöpfe hier unten
- * (Startmenü, Suchtreffer, „Hilfe"-Breadcrumb): `MenuItem` trägt fest
- * `role="menuitem"` und einen Tabulatorstopp von `-1`, weil sie ausschließlich
- * innerhalb eines `<Menu>` (`role="menu"`) Sinn ergibt, das die Pfeiltasten-
- * Navigation und den Fokuseinstieg selbst übernimmt (siehe `Menu.tsx`-
- * Kopfkommentar). Diese Knöpfe hier sind aber eine gewöhnliche Seitennavigation
- * in normaler Tab-Reihenfolge, kein Aufklappmenü — mit `MenuItem` verlöre jeder
- * einzelne seinen eigenen Tabulatorstopp und wäre nur noch über Pfeiltasten
- * *innerhalb* eines `role="menu"` erreichbar, das hier gar nicht existiert.
- * Das wäre eine stille Tastatur-Regression, keine Verbesserung — deshalb
- * bleiben es einfache `<button>`.
  */
 export function HelpTab(): ReactElement {
-  // Lädt das Stylesheet der Redaktionsebene (`SearchField`, `EmptyState`),
-  // referenzgezählt in `document.head` — siehe RibbonShell für dieselbe
-  // Begründung.
-  useEditorStyles();
   const [query, setQuery] = useState("");
   const [topicId, setTopicId] = useState<string | null>(null);
 
@@ -91,41 +74,15 @@ export function HelpTab(): ReactElement {
 
   return (
     <div className="tw-rb__help">
-      {/*
-        N1 (Koordinator): `SearchField` leert sich bei Escape über einen
-        eigenen `onKeyDown` am `<input>` (Bubble-Phase); danach blubbert das
-        native Ereignis weiter bis zu `document`, wo der Schliessen-Zuhörer
-        der Schublade hängt (`help-drawer.tsx`). Ohne Gegenmassnahme löst ein
-        Escape in der Suche also *beides* aus: leeren *und* die Schublade
-        schliessen — gemessen mit dem Test "keeps the drawer open when
-        Escape empties the search field" in `help-drawer.test.tsx`, der ohne
-        diese Hülle tatsächlich fehlschlug.
-
-        Ein `onKeyDownCapture` **auf** `<SearchField>` wäre die naheliegende
-        erste Idee, greift aber zu früh: React ruft Fang- und Bubble-Phase
-        desselben Knotens als **eine** zusammenhängende Traversierung auf,
-        `stopPropagation` in der Fangphase unterbindet dort auch schon den
-        eigenen Bubble-Handler von `SearchField` **am selben Knoten** — die
-        Suche würde dann gar nicht mehr leeren (ebenfalls gemessen). Der
-        Riegel muss deshalb eine Ebene **höher** sitzen, an einer echten
-        Vorfahren-Hülle: dort ist `SearchField`s eigener Bubble-Handler am
-        `<input>` bereits gelaufen, bevor das Ereignis hier ankommt.
-      */}
-      <div
-        className="tw-rb__help-search-guard"
-        onKeyDown={(event) => {
-          if (event.key === "Escape") event.stopPropagation();
-        }}
-      >
-        <SearchField
-          className="tw-rb__help-search"
-          data-testid="help-search"
-          placeholder="Hilfe durchsuchen …"
-          label="Hilfe durchsuchen"
-          value={query}
-          onValueChange={setQuery}
-        />
-      </div>
+      <input
+        type="search"
+        className="tw-rb__help-search"
+        data-testid="help-search"
+        placeholder="Hilfe durchsuchen …"
+        aria-label="Hilfe durchsuchen"
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+      />
 
       <nav className="tw-rb__help-breadcrumbs" aria-label="Hilfe-Navigation">
         <button
@@ -157,16 +114,9 @@ export function HelpTab(): ReactElement {
       <div className="tw-rb__help-content" data-testid="help-content">
         {searching ? (
           hits.length === 0 ? (
-            // N3 (Koordinator): kein `icon` — keins aus dem MAN-Katalog passt
-            // zu "keine Treffer" ohne etwas Falsches zu behaupten (siehe
-            // `EmptyState`-Kopfkommentar). Die Hülle ist jetzt ein `<div>`
-            // statt `<p>`, der Text steckt in einem Kind-`<p>` — die einzige
-            // Prüfung im Testcode ist `toBeInTheDocument()`, die übersteht das.
-            <EmptyState
-              className="tw-rb__help-empty"
-              data-testid="help-no-results"
-              title="Keine Treffer."
-            />
+            <p className="tw-rb__help-empty" data-testid="help-no-results">
+              Keine Treffer.
+            </p>
           ) : (
             <ul className="tw-rb__help-results">
               {hits.map(({ topic: hitTopic, entry }) => (

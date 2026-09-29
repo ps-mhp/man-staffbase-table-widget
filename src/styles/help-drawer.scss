@@ -23,7 +23,6 @@
 
 @use "tokens" as *;
 @use "mixins" as *;
-@use "@shared/editor-ui/styles/type" as type;
 
 .tw-rb__help-drawer {
   flex: 0 0 auto;
@@ -44,10 +43,7 @@
   box-sizing: border-box;
   border-left: 1px solid $border;
   background: $surface;
-  // Grundschrift der Schublade: Fließtext, `body` (siehe Kopfkommentar
-  // `_type.scss`). Der Inhalt selbst (`&__help-*` in `ribbon.scss`) setzt
-  // überall seine eigene Rolle; das hier ist nur die Rückfalloption.
-  @include type.man-editor-type(body);
+  font-size: 13px;
   color: $text;
 }
 
@@ -57,18 +53,35 @@
   justify-content: space-between;
   flex: 0 0 auto;
   padding: 12px 14px;
-  // Der Schliessen-Knopf selbst (`&-close`) ist jetzt ein `<IconButton>`
-  // (`variant="ghost"`, `size="sm"`); seine Optik (Groesse, Rahmenlosigkeit,
-  // Hover-Farbe) liefert `man-ed-button--icon`/`--ghost` aus der Ebene, hier
-  // bleibt nur noch die Anordnung in der Kopfzeile.
 }
 
 .tw-rb__help-drawer-title {
   margin: 0;
-  // Überschrift der Schublade (`<h2>`): `section`, trifft die alten 15px
-  // exakt und ersetzt `600` durch die Rollen-Vorgabe `700`.
-  @include type.man-editor-type(section);
+  font-size: 15px;
+  font-weight: 600;
   color: $text-strong;
+}
+
+.tw-rb__help-drawer-close {
+  @include control-pill;
+  @include focus-ring;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: $control-height;
+  height: $control-height;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: $text-muted-icon;
+  cursor: pointer;
+  transition: background $transition-fast;
+
+  &:hover {
+    background-color: transparent !important;
+    font-weight: $text-strong;
+  }
 }
 
 .tw-rb__help-drawer-body {

@@ -101,6 +101,21 @@
     z-index: 1;
   }
 
+  // Gegen die Typo-Basis des Content Designers: sie setzt jedes `th` mit
+  // `[data-c13y-region="root"] th { text-transform: none; font-family: head }`
+  // — Spezifität (0,1,1), eine einzelne Klasse (0,1,0) verliert. Dort stand
+  // die Kopfzeile darum in gemischter Schreibung und die Zeilentitel in der
+  // Condensed-Schrift, im klassischen Editor wie vorgesehen (gesehen am
+  // 29.09.2026). Für die Schreibung genügen zwei Klassen; die Schrift setzt
+  // der Designer mit `!important`, also muss die Zeilentitel-Schrift es auch.
+  & &__cell--head {
+    text-transform: uppercase;
+  }
+
+  & &__cell--rowhead {
+    font-family: man(font-body) !important;
+  }
+
   &__cell--head.table-widget__cell--first {
     position: sticky;
     left: 0;

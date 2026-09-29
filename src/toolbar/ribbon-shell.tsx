@@ -14,10 +14,9 @@
 import * as React from "react";
 import { ReactElement } from "react";
 
-import { IconSave } from "./icons";
+import { IconClose, IconHelp, IconSave } from "./icons";
 import ribbonCss from "../styles/ribbon.scss";
 import { useHotStyle } from "@shared/hot-style";
-import { Icon, Tabs, TabItem, useEditorStyles } from "@shared/editor-ui";
 
 export interface RibbonTab {
   id: string;
@@ -53,26 +52,15 @@ export interface RibbonShellProps {
  */
 export function RibbonShell({ tabs, activeTab, onSelectTab, onSave, onClose, dirty, onOpenHelp }: RibbonShellProps): ReactElement {
   const hotRibbonCss = useHotStyle(ribbonCss, "table-widget", "styles/ribbon.scss");
-  // Lädt das Stylesheet der Redaktionsebene (`Tabs` u.a.) referenzgezählt in
-  // `document.head`. Das kollidiert nicht mit dem eigenen `<style>`-Blatt des
-  // Editors weiter unten im Baum (siehe `table-editor.tsx`): jenes vermeidet
-  // `document.head` nur, um beim Aushängen nichts im fremden Wirtsdokument zu
-  // hinterlassen — genau das leistet `useEditorStyles()` selbst, durch seine
-  // Referenzzählung.
-  useEditorStyles();
   const active = tabs.find((tab) => tab.id === activeTab) ?? tabs[0];
 
-  const tabItems: readonly TabItem[] = tabs.map((tab) => ({
-    id: tab.id,
-    label: tab.label,
-    // Ein Klick auf einen Reiter darf der gerade bearbeiteten
-    // `contenteditable`-Zelle nicht den Fokus (und damit die native
-    // Text-Selektion) nehmen — derselbe Grund wie bei `RibbonButton`
-    // (`controls.tsx`). Beim Umbau auf die Primitive `Tabs` ging das
-    // verloren; die Primitive trägt seither `TabItem.onMouseDown` genau für
-    // diesen Fall (siehe `@shared/editor-ui`, Befund C3, Aufgabe 12).
-    onMouseDown: (e) => e.preventDefault(),
-  }));
+  const onKeyDown = (event: React.KeyboardEvent): void => {
+    const step = event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
+    if (step === 0) return;
+    event.preventDefault();
+    const index = tabs.findIndex((tab) => tab.id === active.id);
+    onSelectTab(tabs[(index + step + tabs.length) % tabs.length].id);
+  };
 
   return (
     <div className="tw-rb" data-testid="table-toolbar">
@@ -86,13 +74,6 @@ export function RibbonShell({ tabs, activeTab, onSelectTab, onSave, onClose, dir
               className="tw-rb__ctl tw-rb__ctl--primary"
               data-testid="toolbar-done"
               title="Speichern"
-              // `RibbonButton` (`controls.tsx`) setzt für jeden symbolischen
-              // Knopf sowohl `title` als auch `aria-label` — der Titel bleibt
-              // die Kurzhilfe beim Überfahren, `aria-label` der zugängliche
-              // Name selbst, der bei Tastaturfokus/Touch verlässlicher
-              // ankommt als der Title-Fallback. Die drei rohen Knöpfe hier
-              // (anders als `RibbonButton`) trugen bislang nur `title`.
-              aria-label="Speichern"
               onClick={onSave}
             >
               <IconSave />
@@ -107,10 +88,9 @@ export function RibbonShell({ tabs, activeTab, onSelectTab, onSave, onClose, dir
               className="tw-rb__ctl tw-rb__ctl-help"
               data-testid="toolbar-help"
               title="Hilfe"
-              aria-label="Hilfe"
               onClick={onOpenHelp}
             >
-              <Icon name="info" size="md" />
+              <IconHelp />
             </button>
           )}
           {onClose && (
@@ -119,10 +99,9 @@ export function RibbonShell({ tabs, activeTab, onSelectTab, onSave, onClose, dir
               className="tw-rb__ctl tw-rb__ctl-close"
               data-testid="toolbar-close"
               title="Schließen"
-              aria-label="Schließen"
               onClick={onClose}
             >
-              <Icon name="close" size="md" />
+              <IconClose />
             </button>
           )}
           {dirty && (
@@ -134,14 +113,33 @@ export function RibbonShell({ tabs, activeTab, onSelectTab, onSave, onClose, dir
       )}
 
       <div className="tw-rb__tabs">
-        <div className="tw-rb__tablist">
-          <Tabs items={tabItems} activeId={active.id} onActiveIdChange={onSelectTab} label="Werkzeuggruppen" />
+        <div className="tw-rb__tablist" role="tablist" aria-label="Werkzeuggruppen" onKeyDown={onKeyDown}>
+          {tabs.map((tab) => {
+            const selected = tab.id === active.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                id={`tw-rb-tab-${tab.id}`}
+                aria-selected={selected}
+                aria-controls={`tw-rb-panel-${tab.id}`}
+                tabIndex={selected ? 0 : -1}
+                className={`tw-rb__tab${selected ? " tw-rb__tab--active" : ""}`}
+                data-testid={`toolbar-tab-${tab.id}`}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => onSelectTab(tab.id)}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
         </div>
 
         <div
           role="tabpanel"
-          id={`${active.id}-panel`}
-          aria-labelledby={`${active.id}-tab`}
+          id={`tw-rb-panel-${active.id}`}
+          aria-labelledby={`tw-rb-tab-${active.id}`}
           className="tw-rb__panel"
           data-testid="toolbar-panel"
         >

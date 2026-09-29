@@ -14,17 +14,9 @@
 import * as React from "react";
 import { ReactElement } from "react";
 
-// `width`/`height` sind bewusst `"1em"`: das SVG folgt damit der `font-size`
-// seines Elternelements, statt eine eigene Pixelzahl mitzubringen — dieselbe
-// Eigenschaft, über die auch die Katalog-Symbolschrift skaliert
-// (`man-ed-icon--md`/`--sm` in `@shared/editor-ui/styles/icon.scss`). Wo kein
-// Knopf schon eine passende `font-size` traegt, setzt `ribbon.scss` sie
-// gezielt aus dem Token `$icon-md` (`_tokens.scss`), damit die 16px-Groesse
-// erhalten bleibt statt auf die Knopf-Beschriftungsgroesse ("dense", 13px)
-// zurueckzufallen.
 const svgBase = {
-  width: "1em",
-  height: "1em",
+  width: 16,
+  height: 16,
   viewBox: "0 0 16 16",
   fill: "none",
   stroke: "currentColor",
@@ -33,21 +25,25 @@ const svgBase = {
   strokeLinejoin: "round" as const,
 };
 
-// Bleibt als einziges Symbol neben `IconChevron` bei einer festen Pixelzahl
-// statt `1em` — und das Maß hier ist ohnehin wirkungslos: `ribbon.scss` setzt
-// für die Knöpfe der Kopfleiste `.tw-rb__ctl svg { width: 14px; height: 14px }`,
-// und eine CSS-Regel schlägt das Präsentationsattribut. Die Größe entscheidet
-// also das Stylesheet, nicht diese Zeile. Auf `1em` umzustellen brächte darum
-// nichts; sichtbar wäre der Knopf mit 14px sogar etwas kleiner als die 16px
-// der Ribbon-Symbole. Beide Pixelzahlen sind Reste, die eine Größenstufe der
-// Ebene bräuchten (dort gibt es nur `icon-sm`/`icon-md`, 12/16px); eine
-// erfundene Zwischenstufe wäre kein Token, nur eine rohe Zahl unter neuem
-// Namen. Gemeldet, nicht hier gebaut.
 export const IconSave = (): ReactElement => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
     <path d="M5 3h11l3 3v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
     <path d="M8 3v5h6V3" />
     <path d="M8 21v-6h8v6" />
+  </svg>
+);
+
+export const IconClose = (): ReactElement => (
+  <svg {...svgBase} aria-hidden>
+    <path d="M4 4l8 8M12 4l-8 8" />
+  </svg>
+);
+
+export const IconHelp = (): ReactElement => (
+  <svg {...svgBase} aria-hidden>
+    <circle cx="8" cy="8" r="6.3" />
+    <path d="M6 6.2c.2-1 1-1.6 2-1.6 1.1 0 2 .7 2 1.7 0 .9-.6 1.3-1.4 1.8-.6.4-.9.7-.9 1.4" />
+    <circle cx="7.8" cy="11.4" r="0.15" fill="currentColor" stroke="none" />
   </svg>
 );
 
@@ -115,6 +111,13 @@ export const IconUpload = (): ReactElement => (
     <path d="M3 12v1h10v-1" />
   </svg>
 );
+export const IconImage = (): ReactElement => (
+  <svg {...svgBase} aria-hidden>
+    <rect x="2" y="3" width="12" height="10" rx="1.5" />
+    <circle cx="5.5" cy="6.5" r="1" />
+    <path d="M3 12l3.5-3.5L9 11l2-2 2 2" />
+  </svg>
+);
 /** Two images plus size arrows — the "equalize image size" action. */
 export const IconImageSize = (): ReactElement => (
   <svg {...svgBase} aria-hidden>
@@ -123,52 +126,14 @@ export const IconImageSize = (): ReactElement => (
     <path d="M8 2.5v11" strokeWidth={1.1} strokeDasharray="1.5 1.5" />
   </svg>
 );
-// Bleibt ebenfalls bei einer festen Pixelzahl: Der Chevron ist ein kleiner
-// Aufklapp-Anzeiger *innerhalb* einer Knopf-Beschriftung (`tw-rb__label`),
-// die selbst schon "dense" (13px) grosse Schrift traegt. `1em` erbte dort
-// die Textgroesse des Labels, nicht die 10px, die er heute hat — die Ebene
-// fuehrt zudem keine Groessenstufe zwischen `icon-sm` (12px) und keiner,
-// die kleiner waere. Eine erzwungene Stufe aenderte das sichtbare Bild, das
-// war nicht beauftragt; das feste Maß bleibt darum hier stehen.
-export const IconChevron = (): ReactElement => (
-  <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+export const IconClearFormat = (): ReactElement => (
+  <svg {...svgBase} aria-hidden>
+    <path d="M6 3h7M9.5 3L7 13" />
+    <path d="M2 7l4 4M6 7l-4 4" />
+  </svg>
+);
+export const IconChevron = (): ReactElement => (  <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
     <path d="M3 4.5L6 8l3-3.5" />
   </svg>
 );
-
-// Vier der urspruenglich sieben Katalog-Kandidaten (Aufgabe 11, B5) wurden
-// uebernommen (siehe ribbon-shell.tsx, tab-images.tsx, tab-data.tsx):
-// close, image sind eindeutig; help->info und clearFormat->reset sind
-// Annaeherungen (kein Frage-/Hilfe-Zeichen und kein durchgestrichenes
-// Schriftzeichen im Katalog), aber neben Text ("Hilfe"-Titel bzw.
-// "Formatierung"-Beschriftung) tragfaehig.
-//
-// Die uebrigen sechzehn Symbole bleiben handgezeichnet, weil der MAN-Katalog
-// (`src/shared/editor-ui/styles/_icons.scss`) fuer Typografie- und
-// Tabellenoperationen keine Entsprechung fuehrt:
-//   IconSave, IconSuperscript, IconSubscript, IconAlignLeft, IconAlignCenter,
-//   IconAlignRight, IconVAlignTop, IconVAlignMiddle, IconVAlignBottom,
-//   IconInsert, IconDelete, IconSort, IconPainter, IconUpload, IconImageSize,
-//   IconChevron.
-// Zwei der urspruenglich sieben Kandidaten wurden bewusst verworfen:
-//   - IconChevron -> "arrow-line-thin": Das Katalogsymbol zeigt nach RECHTS
-//     (belegt im Schwesterrepo onetruck-css als "weiter"/Slider-Pfeil,
-//     `_app.scss:81-84`), IconChevron ist an allen fuenf Einsatzstellen
-//     (tab-data.tsx, tab-cells.tsx, tab-images.tsx, controls.tsx) aber ein
-//     Aufklapp-Anzeiger, der nach UNTEN zeigt. Der Katalog fuehrt keinen
-//     Abwaertspfeil; ein gedrehter "Weiter"-Pfeil waere eine erfundene
-//     Bedeutung ohne Vorbild im Stylesheet. Handgezeichnet bleibt praeziser.
-//   - IconInsert -> "plus" / IconDelete -> "trash": Beide Symbole bilden ein
-//     Paar (Tabellen-Rechteck mit Plus bzw. Minus, tab-cells.tsx:74+105) fuer
-//     "Einfuegen"/"Loeschen" von Zeilen und Spalten. "trash" bedeutet
-//     "wegwerfen", nicht "aus der Tabellenstruktur entfernen", und zerreisst
-//     die sichtbare Paarbildung, weil es kein visuelles Gegenstueck zu "plus"
-//     ist. Der Katalog fuehrt zwar auch "minus", ein reines Plus/Minus-Paar
-//     verliert aber den Tabellenbezug des Rechtecks, den beide Knoepfe teilen.
-//     Ein ersetztes und ein handgezeichnetes Symbol nebeneinander waere das
-//     schlechteste Ergebnis; darum bleiben beide handgezeichnet.
-//
-// Plan 7 zieht den MAN-Katalog um fehlende Symbole (Abwaertspfeil,
-// Typografie- und Tabellenzeichen) nach; bis dahin sind die oben genannten
-// Ablehnungen bewusst, keine Nachlaessigkeit.
 

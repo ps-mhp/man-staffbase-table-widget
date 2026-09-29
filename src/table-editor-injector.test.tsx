@@ -338,29 +338,6 @@ describe("startTableEditorInjector", () => {
     });
   });
 
-  it("renders the modal in the flush editor variant so the editor draws its own frame", async () => {
-    // Sichert, dass die Variante `editor-flush` wirklich über
-    // `startFieldModalInjector` bis zur Hülle durchgereicht wird: Der
-    // Tabellen-Editor zeichnet seinen eigenen Rahmen, der Panel-Innenabstand
-    // schöbe ihn nur weg. Geprüft an der Panel-Klasse, nicht am berechneten
-    // Stil — jsdom rechnet kein Layout.
-    const { container } = render(
-      <Form schema={configurationSchema} uiSchema={uiSchema} validator={validator} onSubmit={jest.fn()} />,
-    );
-
-    let stop = () => {};
-    await act(async () => {
-      stop = startTableEditorInjector(container);
-    });
-
-    const modal = document.body.querySelector('[data-testid="table-editor-modal"]') as HTMLElement;
-    expect(modal.querySelector(".man-cfg-modal__panel--flush")).not.toBeNull();
-
-    await act(async () => {
-      stop();
-    });
-  });
-
   it("reopens the modal, keeping prior edits, when the placeholder button is clicked", async () => {
     const { container } = render(
       <Form schema={configurationSchema} uiSchema={uiSchema} validator={validator} onSubmit={jest.fn()} />,

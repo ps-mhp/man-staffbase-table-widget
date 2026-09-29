@@ -1,5 +1,5 @@
 import React from "react";
-import { screen, render, fireEvent, waitFor, createEvent } from "@testing-library/react";
+import { screen, render, fireEvent, waitFor } from "@testing-library/react";
 
 import { TableEditor } from "./table-editor";
 import { TableModel } from "./table-model";
@@ -67,6 +67,7 @@ const TOOLBAR_TAB: Record<string, string> = {
   "toolbar-valign-bottom": "Ausrichtung",
   "toolbar-unmerge": "Zellen",
   "toolbar-insert": "Zellen",
+  "toolbar-insert-menu": "Zellen",
   "toolbar-insert-row-above": "Zellen",
   "toolbar-insert-col-left": "Zellen",
   "toolbar-image-button": "Bilder",
@@ -74,6 +75,7 @@ const TOOLBAR_TAB: Record<string, string> = {
   "toolbar-image-equal-height": "Bilder",
   "toolbar-image-equal-width": "Bilder",
   "toolbar-image-reset-size": "Bilder",
+  "toolbar-image-fit": "Bilder",
   "toolbar-painter": "Daten",
   "toolbar-visible-rows": "Daten",
   "toolbar-upload": "Daten",
@@ -88,16 +90,6 @@ function toolbar(testId: string): HTMLElement {
   const label = TOOLBAR_TAB[testId];
   if (label) fireEvent.click(screen.getByRole("tab", { name: label }));
   return screen.getByTestId(testId);
-}
-
-// `<Switch>` (`@shared/editor-ui`) does not accept `data-testid` — it
-// destructures its props individually instead of spreading `...rest`. The
-// image-fit toggle is found by its accessible name instead, which is the
-// same move already made for the ribbon menus. The tab still has to be
-// opened first, exactly like `toolbar()` does via `TOOLBAR_TAB`.
-function imageFitSwitch(): HTMLElement {
-  fireEvent.click(screen.getByRole("tab", { name: "Bilder" }));
-  return screen.getByRole("switch", { name: "Bilder anpassen" });
 }
 
 describe("TableEditor", () => {
@@ -121,17 +113,14 @@ describe("TableEditor", () => {
     render(<TableEditor value={sample()} onChange={jest.fn()} />);
     const td = cellTd("Zeile 2, Spalte 2");
     fireEvent.mouseDown(td);
-    // Die Auswahlfläche kommt jetzt aus `man-editor(accent-surface)` und damit
-    // aus einer CSS-Variablen, die jsdom nicht auflöst. Geprüft wird deshalb
-    // die Klasse, die sie trägt.
-    expect(td).toHaveClass("table-editor__cell--selected");
+    expect(td).toHaveStyle({ background: "#eaf4ff" });
   });
 
   it("selects a whole column via the column handle", () => {
     render(<TableEditor value={sample()} onChange={jest.fn()} />);
     fireEvent.click(screen.getByTestId("col-handle-1"));
-    expect(cellTd("Zeile 1, Spalte 2")).toHaveClass("table-editor__cell--selected");
-    expect(cellTd("Zeile 2, Spalte 2")).toHaveClass("table-editor__cell--selected");
+    expect(cellTd("Zeile 1, Spalte 2")).toHaveStyle({ background: "#eaf4ff" });
+    expect(cellTd("Zeile 2, Spalte 2")).toHaveStyle({ background: "#eaf4ff" });
   });
 
   it("inserts a row below via the context menu", () => {
@@ -162,33 +151,6 @@ describe("TableEditor", () => {
     fireEvent.click(screen.getByTestId("merge-cells"));
     const arg = onChange.mock.calls[0][0] as TableModel;
     expect(arg.merges).toEqual([{ row: 1, col: 1, rowSpan: 1, colSpan: 2 }]);
-  });
-
-  it("keeps a locked context-menu item visibly dimmed", () => {
-    // Right-clicking the wrap itself (not a cell) opens the menu without
-    // `handleCellContextMenu` ever running, so `selection` stays `null` and
-    // every selection-gated item renders `disabled`. Radix's `ContextMenu.Item`
-    // expresses that as `data-disabled`/`aria-disabled`, never the native
-    // `disabled` attribute (see N3) -- this asserts both markers the
-    // stylesheet's `&--disabled, &[data-disabled]` selector relies on are
-    // really there, and that the resulting computed style is dimmed.
-    render(<TableEditor value={sample()} onChange={jest.fn()} />);
-    fireEvent.contextMenu(screen.getByTestId("table-editor-grid-wrap"));
-    const item = screen.getByTestId("insert-row-above");
-    expect(item).toHaveClass("table-editor__menu-item--disabled");
-    expect(item).toHaveAttribute("data-disabled");
-    expect(getComputedStyle(item).opacity).toBe("0.4");
-  });
-
-  it("gives context-menu items the shared layer's menu-item min-height", () => {
-    // Aligns with `.man-ed-menu__item` in `menu.scss`, which sets
-    // `min-height: control-h-md` (36px) -- a context menu is not the dense
-    // ribbon (which deliberately stays at control-h-sm), so its items should
-    // match the shared `Menu` primitive's row height instead.
-    render(<TableEditor value={sample()} onChange={jest.fn()} />);
-    fireEvent.contextMenu(screen.getByTestId("table-editor-grid-wrap"));
-    const item = screen.getByTestId("insert-row-above");
-    expect(getComputedStyle(item).minHeight).toBe("36px");
   });
 
   it("does not render the covered cell of a merge", () => {
@@ -289,20 +251,6 @@ describe("TableEditor", () => {
     expect(arg.formats["1,1"]).toEqual({ fontSize: 20 });
   });
 
-  it("exposes the font size control as a combobox named 'Schriftgroesse'", () => {
-    // Befund 2: nur die Wegwerf-Datei aus der Umbau-Aufgabe prüfte den
-    // zugänglichen Namen; diese Datei wurde danach gelöscht. Dauerhaft
-    // gesichert wird hier über Rolle und Namen, nicht über die Testmarke — ein
-    // `<select>` ohne `multiple` bekommt die Rolle "combobox" (bestätigt durch
-    // Testing Library in dieser Suite), nicht "listbox".
-    render(<TableEditor value={sample()} onChange={jest.fn()} />);
-    fireEvent.click(screen.getByRole("tab", { name: "Schrift" }));
-
-    expect(
-      screen.getByRole("combobox", { name: "Schriftgröße" }),
-    ).toBe(screen.getByTestId("toolbar-fontsize"));
-  });
-
   it("shows contextual insert (only column) when a full column is selected", () => {
     render(<TableEditor value={sample()} onChange={jest.fn()} />);
     fireEvent.click(screen.getByTestId("col-handle-1"));
@@ -320,18 +268,12 @@ describe("TableEditor", () => {
 
   it("closes a toolbar dropdown when clicking outside it", () => {
     render(<TableEditor value={sample()} onChange={jest.fn()} />);
-    const insertTrigger = toolbar("toolbar-insert");
-    fireEvent.click(insertTrigger);
-    // "Menü ist offen": Semantik statt Testmarke (`<Menu>` reicht kein
-    // `data-testid` an die Menüfläche durch) — `role="menu"` und
-    // `aria-expanded` am Auslöser sind die zugängliche Zusicherung.
-    expect(screen.getByRole("menu", { name: "Einfügen" })).toBeInTheDocument();
-    expect(insertTrigger).toHaveAttribute("aria-expanded", "true");
+    fireEvent.click(toolbar("toolbar-insert"));
+    expect(toolbar("toolbar-insert-menu")).toBeInTheDocument();
 
     // A mousedown anywhere outside the dropdown closes it.
     fireEvent.mouseDown(document.body);
-    expect(screen.queryByRole("menu", { name: "Einfügen" })).not.toBeInTheDocument();
-    expect(insertTrigger).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByTestId("toolbar-insert-menu")).not.toBeInTheDocument();
   });
 
   it("copies a format with the painter and applies it to the next selection", () => {
@@ -501,9 +443,8 @@ describe("TableEditor", () => {
       fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
       addToSelection("Zeile 2, Spalte 3");
 
-      // Siehe oben: auf die Klasse gepinnt, weil jsdom `var()` nicht auflöst.
-      expect(cellTd("Zeile 2, Spalte 2")).toHaveClass("table-editor__cell--selected");
-      expect(cellTd("Zeile 2, Spalte 3")).toHaveClass("table-editor__cell--selected");
+      expect(cellTd("Zeile 2, Spalte 2")).toHaveStyle({ background: "#eaf4ff" });
+      expect(cellTd("Zeile 2, Spalte 3")).toHaveStyle({ background: "#eaf4ff" });
     });
 
     it("applies a format to every cell of a multi-cell selection", () => {
@@ -576,7 +517,7 @@ describe("TableEditor", () => {
       const onChange = jest.fn();
       render(<TableEditor value={withImages()} onChange={onChange} measure={measure} />);
 
-      const toggle = imageFitSwitch();
+      const toggle = toolbar("toolbar-image-fit");
       expect(toggle).toHaveAttribute("aria-checked", "true");
       // Table-wide, so it works without a selection.
       fireEvent.click(toggle);
@@ -596,33 +537,11 @@ describe("TableEditor", () => {
         />,
       );
 
-      const toggle = imageFitSwitch();
+      const toggle = toolbar("toolbar-image-fit");
       expect(toggle).toHaveAttribute("aria-checked", "false");
       fireEvent.click(toggle);
 
       expect((onChange.mock.calls.at(-1)![0] as TableModel).fitImages).toBe(true);
-    });
-
-    it("exposes the fit switch's help text to assistive tech, not just the mouse tooltip", () => {
-      // Befund 1: der Hilfetext saß nur als `title` auf der umschließenden
-      // Hülle, was einen Maus-Tooltip erzeugt, aber die Berechnung des
-      // zugänglichen Namens/der Beschreibung liest `title` nur am Element
-      // selbst (`role="switch"`), nicht an Vorfahren — für Screenreader war
-      // die Erklärung verloren. Beide Enden der Verdrahtung werden geprüft:
-      // das `aria-describedby` selbst *und* dass die referenzierte ID auf ein
-      // wirklich vorhandenes Element mit dem erwarteten Text zeigt — ein
-      // `aria-describedby` ins Leere wäre schlimmer als keines.
-      render(<TableEditor value={withImages()} onChange={jest.fn()} measure={measure} />);
-
-      const toggle = imageFitSwitch();
-      const describedById = toggle.getAttribute("aria-describedby");
-      expect(describedById).toBeTruthy();
-
-      const describedByEl = document.getElementById(describedById!);
-      expect(describedByEl).not.toBeNull();
-      expect(describedByEl).toHaveTextContent(
-        "Bilder auf die Breite der Tabelle begrenzen. Ausgeschaltet werden sie immer in ihrer eigenen Größe angezeigt.",
-      );
     });
 
     it("offers only the reset option while a single image is selected", () => {
@@ -815,21 +734,6 @@ describe("row limit", () => {
     expect(toolbar("toolbar-visible-rows")).toHaveValue(3);
   });
 
-  it("exposes the visible-rows control as a spinbutton named via its enclosing label", () => {
-    // Befund 2: der zugängliche Name dieses Zahlenfelds kommt aus der
-    // umschließenden `<label>`, nicht aus einem `aria-label` — genau diese
-    // Verdrahtung ginge unbemerkt verloren, verschöbe man den Text aus dem
-    // `<label>` oder ersetzte es durch ein bloßes `<span>`. `<input
-    // type="number">` traegt die Rolle "spinbutton" (bestätigt durch Testing
-    // Library in dieser Suite), keine "textbox".
-    render(<TableEditor value={longModel(10)} onChange={jest.fn()} measure={measure} />);
-    fireEvent.click(screen.getByRole("tab", { name: "Daten" }));
-
-    expect(
-      screen.getByRole("spinbutton", { name: "Sichtbare Zeilen" }),
-    ).toBe(screen.getByTestId("toolbar-visible-rows"));
-  });
-
   it("reports a changed limit", () => {
     const onChange = jest.fn();
     render(<TableEditor value={longModel(10)} onChange={onChange} measure={measure} />);
@@ -880,45 +784,6 @@ describe("row limit", () => {
     const frame = screen.getByTestId("table-editor-grid-wrap");
     expect(frame.style.alignSelf).toBe("");
   });
-
-  // Ein vertauschter, aber gültiger Katalogname (z. B. "close" statt "image")
-  // faellt durch kein anderes Netz: `Icon` rendert nur eine leere Huelle,
-  // das sichtbare Glyph kommt allein aus dem CSS (`data-icon`), und
-  // `data-testid` prueft nur das Klickverhalten des umschliessenden Knopfs.
-  it("renders the image-insert button with the image catalog glyph", () => {
-    render(<TableEditor value={sample()} onChange={jest.fn()} />);
-    const glyph = toolbar("toolbar-image-button").querySelector("[data-icon]");
-    expect(glyph).toHaveAttribute("data-icon", "image");
-  });
-
-  it("renders the clear-format button with the reset catalog glyph", () => {
-    render(<TableEditor value={sample()} onChange={jest.fn()} />);
-    const glyph = toolbar("toolbar-clear-format").querySelector("[data-icon]");
-    expect(glyph).toHaveAttribute("data-icon", "reset");
-  });
-
-  // Der Auftrag verlangte, dass die handgezeichneten Symbole ihre Größe von
-  // der Ebene erben, statt sie selbst zu setzen (`width`/`height` als
-  // Attribut). `getComputedStyle` misst hier am real gerenderten `<svg>`,
-  // nicht nur am JSX-Quelltext -- ein `width="16"`-Attribut sähe im Quelltext
-  // harmlos aus, bliebe aber trotzdem eine selbst gesetzte, feste Größe.
-  it("sizes a hand-drawn ribbon icon from the button's font-size, not its own width/height", () => {
-    render(<TableEditor value={sample()} onChange={jest.fn()} />);
-    fireEvent.click(screen.getByRole("tab", { name: "Ausrichtung" }));
-    const button = screen.getByTestId("toolbar-align-left");
-    const svg = button.querySelector("svg")!;
-    // Die eigene Größe kommt jetzt aus `1em`, keiner Pixelzahl -- geprüft am
-    // Attribut, weil jsdom die SVG-Geometrieattribute nicht ins CSSOM
-    // abbildet (`getComputedStyle(svg).width` bliebe leer, unabhängig vom
-    // Attributwert).
-    expect(svg.getAttribute("width")).toBe("1em");
-    expect(svg.getAttribute("height")).toBe("1em");
-    // Die Ebene, von der `1em` erben soll, ist real gerendert und misst
-    // 16px (`icon-md`) -- nicht die 13px der Knopf-Beschriftung ("dense"),
-    // die das Symbol ohne die eigene `font-size`-Regel in `ribbon.scss`
-    // stattdessen geerbt hätte.
-    expect(getComputedStyle(svg).fontSize).toBe("16px");
-  });
 });
 
   it("marks a whole selected cell as lowercase", () => {
@@ -953,40 +818,3 @@ describe("row limit", () => {
     fireEvent.mouseDown(cellTd("Zeile 1, Spalte 1"));
     expect(toolbar("toolbar-lowercase")).toHaveAttribute("aria-pressed", "true");
   });
-
-// Nacharbeit zu C3 (Aufgabe 12, Bündel C): der Umbau der Reiterleiste auf die
-// Primitive `Tabs` (`ribbon-shell.tsx`) verlor `onMouseDown={e =>
-// e.preventDefault()}` an ihren Reitern. Ein Mausklick auf einen Reiter nahm
-// damit der gerade bearbeiteten `contenteditable`-Zelle den Fokus und mit ihm
-// die browsereigene Text-Selektion — nur die native Caret-Selektion bei
-// Mausklick ist betroffen, nicht die React-gehaltene Zellrahmen-Auswahl fürs
-// Formatieren und nicht der Tastaturweg (siehe `task-12b-report.md`).
-//
-// Anders als der ursprüngliche, zurückgewiesene Nachweis (eine selbstgebaute
-// `contenteditable`-Stellvertreterzelle) rendert dieser Test die **echte**
-// `TableEditor` mit ihrer echten `EditableCell` — beide sitzen im selben
-// Baum wie in Produktion (`table-editor.tsx` bindet `TableToolbar`, die
-// wiederum `RibbonShell` rendert).
-//
-// jsdom bildet Fokus und Text-Selektion nur teilweise ab (kein natives
-// "Mausklick verschiebt Fokus/Caret"-Standardverhalten wie im Browser) —
-// ein Test, der behauptete, die Selektion "bliebe erhalten", würde also
-// nichts Reales messen. Ehrlich messbar ist stattdessen, ob das
-// Standardverhalten des `mousedown`-Ereignisses unterbunden wird
-// (`event.preventDefault()`) — genau der Mechanismus, den `RibbonButton`
-// bereits für seine eigenen Knöpfe nutzt (`controls.test.tsx`) und den die
-// Primitive dafür extra bekommen hat (`Tabs.tsx`, `TabItem.onMouseDown`).
-describe("RibbonShell tabs: mousedown does not steal the editing cell's focus", () => {
-  it("prevents the default mousedown on a tab so the editing cell keeps its selection", () => {
-    render(<TableEditor value={sample()} onChange={jest.fn()} />);
-
-    // Zelle in den Bearbeitungsmodus versetzen — die echte `EditableCell`.
-    fireEvent.doubleClick(cellTd("Zeile 1, Spalte 2"));
-
-    const tab = screen.getByRole("tab", { name: "Ausrichtung" });
-    const event = createEvent.mouseDown(tab);
-    fireEvent(tab, event);
-
-    expect(event.defaultPrevented).toBe(true);
-  });
-});

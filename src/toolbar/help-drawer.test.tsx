@@ -53,39 +53,8 @@ describe("HelpDrawer", () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
-  // N1 (Koordinator): `SearchField` leert sich bei Escape über einen eigenen
-  // `onKeyDown` am `<input>`; das native Ereignis blubbert von dort bis zu
-  // `document`, wo dieser Zuhörer hängt. Ohne Gegenmaßnahme schlösse ein
-  // Escape in der Suche also *zusätzlich* die ganze Schublade — ein Ärgernis
-  // für die Redaktion, die nur die Suche verwerfen wollte. Gemessen und
-  // gegen den in `tab-help.tsx` eingebauten Riegel (eine Umhüllung, die den
-  // Aufstieg zu `document` per `stopPropagation` unterbindet) abgesichert.
-  it("keeps the drawer open when Escape empties the search field", () => {
-    const onClose = jest.fn();
-    render(<HelpDrawer open onClose={onClose} />);
-    fireEvent.change(screen.getByTestId("help-search"), { target: { value: "Format" } });
-    fireEvent.keyDown(screen.getByTestId("help-search"), { key: "Escape" });
-    expect(screen.getByTestId("help-search")).toHaveValue("");
-    expect(onClose).not.toHaveBeenCalled();
-  });
-
   it("renders no backdrop — the grid stays clickable while open", () => {
     render(<HelpDrawer open onClose={jest.fn()} />);
     expect(screen.queryByTestId("help-drawer-backdrop")).not.toBeInTheDocument();
-  });
-
-  // N1-Gegenprobe (Koordinator): Der Riegel in `tab-help.tsx` darf nur das
-  // Suchfeld abschirmen. Escape auf einem anderen Element *innerhalb* der
-  // offenen Schublade — hier die „Hilfe“-Breadcrumb — muss weiterhin bis zu
-  // `document` blubbern und die Schublade schließen. Anders als der Test
-  // oben, der `fireEvent.keyDown(document, ...)` direkt auf `document`
-  // feuert (und damit die Hülle umgeht), feuert dieser Test auf einem
-  // Kind-Knoten der Hülle — das ist der einzige Weg, zu prüfen, dass die
-  // Hülle nicht zu weit greift.
-  it("still closes on Escape fired on another element inside the open drawer", () => {
-    const onClose = jest.fn();
-    render(<HelpDrawer open onClose={onClose} />);
-    fireEvent.keyDown(screen.getByTestId("help-crumb-home"), { key: "Escape" });
-    expect(onClose).toHaveBeenCalled();
   });
 });

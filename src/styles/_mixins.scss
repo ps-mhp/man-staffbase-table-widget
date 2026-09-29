@@ -20,7 +20,7 @@
   width: auto;
   margin: 0;
   border: 1px solid $border;
-  border-radius: 0;
+  border-radius: $radius-control;
   background: $surface;
   color: $text;
   line-height: 1;
@@ -29,9 +29,7 @@
 }
 
 /// Der Fokusring. Nie `outline`, weil die Wirtsseite eigene Outline-Regeln
-/// mitbringt; der Ring wird deshalb als Schatten gezeichnet. Die MAN-Ebene
-/// zeichnet ihren Ring sonst als `outline` — hier ist die Abweichung erkauft,
-/// nicht vergessen. Der Wert kommt aus `_tokens.scss`.
+/// mitbringt; der Ring wird deshalb als Schatten gezeichnet.
 @mixin focus-ring {
   &:focus-visible {
     outline: none;

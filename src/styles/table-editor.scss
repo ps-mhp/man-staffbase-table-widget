@@ -14,8 +14,6 @@
 // zustand) bleibt inline und gewinnt damit gegen diese Regeln.
 
 @use "tokens" as *;
-@use "mixins" as *;
-@use "@shared/editor-ui/styles/type" as type;
 
 .table-editor {
   // Spaltenlayout, damit die Leiste oben ihren festen Platz behält und nur das
@@ -59,7 +57,7 @@
   }
 
   &__footer-area {
-    border-radius: 0;
+    border-radius: 0 0 8px 8px;
     background: $surface-header;
     display: flex;
     align-items: center;
@@ -67,14 +65,12 @@
     padding: 6px 10px;
 
     .table-editor__footer-item {
-      // Fußzeilen-Metadatum (Version, Zellenzahl u. ä.), kein Rasterinhalt:
-      // `caption` trifft die alten 12px exakt.
-      @include type.man-editor-type(caption);
+      font-size: 12px;
       color: $text-muted;
 
       &--version {
         background: $surface-handle;
-        border-radius: 0;
+        border-radius: 20px;
         padding: 4px 8px;
       }
     }
@@ -103,16 +99,13 @@
     background: $surface-handle;
     cursor: pointer;
     padding: 6px;
-    // Zeilen-/Spaltenindex des Rasters: `dense` (Tabellenraster ist Raster,
-    // siehe Kopfkommentar `_type.scss`). Springt von 11px auf 13px; die
-    // Griffe sind schmale, feste Zellen — siehe Bericht zur Einschätzung.
-    @include type.man-editor-type(dense);
+    font-size: 11px;
     color: $text-handle;
     text-align: center;
     user-select: none;
 
     &.__selectAll {
-      border-top-left-radius: 0;
+      border-top-left-radius: 20px;
       border-right: 1px solid $border-menu;
       border-bottom: 1px solid $border-menu;
     }
@@ -158,98 +151,37 @@
     height: 12px;
     background: $accent;
     border: 2px solid $surface;
-    border-radius: 0;
-    box-shadow: $shadow-overlay;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
     cursor: nwse-resize;
     z-index: 5;
   }
 
   &__menu {
-    // Anordnung, keine Optik: Radix bemisst die Fläche selbst über diese
-    // Mindestbreite, sie ist keine Gestaltungsentscheidung (Nachtrag N2).
     min-width: 220px;
     background: $surface;
-    // Randlinie ergänzt (vorher nur Schatten): das echte `Menu`-Primitiv der
-    // Ebene (`menu.scss`, `.man-ed-menu__list`) zeichnet seine Fläche mit
-    // Rahmen *und* Schatten — dieses Menü bleibt zwar Radix (siehe Nachtrag
-    // N1), soll aber gleich aussehen. Derselbe Rahmenton, den auch die
-    // Werkzeugleiste für ihre Flächen zieht.
-    border: 1px solid $border-menu;
-    border-radius: 0;
-    // Nur senkrecht gepolstert, waagerecht bündig mit dem Rand: genau wie
-    // `.man-ed-menu__list`, damit die Hover-Fläche der Einträge (unten) bis an
-    // die Kante reicht statt einen toten Rand freizulassen.
-    padding: $space-1 0;
+    border-radius: $radius-menu;
+    padding: 4px;
     box-shadow: $shadow-context-menu;
-    // Kontextmenü, eine Liste: `dense`, trifft die alten 13px exakt.
-    @include type.man-editor-type(dense);
-    // Anordnung, keine Optik: hält die Fläche über dem Wirtsdialog (Nachtrag N2).
+    font-size: 13px;
     z-index: 2000;
   }
 
   &__menu-item {
-    // Innenabstand jetzt aus der Abstandsskala der Ebene statt abgeschriebener
-    // Pixelzahlen (`6px 10px`) — dieselben zwei Stufen, die auch
-    // `.man-ed-menu__item` zieht.
-    padding: $space-2 $space-4;
-    // Mindesthoehe wie beim echten `Menu`-Primitiv (`menu.scss`,
-    // `control-h-md`): ein Kontextmenue ist keine dichte Werkzeugleiste (die
-    // oben mit `control-h-sm` bewusst enger sitzt), sondern ein Menue, und
-    // dafuer ist `menu.scss` das Vorbild dieser Ebene.
-    min-height: $control-height-md;
-    border-radius: 0;
+    padding: 6px 10px;
+    border-radius: $radius-small;
     cursor: pointer;
     outline: none;
     user-select: none;
-    color: $text;
 
-    // Hover-Fläche wie beim echten `Menu`-Primitiv: eine gesenkte Fläche,
-    // kein Rahmen- oder Textwechsel (dafür fehlt hier — anders als beim
-    // Knopf — ein sichtbarer Rahmen, an dem `hover-lift` ansetzen könnte).
-    // `[data-disabled]` sperrt den Hover zusätzlich zur lokalen Klasse: siehe
-    // Begründung an `&--disabled` unten.
-    &:hover:not(.table-editor__menu-item--disabled):not([data-disabled]) {
-      background: $surface-hover;
-    }
-
-    // Der geteilte Fokusring-Mixin passt unverändert: `:focus-visible` ist
-    // hier kein Radix-Sonderfall, anders als `disabled` unten.
-    @include focus-ring;
-
-    // Radix' `ContextMenu.Item` setzt bei gesperrten Einträgen
-    // `aria-disabled`/`data-disabled`, **nicht** das native `disabled`-
-    // Attribut (sonst wären gesperrte Einträge per Tastatur nicht mehr
-    // erreichbar) — der geteilte `disabled`-Mixin (`&:disabled`) griffe hier
-    // also nie. Deshalb bleibt die eigene Klasse, ergänzt um den
-    // Radix-Attributselektor als zweiten Weg zum selben Ziel. Der Dämpfungswert
-    // (0.4) bleibt der widget-eigene, nicht der `menu.scss`-Wert (0.5): er ist
-    // hier durchgehend derselbe wie bei jedem anderen deaktivierten Element
-    // dieser Leiste (`_mixins.scss`, Mixin `disabled`).
-    //
-    // Bleibt lokal (Befund C2, Aufgabe 12): `menu.scss` kennt inzwischen
-    // selbst `[aria-disabled="true"]`/`[data-disabled]` (dieselbe Radix-Lücke,
-    // dort für das echte `<Menu>`-Primitiv geschlossen). Das ändert an dieser
-    // Stelle trotzdem nichts — dieser Eintrag trägt nie die Klasse
-    // `man-ed-menu__item`, weil `ContextMenu.Item` (Radix) sich nicht mit dem
-    // knopfbasierten `<MenuItem>` der Ebene bauen lässt; beide Klassenwelten
-    // laufen nebeneinander her, nie übereinander. Ohne diese Regel bliebe ein
-    // gesperrter Eintrag hier komplett undurchsichtig, nicht bloß anders
-    // gedämpft — gemessen, nicht angenommen.
-    &--disabled,
-    &[data-disabled] {
+    &--disabled {
       opacity: 0.4;
-      cursor: not-allowed;
     }
   }
 
   &__menu-separator {
-    // Linienstärke, keine Gestaltungsentscheidung — dieselbe Kategorie wie
-    // die `1px`/`2px`-Randlinien, die überall sonst in dieser Datei roh
-    // stehen (z. B. der Ziehgriff oben). Die Ebene führt keinen eigenen Token
-    // für Trennlinien-Höhe (`menu.scss` kennt keine Trennlinie, siehe
-    // Nachtrag N1/N2 — `ContextMenu.Separator` hat dort kein Vorbild).
     height: 1px;
     background: $border-soft;
-    margin: $space-1 0;
+    margin: 4px 0;
   }
 }
