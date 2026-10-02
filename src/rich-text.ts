@@ -36,8 +36,9 @@ const MIN_IMAGE_WIDTH = 8;
 const BLOCK_TAGS = new Set(["DIV", "P"]);
 
 /**
- * The one class a cell may carry. It cancels the host's global uppercase rule
- * for the text it wraps. It is not tied to a particular element — `<span>` is
+ * The one class a cell may carry. It sets the text it wraps in lower case and
+ * so cancels any uppercase rule a host page applies (the table itself sets no
+ * capitals since Craft). It is not tied to a particular element — `<span>` is
  * just the neutral carrier the editor writes — so it is also honoured on the
  * inline tags this module already keeps.
  */

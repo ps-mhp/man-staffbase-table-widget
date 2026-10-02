@@ -89,11 +89,12 @@ describe("TableWidget", () => {
   });
 
   it("ships its own `.text-lowercase` rule so the lowercase mark (see lowercase-mark.ts) still works without man-theme loaded", () => {
-    // The header row is uppercase (MAN-CI); marking part of a header's text
-    // with `.text-lowercase` (the class `rich-text.ts`/`lowercase-mark.ts`
-    // emit) must undo that locally, e.g. for a brand name like "iPhone".
-    // This used to only be defined globally in man-theme's Custom CSS,
-    // so it silently did nothing in a preview/other tenant.
+    // The table itself no longer sets capitals (Craft), but a host page may
+    // still push text into uppercase; marking text with `.text-lowercase`
+    // (the class `rich-text.ts`/`lowercase-mark.ts` emit) must undo that
+    // locally, and saved tables keep carrying the mark. This used to only be
+    // defined globally in man-theme's Custom CSS, so it silently did nothing
+    // in a preview/other tenant.
     const data = [["<span class=\"text-lowercase\">iPhone</span>", "Q1"]];
 
     render(<TableWidget contentLanguage="de_DE" tabledata={serializeTableData(data)} />);

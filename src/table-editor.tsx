@@ -640,7 +640,9 @@ export const TableEditor = ({
   };
 
   /**
-   * Cancels the host's global uppercase rule for the current selection.
+   * Marks the current selection lower case, which cancels any uppercase rule
+   * of the host page (the published table itself sets no capitals since
+   * Craft).
    *
    * Text selected inside a cell being edited wins over the cell selection: an
    * author who highlighted three letters means those three letters. With no

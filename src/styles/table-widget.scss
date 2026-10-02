@@ -19,12 +19,15 @@
 // gewöhnlichen Zellen (inkl. der Zeilentitel-Spalte im Rumpf) und eine
 // dicke, dunkle Linie ausschließlich unter der Kopfzeile (`thead > th`),
 // dazu `tabular-nums` für Zahlenspalten. Kein Zebra-Streifen, keine dunkle
-// Kopf-Fläche — beides sind keine MAN-CI-Muster. Die Kopfzelle läuft als
-// einzige Abweichung in Versalien, wie eine Überschrift. Farben/Abstände
-// laufen über `man(...)`, damit sich ein MAN-Token-Update hier automatisch
-// nachzieht.
+// Kopf-Fläche — beides sind keine MAN-CI-Muster. Schrift und Knopf folgen
+// Craft (MAN Design System): die Kopfzeile wie der Craft-Tabellenkopf in
+// Man Europe Bold 16px, gemischt geschrieben und ohne Laufweite
+// (man-theme `analysis/craft/foundations-and-display.md` §2.17).
+// Farben/Abstände laufen über `man(...)`, damit sich ein MAN-Token-Update
+// hier automatisch nachzieht.
 
 @use "@shared/stylings/man-tokens" as *;
+@use "@shared/stylings/man-craft" as *;
 
 .table-widget {
   // Absichtlich kein `&__scroll`: die Klasse `table-widget-scroll` steht seit
@@ -61,14 +64,16 @@
     text-align: center;
   }
 
+  // `body-m` (16/1.5) in Bold statt einer Überschriftenstufe: h4 wäre mit
+  // 20px Condensed für eine Kopfzeile zu groß und machte jede Spalte breiter.
+  // 12px Polster oben und unten ergeben die 48px des Craft-Kopfs.
   &__cell--head {
     cursor: pointer;
     user-select: none;
     color: man("text");
-    text-transform: uppercase;
-    letter-spacing: man("track-label");
     border-bottom: man("border-width-strong") solid man("border-strong");
-    @include man-type("h4");
+    @include man-type("body-m");
+    font-weight: man("weight-body-bold");
   }
 
   // Die erste Spalte trägt die (oft langen) Zeilentitel. Sie wird gedeckelt,
@@ -92,7 +97,7 @@
   // exklusiv der Kopfzeile vorbehalten (`thead > th`) — hier gilt die
   // gewöhnliche dünne `&__cell`-Linie.
   &__cell--rowhead {
-    font-weight: 600;
+    font-weight: man("weight-body-bold");
     // Deckend, nicht farbig: rein damit die klebende Spalte beim seitlichen
     // Scrollen nichts durchscheinen lässt, keine eigene Markenfläche.
     background: man("surface");
@@ -103,15 +108,12 @@
 
   // Gegen die Typo-Basis des Content Designers: sie setzt jedes `th` mit
   // `[data-c13y-region="root"] th { text-transform: none; font-family: head }`
-  // — Spezifität (0,1,1), eine einzelne Klasse (0,1,0) verliert. Dort stand
-  // die Kopfzeile darum in gemischter Schreibung und die Zeilentitel in der
-  // Condensed-Schrift, im klassischen Editor wie vorgesehen (gesehen am
-  // 29.09.2026). Für die Schreibung genügen zwei Klassen; die Schrift setzt
-  // der Designer mit `!important`, also muss die Zeilentitel-Schrift es auch.
-  & &__cell--head {
-    text-transform: uppercase;
-  }
-
+  // — Spezifität (0,1,1), eine einzelne Klasse (0,1,0) verliert. Dort standen
+  // die Zeilentitel darum in der Condensed-Schrift, im klassischen Editor wie
+  // vorgesehen (gesehen am 29.09.2026). Die Schrift setzt der Designer mit
+  // `!important`, also müssen Kopfzeile und Zeilentitel es auch; seine
+  // gemischte Schreibung ist seit Craft ohnehin die eigene.
+  & &__cell--head,
   & &__cell--rowhead {
     font-family: man(font-body) !important;
   }
@@ -127,31 +129,28 @@
     padding-top: 16px;
   }
 
-  // `.text-lowercase`: hebt die Versal-Regel der Kopfzelle für markierten
-  // Text auf (z. B. Markennamen wie "iPhone" innerhalb einer sonst
-  // grossgeschriebenen Kopfzeile). Diese Klasse wird auch von
-  // `man-theme/src/02-typography/_app.scss` global definiert (`.page
-  // .text-lowercase`); eine eigene Kopie hier stellt sicher, dass sie auch
-  // ohne geladenes Custom CSS (Vorschau, anderer Tenant, CDN-Ausfall) wirkt —
-  // `LOWERCASE_CLASS` in `rich-text.ts` und `lowercase-mark.ts` erzeugen
-  // genau diese Klasse, unabhängig von der Wirtsseite.
+  // `.text-lowercase`: setzt markierten Text klein und hebt so eine
+  // Großschreibung auf, die eine Wirtsseite per CSS hineinträgt. Die Tabelle
+  // selbst setzt seit Craft keine Versalien mehr; die Klasse bleibt, weil
+  // gespeicherte Tabellen sie tragen und der Editor sie weiter anbietet.
+  // Diese Klasse wird auch von `man-theme/src/02-typography/_app.scss` global
+  // definiert (`.page .text-lowercase`); eine eigene Kopie hier stellt sicher,
+  // dass sie auch ohne geladenes Custom CSS (Vorschau, anderer Tenant,
+  // CDN-Ausfall) wirkt — `LOWERCASE_CLASS` in `rich-text.ts` und
+  // `lowercase-mark.ts` erzeugen genau diese Klasse, unabhängig von der
+  // Wirtsseite.
   .text-lowercase {
     text-transform: lowercase !important;
   }
 
-  // Der Umschalter für eingeklappte Zeilen. Bewusst zurückhaltend — er ist ein
-  // Bedienelement auf fremder Seite und borgt sich deshalb die Textfarbe der
-  // Umgebung, statt eine eigene Markenfarbe einzuführen.
+  // Der Umschalter für eingeklappte Zeilen. Bewusst zurückhaltend — der
+  // sekundäre Craft-Knopf in Größe s (32px, Rand 1px, Condensed 14px) statt
+  // einer roten Fläche. `!important`, weil man-theme jedem `.page button`
+  // Polster, Rand und Schrift gibt (Spezifität 0,2,2). Danach nur noch die
+  // Zentrierung: ein `button` mit `width: auto` bleibt so breit wie sein Text.
   &__toggle {
-    display: block;
-    margin: 12px auto 0;
-    padding: 8px 16px;
-    font: inherit;
-    font-size: 0.9em;
-    color: inherit;
-    background: transparent;
-    border: man("border-width") solid man("border");
-    border-radius: man("radius");
-    cursor: pointer;
+    @include man-button("s", "secondary", $important: true);
+    display: flex !important;
+    margin: man("space-3") auto 0 !important;
   }
 }
