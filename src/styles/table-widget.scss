@@ -130,7 +130,7 @@
   // `.text-lowercase`: hebt die Versal-Regel der Kopfzelle für markierten
   // Text auf (z. B. Markennamen wie "iPhone" innerhalb einer sonst
   // grossgeschriebenen Kopfzeile). Diese Klasse wird auch von
-  // `onetruck-css/src/app/00-base.scss` global definiert (`.page
+  // `man-theme/src/02-typography/_app.scss` global definiert (`.page
   // .text-lowercase`); eine eigene Kopie hier stellt sicher, dass sie auch
   // ohne geladenes Custom CSS (Vorschau, anderer Tenant, CDN-Ausfall) wirkt —
   // `LOWERCASE_CLASS` in `rich-text.ts` und `lowercase-mark.ts` erzeugen

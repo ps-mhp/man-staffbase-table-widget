@@ -88,11 +88,11 @@ describe("TableWidget", () => {
     });
   });
 
-  it("ships its own `.text-lowercase` rule so the lowercase mark (see lowercase-mark.ts) still works without onetruck-css loaded", () => {
+  it("ships its own `.text-lowercase` rule so the lowercase mark (see lowercase-mark.ts) still works without man-theme loaded", () => {
     // The header row is uppercase (MAN-CI); marking part of a header's text
     // with `.text-lowercase` (the class `rich-text.ts`/`lowercase-mark.ts`
     // emit) must undo that locally, e.g. for a brand name like "iPhone".
-    // This used to only be defined globally in onetruck-css's Custom CSS,
+    // This used to only be defined globally in man-theme's Custom CSS,
     // so it silently did nothing in a preview/other tenant.
     const data = [["<span class=\"text-lowercase\">iPhone</span>", "Q1"]];
 
