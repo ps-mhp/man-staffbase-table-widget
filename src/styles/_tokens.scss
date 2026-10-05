@@ -21,8 +21,5 @@
 
 @forward "@shared/stylings/editor-chrome";
 
-// Markierung für Kleinschreibung (Editor-Hinweis, kein Markenton)
-$mark-lowercase: #f97316;
-
 // Die runde Schaltfläche an der Tabellenkante — es gibt sie nur hier.
 $radius-table-control: 20px;

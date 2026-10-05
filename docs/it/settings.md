@@ -19,7 +19,7 @@ lo riporta in primo piano.
 
 | Scheda | Cosa contiene |
 | --- | --- |
-| Carattere | Dimensione carattere (predefinita, 10–32), ingrandisci/riduci carattere, grassetto, corsivo, sottolineato, barrato, apice, pedice, rimuovi maiuscole, colore carattere, colore sfondo. |
+| Carattere | Dimensione carattere (predefinita, 10–32), ingrandisci/riduci carattere, grassetto, corsivo, sottolineato, barrato, apice, pedice, colore carattere, colore sfondo. |
 | Allineamento | Allineamento a sinistra, centrato, allineamento a destra, nonché in alto, al centro, in basso. |
 | Celle | Unire, separare, inserire (riga sopra/sotto, colonna a sinistra/a destra), eliminare (riga/e, colonna/e). |
 | Immagini | Inserisci immagine nella cella, Adegua dimensioni immagine (stessa altezza/larghezza della prima immagine, dimensione predefinita), pulsante «Adatta immagini». |
@@ -31,5 +31,4 @@ lo riporta in primo piano.
 | --- | --- |
 | Righe visibili (scheda «Dati») | Numero di righe di dati immediatamente visibili sulla pagina; il resto è nascosto dietro un pulsante di visualizzazione. Impostazione predefinita 5, `0` significa «sempre tutte le righe». L’intestazione non viene conteggiata. |
 | Adatta immagini (scheda «Immagini») | Se attivata, tutte le immagini rimangono entro la larghezza della tabella. Se disattivata, ogni immagine appare nelle sue dimensioni originali — e può superare i limiti della tabella. |
-| Rimuovi maiuscole (scheda «Carattere») | Rimedio nel caso in cui la pagina visualizzi automaticamente il testo in maiuscolo: per le celle selezionate, questa impostazione viene neutralizzata. Il testo stesso rimane invariato. |
 | Copia formato (scheda «Dati») | Applica il formato della selezione corrente alle celle selezionate successivamente. |

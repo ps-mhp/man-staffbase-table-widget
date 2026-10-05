@@ -19,7 +19,7 @@ bewerken** weer openen.
 
 | Tabblad | Wat erin staat |
 | --- | --- |
-| Lettertype | Lettergrootte (standaard, 10–32), lettertype vergroten/verkleinen, vet, cursief, onderstreept, doorgestreept, superscript, subscript, hoofdletters uitschakelen, letterkleur, achtergrondkleur. |
+| Lettertype | Lettergrootte (standaard, 10–32), lettertype vergroten/verkleinen, vet, cursief, onderstreept, doorgestreept, superscript, subscript, letterkleur, achtergrondkleur. |
 | Uitlijning | Links uitgelijnd, gecentreerd, rechts uitgelijnd, evenals boven, midden, onder. |
 | Cellen | Samenvoegen, splitsen, invoegen (rij boven/onder, kolom links/rechts), verwijderen (rij(en), kolom(men)). |
 | Afbeeldingen | Afbeelding in cel invoegen, afbeeldingsgroottes aanpassen (zelfde hoogte/breedte als eerste afbeelding, standaardgrootte), schakelaar „Afbeeldingen aanpassen“. |
@@ -31,5 +31,4 @@ bewerken** weer openen.
 | --- | --- |
 | Zichtbare rijen (tabblad „Gegevens“) | Aantal gegevensrijen dat direct op de pagina te zien is; de rest is verborgen achter een knop om weer te geven. Standaardinstelling 5, `0` betekent „altijd alle rijen“. De kopregel telt niet mee. |
 | Afbeeldingen aanpassen (tabblad „Afbeeldingen“) | Indien ingeschakeld blijven alle afbeeldingen binnen de tabelbreedte. Indien uitgeschakeld verschijnt elke afbeelding in zijn oorspronkelijke grootte — en kan de tabel uit zijn kanten lopen. |
-| Hoofdletters uitschakelen (tabblad „Lettertype“) | Oplossing wanneer de pagina tekst automatisch in hoofdletters weergeeft: voor de geselecteerde cellen wordt deze hoofdletterweergave geneutraliseerd. De tekst zelf blijft ongewijzigd. |
 | Opmaak kopiëren (tabblad „Gegevens“) | Past de opmaak van de huidige selectie toe op de volgende geselecteerde cellen. |

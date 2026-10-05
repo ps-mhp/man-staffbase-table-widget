@@ -52,11 +52,11 @@ describe("stripTextMarkup", () => {
     expect(stripTextMarkup(undefined)).toBe("");
   });
 
-  it("removes the lowercase mark", () => {
+  it("drops the retired lowercase mark of a saved cell", () => {
     expect(stripTextMarkup('a<span class="text-lowercase">Bc</span>')).toBe("aBc");
   });
 
-  it("removes the lowercase mark from a superscript it unwraps", () => {
+  it("drops the retired lowercase mark from a superscript it unwraps", () => {
     expect(stripTextMarkup('m<sup class="text-lowercase">2</sup>')).toBe("m2");
   });
 });

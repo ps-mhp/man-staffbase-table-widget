@@ -161,20 +161,6 @@ $head-ink: #161616;
     padding-top: 16px;
   }
 
-  // `.text-lowercase`: setzt markierten Text klein und hebt so eine
-  // Großschreibung auf, die eine Wirtsseite per CSS hineinträgt. Die Tabelle
-  // selbst setzt seit Craft keine Versalien mehr; die Klasse bleibt, weil
-  // gespeicherte Tabellen sie tragen und der Editor sie weiter anbietet.
-  // Diese Klasse wird auch von `man-theme/src/02-typography/_app.scss` global
-  // definiert (`.page .text-lowercase`); eine eigene Kopie hier stellt sicher,
-  // dass sie auch ohne geladenes Custom CSS (Vorschau, anderer Tenant,
-  // CDN-Ausfall) wirkt — `LOWERCASE_CLASS` in `rich-text.ts` und
-  // `lowercase-mark.ts` erzeugen genau diese Klasse, unabhängig von der
-  // Wirtsseite.
-  .text-lowercase {
-    text-transform: lowercase !important;
-  }
-
   // Der Umschalter für eingeklappte Zeilen. Bewusst zurückhaltend — der
   // sekundäre Craft-Knopf in Größe s (32px, Rand 1px, Condensed 14px) statt
   // einer roten Fläche. `!important`, weil man-theme jedem `.page button`

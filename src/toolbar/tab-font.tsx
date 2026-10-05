@@ -33,8 +33,6 @@ export type FontTabProps = Pick<
   | "onFontSizeStep"
   | "onSuperscript"
   | "onSubscript"
-  | "onToggleLowercase"
-  | "lowercaseActive"
 >;
 
 /** Everything that changes how the characters in a cell look. */
@@ -50,8 +48,6 @@ export function FontTab({
   onFontSizeStep,
   onSuperscript,
   onSubscript,
-  onToggleLowercase,
-  lowercaseActive,
 }: FontTabProps): ReactElement {
   const disabled = !hasSelection;
 
@@ -97,16 +93,6 @@ export function FontTab({
       </RibbonButton>
       <RibbonButton testId="toolbar-subscript" variant="icon" title="Tiefstellen" disabled={disabled} onClick={onSubscript}>
         <IconSubscript />
-      </RibbonButton>
-      <RibbonButton
-        testId="toolbar-lowercase"
-        variant="icon"
-        title="Versalien aufheben"
-        disabled={disabled}
-        active={lowercaseActive}
-        onClick={onToggleLowercase}
-      >
-        <span className="tw-rb__glyph tw-rb__glyph--lowercase">aa</span>
       </RibbonButton>
       <ColorButton
         testId="toolbar-bg"

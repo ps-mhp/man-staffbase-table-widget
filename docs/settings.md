@@ -19,7 +19,7 @@ bearbeiten** zurück.
 
 | Reiter | Was darin steckt |
 | --- | --- |
-| Schrift | Schriftgröße (Standard, 10–32), Schrift vergrößern/verkleinern, Fett, Kursiv, Unterstrichen, Durchgestrichen, Hochstellen, Tiefstellen, Versalien aufheben, Schriftfarbe, Hintergrundfarbe. |
+| Schrift | Schriftgröße (Standard, 10–32), Schrift vergrößern/verkleinern, Fett, Kursiv, Unterstrichen, Durchgestrichen, Hochstellen, Tiefstellen, Schriftfarbe, Hintergrundfarbe. |
 | Ausrichtung | Linksbündig, Zentriert, Rechtsbündig sowie Oben, Mittig, Unten. |
 | Zellen | Verbinden, Lösen, Einfügen (Zeile oberhalb/unterhalb, Spalte links/rechts), Löschen (Zeile(n), Spalte(n)). |
 | Bilder | Bild in Zelle einfügen, Bildgrößen angleichen (gleiche Höhe/Breite wie erstes Bild, Standardgröße), Schalter „Bilder anpassen“. |
@@ -31,5 +31,4 @@ bearbeiten** zurück.
 | --- | --- |
 | Sichtbare Zeilen (Reiter „Daten“) | Anzahl der Datenzeilen, die auf der Seite sofort zu sehen sind; der Rest liegt hinter einem Einblenden-Button. Voreinstellung 5, `0` bedeutet „immer alle Zeilen“. Die Kopfzeile zählt nicht mit. |
 | Bilder anpassen (Reiter „Bilder“) | Eingeschaltet bleiben alle Bilder innerhalb der Tabellenbreite. Ausgeschaltet erscheint jedes Bild in seiner Originalgröße — und kann die Tabelle sprengen. |
-| Versalien aufheben (Reiter „Schrift“) | Gegenmittel, wenn die Seite Text automatisch in Großbuchstaben anzeigt: Für die markierten Zellen wird diese Großschreibung neutralisiert. Der Text selbst bleibt unverändert. |
 | Format kopieren (Reiter „Daten“) | Überträgt das Format der aktuellen Markierung auf die als Nächstes markierten Zellen. |

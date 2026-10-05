@@ -78,13 +78,6 @@ maar geen links. Links horen thuis in een tekstelement naast de tabel.
 Antwoord: Nee. Sla daarom bij grotere aanpassingen tussentijds op — en
 denk er vóór een import aan dat deze de gehele tabel vervangt.
 
-**Vraag:** Mijn tekst verschijnt volledig in hoofdletters, hoewel ik deze
-normaal heb geschreven.
-
-Antwoord: Dat komt door de opmaak van de pagina, niet door de tabel. Selecteer de
-betrokken cellen en klik in het tabblad **Lettertype** op **Hoofdletters
-opheffen**.
-
 **Vraag:** Wat gebeurt er met mijn tabel bij de automatische vertaling
 van de pagina?
 

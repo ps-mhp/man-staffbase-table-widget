@@ -78,12 +78,6 @@ mas não links. Os links devem ser colocados num elemento de texto ao lado da ta
 Resposta: Não. Por isso, em alterações mais significativas, guarde o trabalho de vez em quando — e
 antes de uma importação, lembre-se de que esta substituirá toda a tabela.
 
-**Pergunta:** O meu texto aparece todo em maiúsculas, apesar de o ter
-escrito normalmente.
-
-Resposta: Isso deve-se ao design da página, não à tabela. Selecione as
-células afetadas e, no separador **Tipo de letra**, clique em **Desativar maiúsculas**.
-
 **Pergunta:** O que acontece à minha tabela durante a tradução automática
 da página?
 

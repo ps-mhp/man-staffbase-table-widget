@@ -77,13 +77,6 @@ ale nie zawierają linków. Linki należy umieścić w elemencie tekstowym obok 
 Odpowiedź: Nie. Dlatego w przypadku większych zmian należy zapisywać na bieżąco — a
 przed importem należy pamiętać, że zastąpi on całą tabelę.
 
-**Pytanie:** Mój tekst wyświetla się całkowicie wielkimi literami, mimo że
-napisałem go normalnie.
-
-Odpowiedź: Wynika to z układu strony, a nie z samej tabeli. Należy
-zaznaczyć odpowiednie komórki i w zakładce **Czcionka** kliknąć opcję **Usuń
-wielkie litery**.
-
 **Pytanie:** Co stanie się z moją tabelą podczas automatycznego tłumaczenia
 strony?
 

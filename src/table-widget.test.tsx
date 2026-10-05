@@ -88,19 +88,26 @@ describe("TableWidget", () => {
     });
   });
 
-  it("ships its own `.text-lowercase` rule so the lowercase mark (see lowercase-mark.ts) still works without man-theme loaded", () => {
-    // The table itself no longer sets capitals (Craft), but a host page may
-    // still push text into uppercase; marking text with `.text-lowercase`
-    // (the class `rich-text.ts`/`lowercase-mark.ts` emit) must undo that
-    // locally, and saved tables keep carrying the mark. This used to only be
-    // defined globally in man-theme's Custom CSS, so it silently did nothing
-    // in a preview/other tenant.
-    const data = [["<span class=\"text-lowercase\">iPhone</span>", "Q1"]];
+  it("renders a saved cell with the retired lowercase mark without the class, text as typed", () => {
+    // The editor no longer offers the `text-lowercase` mark, but saved tables
+    // still carry it. man-theme styles the class globally
+    // (`.page .text-lowercase { text-transform: lowercase !important }`), so
+    // rendering it would keep forcing "MAN" to "man" on the page.
+    const data = [
+      ['<span class="text-lowercase">MAN</span> Truck', "m<sup class=\"text-lowercase\">2</sup>"],
+      ["Zeile", "1"],
+    ];
 
-    render(<TableWidget contentLanguage="de_DE" tabledata={serializeTableData(data)} />);
+    const { container } = render(
+      <TableWidget contentLanguage="de_DE" tabledata={serializeTableData(data)} />,
+    );
 
-    const marked = screen.getByText("iPhone");
-    expect(marked).toHaveStyle({ textTransform: "lowercase" });
+    expect(container.querySelector(".text-lowercase")).toBeNull();
+    expect(container.querySelector("[class*='lowercase']")).toBeNull();
+    const head = screen.getByRole("columnheader", { name: "MAN Truck" });
+    expect(head.querySelector("span")?.innerHTML).toBe("MAN Truck");
+    expect(screen.getByText("2").tagName).toBe("SUP");
+    expect(screen.getByText("2")).not.toHaveAttribute("class");
   });
 
   it("renders merged cells with colSpan and skips covered cells", () => {

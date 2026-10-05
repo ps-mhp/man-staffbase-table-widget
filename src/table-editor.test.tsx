@@ -63,7 +63,6 @@ const TOOLBAR_TAB: Record<string, string> = {
   "toolbar-fontsize": "Schrift",
   "toolbar-bold": "Schrift",
   "toolbar-bg": "Schrift",
-  "toolbar-lowercase": "Schrift",
   "toolbar-valign-bottom": "Ausrichtung",
   "toolbar-unmerge": "Zellen",
   "toolbar-insert": "Zellen",
@@ -786,35 +785,29 @@ describe("row limit", () => {
   });
 });
 
-  it("marks a whole selected cell as lowercase", () => {
-    const onChange = jest.fn();
-    render(<TableEditor value={model([["MAN", "b"]])} onChange={onChange} />);
-    fireEvent.mouseDown(cellTd("Zeile 1, Spalte 1"));
-    fireEvent.click(toolbar("toolbar-lowercase"));
-
-    expect(onChange).toHaveBeenCalled();
-    const next = onChange.mock.calls[0][0] as TableModel;
-    expect(next.data[0][0]).toBe('<span class="text-lowercase">MAN</span>');
+// The lowercase mark (`text-lowercase`) is gone from the editor. Saved tables
+// may still carry it; loading them must not bring the class back, because
+// man-theme styles it globally and would keep the text in lower case.
+describe("retired lowercase mark", () => {
+  it("offers no lowercase button in the font tab", () => {
+    render(<TableEditor value={model([["MAN"]])} onChange={jest.fn()} />);
+    fireEvent.click(screen.getByRole("tab", { name: "Schrift" }));
+    expect(screen.queryByTestId("toolbar-lowercase")).toBeNull();
+    expect(screen.queryByTitle("Versalien aufheben")).toBeNull();
   });
 
-  it("clears the mark again on a second click", () => {
-    const onChange = jest.fn();
-    render(
+  it("loads a saved cell carrying the mark without the class, text as typed", () => {
+    const { container } = render(
       <TableEditor
-        value={model([['<span class="text-lowercase">MAN</span>', "b"]])}
-        onChange={onChange}
+        value={model([
+          ['<span class="text-lowercase">MAN</span> Truck', 'm<sup class="text-lowercase">2</sup>'],
+        ])}
+        onChange={jest.fn()}
       />,
     );
-    fireEvent.mouseDown(cellTd("Zeile 1, Spalte 1"));
-    fireEvent.click(toolbar("toolbar-lowercase"));
 
-    expect((onChange.mock.calls[0][0] as TableModel).data[0][0]).toBe("MAN");
+    expect(container.querySelector(".text-lowercase")).toBeNull();
+    expect(cellDiv("Zeile 1, Spalte 1").innerHTML).toBe("MAN Truck");
+    expect(cellDiv("Zeile 1, Spalte 2").innerHTML).toBe("m<sup>2</sup>");
   });
-
-  it("shows the button as active for a fully marked cell", () => {
-    render(
-      <TableEditor value={model([['<span class="text-lowercase">MAN</span>']])} onChange={jest.fn()} />,
-    );
-    fireEvent.mouseDown(cellTd("Zeile 1, Spalte 1"));
-    expect(toolbar("toolbar-lowercase")).toHaveAttribute("aria-pressed", "true");
-  });
+});

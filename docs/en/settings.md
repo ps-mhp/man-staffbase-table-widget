@@ -19,7 +19,7 @@ brings it back.
 
 | Tab | What it contains |
 | --- | --- |
-| Font | Font size (default, 10–32), increase/decrease font size, bold, italic, underline, strikethrough, superscript, subscript, remove all caps, font color, background color. |
+| Font | Font size (default, 10–32), increase/decrease font size, bold, italic, underline, strikethrough, superscript, subscript, font color, background color. |
 | Alignment | Left-aligned, Centered, Right-aligned, as well as Top, Middle, Bottom. |
 | Cells | Merge, Unmerge, Insert (row above/below, column left/right), Delete (row(s), column(s)). |
 | Images | Insert image into cell, adjust image sizes (same height/width as first image, default size), “Fit Images” button. |
@@ -31,5 +31,4 @@ brings it back.
 | --- | --- |
 | Visible Rows (Data tab) | Number of data rows immediately visible on the page; the rest are hidden behind a “Show” button. Default is 5; `0` means “always show all rows.” The header row is not included in the count. |
 | Fit Images ( “Images” tab) | When enabled, all images fit within the table width. When disabled, each image appears in its original size—and may cause the table to overflow. |
-| Remove Capitalization (Font tab) | A fix if the page automatically displays text in uppercase: This feature neutralizes the capitalization for the selected cells. The text itself remains unchanged. |
 | Copy Format (Data tab) | Applies the format of the currently selected range to the next range selected. |

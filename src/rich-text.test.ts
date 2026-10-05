@@ -104,28 +104,44 @@ describe("sanitizeRichText", () => {
     expect(sanitizeRichText("")).toBe("");
   });
 
-  it("keeps a span carrying only the lowercase class", () => {
-    expect(sanitizeRichText('a<span class="text-lowercase">Bc</span>')).toBe(
-      'a<span class="text-lowercase">Bc</span>',
-    );
-  });
-
-  it("unwraps a span without that class", () => {
+  it("unwraps every span, keeping its text", () => {
     expect(sanitizeRichText("a<span>Bc</span>")).toBe("aBc");
     expect(sanitizeRichText('a<span class="evil">Bc</span>')).toBe("aBc");
   });
 
-  it("drops every other attribute from a marked span", () => {
-    expect(
-      sanitizeRichText('<span class="text-lowercase" onclick="x()" style="color:red">a</span>'),
-    ).toBe('<span class="text-lowercase">a</span>');
+  it("drops every class from sup and sub", () => {
+    expect(sanitizeRichText('<sup class="other">x</sup>')).toBe("<sup>x</sup>");
   });
 
-  it("keeps the lowercase class on sup and sub", () => {
-    expect(sanitizeRichText('m<sup class="text-lowercase">Xy</sup>')).toBe(
-      'm<sup class="text-lowercase">Xy</sup>',
-    );
-    expect(sanitizeRichText('<sup class="other">x</sup>')).toBe("<sup>x</sup>");
+  // The editor used to offer a lowercase mark (`text-lowercase`), and saved
+  // tables still carry it. man-theme styles that class globally
+  // (`.page .text-lowercase { text-transform: lowercase !important }`), so it
+  // must never reach the page again: the text shows as it was typed.
+  describe("retired lowercase mark in saved cells", () => {
+    it("unwraps the marked span, keeping the text as typed", () => {
+      expect(sanitizeRichText('a<span class="text-lowercase">Bc</span>')).toBe("aBc");
+    });
+
+    it("drops the span together with its other attributes", () => {
+      expect(
+        sanitizeRichText('<span class="text-lowercase" onclick="x()" style="color:red">MAN</span>'),
+      ).toBe("MAN");
+    });
+
+    it("drops a span the mark leaves empty", () => {
+      expect(sanitizeRichText('a<span class="text-lowercase"></span>b')).toBe("ab");
+    });
+
+    it("keeps sup and sub but drops the class from them", () => {
+      expect(sanitizeRichText('m<sup class="text-lowercase">Xy</sup>')).toBe("m<sup>Xy</sup>");
+      expect(sanitizeRichText('H<sub class="text-lowercase">2</sub>O')).toBe("H<sub>2</sub>O");
+    });
+
+    it("keeps line breaks and images around the old mark", () => {
+      expect(
+        sanitizeRichText('<span class="text-lowercase">a</span><br>b<img src="https://x/y.png">'),
+      ).toBe('a<br>b<img src="https://x/y.png" alt="" style="height:auto">');
+    });
   });
 });
 

@@ -78,12 +78,6 @@ but no links. Links belong in a text element next to the table.
 Answer: No. That’s why you should save periodically when making major changes—and
 remember before importing that it will replace the entire table.
 
-**Question:** My text appears entirely in uppercase, even though I
-wrote it normally.
-
-Answer: This is due to the page’s design, not the table. Select the
-affected cells and click **Unset Capitalization** in the **Font** tab.
-
 **Question:** What happens to my table when the page is automatically translated
 ?
 

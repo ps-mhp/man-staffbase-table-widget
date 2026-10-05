@@ -78,12 +78,6 @@ mais pas de liens. Les liens doivent être placés dans un élément de texte à
 Réponse : Non. C’est pourquoi il faut enregistrer régulièrement lors de modifications importantes — et
 penser, avant une importation, que celle-ci remplacera l’intégralité du tableau.
 
-**Question :** Mon texte s’affiche entièrement en majuscules, alors que je l’ai
-écrit normalement.
-
-Réponse : Cela vient de la mise en page du site, et non du tableau. Sélectionnez les
-cellules concernées et, dans l’onglet **Police**, cliquez sur **Supprimer les majuscules**.
-
 **Question :** Qu’advient-il de mon tableau lors de la traduction automatique
 de la page ?
 

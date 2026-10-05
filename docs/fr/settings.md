@@ -19,7 +19,7 @@ permet de le rouvrir.
 
 | Onglet | Ce qu’il contient |
 | --- | --- |
-| Police | Taille de police (par défaut, 10–32), agrandir/réduire la police, gras, italique, souligné, barré, exposant, indice, désactiver les majuscules, couleur de police, couleur d’arrière-plan. |
+| Police | Taille de police (par défaut, 10–32), agrandir/réduire la police, gras, italique, souligné, barré, exposant, indice, couleur de police, couleur d’arrière-plan. |
 | Alignement | Aligné à gauche, centré, aligné à droite, ainsi qu’en haut, au milieu, en bas. |
 | Cellules | Fusionner, séparer, insérer (ligne au-dessus/en dessous, colonne à gauche/à droite), supprimer (ligne(s), colonne(s)). |
 | Images | Insérer une image dans une cellule, ajuster la taille des images (même hauteur/largeur que la première image, taille par défaut), bouton « Ajuster les images ». |
@@ -31,5 +31,4 @@ permet de le rouvrir.
 | --- | --- |
 | Lignes visibles (onglet « Données ») | Nombre de lignes de données immédiatement visibles sur la page ; le reste est masqué derrière un bouton d’affichage. Valeur par défaut : 5, `0` signifie « toujours toutes les lignes ». L’en-tête n’est pas pris en compte. |
 | Ajuster les images (onglet « Images ») | Lorsque cette option est activée, toutes les images s’adaptent à la largeur du tableau. Lorsqu’elle est désactivée, chaque image s’affiche dans sa taille d’origine — et peut déborder du tableau. |
-| Supprimer les majuscules (onglet « Police ») | Solution si la page affiche automatiquement le texte en majuscules : cette mise en majuscules est désactivée pour les cellules sélectionnées. Le texte lui-même reste inchangé. |
 | Copier le format (onglet « Données ») | Applique le format de la sélection actuelle aux cellules sélectionnées ensuite. |

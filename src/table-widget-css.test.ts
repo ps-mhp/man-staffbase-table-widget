@@ -108,3 +108,11 @@ describe("table stylesheet after Craft", () => {
     );
   });
 });
+
+// The lowercase mark is retired: saved cells lose the class in the sanitizer
+// (`rich-text.ts`), so the stylesheet needs no rule for it any more.
+describe("table stylesheet without the lowercase mark", () => {
+  it("ships no `.text-lowercase` rule", () => {
+    expect(css).not.toMatch(/text-lowercase|text-transform:\s*lowercase/);
+  });
+});

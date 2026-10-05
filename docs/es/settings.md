@@ -19,7 +19,7 @@ lo vuelve a abrir.
 
 | Pestaña | Qué contiene |
 | --- | --- |
-| Fuente | Tamaño de fuente (predeterminado, 10–32), aumentar/reducir el tamaño de la fuente, negrita, cursiva, subrayado, tachado, superíndice, subíndice, quitar mayúsculas, color de fuente, color de fondo. |
+| Fuente | Tamaño de fuente (predeterminado, 10–32), aumentar/reducir el tamaño de la fuente, negrita, cursiva, subrayado, tachado, superíndice, subíndice, color de fuente, color de fondo. |
 | Alineación | Alineado a la izquierda, centrado, alineado a la derecha, así como arriba, en el centro y abajo. |
 | Celdas | Unir, separar, insertar (fila superior/inferior, columna izquierda/derecha), eliminar (fila(s), columna(s)). |
 | Imágenes | Insertar imagen en celda, ajustar el tamaño de las imágenes (misma altura/anchura que la primera imagen, tamaño predeterminado), botón «Ajustar imágenes». |
@@ -31,5 +31,4 @@ lo vuelve a abrir.
 | --- | --- |
 | Filas visibles (pestaña «Datos») | Número de filas de datos que se ven inmediatamente en la página; el resto se oculta tras un botón de visualización. El valor predeterminado es 5; `0` significa «siempre todas las filas». La fila de encabezado no cuenta. |
 | Ajustar imágenes (pestaña «Imágenes») | Si está activada, todas las imágenes se ajustan al ancho de la tabla. Si está desactivada, cada imagen aparece en su tamaño original, lo que puede hacer que la tabla se salga de los límites. |
-| Eliminar mayúsculas (pestaña «Fuente») | Solución si la página muestra automáticamente el texto en mayúsculas: se neutraliza el uso de mayúsculas en las celdas seleccionadas. El texto en sí permanece sin cambios. |
 | Copiar formato (pestaña «Datos») | Aplica el formato de la selección actual a las siguientes celdas seleccionadas. |

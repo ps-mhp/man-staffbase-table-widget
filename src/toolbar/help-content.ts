@@ -69,10 +69,6 @@ export const HELP_TOPICS: HelpTopic[] = [
         text: "Setzt den markierten Text hoch- oder tiefgestellt, etwa für Exponenten oder chemische Formeln.",
       },
       {
-        title: "Versalien aufheben",
-        text: "Hebt eine automatische Großschreibung (z. B. durch CSS der Wirtsseite) für die Markierung wieder auf.",
-      },
-      {
         title: "Schrift- und Hintergrundfarbe",
         text: "Öffnet je einen Farbwähler für Text- und Zellenhintergrundfarbe der Markierung. Ein Klick auf die durchgestrichene Fläche entfernt die gesetzte Farbe wieder.",
       },

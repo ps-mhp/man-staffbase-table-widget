@@ -36,13 +36,7 @@ import {
   mergeAt,
 } from "./table-model";
 import { updateCell, parsePastedText, pasteBlock } from "./grid-operations";
-import { richTextToPlain, sanitizeRichText } from "./rich-text";
-import {
-  hasLowercaseMark,
-  markLowercase,
-  selectionOffsets,
-  unmarkLowercase,
-} from "./lowercase-mark";
+import { sanitizeRichText } from "./rich-text";
 import { formatToStyle, formatToCellStyle } from "./cell-style";
 import { TableToolbar } from "./table-toolbar";
 import { HelpDrawer } from "./toolbar/help-drawer";
@@ -63,7 +57,6 @@ import { IMAGE_FIT_CLASS, IMAGE_NO_FIT_CLASS } from "./image-fit";
 import imageFitCss from "./styles/image-fit.scss";
 import imageNoFitCss from "./styles/image-no-fit.scss";
 import { ClearScope, clearFormatting } from "./clear-format";
-import lowercaseMarkCss from "./styles/lowercase-mark.scss";
 import tableEditorCss from "./styles/table-editor.scss";
 import { useHotStyle } from "@shared/hot-style";
 
@@ -333,7 +326,6 @@ export const TableEditor = ({
   measure = measureImage,
 }: TableEditorProps): ReactElement => {
   const hotTableEditorCss = useHotStyle(tableEditorCss, "table-widget", "styles/table-editor.scss");
-  const hotLowercaseMarkCss = useHotStyle(lowercaseMarkCss, "table-widget", "styles/lowercase-mark.scss");
   const hotImageFitCss = useHotStyle(imageFitCss, "table-widget", "styles/image-fit.scss");
   const hotImageNoFitCss = useHotStyle(imageNoFitCss, "table-widget", "styles/image-no-fit.scss");
   const data = value.data;
@@ -633,67 +625,6 @@ export const TableEditor = ({
     }
   };
 
-  /** The cell's markup and its plain-text length, as the mark functions need it. */
-  const cellMarkup = (row: number, col: number): { html: string; length: number } => {
-    const html = sanitizeRichText(data[row]?.[col] ?? "");
-    return { html, length: richTextToPlain(html).length };
-  };
-
-  /**
-   * Marks the current selection lower case, which cancels any uppercase rule
-   * of the host page (the published table itself sets no capitals since
-   * Craft).
-   *
-   * Text selected inside a cell being edited wins over the cell selection: an
-   * author who highlighted three letters means those three letters. With no
-   * text selected the whole content of every selected cell is marked. Both
-   * write the same markup — there is no cell-level flag — so the two cases
-   * differ only in which range they hand to `markLowercase`.
-   */
-  const toggleLowercase = (): void => {
-    const cell = activeCell.current;
-    const el = document.activeElement as HTMLElement | null;
-    if (cell && el && el.isContentEditable) {
-      const offsets = selectionOffsets(el);
-      if (offsets && offsets.to > offsets.from) {
-        const html = sanitizeRichText(el.innerHTML);
-        const next = hasLowercaseMark(html, offsets.from, offsets.to)
-          ? unmarkLowercase(html, offsets.from, offsets.to)
-          : markLowercase(html, offsets.from, offsets.to);
-        handleInput(cell[0], cell[1], next);
-        return;
-      }
-    }
-
-    if (ranges.length === 0) return;
-    const cells = cellsInRanges(ranges);
-    const allMarked = cells.every(([row, col]) => {
-      const { html, length } = cellMarkup(row, col);
-      return length === 0 || hasLowercaseMark(html, 0, length);
-    });
-
-    let next = data;
-    cells.forEach(([row, col]) => {
-      const html = sanitizeRichText(next[row]?.[col] ?? "");
-      const length = richTextToPlain(html).length;
-      if (length === 0) return;
-      next = updateCell(
-        next,
-        row,
-        col,
-        allMarked ? unmarkLowercase(html, 0, length) : markLowercase(html, 0, length),
-      );
-    });
-    onChange({ ...value, data: next });
-  };
-
-  /** The anchor cell decides the button's state, like the other format toggles. */
-  const lowercaseActive = ((): boolean => {
-    if (!selection) return false;
-    const { html, length } = cellMarkup(selection.top, selection.left);
-    return length > 0 && hasLowercaseMark(html, 0, length);
-  })();
-
   // --- Insert / delete / merge (context menu + toolbar) ---
 
   const withSelection = (fn: (sel: CellRange) => void) => (): void => {
@@ -817,7 +748,7 @@ export const TableEditor = ({
       {/* The editor carries its own stylesheet rather than writing to
           `document.head`: it is mounted into someone else's dialog and should
           leave nothing behind when it goes. */}
-      <style>{`${hotTableEditorCss}\n${hotLowercaseMarkCss}`}</style>
+      <style>{hotTableEditorCss}</style>
       <TableToolbar
         hasSelection={selection !== null}
         activeFormat={anchorFormat}
@@ -834,8 +765,6 @@ export const TableEditor = ({
         onFontSizeStep={stepFontSize}
         onSuperscript={() => applyVertAlign("superscript")}
         onSubscript={() => applyVertAlign("subscript")}
-        onToggleLowercase={toggleLowercase}
-        lowercaseActive={lowercaseActive}
         onInsertRowAbove={insertRowAbove}
         onInsertRowBelow={insertRowBelow}
         onInsertColLeft={insertColLeft}

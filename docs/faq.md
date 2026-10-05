@@ -78,13 +78,6 @@ aber keine Verlinkungen. Links gehören in ein Textelement neben der Tabelle.
 Antwort: Nein. Deshalb bei größeren Umbauten zwischendurch speichern — und
 vor einem Import daran denken, dass er die gesamte Tabelle ersetzt.
 
-**Frage:** Mein Text erscheint komplett in Großbuchstaben, obwohl ich ihn
-normal geschrieben habe.
-
-Antwort: Das kommt von der Gestaltung der Seite, nicht von der Tabelle. Die
-betroffenen Zellen markieren und im Reiter **Schrift** auf **Versalien
-aufheben** klicken.
-
 **Frage:** Was passiert mit meiner Tabelle bei der automatischen Übersetzung
 der Seite?
 

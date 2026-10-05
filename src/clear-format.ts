@@ -14,7 +14,6 @@
 import { TableModel } from "./table-model";
 import { sanitizeRichText } from "./rich-text";
 import { cellHasImage } from "./cell-image";
-import { stripLowercaseMarks } from "./lowercase-mark";
 
 /**
  * Resetting a table back to unformatted content. Formatting lives in two
@@ -42,11 +41,11 @@ const parseBody = (html: string): HTMLElement =>
 
 /**
  * Drops inline text markup from a cell while keeping its images and line
- * breaks: `<sup>`/`<sub>` and the `text-lowercase` mark are unwrapped rather
- * than deleted, so the characters they carried survive as plain text.
+ * breaks: `<sup>`/`<sub>` are unwrapped rather than deleted, so the
+ * characters they carried survive as plain text.
  */
 export function stripTextMarkup(html: string | null | undefined): string {
-  const value = stripLowercaseMarks(sanitizeRichText(html));
+  const value = sanitizeRichText(html);
   if (!value || !/<(sup|sub)\b/i.test(value)) return value;
 
   const body = parseBody(value);

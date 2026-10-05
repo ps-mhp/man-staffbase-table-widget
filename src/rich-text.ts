@@ -35,21 +35,6 @@ const MIN_IMAGE_WIDTH = 8;
  */
 const BLOCK_TAGS = new Set(["DIV", "P"]);
 
-/**
- * The one class a cell may carry. It sets the text it wraps in lower case and
- * so cancels any uppercase rule a host page applies (the table itself sets no
- * capitals since Craft). It is not tied to a particular element — `<span>` is
- * just the neutral carrier the editor writes — so it is also honoured on the
- * inline tags this module already keeps.
- */
-export const LOWERCASE_CLASS = "text-lowercase";
-
-const isLowercaseMarked = (el: HTMLElement): boolean => el.classList.contains(LOWERCASE_CLASS);
-
-/** Re-emits an allowed tag, carrying the lowercase class when it had it. */
-const openTag = (tag: string, marked: boolean): string =>
-  marked ? `<${tag} class="${LOWERCASE_CLASS}">` : `<${tag}>`;
-
 const escapeText = (text: string): string =>
   text
     .replace(/&/g, "&amp;")
@@ -117,12 +102,9 @@ const serializeChildren = (node: Node): string => {
       } else if (el.tagName === "IMG") {
         out += serializeImage(el);
       } else if (ALLOWED_TAGS.has(el.tagName)) {
+        // Re-emitted bare: no class or other attribute survives.
         const tag = el.tagName.toLowerCase();
-        out += `${openTag(tag, isLowercaseMarked(el))}${serializeChildren(el)}</${tag}>`;
-      } else if (el.tagName === "SPAN" && isLowercaseMarked(el)) {
-        // A span survives only as the carrier of that one class; every other
-        // span (and every other attribute) is dropped, keeping the text.
-        out += `<span class="${LOWERCASE_CLASS}">${serializeChildren(el)}</span>`;
+        out += `<${tag}>${serializeChildren(el)}</${tag}>`;
       } else if (BLOCK_TAGS.has(el.tagName)) {
         // A block element starts a new line: emit a break before its content
         // unless it's the very first thing (leading blank line is dropped).
@@ -130,6 +112,10 @@ const serializeChildren = (node: Node): string => {
         out += serializeChildren(el);
       } else {
         // Disallowed tag: drop the tag itself but keep its (sanitized) text.
+        // This includes `<span class="text-lowercase">`, the lowercase mark
+        // older tables carry: the editor no longer offers it, and man-theme
+        // styles the class globally (`.page .text-lowercase`), so it must not
+        // reach the page — the text shows as it was typed.
         out += serializeChildren(el);
       }
     }

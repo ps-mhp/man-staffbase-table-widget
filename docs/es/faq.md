@@ -78,12 +78,6 @@ pero no enlaces. Los enlaces deben colocarse en un elemento de texto junto a la 
 Respuesta: No. Por eso, en caso de modificaciones importantes, guarda el documento de vez en cuando y,
 antes de importar, recuerda que la importación sustituirá toda la tabla.
 
-**Pregunta:** Mi texto aparece completamente en mayúsculas, aunque lo haya
-escrito normalmente.
-
-Respuesta: Eso se debe al diseño de la página, no a la tabla. Selecciona las
-celdas afectadas y, en la pestaña **Fuente**, haz clic en **Quitar mayúsculas**.
-
 **Pregunta:** ¿Qué ocurre con mi tabla al traducir automáticamente
 la página?
 

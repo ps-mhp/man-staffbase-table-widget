@@ -19,7 +19,7 @@ reabre-o.
 
 | Separador | O que contém |
 | --- | --- |
-| Tipo de letra | Tamanho da letra (padrão, 10–32), aumentar/diminuir o tamanho da letra, negrito, itálico, sublinhado, riscado, sobrescrito, subscrito, remover maiúsculas, cor da letra, cor de fundo. |
+| Tipo de letra | Tamanho da letra (padrão, 10–32), aumentar/diminuir o tamanho da letra, negrito, itálico, sublinhado, riscado, sobrescrito, subscrito, cor da letra, cor de fundo. |
 | Alinhamento | Alinhado à esquerda, centralizado, alinhado à direita, bem como alinhado à parte superior, ao centro e à parte inferior. |
 | Células | Unir, separar, inserir (linha acima/abaixo, coluna à esquerda/direita), apagar (linha(s), coluna(s)). |
 | Imagens | Inserir imagem na célula, ajustar o tamanho das imagens (mesma altura/largura que a primeira imagem, tamanho padrão), botão «Ajustar imagens». |
@@ -31,5 +31,4 @@ reabre-o.
 | --- | --- |
 | Linhas visíveis (separador «Dados») | Número de linhas de dados que são imediatamente visíveis na página; o restante fica atrás de um botão para mostrar. Predefinição 5, `0` significa «sempre todas as linhas». O cabeçalho não é contabilizado. |
 | Ajustar imagens (separador «Imagens») | Quando ativada, todas as imagens mantêm-se dentro da largura da tabela. Quando desativada, cada imagem aparece no seu tamanho original — e pode ultrapassar os limites da tabela. |
-| Desativar maiúsculas (separador «Fontes») | Solução caso a página apresente automaticamente o texto em maiúsculas: esta formatação em maiúsculas é neutralizada nas células selecionadas. O texto em si permanece inalterado. |
 | Copiar formato (separador «Dados») | Aplica o formato da seleção atual às células selecionadas a seguir. |

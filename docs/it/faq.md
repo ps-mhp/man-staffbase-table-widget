@@ -78,12 +78,6 @@ ma non i collegamenti. I link devono essere inseriti in un elemento di testo acc
 Risposta: No. Per questo motivo, in caso di modifiche significative, salvare di tanto in tanto — e
 prima di un’importazione, ricordarsi che questa sostituirà l’intera tabella.
 
-**Domanda:** Il mio testo appare completamente in maiuscolo, anche se l’ho
-scritto normalmente.
-
-Risposta: Dipende dall’impaginazione della pagina, non dalla tabella. Selezionare le
-celle interessate e, nella scheda **Caratteri**, cliccare su **Rimuovi maiuscole**.
-
 **Domanda:** Cosa succede alla mia tabella durante la traduzione automatica
 della pagina?
 

@@ -6,13 +6,6 @@ Die Werkzeugleiste des Editors besteht aus dem Button **Speichern** und den
 Tabs **Schrift**, **Ausrichtung**, **Zellen**, **Bilder** und **Daten**. Der
 gewählte Tab bleibt beim Wechsel der Zellauswahl bestehen.
 
-Der Umschalter **Versalien aufheben** (Tab *Schrift*) setzt auf den markierten
-Text — ohne Textmarkierung auf den Inhalt der ausgewählten Zellen — die Klasse
-`text-lowercase`, die die globale Versalien-Regel des Hosts außer Kraft setzt.
-Im Editor wird der so ausgezeichnete Text geriffelt orange unterstrichen; im
-Frontend erscheint nur die Klasse. „Formatierung löschen“ entfernt die
-Auszeichnung mit.
-
 Dieses Repository enthält nur Quellcode und das gebaute Bundle. Es ist **nicht
 eigenständig baubar** — Toolchain und geteilter Code liegen im Meta-Repo:
 
@@ -32,9 +25,9 @@ Der Quellcode liegt danach unter `src/widgets/table-widget/`.
 Die Styles stehen als SCSS unter `src/styles/`: `tokens`/`mixins` als gemeinsame
 Grundlage, dazu je ein Stylesheet für Werkzeugleiste (`ribbon`), Editor
 (`table-editor`), veröffentlichte Tabelle (`table-widget`), Medienauswahl
-(`media-picker`), Bilddeckelung (`image-fit`/`image-no-fit`) und die
-Kleinschreibungs-Markierung (`lowercase-mark`). Jede Komponente importiert ihr
-Stylesheet als String und rendert es selbst als `<style>`.
+(`media-picker`) und Bilddeckelung (`image-fit`/`image-no-fit`). Jede
+Komponente importiert ihr Stylesheet als String und rendert es selbst als
+`<style>`.
 
 ```bash
 npm run build -- --env widget=table-widget

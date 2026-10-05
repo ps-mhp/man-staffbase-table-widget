@@ -34,10 +34,6 @@ export interface TableToolbarProps {
   onFontSizeStep: (delta: number) => void;
   onSuperscript: () => void;
   onSubscript: () => void;
-  /** Toggles the "text-lowercase" mark on the current text or cell selection. */
-  onToggleLowercase: () => void;
-  /** True when the anchor cell is fully marked, so the button shows as active. */
-  lowercaseActive: boolean;
   onInsertRowAbove: () => void;
   onInsertRowBelow: () => void;
   onInsertColLeft: () => void;
