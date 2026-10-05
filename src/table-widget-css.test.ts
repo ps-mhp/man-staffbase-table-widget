@@ -58,11 +58,42 @@ describe("table stylesheet after Craft", () => {
     expect(tracking.filter((declaration) => !/:\s*normal\b/.test(declaration))).toEqual([]);
   });
 
-  it("sets the header row like Craft's table header: 16px, bold, mixed case", () => {
+  it("sets the body cells like Craft's table cells: Regular 16px, 20px sides, hairline", () => {
+    const cell = rule(".table-widget__cell");
+    expect(cell).toMatch(/font-size:\s*16px/);
+    expect(cell).toMatch(/font-weight:\s*400/);
+    expect(cell).toMatch(/font-family:\s*var\(--man-font-body, "?Man Europe"?, Arial, sans-serif\)/);
+    expect(cell).toMatch(/text-transform:\s*none/);
+    expect(cell).toMatch(/color:\s*var\(--man-text, #303c49\)/);
+    // 12px above and below around a 24px line make Craft's 48px row.
+    expect(cell).toMatch(/padding:\s*var\(--man-space-3, 12px\) 20px/);
+    expect(cell).toMatch(/border-bottom:\s*var\(--man-border-width, 1px\) solid var\(--man-border, #cbd3dc\)/);
+  });
+
+  it("sets the header row like Craft's table header: grey band, #161616, bold 16px, light 2px rule", () => {
     const head = rule(".table-widget__cell--head");
-    expect(head).toMatch(/font-size:\s*16px/);
-    expect(head).toMatch(/text-transform:\s*none/);
+    expect(head).toMatch(/background:\s*var\(--man-surface-sunken, #f8f8f8\)/);
+    expect(head).toMatch(/color:\s*#161616/);
     expect(head).toMatch(/font-weight:\s*var\(--man-weight-body-bold, 700\)/);
+    expect(head).toMatch(
+      /border-bottom:\s*var\(--man-border-width-strong, 2px\) solid var\(--man-border, #cbd3dc\)/,
+    );
+    expect(head).not.toMatch(/border-strong/);
+    // Size, face and padding come from the cell rule it shares.
+    expect(head).not.toMatch(/font-size|padding/);
+  });
+
+  it("marks the sortable header on hover like Craft, but draws no row hover", () => {
+    expect(css).toMatch(
+      /@media \(hover: hover\)\s*\{\s*\.table-widget__cell--head:hover\s*\{\s*background:\s*var\(--man-border, #cbd3dc\);\s*\}/,
+    );
+    expect(css).not.toMatch(/tr:hover|tbody[^{]*:hover|__cell:hover|__cell--rowhead:hover/);
+  });
+
+  it("keeps the old 16px sides on narrow screens, so a table gets no wider there", () => {
+    expect(css).toMatch(
+      /@media \(max-width: 767px\)\s*\{\s*\.table-widget__cell\s*\{\s*padding-inline:\s*var\(--man-space-4, 16px\);\s*\}/,
+    );
   });
 
   it("sets the row titles bold at 700, not the retired 600", () => {

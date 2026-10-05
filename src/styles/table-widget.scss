@@ -14,20 +14,28 @@
 // bewusst ein Inline-Style — der gewinnt gegen diese Regeln und braucht deshalb
 // keine Klasse pro Kombination.
 //
-// Look und Werte kommen aus dem MAN-CI: keine Außenkontur (kein Rahmen, kein
-// Radius, kein Flächenfüllton) — nur dünne, helle Trennlinien unter allen
-// gewöhnlichen Zellen (inkl. der Zeilentitel-Spalte im Rumpf) und eine
-// dicke, dunkle Linie ausschließlich unter der Kopfzeile (`thead > th`),
-// dazu `tabular-nums` für Zahlenspalten. Kein Zebra-Streifen, keine dunkle
-// Kopf-Fläche — beides sind keine MAN-CI-Muster. Schrift und Knopf folgen
-// Craft (MAN Design System): die Kopfzeile wie der Craft-Tabellenkopf in
-// Man Europe Bold 16px, gemischt geschrieben und ohne Laufweite
-// (man-theme `analysis/craft/foundations-and-display.md` §2.17).
-// Farben/Abstände laufen über `man(...)`, damit sich ein MAN-Token-Update
-// hier automatisch nachzieht.
+// Look und Werte folgen der Craft-Tabelle in Größe m (MAN Design System,
+// man-theme `analysis/craft/foundations-and-display.md` §2.17): keine
+// Außenkontur, kein Radius. Die Kopfzeile ist ein hellgraues Band (#F8F8F8)
+// in Man Europe Bold 16px mit einer 2px-Linie in Haarlinienfarbe darunter; die
+// Rumpfzellen stehen in Man Europe Regular 16px auf der Wirtsfläche, getrennt
+// durch 1px-Haarlinien. Zeilenhöhe 48px (12px Polster um 24px Zeile), seitlich
+// 20px. Kein Zeilen-Hover, kein Zebra-Streifen (Craft kennt ihn nur als
+// Option, die dieses Widget nicht anbietet). Dazu `tabular-nums` für
+// Zahlenspalten. Farben/Abstände laufen über `man(...)`, damit sich ein
+// MAN-Token-Update hier automatisch nachzieht.
 
 @use "@shared/stylings/man-tokens" as *;
 @use "@shared/stylings/man-craft" as *;
+
+// Seitenpolster der Craft-Zelle (Kopf und Rumpf). In Craft ein Literal
+// (`table.scss`), kein Abstands-Token: space-4 ist 16px, space-5 24px.
+$cell-padding-inline: 20px;
+
+// Schrift der Kopfzeile: Craft man-silver-900 (`--craft-pp-color-text-strong`,
+// man-theme `analysis/craft/tokens-light.tsv`). Dafür gibt es kein `--man-*`;
+// `text` (#303c49) wäre sichtbar heller als das Craft-Soll.
+$head-ink: #161616;
 
 .table-widget {
   // Absichtlich kein `&__scroll`: die Klasse `table-widget-scroll` steht seit
@@ -57,23 +65,47 @@
     background: transparent;
   }
 
+  // Craft-Zelle: Regular 16px (`body-m`, 16/1.5) statt der Größe der
+  // Wirtsseite, die die Zellen früher erbten (meist 18px). 12px Polster oben
+  // und unten um die 24px-Zeile ergeben die 48px-Zeile von Craft.
   &__cell {
-    padding: man("space-3") man("space-4");
+    padding: man("space-3") $cell-padding-inline;
     white-space: nowrap;
     border-bottom: man("border-width") solid man("border");
     text-align: center;
+    color: man("text");
+    @include man-type("body-m");
+
+    // Schmal (Telefon) bleibt es bei den bisherigen 16px seitlich: Spalten,
+    // deren Breite die Kopfzeile bestimmt, würden sonst je 8px breiter und
+    // die Tabelle schöbe sich früher aus dem Bild.
+    @media (max-width: 767px) {
+      padding-inline: man("space-4");
+    }
   }
 
-  // `body-m` (16/1.5) in Bold statt einer Überschriftenstufe: h4 wäre mit
-  // 20px Condensed für eine Kopfzeile zu groß und machte jede Spalte breiter.
-  // 12px Polster oben und unten ergeben die 48px des Craft-Kopfs.
+  // Craft-Tabellenkopf: Größe, Schrift und Polster wie die Zelle, dazu Bold,
+  // das hellgraue Band, Craft-Kopfschrift und eine 2px-Linie in
+  // Haarlinienfarbe (Craft zieht sie als `box-shadow: inset`, hier als
+  // Unterkante, weil `border-collapse` die Zellränder ohnehin zusammenlegt).
+  // h4 wäre mit 20px Condensed für eine Kopfzeile zu groß und machte jede
+  // Spalte breiter.
   &__cell--head {
     cursor: pointer;
     user-select: none;
-    color: man("text");
-    border-bottom: man("border-width-strong") solid man("border-strong");
-    @include man-type("body-m");
+    color: $head-ink;
+    background: man("surface-sunken");
+    border-bottom: man("border-width-strong") solid man("border");
     font-weight: man("weight-body-bold");
+
+    // Ein Klick sortiert nach der Spalte; wie der sortierbare Craft-Kopf
+    // zeigt das ein Hover in Haarlinienfarbe. Nur mit echtem Zeiger, damit
+    // auf Touch-Geräten nach dem Tippen kein Hover hängen bleibt.
+    @media (hover: hover) {
+      &:hover {
+        background: man("border");
+      }
+    }
   }
 
   // Die erste Spalte trägt die (oft langen) Zeilentitel. Sie wird gedeckelt,
