@@ -1,93 +1,93 @@
-# Step by Step
+# Step by step
 
-## Creating Your First Table
+## Create your first table
 
-1. Place the **Table** widget on the page and open the widget settings.
-   The **Table Editor** appears automatically above the
-   “Table Data” field.
-2. **Double-click** a cell and type in the text. Clicking
-   another cell will save your entry.
-3. Fill in the **first row** with the column headers.
-4. If rows or columns are missing: **Cells** tab → **Insert** → e.g., “Row
-   below” or “Column to the right.”
-5. Click **Save** in the upper-right corner. Only then will the table appear in
-   the widget.
-6. Click **Close** to exit the editor and save the page.
+1. Place the **Table** widget on the page and adjust the widget settings
+   . The **Table Editor** will automatically appear above the
+   "Table Data". 
+2. **Double-click** in a cell and type in the text. By clicking on
+   another cell takes over the input. 
+3. Fill the **first row** with the column headers. 
+4. Missing rows or columns: Tab **Cells** → **Insert** → e.g. "Row
+   below" or "Column on the right". 
+5. Click on **Save** in the upper right corner. Only then will the table land in the
+   Widget. 
+6. Exit the editor with **Close** and save the page. 
 
-If **“Unsaved changes”** appears next to the buttons, the changes have not yet
-been saved—first click “Save,” then “Close.”
+If it says **"Unsaved changes"** next to the buttons, it has not yet been
+— then click "Save", then "Close". 
 
-## Import an Existing Table from Excel or CSV
+## Copy an existing table from Excel or CSV
 
-1. In the table editor, open the **Data** tab.
-2. Click **Import** and select the file (`.csv`, `.xlsx`, or
-   `.xls`).
-3. Check the result: The import **replaces the entire table**; nothing is
-   appended. From Excel, merged cells, bold/italic/
-   underlining, colors, font sizes, alignment, and superscript and
-   subscript formatting are preserved. If the file is an Excel workbook, the **first
-   worksheet** is used.
-4. **Save**.
+1. Open the **Data** tab in the table editor. 
+2. Click on **Import** and select the file ('.csv', '.xlsx' or
+   '.xls'). 
+3. Check the result: The import **replaces the complete table**, it will be
+   nothing appended. From Excel, connected cells remain, bold/italic/ 
+   underline, colors, font sizes, alignment, and portrait and
+   subscripts. In the case of an Excel book, the **first
+   Spreadsheet**. 
+4. **Save**. 
 
-Alternatively, you can **copy and paste** cells directly from Excel:
-double-click a cell and paste—the block will be distributed across multiple cells
-starting from that point.
+Alternatively, cells can also be **copied and pasted** directly from Excel: 
+double-click and paste into a cell — the block will start at that point
+spread over several cells. 
 
-## Formatting Cells
+## Format cells
 
-1. Select the cells to be formatted: click, drag while holding down the mouse button,
-   use **Shift** to select a range, or use **Ctrl/Cmd**
-   to include additional ranges. You can use the handles at the edges to select entire
-   rows, columns, or the entire table.
-2. The **Font** tab for font size, bold, italics, underline,
-   strikethrough, superscript/subscript, and font and background color.
-3. **Alignment** tab for left/centered/right and top/middle/bottom.
-4. **Save**.
+1. Select the cells to be formatted: click, hold down the mouse button
+   , use **Shift** to draw an area or **Ctrl/Cmd** 
+   additional areas. The handles on the edge can be used to
+   Select rows, columns, or the entire table. 
+2. Tab **Font** for font size, bold, italics, underline, 
+   Strikethrough, superscript/subscript, font and background color. 
+3. Tab **Orientation** for left/center/right and top/center/bottom. 
+4. **Save**. 
 
-To apply formatting to additional cells:
+To transfer a formatting to other cells: 
 
-1. Select a cell that has already been formatted.
-2. Click the **Data** tab → **Format**.
-3. Select the target cells—they will adopt the format.
+1. Select an already formatted cell. 
+2. Click on the **Data** tab → **Format**. 
+3. Select the target cells — they will adopt the format. 
 
 ## Merge Cells
 
-1. Select the cells you want to merge.
-2. **Cells** tab → **Merge**.
-3. Undo with **Unlink**.
+1. Select the cells to be joined. 
+2. Tab **Cells** → **Connect**. 
+3. Undo with **Solve**. 
 
-## Insert an Image into a Cell
+## Insert image into a cell
 
-1. Select the cell.
-2. Click the **Pictures** tab → **Picture**. The media selection window opens; there,
-   select an existing image or upload a new one.
-3. If multiple images have different sizes: select all image cells and
-   use **Image Size** to choose either “Same height as first image” or “Same
-   width as first image” (this requires at least two images).
-   **Default Size** resets the settings.
-4. If an image extends beyond the table, go to the **Images** tab and turn on the **Adjust
-   Images** switch—this will ensure all images stay within the
-   table width.
+1. Select the cell. 
+2. Tab **Images** → **Image**. The media selection opens; there is a
+   select an existing image or upload a new one. 
+3. If several images are of different sizes: select all image cells and
+   via **Image Size** either "Same height as first image" or "Same
+   Width as first image" (this requires at least two images). 
+   **Standard size** resets. 
+4. If an image blows up the table, in the tab **Images** the switch **Images
+   adjust** — then all images remain within the
+   Table width. 
 
-## Sorting the Table
+## Sort table
 
-1. Select the column by which you want to sort.
-2. **Data** tab → **Sort** → “Ascending (this column)” or
-   “Descending (this column)”.
-3. **Save**. This sort order is the default for all
-   readers; the header row always remains at the top.
+1. Select the column by which you want to sort. 
+2. Tab **Data** → **Sort** → "Ascending (this column)" or
+   "Descending (this column)". 
+3. **Save**. This sort is the starting sort for all
+   readers; the header always remains at the top. 
 
-## Collapse a Long Table
+## Collapse long table
 
-1. Open the **Data** tab.
-2. Under **Visible Rows**, enter the number of data rows that should be
-   visible immediately. The default is 5; `0` always shows all rows.
-3. **Save**. A button will then appear on the page below the table that says
-   “Show N more rows” or “Show fewer rows.”
+1. Open the **Data** tab. 
+2. Under **Visible rows**, enter the number of rows of data that will be immediately
+   should be visible. The default is 5; '0' always shows all lines. 
+3. **Save**. A button will then appear on the page below the table
+   "Show more N rows" or "Show fewer rows". 
 
-## Remove Formatting
+## Remove formatting again
 
-1. Select the relevant cells.
-2. Go to the **Data** tab → **Formatting** and select the appropriate option:
-   remove everything, remove only text formatting, or remove only image sizes.
+1. Mark the affected cells. 
+2. Tab **Data** → **Formatting** and select the appropriate entry: 
+   remove everything, only the text formatting or only the image sizes. 
 3. **Save**.

@@ -1,91 +1,91 @@
-# Perguntas Frequentes
+# FAQ
 
-**Pergunta:** Em vez do editor de tabelas, só vejo um campo de texto com
-conteúdo enigmático que começa por `b64:`.
+**Pergunta:** Em vez do editor de tabelas, eu só vejo um campo de texto com
+conteúdo enigmático que começa com 'b64:'. 
 
-Resposta: Esse é o campo **Dados da tabela** — a forma guardada da
-tabela, que o editor normalmente oculta. Nunca edite este texto manualmente
-. Um clique em **Editar tabela** ou a reabertura da
-caixa de diálogo faz com que o editor volte a aparecer. A codificação protege a tabela de
-ser danificada pela tradução automática da página.
+Resposta: Este é o campo **Table Data** — a forma armazenada do
+tabela que o editor normalmente cobre. Nunca use este texto manualmente
+editar. Clique em **Editar tabela** ou reabra a
+O diálogo recupera o editor. A codificação protege a tabela de ser
+tradução automática de páginas. 
 
-**Pergunta:** As minhas alterações desapareceram depois de fechar.
+**Pergunta:** Minhas mudanças desapareceram depois do fechamento. 
 
-Resposta: **Fechar** não guarda. Antes de fechar, clique sempre em
-**Guardar** — enquanto «Alterações não guardadas» aparecer ao lado dos botões,
-significa que algo está em aberto.
+Resposta: **Fechar** não salva. Sempre definir antes do fechamento
+**Salvar** — desde que "Alterações Não Salvas" esteja ao lado dos botões
+é um tanto aberto. 
 
-**Pergunta:** Como escrevo numa célula?
+**Pergunta:** Como eu escrevo em uma cela? 
 
-Resposta: **Clique duas vezes** na célula e, em seguida, digite. Um simples clique
-apenas seleciona a célula (para formatação), não a abre para
-edição.
+Resposta: **Clique duplo** na célula, depois toque. Um clique simples
+só seleciona a célula (para formatação), não a abre para
+Edit. 
 
-**Pergunta:** Não consigo apagar a primeira linha nem a primeira coluna.
+**Pergunta:** Não consigo apagar a primeira linha ou coluna. 
 
-Resposta: É assim que deve ser: a primeira linha é o cabeçalho, a primeira
-coluna é o título da linha. Se não forem necessárias, basta
-deixá-las em branco.
+Resposta: É assim que é pensado: A primeira linha é o cabeçalho, a primeira é o
+coluna a etiqueta da linha. Se não forem necessárias, simplesmente vazia
+. 
 
-**Pergunta:** Que formatos de ficheiro posso importar?
+**Pergunta:** Quais formatos de arquivo posso importar? 
 
-Resposta: `.csv`, bem como `.xlsx`/`.xls`. No caso do CSV, o ponto e vírgula e a vírgula são
-automaticamente reconhecidos como separadores. No caso do Excel, é importada a primeira folha de cálculo,
-incluindo células unidas, formatação de texto, cores, tamanhos de letra
-e alinhamento. Uma importação **substitui sempre toda a tabela**.
+Resposta: '.csv' e '.xlsx'/'.xls'. No CSV, ponto e vírgula são usados como
+os separadores são detectados automaticamente. No Excel, a primeira planilha
+incluindo células conectadas, formatação de texto, cores, tamanhos de fonte
+e alinhamento. Uma importação **sempre substitui toda a mesa**. 
 
-**Pergunta:** Aparece a mensagem «Importação falhada».
+**Pergunta:** "Importação falhada" aparece. 
 
-Resposta: Não foi possível ler o ficheiro. Verifique se é realmente um
-ficheiro `.csv`, `.xlsx` ou `.xls` (e não, por exemplo, um ficheiro renomeado ou
-protegido por palavra-passe) e se contém conteúdo. Se necessário,
-guarde-o novamente no Excel como `.xlsx`.
+Resposta: O arquivo não pôde ser lido. Verifique se realmente existe um
+'.csv', '.xlsx' ou '.xls' (não renomeado ou
+arquivo protegido por senha) e se contém conteúdo. No Excel, se necessário
+Salve como '.xlsx' novamente. 
 
-**Pergunta:** Nem todas as linhas são apresentadas na página.
+**Pergunta:** Nem todas as linhas são exibidas na página. 
 
-Resposta: Trata-se da configuração **Linhas visíveis** (separador «Dados»),
-predefinida para 5 linhas de dados. O resto aparece através do botão abaixo
-da tabela. Se pretender que todas as linhas sejam visíveis desde o início, defina o valor para `0`
-.
+Resposta: Esta é a configuração **Linhas visíveis** (aba "Data"), 
+preset para 5 linhas de dados. O restante aparece pelo botão abaixo
+tabela. Se você quiser que todas as linhas fiquem visíveis desde o início, defina o valor para '0'
+. 
 
-**Pergunta:** Uma imagem ocupa toda a tabela.
+**Pergunta:** Uma foto explode a mesa inteira. 
 
-Resposta: No separador **Imagens**, ative a opção **Ajustar imagens**.
-Esta opção limita todas as imagens à largura da tabela. Quando desativada, cada
-imagem aparece no seu tamanho original.
+Resposta: Na aba **Imagens**, ative o botão de **Ajustar imagens**. 
+Limita todas as imagens à largura da tabela. Quando desligado, cada
+Imagem em seu tamanho original. 
 
-**Pergunta:** Várias imagens têm tamanhos diferentes.
+**Pergunta:** Várias fotos têm tamanhos diferentes. 
 
-Resposta: Selecione todas as células com imagens e, no separador **Imagens**, em
-**Tamanho da imagem**, selecione «Altura igual à da primeira imagem» ou «Largura igual à da primeira
-imagem». É necessário selecionar, pelo menos, duas imagens.
+Resposta: Selecione todas as células de imagem e selecione-as na aba **Imagens** abaixo
+**Tamanho da imagem** "Mesma altura da primeira imagem" ou "Mesma largura da primeira imagem"
+Imagem". Pelo menos duas imagens devem ser destacadas. 
 
-**Pergunta:** Um leitor ordenou a tabela de forma diferente daquela em que eu a guardei
-.
+**Pergunta:** Um leitor organizou a tabela de um jeito diferente de como eu a salvei
+. 
 
-Resposta: Na página publicada, cada leitor pode reordenar a tabela clicando
-no título de uma coluna. Isto aplica-se apenas à sua visualização
-e não altera a tabela guardada. A ordenação definida no editor
-continua a ser a visualização inicial.
+Resposta: Na página publicada, qualquer pessoa que leia pode clicar na
+para um cabeçalho de coluna em si. Isso se aplica apenas à visão deles
+e não altera a tabela salva. Seu conjunto de ordenação no editor
+a visão de largada permanece. 
 
-**Pergunta:** Posso inserir um link numa célula?
+**Pergunta:** Posso colocar um link em uma cela? 
 
-Resposta: Não. As células aceitam texto, imagens e caracteres em superíndice/subíndice,
-mas não links. Os links devem ser colocados num elemento de texto ao lado da tabela.
+Resposta: Não. As células recebem texto, imagens e subscritos/subscritos, 
+Mas sem links. Links pertencem a um elemento de texto ao lado da tabela. 
 
-**Pergunta:** Existe a função «Anular»?
+**Pergunta:** Existe algo como "desfazer"? 
 
-Resposta: Não. Por isso, em alterações mais significativas, guarde o trabalho de vez em quando — e
-antes de uma importação, lembre-se de que esta substituirá toda a tabela.
+Resposta: Não. Portanto, reserve entre as reformas — e
+Antes de importar, lembre-se de que ele substitui toda a mesa. 
 
-**Pergunta:** O que acontece à minha tabela durante a tradução automática
-da página?
+**Pergunta:** O que acontece com minha mesa durante a tradução automática
+do local? 
 
-Resposta: Apenas o conteúdo das células é traduzido. As células unidas,
-as formatações, as imagens e a ordenação permanecem inalteradas.
+Resposta: Apenas o conteúdo das células é traduzido. Células conectadas, 
+Formatação, imagens e ordenação permanecem inalteradas. 
 
-**Pergunta:** A tabela fica demasiado larga no telemóvel.
+**Pergunta:** A mesa está muito larga no celular. 
 
-Resposta: É possível deslocá-la lateralmente. Para ecrãs estreitos, ajuda
-agrupar colunas, utilizar títulos mais curtos ou remover
-imagens grandes das células.
+Resposta: Pode ser empurrada lateralmente. Para telas estreitas, ajuda 
+Unir colunas, usar cabeçalhos mais curtos ou usar grandes
+Para tirar fotos das celas.

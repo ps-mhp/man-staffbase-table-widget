@@ -1,91 +1,91 @@
 # FAQ
 
 **Question:** Instead of the table editor, I only see a text field with
-cryptic content that begins with `b64:`.
+cryptic content that starts with 'b64:'. 
 
-Answer: This is the **Table Data** field—the stored form of the
-table that the editor normally covers. Never edit this text manually.
-Clicking **Edit Table** or reopening the
-dialog box will bring back the editor. The encoding protects the table from
-being corrupted by automatic page translation.
+Answer: This is the **Table Data** field — the stored form of the
+table that the editor usually covers. Never use this text by hand
+edit. Click on **Edit table** or reopen the
+dialog retrieves the editor. The encoding protects the table from being
+automatic page translation. 
 
-**Question:** My changes are gone after closing.
+**Question:** My changes are gone after closing. 
 
-Answer: **Close** does not save. Always click
-**Save** before closing—as long as “Unsaved changes” appears next to the buttons,
-something is still open.
+Answer: **Close** does not save. Always set before closing
+**Save** — as long as "Unsaved Changes" next to the buttons
+is somewhat open. 
 
-**Question:** How do I type in a cell?
+**Question:** How do I write in a cell? 
 
-Answer: **Double-click** the cell, then type. A single click
-only selects the cell (for formatting); it does not open it for
-editing.
+Answer: **Double-click** in the cell, then tap. A simple click
+only selects the cell (for formatting), it does not open it for
+Edit. 
 
-**Question:** I can’t delete the first row or the first column.
+**Question:** I can't delete the first row or column. 
 
-Answer: This is by design: The first row is the header row, and the first
-column is the row label. If you don’t need them, just leave them
-blank.
+Answer: This is how it is intended: The first line is the header, the first is the
+column the row label. If they are not needed, simply empty
+. 
 
-**Question:** Which file formats can I import?
+**Question:** What file formats can I import? 
 
-Answer: `.csv` and `.xlsx`/`.xls`. For CSV files, semicolons and commas are
-automatically recognized as delimiters. For Excel files, the first worksheet
-is imported, including merged cells, text formatting, colors, font sizes,
-and alignment. An import **always replaces the entire table**.
+Answer: '.csv' and '.xlsx'/'.xls'. In CSV, semicolon and comma are used as
+separators are automatically detected. In Excel, the first worksheet
+including connected cells, text formatting, colors, font sizes
+and alignment. An import **always replaces the entire table**. 
 
-**Question:** “Import failed” appears.
+**Question:** "Import failed" appears. 
 
-Answer: The file could not be read. Check whether it is actually a
-`.csv`, `.xlsx`, or `.xls` file (not, for example, a renamed or
-password-protected file) and whether it contains any data. If necessary,
-save it again as a `.xlsx` file in Excel.
+Answer: The file could not be read. Check if there is really a
+'.csv', '.xlsx' or '.xls' file (not a renamed or
+password-protected file) and whether it contains content. In Excel if necessary
+Save as '.xlsx' again. 
 
-**Question:** Not all rows are displayed on the page.
+**Question:** Not all rows are displayed on the page. 
 
-Answer: This is the **Visible Rows** setting (on the “Data” tab),
-set by default to 5 data rows. The rest can be viewed using the button below
-the table. If you want all rows to be visible from the start, set the value to `0`
-.
+Answer: This is the **Visible rows** setting (tab "Data"), 
+preset to 5 data rows. The rest appears via the button under
+table. If you want all rows to be visible from the beginning, set the value to '0'
+. 
 
-**Question:** An image is stretching the entire table.
+**Question:** One picture blows up the whole table. 
 
-Answer: On the **Pictures** tab, turn on the **Fit Pictures** checkbox.
-This limits all images to the width of the table. When turned off, each
-image appears in its original size.
+Answer: In the **Images** tab, turn on the **Adjust images** switch. 
+It limits all images to the table width. When turned off, each
+Picture in its original size. 
 
-**Question:** Several images are different sizes.
+**Question:** Several pictures are different sizes. 
 
-Answer: Select all image cells and, in the **Images** tab under
-**Image Size**, choose “Same height as first image” or “Same width as first
-image.” At least two images must be selected.
+Answer: Select all image cells and select them in the **Images** tab under
+**Image size** "Same height as first image" or "Same width as first image"
+Image". At least two images must be highlighted. 
 
-**Question:** A reader has sorted the table differently than how I saved
-it.
+**Question:** A reader sorted the table differently than I saved it
+. 
 
-Answer: On the published page, any reader can reorder the table themselves by clicking
-on a column header. This applies only to their view
-and does not change the saved table. The sort order you set in the editor
-remains the default view.
+Answer: On the published page, any reading person can click on the
+to a column header itself. This only applies to their view
+and does not change the saved table. Your sorting set in the editor
+the start view remains. 
 
-**Question:** Can I insert a link into a cell?
+**Question:** Can I put a link in a cell? 
 
-Answer: No. Cells can contain text, images, and superscript/subscript,
-but no links. Links belong in a text element next to the table.
+Answer: No. Cells take text, images, and superscripts/subscripts, 
+but no links. Links belong in a text element next to the table. 
 
-**Question:** Is there an “Undo” function?
+**Question:** Is there such a thing as "undo"? 
 
-Answer: No. That’s why you should save periodically when making major changes—and
-remember before importing that it will replace the entire table.
+Answer: No. Therefore, save in between for major renovations — and
+before importing, remember that it replaces the entire table. 
 
-**Question:** What happens to my table when the page is automatically translated
-?
+**Question:** What happens to my table during automatic translation
+of the site? 
 
-Answer: Only the cell contents are translated. Merged cells,
-formatting, images, and sorting remain unchanged.
+Answer: Only the cell contents are translated. Connected cells, 
+Formatting, images and sorting remain unchanged. 
 
-**Question:** The table is too wide on my phone.
+**Question:** The table is too wide on mobile. 
 
-Answer: You can scroll sideways through it. For narrow screens, it helps to
-merge columns, use shorter headings, or remove large
-images from the cells.
+Answer: It can be pushed sideways. For narrow screens, it helps to 
+Merge columns, use shorter headings, or use large
+To take pictures out of the cells.

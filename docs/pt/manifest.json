@@ -1,6 +1,6 @@
 {
   "title": "Tabela",
-  "summary": "Incorpora uma tabela formatável — com editor próprio, importação de ficheiros Excel/CSV e imagens nas células.",
+  "summary": "Incorpora uma formatável — com seu próprio editor, importação Excel/CSV e imagens em células.",
   "pages": [
     {
       "id": "overview",
@@ -14,12 +14,12 @@
     },
     {
       "id": "settings",
-      "title": "Definições",
+      "title": "Configurações",
       "file": "settings.md"
     },
     {
       "id": "faq",
-      "title": "Perguntas frequentes",
+      "title": "FAQ",
       "file": "faq.md"
     }
   ],

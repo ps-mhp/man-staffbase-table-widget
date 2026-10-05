@@ -1,34 +1,34 @@
 # Table
 
-The Table widget adds a real table to the page—with its
-own table editor that works just like a small spreadsheet program.
-You can format, merge, fill with images, and sort cells
-without any knowledge of HTML.
+The table widget brings a real table to the page — with a
+own table editor, which works like a small table program. 
+Cells can be formatted, joined, filled with images and sorted, 
+without any HTML knowledge. 
 
-Suitable for anything tabular: comparison tables, contact lists,
-key figures, business hours, shift schedules, price lists.
+Suitable for everything in tabular form: comparison tables, contact lists, 
+Key figures, opening hours, shift schedules, price overviews. 
 
-## How a table is structured
+## This is how a table is structured
 
-- The **first row** is the header row. It is highlighted
-  and always remains at the top when sorting.
-- The **first column** is the column header and is also
-  highlighted.
-- The **top-left cell** is the corner between the two and usually remains
-  empty. This is normal—it’s not a mistake.
-- The header row and first column cannot be deleted. If you don’t need them,
-  just leave them blank.
+- The **first line** is the header. It is highlighted
+  and always stays on top when sorting. 
+- The **first column** is the row label and is also
+  highlighted. 
+- The **upper left cell** is the corner between the two and usually remains
+  empty. This is normal, not a bug. 
+- Header and first column cannot be deleted. If you don't need them, 
+  leaves them empty. 
 
-## What Readers See
+## What readers see
 
-The finished table. If it’s wider than the screen, you can
-scroll sideways. If it’s longer than the set number of rows,
-only the first few rows are visible at first, and a button below them reveals the
-rest. Clicking a column header sorts the table for the
-reader—this doesn’t change the saved table.
+The finished table. If it is wider than the screen, it can be
+sideways. If it is longer than the set number of lines,
+only the first few lines are visible at first and a button underneath hides the
+rest. Clicking on a column header sorts the table for the
+reading person — this does not change the saved table. 
 
 ## Where you work
 
-Not in the **Table Data** field, but in the **Table Editor**, which
-opens above it. The field below contains only the technically stored version
-of the table and is never edited manually.
+Not in the **Table Data** field, but in the **Table Editor**, which is located in the
+above it. The field below contains only the technically stored shape
+of the table and is never edited by hand.

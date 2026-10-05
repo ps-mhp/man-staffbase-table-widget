@@ -1,34 +1,34 @@
-# Tabella
+# Tavolo
 
-Il widget Tabella inserisce una vera e propria tabella nella pagina — con un
-proprio editor di tabelle che funziona come un piccolo programma per tabelle.
-Le celle possono essere formattate, unite, riempite con immagini e ordinate,
-senza bisogno di alcuna conoscenza di HTML.
+Il widget della tabella porta una tabella reale sulla pagina — con un
+Un editor di tabelle proprio, che funziona come un programma di tabelle piccole. 
+Le celle possono essere formattate, unite, riempite con immagini e ordinate, 
+senza alcuna conoscenza di HTML. 
 
-Adatto a qualsiasi contenuto tabellare: tabelle comparative, elenchi di referenti,
-indicatori chiave, orari di apertura, turni di lavoro, tabelle dei prezzi.
+Adatto a tutto in forma tabellare: tabelle comparative, liste contatti, 
+Cifre chiave, orari di apertura, orari di turno, panoramiche dei prezzi. 
 
-## Come è strutturata una tabella
+## Ecco come è strutturato un tavolo
 
-- La **prima riga** è l’intestazione. Viene evidenziata
-  e rimane sempre in cima durante l’ordinamento.
-- La **prima colonna** è l’intestazione delle righe e viene anch’essa
-  evidenziata.
-- La **cella in alto a sinistra** è l’angolo tra le due e rimane solitamente
-  vuota. È normale, non è un errore.
-- L’intestazione e la prima colonna non possono essere eliminate. Chi non ne ha bisogno,
-  le lascia vuote.
+- La **prima riga** è l'intestazione (header). È evidenziata
+  E rimane sempre al top quando si ordina. 
+- La **prima colonna** è l'etichetta della riga ed è anche
+  evidenziata. 
+- La **cella in alto a sinistra** è l'angolo tra le due e di solito rimane
+  vuoto. È normale, non un bug. 
+- Intestazione e prima colonna non possono essere cancellate. Se non ti servono, 
+  Li lascia vuoti. 
 
 ## Cosa vedono i lettori
 
-La tabella completa. Se è più larga dello schermo, può essere
-scorretta lateralmente. Se è più lunga del numero di righe impostato,
-inizialmente sono visibili solo le prime righe e un pulsante sotto di esse mostra il
-resto. Cliccando su un'intestazione di colonna si ordina la tabella per il
-lettore — ciò non modifica in alcun modo la tabella salvata.
+Il tavolo finito. Se è più largo dello schermo, può esserlo
+di lato. Se è più lungo del numero di righe stabilito,
+All'inizio sono visibili solo le prime linee e un pulsante sotto nasconde il
+rip. Cliccando su un'intestazione di colonna si ordina la tabella per il
+Persona che legge — Questo non cambia la tabella salvata. 
 
-## Dove si lavora
+## Dove lavori
 
-Non nel campo **Dati tabella**, ma nell’**Editor tabella**, che si
-apre sopra di esso. Il campo sottostante contiene solo la forma tecnicamente salvata
-della tabella e non viene mai modificato manualmente.
+Non nel campo **Dati della Tabella**, ma nell'**Editor Tabella**, che si trova nel
+sopra di essa. Il campo sottostante contiene solo la forma tecnicamente memorizzata
+della tabella e non viene mai editata a mano.

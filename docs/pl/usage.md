@@ -1,93 +1,93 @@
 # Krok po kroku
 
-## Tworzenie pierwszej tabeli
+## Stwórz swój pierwszy stół
 
-1. Umieść widżet **Tabela** na stronie i otwórz ustawienia widżetu.
-   **Edytor tabeli** pojawi się automatycznie nad polem
-   „Dane tabeli”.
-2. **Kliknij dwukrotnie** w komórkę i wpisz tekst. Kliknięcie
-   innej komórki spowoduje zatwierdzenie wprowadzonych danych.
-3. Wpisz nagłówki kolumn w **pierwszym wierszu**.
-4. Brakujące wiersze lub kolumny: zakładka **Komórki** → **Wstaw** → np. „Wiersz
-   poniżej” lub „Kolumna po prawej”.
-5. Kliknij **Zapisz** w prawym górnym rogu. Dopiero wtedy tabela pojawi się w
-   widżecie.
-6. Kliknij **Zamknij**, aby zamknąć edytor i zapisać stronę.
+1. Umieść widget **Tabela** na stronie i dostosuj ustawienia widżetu
+   . **Edytor tabel** automatycznie pojawi się nad
+   "Dane tabelowe". 
+2. **Podwójne kliknięcie** w komórce i wpisanie tekstu. Klikając na
+   Inna komórka przejmuje wejście. 
+3. Wypełnij **pierwszy wiersz** nagłówkami kolumn. 
+4. Brakujące wiersze lub kolumny: Tabulator **Komórki** → **Wstaw** → np. "Wiersz
+   poniżej" lub "Kolumna po prawej". 
+5. Kliknij **Zapisz** w prawym górnym rogu. Dopiero wtedy tabela wyląduje w
+   Widget. 
+6. Wyjście z edytora za pomocą **Zamknij** i zapisz stronę. 
 
-Jeśli obok przycisków widnieje napis **„Niezapisane zmiany”**, oznacza to, że nie zostały one jeszcze
-zapisane — najpierw kliknij „Zapisz”, a dopiero potem „Zamknij”.
+Jeśli obok przycisków pojawia się **"Niezapisane zmiany"**, to jeszcze nie zostało
+— następnie kliknij "Zapisz", a następnie "Zamknij". 
 
-## Przenoszenie istniejącej tabeli z programu Excel lub pliku CSV
+## Skopiuj istniejącą tabelę z Excela lub CSV
 
-1. W edytorze tabel otwórz zakładkę **Dane**.
-2. Kliknij **Importuj** i wybierz plik (`.csv`, `.xlsx` lub
-   `.xls`).
-3. Sprawdź wynik: import **zastępuje całą tabelę**, nic nie jest
-   dodawane na końcu. Z programu Excel zachowane zostaną połączone komórki, pogrubienie/kursywa/
-   podkreślenia, kolory, rozmiary czcionek, wyrównanie oraz indeksy górne i
-   dolne. W przypadku skoroszytu programu Excel wykorzystywany jest **pierwszy
-   arkusz**.
-4. **Zapisz**.
+1. Otwórz zakładkę **Dane** w edytorze tabel. 
+2. Kliknij **Import** i wybierz plik (".csv", ".xlsx" lub
+   '.xls'). 
+3. Sprawdź wynik: Import **zastępuje całą tabelę**, będzie
+   Nic nie dodaję. Z Excela pozostają połączone komórki, pogrubione/kursywa/ 
+   podkreślenie, kolory, rozmiary czcionek, wyrównanie i portret oraz
+   indeksy dolne. W przypadku książki Excel **pierwszy
+   Arkusz kalkulacyjny**. 
+4. **Zapisz**. 
 
-Alternatywnie komórki można również **skopiować i wkleić** bezpośrednio z programu Excel:
-kliknij dwukrotnie w komórkę i wklej — blok zostanie rozłożony od tego miejsca
-na kilka komórek.
+Alternatywnie, komórki mogą być również **kopiowane i wklejone** bezpośrednio z Excela: 
+Kliknij dwukrotnie i wklej do komórki — blok zacznie się w tym miejscu
+rozłożone na kilka komórek. 
 
-## Formatowanie komórek
+## Komórki formatowania
 
-1. Zaznacz komórki do sformatowania: kliknij, przeciągaj z wciśniętym przyciskiem myszy,
-   zaznacz obszar za pomocą klawisza **Shift** lub dodaj kolejne obszary za pomocą klawisza **Ctrl/Cmd**.
-   Za pomocą uchwytów na krawędziach można zaznaczyć całe Za pomocą uchwytów na krawędziach można zaznaczyć całe
-   wiersze, kolumny lub całą tabelę.
-2. Zakładka **Czcionka** służy do ustawiania rozmiaru czcionki, pogrubienia, kursywy, podkreślenia,
-   przekreślenia, indeksu górnego/dolnego oraz koloru czcionki i tła.
-3. Zakładka **Wyrównanie** do ustawienia wyrównania do lewej/do środka/do prawej oraz do góry/do środka/do dołu.
-4. **Zapisz**.
+1. Wybierz komórki do formatowania: kliknij, przytrzymaj przycisk myszy
+   , użyj **Shift** do narysowania obszaru lub **Ctrl/Cmd** 
+   dodatkowe obszary. Uchwyty na krawędzi mogą być używane do
+   Wybierz wiersze, kolumny lub całą tabelę. 
+2. Tabulator **Font** dla rozmiaru czcionki, pogrubiony, kursywa, podkreślenie, 
+   Przekreślone, indeks górny/dolny, czcionka i kolor tła. 
+3. Zakładka **Orientacja** dla lewej/środka/prawej oraz góry/środka/dołu. 
+4. **Zapisz**. 
 
-Aby przenieść formatowanie na kolejne komórki:
+Aby przenieść formatowanie do innych komórek: 
 
-1. Zaznacz już sformatowaną komórkę.
-2. Kliknij kartę **Dane** → **Format**.
-3. Zaznacz komórki docelowe — przejmą one format.
+1. Wybierz już sformatowaną komórkę. 
+2. Kliknij zakładkę **Dane** → **Format**. 
+3. Wybierz komórki docelowe — przyjmą one ten format. 
 
-## Łączenie komórek
+## Połączenie komórek
 
-1. Zaznacz komórki, które chcesz połączyć.
-2. Karta **Komórki** → **Połącz**.
-3. Cofnij operację, klikając **Rozłącz**.
+1. Wybierz komórki do połączenia. 
+2. Zakładka **Komórki** → **Połącz**. 
+3. Cofnij za pomocą **Solve**. 
 
-## Wstawianie obrazu do komórki
+## Wstaw obraz do komórki
 
-1. Zaznacz komórkę.
-2. Zakładka **Obrazy** → **Obraz**. Otworzy się okno wyboru multimediów; tam wybierz
-   istniejący obraz lub prześlij nowy.
-3. Jeśli obrazy mają różne rozmiary: zaznacz wszystkie komórki z obrazami i
-   w opcji **Rozmiar obrazu** wybierz „Taka sama wysokość jak pierwszy obraz” lub „Taka sama
-   szerokość jak pierwszy obraz” (wymagane są co najmniej dwa obrazy).
-   Opcja **Rozmiar domyślny** przywraca domyślne ustawienia.
-4. Jeśli obrazek wykracza poza tabelę, w zakładce **Obrazy** włącz przełącznik **Dopasuj obrazy** —
-   wtedy wszystkie obrazy pozostaną w granicach
-   szerokości tabeli.
+1. Wybierz komórkę. 
+2. Zakładka **Obrazy** → **Obraz**. Otwiera się wybór mediów; jest
+   Wybierz istniejący obraz lub prześlij nowy. 
+3. Jeśli kilka obrazów ma różne rozmiary: wybierz wszystkie komórki obrazowe i
+   via **Rozmiar obrazu** albo "Taki sam wzrost co pierwszy obraz" lub "Taki sam
+   Szerokość jako pierwszy obraz" (wymaga to co najmniej dwóch obrazów). 
+   **Standardowy rozmiar** resetuje. 
+4. Jeśli obraz powiększy stół, w zakładce **Obrazy** przełącz się **Obrazy
+   adjust** — wtedy wszystkie obrazy pozostają w obrębie
+   Szerokość stołu. 
 
-## Sortowanie tabeli
+## Tabela sortowania
 
-1. Zaznacz kolumnę, według której ma odbywać się sortowanie.
-2. Zakładka **Dane** → **Sortuj** → „Rosnąco (ta kolumna)” lub
-   „Malejąco (ta kolumna)”.
-3. **Zapisz**. To sortowanie jest sortowaniem domyślnym dla wszystkich
-   czytelników; nagłówek pozostaje przy tym zawsze na górze.
+1. Wybierz kolumnę, według której chcesz sortować. 
+2. Zakładka **Dane** → **Sort** → "Rosnące (ta kolumna)" lub
+   "Zejście (ta kolumna)". 
+3. **Zachowaj**. To jest początek dla wszystkich
+   czytelnikom; nagłówek zawsze pozostaje na górze. 
 
-## Zwiń długą tabelę
+## Zwal długi stół
 
-1. Otwórz zakładkę **Dane**.
-2. W sekcji **Widoczne wiersze** wprowadź liczbę wierszy danych, które mają być od razu
-   widoczne. Domyślnie jest to 5; `0` zawsze pokazuje wszystkie wiersze.
-3. **Zapisz**. Na stronie pod tabelą pojawi się wówczas przycisk
-   „Pokaż kolejne N wierszy” lub „Pokaż mniej wierszy”.
+1. Otwórz zakładkę **Data**. 
+2. W sekcji **Widoczne wiersze** wpisz liczbę wierszy danych, które będą natychmiast
+   powinno być widoczne. Domyślnie to 5; '0' zawsze pokazuje wszystkie linie. 
+3. **Zapisz**. Następnie na stronie pod stołem pojawi się przycisk
+   "Pokaż więcej N wierszy" lub "Pokaż mniej wierszy". 
 
-## Usuwanie formatowania
+## Usuń formatowanie ponownie
 
-1. Zaznacz odpowiednie komórki.
-2. Zakładka **Dane** → **Formatowanie** i wybierz odpowiednią opcję:
-   usuń wszystko, tylko formatowanie tekstu lub tylko rozmiary obrazów.
+1. Oznacz dotknięte komórki. 
+2. Zakładz zakładkę **Dane** → **Formatowanie** i wybierz odpowiedni wpis: 
+   Usuń wszystko, tylko formatowanie tekstu lub tylko rozmiary obrazów. 
 3. **Zapisz**.

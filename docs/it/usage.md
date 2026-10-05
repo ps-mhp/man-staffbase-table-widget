@@ -1,93 +1,93 @@
 # Passo dopo passo
 
-## Creare la prima tabella
+## Crea il tuo primo tavolo
 
-1. Posizionare il widget **Tabella** sulla pagina e aprire le impostazioni del widget
-  . L’**editor della tabella** appare automaticamente sopra il campo
-  “Dati della tabella”.
-2. **Fare doppio clic** su una cella e digitare il testo. Cliccando su
-   un’altra cella, il testo inserito viene salvato.
-3. Compilare la **prima riga** con le intestazioni delle colonne.
-4. Se mancano righe o colonne: scheda **Celle** → **Inserisci** → ad es. «Riga
-   sotto» o «Colonna a destra».
-5. Clicca in alto a destra su **Salva**. Solo così la tabella verrà inserita nel
-   widget.
-6. Chiudere l’editor con **Chiudi** e salvare la pagina.
+1. Posizionare il widget **Tabella** sulla pagina e regolare le impostazioni del widget
+   . L'**Editor di Tabelle** apparirà automaticamente sopra il
+   "Dati della tabella". 
+2. **Doppio clic** in una cella e digita il testo. Cliccando su
+   un'altra cella prende il controllo dell'ingresso. 
+3. Riempire la **prima riga** con le intestazioni delle colonne. 
+4. Righe o colonne mancanti: tab **Celle** → **Inserimento** → ad esempio "Riga
+   sotto" o "Colonna a destra". 
+5. Clicca su **Salva** nell'angolo in alto a destra. Solo allora la tabella finirà nel
+   Widget. 
+6. Esci dall'editor con **Chiudi** e salva la pagina. 
 
-Se accanto ai pulsanti compare la scritta **«Modifiche non salvate»**, significa che non è stato ancora
-effettuato il salvataggio: in tal caso, cliccare prima su «Salva», poi su «Chiudi».
+Se accanto ai pulsanti c'è scritto **"Modifiche non salvate"**, non è ancora stato
+— poi clicca su "Salva", poi su "Chiudi". 
 
-## Importare una tabella esistente da Excel o CSV
+## Copia una tabella esistente da Excel o CSV
 
-1. Nell’editor delle tabelle, aprire la scheda **Dati**.
-2. Fare clic su **Importa** e selezionare il file (`.csv`, `.xlsx` o
-   `.xls`).
-3. Verificare il risultato: l’importazione **sostituisce l’intera tabella**, non viene
-   aggiunto nulla. Da Excel vengono mantenute le celle unite, il grassetto/corsivo/
-   sottolineati, i colori, le dimensioni dei caratteri, l’allineamento e l’
-  apice e il pedice. Nel caso di una cartella di lavoro Excel, viene utilizzato il **primo
-  foglio di calcolo**.
-4. **Salvare**.
+1. Apri la scheda **Data** nell'editor di tabelle. 
+2. Clicca su **Importa** e seleziona il file ('.csv', '.xlsx' oppure
+   '.xls'). 
+3. Controlla il risultato: l'importazione **sostituisce la tabella completa**, sarà
+   Niente aggiunto. Da Excel, le celle connesse rimangono, grassetto/corsivo/ 
+   sottoline, colori, dimensioni del carattere, allineamento e ritratto e
+   pedici. Nel caso di un libro Excel, il **primo
+   Foglio di calcolo**. 
+4. **Salva**. 
 
-In alternativa, è possibile **copiare e incollare** le celle direttamente da Excel:
-fare doppio clic su una cella e incollare — il blocco verrà distribuito a partire da quel punto
-su più celle.
+In alternativa, le celle possono anche essere **copiate e incollate** direttamente da Excel: 
+Doppio clic e incolla in una cella — il blocco inizierà da quel punto
+distribuiti su più cellule. 
 
-## Formattazione delle celle
+## Formata celle
 
-1. Selezionare le celle da formattare: cliccare, trascinare tenendo premuto il pulsante del mouse,
-   selezionare un’area con **Shift** o aggiungere ulteriori aree con **Ctrl/Cmd**.
-   Tramite le maniglie ai bordi è possibile selezionare intere
-   righe, colonne o l’intera tabella.
-2. Scheda **Caratteri** per dimensione del carattere, grassetto, corsivo, sottolineato,
-   barrato, apice/pedice, colore del carattere e dello sfondo.
-3. Scheda **Allineamento** per allineamento a sinistra/centrato/a destra e in alto/al centro/in basso.
-4. **Salva**.
+1. Seleziona le celle da formattare: clicca, tieni premuto il tasto del mouse
+   , usa **Shift** per disegnare un'area o **Ctrl/Cmd** 
+   aree aggiuntive. Le maniglie sul bordo possono essere usate per
+   Seleziona righe, colonne o l'intera tabella. 
+2. Tab **Font** per la dimensione del carattere, grassetto, corsivo, sottolinea, 
+   Cancellazione, sovrapdice/pedice, font e colore di sfondo. 
+3. Scheda **Orientamento** per sinistra/centro/destra e alto/centro/basso. 
+4. **Salva**. 
 
-Per applicare una formattazione ad altre celle:
+Per trasferire una formattazione ad altre celle: 
 
-1. Selezionare una cella già formattata.
-2. Fare clic sulla scheda **Dati** → **Formato**.
-3. Selezionare le celle di destinazione: queste assumeranno la formattazione.
+1. Seleziona una cella già formattata. 
+2. Clicca sulla scheda **Dati** → **Formatto**. 
+3. Seleziona le celle di destinazione — adotteranno il formato. 
 
-## Unire le celle
+## Cellule di Fusione
 
-1. Selezionare le celle da unire.
-2. Scheda **Celle** → **Unisci**.
-3. Annullare l’operazione con **Seleziona tutto**.
+1. Selezionare le celle da unire. 
+2. Tabula **Celle** → **Connetti**. 
+3. Annulla con **Solve**. 
 
-## Inserire un’immagine in una cella
+## Inserisci immagine in una cella
 
-1. Selezionare la cella.
-2. Scheda **Immagini** → **Immagine**. Si apre la finestra di selezione dei file multimediali; da lì
-   selezionare un’immagine esistente o caricarne una nuova.
-3. Se le immagini hanno dimensioni diverse: selezionare tutte le celle contenenti le immagini e
-   tramite **Dimensioni immagine** scegliere «Stessa altezza della prima immagine» oppure «Stessa
-   larghezza della prima immagine» (per farlo sono necessarie almeno due immagini).
-   **Dimensioni predefinite** ripristina le impostazioni di base.
-4. Se un’immagine supera i limiti della tabella, nella scheda **Immagini** attivare l’opzione **Adatta immagini**
-  : in questo modo tutte le immagini rimarranno all’interno della
-   larghezza della tabella.
+1. Selezionare la cella. 
+2. Scheda **Immagini** → **Immagine**. Si apre la selezione dei media; c'è un
+   Seleziona un'immagine esistente o caricane una nuova. 
+3. Se diverse immagini sono di dimensioni diverse: selezionare tutte le celle immagine e
+   tramite **Dimensione dell'Immagine** o "Stessa altezza della prima immagine" o "Stessa
+   Larghezza come prima immagine" (questo richiede almeno due immagini). 
+   **Dimensione standard** si resetta. 
+4. Se un'immagine fa ingrandire la tabella, nella scheda **Immagini** si cambia **Immagini
+   aright** — quindi tutte le immagini rimangono all'interno del
+   Larghezza del tavolo. 
 
-## Ordinare la tabella
+## Tabella di smistamento
 
-1. Selezionare la colonna in base alla quale si desidera ordinare.
-2. Scheda **Dati** → **Ordina** → “In ordine crescente (questa colonna)” o
-   “In ordine decrescente (questa colonna)”.
-3. **Salva**. Questo ordinamento è quello iniziale per tutti i
-   lettori; l’intestazione rimane sempre in alto.
+1. Seleziona la colonna con cui vuoi ordinare. 
+2. Tab **Data** → **Ordin** → "Ascendente (questa colonna)" oppure
+   "Discendendo (questa colonna)". 
+3. **Salva**. Questo è il primo ordine per tutti
+   lettori; l'intestazione rimane sempre in alto. 
 
-## Comprimere una tabella lunga
+## Collasso il tavolo lungo
 
-1. Aprire la scheda **Dati**.
-2. In **Righe visibili** inserire il numero di righe di dati che devono essere immediatamente
-   visibili. Il valore predefinito è 5; `0` mostra sempre tutte le righe.
-3. **Salva**. Nella pagina apparirà quindi sotto la tabella un pulsante
-   «Mostra altre N righe» o «Mostra meno righe».
+1. Apri la scheda **Data**. 
+2. Sotto **Righe visibili**, inserisci il numero di righe di dati che saranno immediatamente
+   dovrebbe essere visibile. Il valore predefinito è 5; '0' mostra sempre tutte le linee. 
+3. **Salva**. Un pulsante apparirà quindi sulla pagina sotto la tabella
+   "Mostra più N righe" o "Mostra meno righe". 
 
-## Rimuovere la formattazione
+## Rimuovi di nuovo la formattazione
 
-1. Selezionare le celle interessate.
-2. Scheda **Dati** → **Formattazione** e selezionare l’opzione appropriata:
-   rimuovere tutto, solo la formattazione del testo o solo le dimensioni delle immagini.
+1. Segna le cellule interessate. 
+2. Scheda **Data** → **Formatting** e seleziona la voce appropriata: 
+   Rimuovi tutto, solo la formattazione del testo o solo le dimensioni delle immagini. 
 3. **Salva**.

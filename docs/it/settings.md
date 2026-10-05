@@ -1,34 +1,34 @@
-# Impostazioni
+# Ambientazioni
 
-Nella finestra di dialogo di configurazione è presente, tecnicamente, un solo campo: **Dati tabella**.
-In esso è presente la tabella nella forma salvata; la modifica avviene
-esclusivamente tramite l’**editor di tabelle**, che si apre automaticamente
-sopra di essa. Una volta chiuso l’editor, il pulsante **Modifica tabella**
-lo riporta in primo piano.
+Nella finestra di dialogo di configurazione, tecnicamente c'è un solo campo — **Table Data**. 
+Contiene la tabella in forma salvata; è modificata
+esclusivamente tramite il **Table Editor**, che automaticamente
+. Una volta chiuso l'editor, il pulsante **Table lo porta
+modifica** Torna. 
 
-## Barra superiore dell’editor
+## Barra di intestazione dell'editor
 
-| Pulsante | Funzione |
+| Pulsante | Impatto |
 | --- | --- |
-| Salva | Trasferisce lo stato attuale al widget. Se non si clicca qui, tutto andrà perso. |
-| Aiuto | Apre la guida rapida per ogni funzione direttamente nell’editor. |
-| Chiudi | Esce dall’editor **senza** salvare. |
-| «Modifiche non salvate» | Testo di avviso accanto ai pulsanti: ci sono ancora delle modifiche in sospeso. |
+| Salva | Trasferisce lo stato corrente al widget. Senza cliccarci, tutto andrà perso. |
+| Aiuto | Apre l'aiuto rapido per ogni funzione direttamente nell'editor. |
+| Chiudi | Lascia l'editor **senza** salvare. |
+| "Modifiche non salvate" | Nota il testo accanto ai pulsanti: C'è ancora qualcosa in sospeso. |
 
-## Schede della barra degli strumenti
+## Scheda della barra degli strumenti
 
-| Scheda | Cosa contiene |
+| Reiter | Cosa c'è dentro |
 | --- | --- |
-| Carattere | Dimensione carattere (predefinita, 10–32), ingrandisci/riduci carattere, grassetto, corsivo, sottolineato, barrato, apice, pedice, colore carattere, colore sfondo. |
-| Allineamento | Allineamento a sinistra, centrato, allineamento a destra, nonché in alto, al centro, in basso. |
-| Celle | Unire, separare, inserire (riga sopra/sotto, colonna a sinistra/a destra), eliminare (riga/e, colonna/e). |
-| Immagini | Inserisci immagine nella cella, Adegua dimensioni immagine (stessa altezza/larghezza della prima immagine, dimensione predefinita), pulsante «Adatta immagini». |
-| Dati | Ordina (in ordine crescente, decrescente, rimuovi ordinamento), copia formato, righe visibili, rimuovi formattazione, importa. |
+| Font | Dimensione del font (predefinita, 10–32), aumenta/diminuisce il carattere, grassetto, corsivo, sottolineato, trabattuto, sovrapdice, acritice, colore del font, colore di sfondo. |
+| Orientamento | Allineato a sinistra, centrato, allineato a destra così come in alto, centro, basso. |
+| Celle | Unisci, stacca, inserisci (riga sopra/basso, colonna sinistra/destra), elimina (riga/e, colonna/e). |
+| Immagini | Inserisci l'immagine nella cella, regola le dimensioni dell'immagine (stessa altezza/larghezza della prima immagine, dimensione predefinita), pulsante "Modifica immagini". |
+| Dati | Ordina (ascendente, discendente, rimuovi ordinamento), copia formattazione, linee visibili, rimuovi la formattazione, importa. |
 
 ## Impostazioni con effetti collaterali
 
-| Impostazione | Descrizione |
+| Ambientazione | Descrizione |
 | --- | --- |
-| Righe visibili (scheda «Dati») | Numero di righe di dati immediatamente visibili sulla pagina; il resto è nascosto dietro un pulsante di visualizzazione. Impostazione predefinita 5, `0` significa «sempre tutte le righe». L’intestazione non viene conteggiata. |
-| Adatta immagini (scheda «Immagini») | Se attivata, tutte le immagini rimangono entro la larghezza della tabella. Se disattivata, ogni immagine appare nelle sue dimensioni originali — e può superare i limiti della tabella. |
-| Copia formato (scheda «Dati») | Applica il formato della selezione corrente alle celle selezionate successivamente. |
+| Righe visibili (scheda "Dati") | Numero di righe di dati visibili immediatamente sulla pagina; il resto è dietro un pulsante di mostra. Default 5, '0' significa "sempre tutte le righe". L'intestazione non conta. |
+| Regolazione delle immagini (scheda Immagini) | Quando è attivata, tutte le immagini rimangono entro la larghezza della tabella. Quando è disattivata, ogni immagine appare nella sua dimensione originale — e può far ingrandire la tabella. |
+| Copia Formato (scheda Dati) | Trasferisce il formato della selezione corrente alle celle selezionate successivamente. |

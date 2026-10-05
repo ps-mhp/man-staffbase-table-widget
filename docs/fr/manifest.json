@@ -1,6 +1,6 @@
 {
   "title": "Tableau",
-  "summary": "Intègre un tableau formatable — avec son propre éditeur, l'importation de fichiers Excel/CSV et des images dans les cellules.",
+  "summary": "Intègre une table formatable — avec son propre éditeur, importation Excel/CSV et images dans les cellules.",
   "pages": [
     {
       "id": "overview",
@@ -14,7 +14,7 @@
     },
     {
       "id": "settings",
-      "title": "Paramètres",
+      "title": "Décors",
       "file": "settings.md"
     },
     {

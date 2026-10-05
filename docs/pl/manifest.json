@@ -1,6 +1,6 @@
 {
   "title": "Tabela",
-  "summary": "Osadza tabelę z możliwością formatowania — z własnym edytorem, funkcją importu z Excela i plików CSV oraz obrazami w komórkach.",
+  "summary": "Osadza formatowalny system — z własnym edytorem, importem Excel/CSV i obrazami w komórkach.",
   "pages": [
     {
       "id": "overview",
@@ -19,7 +19,7 @@
     },
     {
       "id": "faq",
-      "title": "Najczęściej zadawane pytania",
+      "title": "FAQ",
       "file": "faq.md"
     }
   ],

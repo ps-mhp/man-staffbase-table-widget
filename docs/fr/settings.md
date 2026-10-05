@@ -1,34 +1,34 @@
-# Paramètres
+# Décors
 
-Dans la boîte de dialogue de configuration, il n'y a techniquement qu'un seul champ : **Données du tableau**.
-Celle-ci contient le tableau sous sa forme enregistrée ; sa modification s’effectue
-exclusivement via l’**éditeur de tableau**, qui s’ouvre automatiquement par-dessus
-. Une fois l’éditeur fermé, le bouton **Modifier le tableau**
-permet de le rouvrir.
+Dans la boîte de configuration de dialogue, il n’y a techniquement qu’un seul champ — **Table Data**. 
+Il contient le tableau en forme sauvegardée ; il est édité
+exclusivement via l'**Éditeur de table**, qui est automatiquement
+. Une fois l’éditeur fermé, le bouton **Table l’amène
+Édit** En arrière. 
 
-## Barre d’en-tête de l’éditeur
+## Barre-en-tête de l’éditeur
 
-| Bouton | Effet |
+| Bouton | Impact |
 | --- | --- |
-| Enregistrer | Transfère l’état actuel vers le widget. Si vous ne cliquez pas ici, tout sera perdu. |
-| Aide | Ouvre l’aide contextuelle de chaque fonction directement dans l’éditeur. |
-| Fermer | Quitte l’éditeur **sans** enregistrer. |
-| « Modifications non enregistrées » | Texte d’avertissement à côté des boutons : il reste encore des modifications à enregistrer. |
+| Enregistrer | Transfère l’état actuel dans le widget. Sans cliquer dessus, tout sera perdu. |
+| Aide | Ouvre l’aide rapide pour chaque fonction directement dans l’éditeur. |
+| Fermer | Laisse l’éditeur **sans** sauvegarder. |
+| « Modifications non enregistrées » | Note le texte à côté des boutons : Il reste encore quelque chose en attente. |
 
-## Onglets de la barre d’outils
+## Onglet barre d’outils
 
-| Onglet | Ce qu’il contient |
+| Reiter | Qu’est-ce qu’il y a dedans ?
 | --- | --- |
-| Police | Taille de police (par défaut, 10–32), agrandir/réduire la police, gras, italique, souligné, barré, exposant, indice, couleur de police, couleur d’arrière-plan. |
-| Alignement | Aligné à gauche, centré, aligné à droite, ainsi qu’en haut, au milieu, en bas. |
-| Cellules | Fusionner, séparer, insérer (ligne au-dessus/en dessous, colonne à gauche/à droite), supprimer (ligne(s), colonne(s)). |
-| Images | Insérer une image dans une cellule, ajuster la taille des images (même hauteur/largeur que la première image, taille par défaut), bouton « Ajuster les images ». |
-| Données | Trier (par ordre croissant, décroissant, supprimer le tri), copier le format, lignes visibles, supprimer la mise en forme, importer. |
+| Police | Taille de police (par défaut, 10–32), augmenter/diminuer la police, gras, italique, souligner, rayure, exposer, indice, couleur de police, couleur de fond. |
+| Orientation | Aligné à gauche, centré, aligné à droite ainsi qu’en haut, centre, bas. |
+| Cellules | Joindre, détacher, insérer (ligne haut/bas, colonne gauche/droite), supprimer (ligne(s), colonne(s)). |
+| Images | Insérer l’image dans la cellule, ajuster la taille des images (même hauteur/largeur que la première image, taille par défaut), bouton « Ajuster les images ». |
+| Données | Trier (ascendant, descendant, retirer le tri), copier format, lignes visibles, supprimer la mise en forme, importer. |
 
-## Paramètres ayant des effets secondaires
+## Réglages avec effets secondaires
 
-| Paramètre | Description |
+| Cadre | Description |
 | --- | --- |
-| Lignes visibles (onglet « Données ») | Nombre de lignes de données immédiatement visibles sur la page ; le reste est masqué derrière un bouton d’affichage. Valeur par défaut : 5, `0` signifie « toujours toutes les lignes ». L’en-tête n’est pas pris en compte. |
-| Ajuster les images (onglet « Images ») | Lorsque cette option est activée, toutes les images s’adaptent à la largeur du tableau. Lorsqu’elle est désactivée, chaque image s’affiche dans sa taille d’origine — et peut déborder du tableau. |
-| Copier le format (onglet « Données ») | Applique le format de la sélection actuelle aux cellules sélectionnées ensuite. |
+| Lignes visibles (onglet « Données ») | Nombre de lignes de données visibles immédiatement sur la page ; le reste se trouve derrière un bouton d’affichage. Par défaut 5, « 0 » signifie « toujours toutes les lignes ». L’en-tête ne compte pas. |
+| Ajustement des images (onglet Images) | Lorsqu’elle est activée, toutes les images restent dans la largeur de la table. Lorsqu’elles sont désactivées, chaque image apparaît à sa taille d’origine — et peut agrandir la table. |
+| Copie du format (onglet Données) | Transfert du format de la sélection actuelle vers les cellules sélectionnées ensuite. |

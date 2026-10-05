@@ -1,34 +1,34 @@
 # Instellingen
 
-In het configuratievenster is er technisch gezien slechts één veld: **Tabelgegevens**.
-Daarin staat de tabel in opgeslagen vorm; deze wordt
-uitsluitend bewerkt via de **tabeleditor**, die automatisch erboven
-wordt geopend. Als de editor eenmaal is gesloten, kunt u deze met de knop **Tabel
-bewerken** weer openen.
+In het configuratiemenu is er technisch gezien maar één veld — **Tabel Data**. 
+Het bevat de tabel in opgeslagen vorm; het is bewerkt
+uitsluitend via de **Table Editor**, die automatisch
+. Zodra de editor gesloten is, brengt de **Table-knop hem
+Edit** terug. 
 
-## Bovenbalk van de editor
+## Editor headerbalk
 
-| Knop | Functie |
+| Knop | Impact |
 | --- | --- |
-| Opslaan | Geeft de huidige status door aan de widget. Zonder hierop te klikken gaat alles verloren. |
-| Help | Opent de korte helptekst bij elke functie direct in de editor. |
-| Sluiten | Sluit de editor af, **zonder** op te slaan. |
-| „Niet-opgeslagen wijzigingen“ | Informatietekst naast de knoppen: er zijn nog wijzigingen die niet zijn opgeslagen. |
+| Opslaan | Zet de huidige staat over naar de widget. Zonder erop te klikken, gaat alles verloren. |
+| Help | Opent de snelle hulp voor elke functie direct in de editor. |
+| Sluit | Laat de editor **zonder** opslaan. |
+| "Niet-opgeslagen wijzigingen" | Let op tekst naast de knoppen: Er is nog iets in behandeling. |
 
-## Tabbladen van de werkbalk
+## Toolbar-tabblad
 
-| Tabblad | Wat erin staat |
+| Reiter | Wat zit erin |
 | --- | --- |
-| Lettertype | Lettergrootte (standaard, 10–32), lettertype vergroten/verkleinen, vet, cursief, onderstreept, doorgestreept, superscript, subscript, letterkleur, achtergrondkleur. |
-| Uitlijning | Links uitgelijnd, gecentreerd, rechts uitgelijnd, evenals boven, midden, onder. |
-| Cellen | Samenvoegen, splitsen, invoegen (rij boven/onder, kolom links/rechts), verwijderen (rij(en), kolom(men)). |
-| Afbeeldingen | Afbeelding in cel invoegen, afbeeldingsgroottes aanpassen (zelfde hoogte/breedte als eerste afbeelding, standaardgrootte), schakelaar „Afbeeldingen aanpassen“. |
-| Gegevens | Sorteren (oplopend, aflopend, sortering verwijderen), opmaak kopiëren, zichtbare rijen, opmaak verwijderen, importeren. |
+| Lettertype | Lettergrootte (standaard, 10–32), lettertype vergroten/verkleinen, vet, cursief, onderstrepen, doorstrepen, superscript, subscript, lettertypekleur, achtergrondkleur. |
+| Oriëntatie | Links-uitgelijnd, gecentreerd, rechts-uitgelijnd, evenals boven, midden, onder. |
+| Cellen | Verbinden, loskoppelen, invoegen (rij boven/onder, kolom links/rechts), verwijderen (rij(en), kolom(en)). |
+| Afbeeldingen | Afbeelding in cel plaatsen, beeldgroottes aanpassen (zelfde hoogte/breedte als de eerste afbeelding, standaardgrootte), knop "Afbeeldingen aanpassen". |
+| Data | Sorteren (stijgend, dalend, sortering verwijderen), kopiëren, opmaken, lijnen zichtbaar maken, opmaak verwijderen, importeren. |
 
-## Instellingen met neveneffecten
+## Instellingen met bijwerkingen
 
-| Instelling | Beschrijving |
+| Setting | Beschrijving |
 | --- | --- |
-| Zichtbare rijen (tabblad „Gegevens“) | Aantal gegevensrijen dat direct op de pagina te zien is; de rest is verborgen achter een knop om weer te geven. Standaardinstelling 5, `0` betekent „altijd alle rijen“. De kopregel telt niet mee. |
-| Afbeeldingen aanpassen (tabblad „Afbeeldingen“) | Indien ingeschakeld blijven alle afbeeldingen binnen de tabelbreedte. Indien uitgeschakeld verschijnt elke afbeelding in zijn oorspronkelijke grootte — en kan de tabel uit zijn kanten lopen. |
-| Opmaak kopiëren (tabblad „Gegevens“) | Past de opmaak van de huidige selectie toe op de volgende geselecteerde cellen. |
+| Zichtbare rijen (tabblad "Data") | Aantal datarijen dat direct op de pagina zichtbaar is; de rest bevindt zich achter een toonknop. Standaard 5, '0' betekent "altijd alle rijen". De header telt niet mee. |
+| Afbeeldingen aanpassen (tabblad Afbeeldingen) | Wanneer ingeschakeld, blijven alle afbeeldingen binnen de tabelbreedte. Wanneer deze is uitgeschakeld, verschijnt elke afbeelding in zijn oorspronkelijke formaat — en kan de tabel vergroten. |
+| Kopieer Formaat (Gegevenstab) | Draagt het formaat van de huidige selectie over naar de volgende geselecteerde cellen. |

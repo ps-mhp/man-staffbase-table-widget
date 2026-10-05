@@ -1,34 +1,34 @@
-# Ajustes
+# Escenarios
 
-En el cuadro de diálogo de configuración solo hay un campo, técnicamente: **Datos de la tabla**.
-En él aparece la tabla tal y como se ha guardado; su edición se realiza
-exclusivamente a través del **editor de tablas**, que se abre automáticamente
-encima de ella. Una vez cerrado el editor, el botón **Editar tabla**
-lo vuelve a abrir.
+En el diálogo de configuración, técnicamente solo hay un campo — **Table Data**. 
+Contiene la tabla en forma guardada; está editada
+exclusivamente a través del **Editor de Tablas**, que automáticamente
+. Una vez cerrado el editor, el botón **Table lo activa
+edición** de vuelta. 
 
-## Barra de herramientas del editor
+## Barra de cabecera del editor
 
-| Botón | Función |
+| Botón | Impacto |
 | --- | --- |
-| Guardar | Transfiere el estado actual al widget. Si no se hace clic aquí, se perderá todo. |
+| Guardar | Transfiere el estado actual al widget. Sin hacer clic en él, todo se perderá. |
 | Ayuda | Abre la ayuda rápida de cada función directamente en el editor. |
-| Cerrar | Sale del editor **sin** guardar. |
-| «Cambios no guardados» | Texto informativo junto a los botones: aún hay cambios pendientes. |
+| Cerrar | Deja al editor **sin** guardando. |
+| "Cambios no guardados" | Nota el texto junto a los botones: Todavía hay algo pendiente. |
 
-## Pestañas de la barra de herramientas
+## Pestaña de barra de herramientas
 
-| Pestaña | Qué contiene |
+| Reiter | ¿Qué lleva dentro?
 | --- | --- |
-| Fuente | Tamaño de fuente (predeterminado, 10–32), aumentar/reducir el tamaño de la fuente, negrita, cursiva, subrayado, tachado, superíndice, subíndice, color de fuente, color de fondo. |
-| Alineación | Alineado a la izquierda, centrado, alineado a la derecha, así como arriba, en el centro y abajo. |
-| Celdas | Unir, separar, insertar (fila superior/inferior, columna izquierda/derecha), eliminar (fila(s), columna(s)). |
-| Imágenes | Insertar imagen en celda, ajustar el tamaño de las imágenes (misma altura/anchura que la primera imagen, tamaño predeterminado), botón «Ajustar imágenes». |
-| Datos | Ordenar (ascendente, descendente, eliminar ordenación), copiar formato, filas visibles, eliminar formato, importar. |
+| Fuente | Tamaño de fuente (por defecto, 10–32), aumentar/disminuir la fuente, negrita, cursiva, subrayado, tachado, superíndice, subíndice, color de fuente, color de fondo. |
+| Orientación | Alineado a la izquierda, centrado, alineado a la derecha, así como arriba, centro, abajo. |
+| Celdas | Unir, desacoplar, insertar (fila arriba/abajo, columna izquierda/derecha), eliminar (fila(s), columna(s)). |
+| Imágenes | Inserta la imagen en la celda, ajusta el tamaño de la imagen (misma altura/ancho que la primera imagen, tamaño por defecto), botón de "Ajustar imágenes". |
+| Datos | Ordenar (ascendente, descendente, eliminar ordenación), copiar formato, líneas visibles, eliminar formato, importar. |
 
 ## Ajustes con efectos secundarios
 
-| Ajuste | Descripción |
+| Ambientación | Descripción |
 | --- | --- |
-| Filas visibles (pestaña «Datos») | Número de filas de datos que se ven inmediatamente en la página; el resto se oculta tras un botón de visualización. El valor predeterminado es 5; `0` significa «siempre todas las filas». La fila de encabezado no cuenta. |
-| Ajustar imágenes (pestaña «Imágenes») | Si está activada, todas las imágenes se ajustan al ancho de la tabla. Si está desactivada, cada imagen aparece en su tamaño original, lo que puede hacer que la tabla se salga de los límites. |
-| Copiar formato (pestaña «Datos») | Aplica el formato de la selección actual a las siguientes celdas seleccionadas. |
+| Filas visibles (pestaña "Datos") | Número de filas de datos que pueden verse inmediatamente en la página; el resto está detrás de un botón de mostrar. Por defecto 5, '0' significa "siempre todas las filas". El encabezado no cuenta. |
+| Ajustando imágenes (pestaña Imágenes) | Cuando está activada, todas las imágenes permanecen dentro del ancho de la tabla. Cuando está desactivada, cada imagen aparece en su tamaño original — y puede ampliar la tabla. |
+| Copiar Formato (pestaña de datos) | Transfiere el formato de la selección actual a las celdas seleccionadas a continuación. |

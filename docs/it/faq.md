@@ -1,91 +1,91 @@
-# Domande frequenti
+# FAQ
 
-**Domanda:** Al posto dell'editor di tabelle vedo solo un campo di testo con
-contenuto criptico che inizia con `b64:`.
+**Domanda:** Invece dell'editor di tabelle, vedo solo un campo di testo con
+contenuti criptici che iniziano con 'b64:'. 
 
-Risposta: Si tratta del campo **Dati tabella** — la forma salvata della
-tabella, che normalmente viene coperta dall’editor. Non modificare mai manualmente
-questo testo. Cliccando su **Modifica tabella** o riaprendo la
-finestra di dialogo, l’editor verrà ripristinato. La codifica protegge la tabella dal
-rischio di essere danneggiata dalla traduzione automatica della pagina.
+Risposta: Questo è il campo **Table Data** — la forma memorizzata del
+Tabella che di solito copre l'editor. Non usare mai questo testo a mano
+modifica. Clicca su **Modifica tabella** o riapri il
+Il dialogo recupera l'editor. La codifica protegge la tabella dall'essere
+Traduzione automatica delle pagine. 
 
-**Domanda:** Le mie modifiche sono sparite dopo la chiusura.
+**Domanda:** I miei cambiamenti sono spariti dopo la chiusura. 
 
-Risposta: **Chiudi** non salva. Prima di chiudere, clicca sempre su
-**Salva** — finché accanto ai pulsanti compare la dicitura «Modifiche non salvate»,
-significa che c’è qualcosa di aperto.
+Risposta: **Chiudi** non salva. Imposta sempre prima della chiusura
+**Salva** — finché "Modifiche non salvate" accanto ai pulsanti
+è piuttosto aperto. 
 
-**Domanda:** Come faccio a scrivere in una cella?
+**Domanda:** Come si scrive in una cella? 
 
-Risposta: **Fai doppio clic** sulla cella, poi digita. Un semplice clic
-seleziona solo la cella (per la formattazione), non la apre per la
-modifica.
+Risposta: **Doppio clic** nella cella, poi tocco. Un semplice clic
+seleziona solo la cella (per la formattazione), non la apre per
+Modifica. 
 
-**Domanda:** Non riesco a cancellare la prima riga o la prima colonna.
+**Domanda:** Non posso cancellare la prima riga o colonna. 
 
-Risposta: È previsto così: la prima riga è l’intestazione, la prima
-colonna è l’etichetta della colonna. Se non servono, basta lasciarle
-vuote.
+Risposta: Ecco come è inteso: la prima riga è l'intestazione principale, la prima è il
+colonna l'etichetta della riga. Se non sono necessarie, basta vuotare
+. 
 
-**Domanda:** Quali formati di file posso importare?
+**Domanda:** Quali formati di file posso importare? 
 
-Risposta: `.csv` e `.xlsx`/`.xls`. Nel formato CSV, il punto e virgola e la virgola vengono
-riconosciuti automaticamente come separatori. Per i file Excel viene importato il primo foglio di lavoro
-, comprese le celle unite, la formattazione del testo, i colori, le dimensioni dei caratteri
-e l’allineamento. Un’importazione **sostituisce sempre l’intera tabella**.
+Risposta: '.csv' e '.xlsx'/'.xls'. In CSV, punto e virgola sono usati come
+i separatori vengono rilevati automaticamente. In Excel, il primo foglio di lavoro
+Inclusi celle connesse, formattazione del testo, colori, dimensioni dei font
+e allineamento. Un'importazione **sostituisce sempre l'intera tabella**. 
 
-**Domanda:** Viene visualizzato il messaggio «Importazione non riuscita».
+**Domanda:** "Importazione fallita" appare. 
 
-Risposta: Non è stato possibile leggere il file. Verificare che si tratti effettivamente di un
-file `.csv`, `.xlsx` o `.xls` (non ad esempio un file rinominato o
-protetto da password) e che contenga dei dati. Se necessario,
-salvarlo nuovamente in formato `.xlsx` in Excel.
+Risposta: Il file non poteva essere letto. Controlla se esiste davvero un
+'.csv', '.xlsx' o '.xls' (non un rinominato o
+file protetti da password) e se contenga contenuti. In Excel se necessario
+Salva di nuovo come '.xlsx'. 
 
-**Domanda:** Nella pagina non vengono visualizzate tutte le righe.
+**Domanda:** Non tutte le righe sono visualizzate sulla pagina. 
 
-Risposta: Si tratta dell’impostazione **Righe visibili** (scheda “Dati”),
-impostata di default su 5 righe di dati. Il resto appare tramite il pulsante sotto
-la tabella. Se si desidera che tutte le righe siano visibili fin dall’inizio, impostare il valore su `0`
-.
+Risposta: Questa è l'impostazione **Righe visibili** (scheda "Data"), 
+impostato a 5 righe dati. Il resto appare tramite il pulsante sottostante
+tabella. Se vuoi che tutte le righe siano visibili dall'inizio, imposta il valore a '0'
+. 
 
-**Domanda:** Un'immagine occupa l'intera tabella.
+**Domanda:** Una foto fa esplodere tutto il tavolo. 
 
-Risposta: Nella scheda **Immagini**, attivare l'opzione **Adatta immagini**.
-Questa opzione limita tutte le immagini alla larghezza della tabella. Se disattivata, ogni
-immagine appare nelle sue dimensioni originali.
+Risposta: Nella scheda **Immagini**, attiva l'interruttore **Regola immagini**. 
+Limita tutte le immagini alla larghezza della tabella. Quando è disattivato, ciascuno
+Immagine nella sua dimensione originale. 
 
-**Domanda:** Diverse immagini hanno dimensioni diverse.
+**Domanda:** Diverse foto sono di dimensioni diverse. 
 
-Risposta: Selezionare tutte le celle delle immagini e, nella scheda **Immagini** sotto
-**Dimensioni immagine**, selezionare «Stessa altezza della prima immagine» o «Stessa larghezza della prima
-immagine». Devono essere selezionate almeno due immagini.
+Risposta: Seleziona tutte le celle immagine e selezionale nella scheda **Immagini** sotto
+**Dimensione dell'immagine** "Altezza della prima immagine" oppure "Larghezza della prima immagine"
+Immagine". Almeno due immagini devono essere evidenziate. 
 
-**Domanda:** Un lettore ha ordinato la tabella in modo diverso da come l’ho salvata
-io.
+**Domanda:** Un lettore ha ordinato la tabella in modo diverso da come l'avevo salvata
+. 
 
-Risposta: Nella pagina pubblicata, ogni lettore può riordinare la tabella cliccando
-sull’intestazione di una colonna. Ciò vale solo per la sua visualizzazione
-e non modifica la tabella salvata. L’ordinamento impostato nell’editor
-rimane la visualizzazione iniziale.
+Risposta: Nella pagina pubblicata, chiunque legga può cliccare sulla
+a un'intestazione di colonna stessa. Questo si applica solo alla loro vista
+e non cambia la tabella salvata. Il tuo set di ordinamento nell'editor
+La visuale di partenza rimane. 
 
-**Domanda:** Posso inserire un link in una cella?
+**Domanda:** Posso mettere un link in una cella? 
 
-Risposta: No. Le celle accettano testo, immagini e caratteri in apice o pedice,
-ma non i collegamenti. I link devono essere inseriti in un elemento di testo accanto alla tabella.
+Risposta: No. Le celle prendono testo, immagini e sovrappedi/adice, 
+ma nessun link. I link devono stare in un elemento di testo accanto al tavolo. 
 
-**Domanda:** C’è la funzione “Annulla”?
+**Domanda:** Esiste qualcosa come "annulla"? 
 
-Risposta: No. Per questo motivo, in caso di modifiche significative, salvare di tanto in tanto — e
-prima di un’importazione, ricordarsi che questa sostituirà l’intera tabella.
+Risposta: No. Pertanto, si conserva nel mezzo per grandi ristrutturazioni — e
+Prima di importare, ricorda che sostituisce l'intera tabella. 
 
 **Domanda:** Cosa succede alla mia tabella durante la traduzione automatica
-della pagina?
+del sito? 
 
-Risposta: Vengono tradotti solo i contenuti delle celle. Le celle unite,
-la formattazione, le immagini e l’ordinamento rimangono invariati.
+Risposta: Solo il contenuto delle celle viene tradotto. Celle connesse, 
+Formattazione, immagini e ordinamento rimangono invariati. 
 
-**Domanda:** La tabella è troppo larga sul cellulare.
+**Domanda:** Il tavolo è troppo largo su mobile. 
 
-Risposta: È possibile scorrerla lateralmente. Per gli schermi stretti è utile
-unire le colonne, utilizzare intestazioni più brevi o rimuovere le immagini di grandi
-dimensioni dalle celle.
+Risposta: Può essere spinto lateralmente. Per schermi stretti, aiuta 
+Unisci colonne, usa titoli più corti o usa grandi
+Per scattare foto dalle celle.

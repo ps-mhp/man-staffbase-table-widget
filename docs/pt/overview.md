@@ -1,34 +1,34 @@
-# Tabela
+# Mesa
 
-O widget de tabela insere uma tabela real na página — com um
-editor de tabelas próprio, que funciona como um pequeno programa de tabelas.
-É possível formatar, unir, preencher com imagens e ordenar as células,
-sem qualquer conhecimento de HTML.
+O widget de tabela traz uma tabela real para a página — com um
+Editor de tabelas próprio, que funciona como um programa de tabelas pequenas. 
+Células podem ser formatadas, unidas, preenchidas com imagens e organizadas, 
+sem nenhum conhecimento de HTML. 
 
-Adequado para tudo o que seja apresentado em tabela: tabelas comparativas, listas de contactos,
-indicadores, horários de funcionamento, horários de turnos, tabelas de preços.
+Adequado para tudo em forma tabular: tabelas comparativas, listas de contatos, 
+Números-chave, horários de funcionamento, horários de turnos, visão geral de preços. 
 
-## Como está estruturada uma tabela
+## É assim que uma mesa é estruturada
 
-- A **primeira linha** é o cabeçalho. É apresentada em destaque
-  e permanece sempre no topo quando se ordena.
-- A **primeira coluna** é o título da linha e também é
-  destacada.
-- A **célula superior esquerda** é o canto entre ambas e fica normalmente
-  em branco. Isto é normal, não é um erro.
-- O cabeçalho e a primeira coluna não podem ser eliminados. Quem não precisar deles,
-  deve deixá-los em branco.
+- A **primeira linha** é o cabeçalho. Ela é destacada
+  E sempre fica no topo na hora de organizar. 
+- A **primeira coluna** é o rótulo da linha e também é
+  destacado. 
+- A **célula superior esquerda** é o canto entre as duas e geralmente permanece
+  vazio. Isso é normal, não é um bug. 
+- Cabeçalho e primeira coluna não podem ser excluídos. Se você não precisar, 
+  deixa tudo vazio. 
 
 ## O que os leitores veem
 
-A tabela finalizada. Se for mais larga do que o ecrã, pode ser
-deslocada lateralmente. Se for mais comprida do que o número de linhas definido,
-inicialmente apenas as primeiras linhas ficam visíveis e um botão por baixo mostra o
-resto. Um clique num título de coluna ordena a tabela para o
-leitor — isso não altera a tabela guardada.
+A mesa acabada. Se for mais larga que a tela, pode ser
+de lado. Se for maior que o número estabelecido de linhas,
+apenas as primeiras linhas são visíveis no início e um botão abaixo esconde o
+descanso. Clicar em um cabeçalho de coluna ordena a tabela para o
+Pessoa que lê — Isso não altera a tabela salva. 
 
-## Onde trabalhar
+## Onde você trabalha
 
-Não no campo **Dados da tabela**, mas sim no **Editor de tabelas**, que se
-abre por cima. O campo abaixo contém apenas a forma tecnicamente guardada
-da tabela e nunca é editado manualmente.
+Não no campo **Table Data**, mas no **Table Editor**, que está localizado no
+acima. O campo abaixo contém apenas a forma tecnicamente armazenada
+da tabela e nunca é editada à mão.

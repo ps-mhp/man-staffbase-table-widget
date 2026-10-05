@@ -1,34 +1,34 @@
-# Definições
+# Configurações
 
-Na caixa de diálogo de configuração, existe, tecnicamente, apenas um campo — **Dados da tabela**.
-Nele encontra-se a tabela na sua forma guardada; a sua edição é feita
-exclusivamente através do **Editor de tabelas**, que se abre automaticamente
-por cima. Se o editor for fechado, o botão **Editar tabela**
-reabre-o.
+No diálogo de configuração, tecnicamente há apenas um campo — **Table Data**. 
+Ela contém a tabela em forma salva; é editada
+exclusivamente via o **Editor de Tabelas**, que automaticamente
+. Quando o editor está fechado, o botão **Table o traz
+edit** de volta. 
 
-## Barra de ferramentas do editor
+## Barra de cabeçalho do editor
 
-| Botão | Efeito |
+| Botão | Impacto |
 | --- | --- |
-| Guardar | Transfere o estado atual para o widget. Se não clicar aqui, tudo se perde. |
+| Salvar | Transfere o estado atual para o widget. Sem clicar nele, tudo será perdido. |
 | Ajuda | Abre a ajuda rápida para cada função diretamente no editor. |
-| Fechar | Sai do editor, **sem** guardar. |
-| «Alterações não guardadas» | Texto informativo ao lado dos botões: ainda há algo por fazer. |
+| Fechar | Deixa o editor **sem** salvando. |
+| "Alterações Não Salvas" | Note o texto ao lado dos botões: Ainda há algo pendente. |
 
-## Separadores da barra de ferramentas
+## Aba da barra de ferramentas
 
-| Separador | O que contém |
+| Reiter | O que tem nele |
 | --- | --- |
-| Tipo de letra | Tamanho da letra (padrão, 10–32), aumentar/diminuir o tamanho da letra, negrito, itálico, sublinhado, riscado, sobrescrito, subscrito, cor da letra, cor de fundo. |
-| Alinhamento | Alinhado à esquerda, centralizado, alinhado à direita, bem como alinhado à parte superior, ao centro e à parte inferior. |
-| Células | Unir, separar, inserir (linha acima/abaixo, coluna à esquerda/direita), apagar (linha(s), coluna(s)). |
-| Imagens | Inserir imagem na célula, ajustar o tamanho das imagens (mesma altura/largura que a primeira imagem, tamanho padrão), botão «Ajustar imagens». |
-| Dados | Ordenar (por ordem crescente, decrescente, remover ordenação), copiar formato, linhas visíveis, remover formatação, importar. |
+| Fonte | Tamanho da fonte (padrão, 10–32), aumentar/diminuir a fonte, negrito, itálico, sublinhado, riscado, sobrescrito, subscrito, cor da fonte, cor de fundo. |
+| Orientação | Alinhado à esquerda, centralizado, alinhado à direita, assim como em cima, centro, baixo. |
+| Células | Join, Separar, Inserir (linha acima/inferior, coluna esquerda/direita), Delete (linha(s), coluna(s)). |
+| Imagens | Insira a imagem na célula, ajuste o tamanho da imagem (mesma altura/largura da primeira imagem, tamanho padrão), botão "Ajustar imagens". |
+| Dados | Ordenar (ascendente, descendente, remover ordenação), copiar formatar, linhas visíveis, remover formatação, importar. |
 
-## Definições com efeitos secundários
+## Configurações com efeitos colaterais
 
-| Definição | Descrição |
+| Cenário | Descrição |
 | --- | --- |
-| Linhas visíveis (separador «Dados») | Número de linhas de dados que são imediatamente visíveis na página; o restante fica atrás de um botão para mostrar. Predefinição 5, `0` significa «sempre todas as linhas». O cabeçalho não é contabilizado. |
-| Ajustar imagens (separador «Imagens») | Quando ativada, todas as imagens mantêm-se dentro da largura da tabela. Quando desativada, cada imagem aparece no seu tamanho original — e pode ultrapassar os limites da tabela. |
-| Copiar formato (separador «Dados») | Aplica o formato da seleção atual às células selecionadas a seguir. |
+| Linhas visíveis (aba "Dados") | Número de linhas de dados que podem ser vistas imediatamente na página; o restante está atrás de um botão mostrar. Padrão 5, '0' significa "sempre todas as linhas". O cabeçalho não conta. |
+| Ajustando Imagens (Aba Imagens) | Quando ativada, todas as imagens permanecem dentro da largura da tabela. Quando desligada, cada imagem aparece em seu tamanho original — e pode ampliar a tabela. |
+| Copiar Formato (aba Data) | Transfere o formato da seleção atual para as células selecionadas a seguir. |

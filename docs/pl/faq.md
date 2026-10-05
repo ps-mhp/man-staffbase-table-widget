@@ -1,90 +1,91 @@
 # FAQ
 
-**Pytanie:** Zamiast edytora tabeli widzę tylko pole tekstowe z
-niezrozumiałą treścią, zaczynającą się od `b64:`.
+**Pytanie:** Zamiast edytora tabel widzę tylko pole tekstowe z
+Tajemnicze treści zaczynające się na 'b64:'. 
 
 Odpowiedź: To jest pole **Dane tabeli** — zapisana forma
-tabeli, którą zazwyczaj zasłania edytor. Nigdy nie edytuj tego tekstu ręcznie.
-Kliknięcie przycisku **Edytuj tabelę** lub ponowne otwarcie
-okna dialogowego przywróci edytor. Kodowanie to chroni tabelę przed
-uszkodzeniem przez automatyczne tłumaczenie strony.
+tabelę, którą zwykle pokrywa redaktor. Nigdy nie używaj tego tekstu ręcznie
+edytuj. Kliknij **Edytuj tabelę** lub otwórz ponownie
+Dialog pobiera edytor. Kodowanie chroni tabelę przed byciem
+Automatyczne tłumaczenie strony. 
 
-**Pytanie:** Moje zmiany zniknęły po zamknięciu.
+**Pytanie:** Moje zmiany znikają po zamknięciu transakcji. 
 
-Odpowiedź: Przycisk **Zamknij** nie zapisuje zmian. Przed zamknięciem zawsze należy kliknąć
-**Zapisz** — dopóki obok przycisków widnieje napis „Niezapisane zmiany”,
-coś jest otwarte.
+Odpowiedź: **Zamknij** nie zapisuje. Zawsze ustawiasz przed zamknięciem
+**Zapisz** — pod warunkiem, że "Niezapisane zmiany" obok przycisków
+jest dość otwarta. 
 
-**Pytanie:** Jak wpisać tekst do komórki?
+**Pytanie:** Jak pisać w komórce? 
 
-Odpowiedź: **Kliknij dwukrotnie** komórkę, a następnie wpisz tekst. Pojedyncze kliknięcie
-tylko zaznacza komórkę (w celu formatowania), nie otwiera jej do
-edycji.
+Odpowiedź: **Podwójne kliknięcie** w komórce, potem stuknięcie. Proste kliknięcie
+wybiera tylko komórkę (do formatowania), nie otwiera jej dla
+Edycja. 
 
-**Pytanie:** Nie mogę usunąć pierwszego wiersza ani pierwszej kolumny.
+**Pytanie:** Nie mogę usunąć pierwszego wiersza ani kolumny. 
 
-Odpowiedź: Tak zostało zaprojektowane: pierwszy wiersz to nagłówek, a pierwsza
-kolumna to etykieta wiersza. Jeśli nie są potrzebne, po prostu pozostaw je
-puste.
+Odpowiedź: Tak to jest zamierzone: pierwsza linia to nagłówek, pierwsza to
+kolumna to etykieta wiersza. Jeśli nie są potrzebne, wystarczy opróżnić
+. 
 
-**Pytanie:** Jakie formaty plików mogę importować?
+**Pytanie:** Jakie formaty plików mogę zaimportować? 
 
-Odpowiedź: `.csv` oraz `.xlsx`/`.xls`. W przypadku plików CSV średnik i przecinek są
-automatycznie rozpoznawane jako separatory. W przypadku plików Excel importowany jest pierwszy arkusz
-wraz z połączonymi komórkami, formatowaniem tekstu, kolorami, rozmiarami czcionek
-i wyrównaniem. Import **zawsze zastępuje całą tabelę**.
+Odpowiedź: '.csv' i '.xlsx'/'.xls'. W CSV średnik i przecinek są używane jako
+separatory są wykrywane automatycznie. W Excelu pierwszy arkusz
+w tym połączone komórki, formatowanie tekstu, kolory, rozmiary czcionek
+oraz wyrównanie. Import **zawsze zastępuje całą tabelę**. 
 
-**Pytanie:** Pojawia się komunikat „Import nie powiódł się”.
+**Pytanie:** Pojawia się "Import niepowiódł". 
 
-Odpowiedź: Nie udało się odczytać pliku. Sprawdź, czy rzeczywiście jest to
-plik `.csv`, `.xlsx` lub `.xls` (a nie np. plik o zmienionej nazwie lub
-chroniony hasłem) oraz czy zawiera on treść. W razie potrzeby w programie Excel
-zapisz go ponownie jako plik `.xlsx`.
+Odpowiedź: Plik nie mógł zostać odczytany. Sprawdź, czy naprawdę istnieje
+'.csv', '.xlsx' lub '.xls' (nie jest to przemianowany lub
+chroniony hasłem) oraz czy zawiera zawartość. W razie potrzeby w Excelu
+Zapisz jako '.xlsx' ponownie. 
 
-**Pytanie:** Na stronie nie wyświetlają się wszystkie wiersze.
+**Pytanie:** Nie wszystkie wiersze są wyświetlane na stronie. 
 
-Odpowiedź: Jest to ustawienie **Widoczne wiersze** (zakładka „Dane”),
-domyślnie ustawione na 5 wierszy danych. Pozostałe wiersze można wyświetlić za pomocą przycisku pod
-tabelą. Jeśli od początku mają być widoczne wszystkie wiersze, należy ustawić wartość na `0`.
+Odpowiedź: To jest ustawienie **Widoczne wiersze** (zakładka "Dane"), 
+Ustawione na 5 wierszy danych. Reszta pojawia się za pomocą przycisku poniżej
+tabela. Jeśli chcesz, aby wszystkie wiersze były widoczne od początku, ustaw wartość na '0'
+. 
 
-**Pytanie:** Obrazek rozciąga się na całą szerokość tabeli.
+**Pytanie:** Jedno zdjęcie wybucha na całym stole. 
 
-Odpowiedź: W zakładce **Obrazy** włącz opcję **Dopasuj obrazy**.
-Ogranicza ona wszystkie obrazy do szerokości tabeli. Gdy opcja jest wyłączona, każdy
-obrazek wyświetla się w oryginalnym rozmiarze.
+Odpowiedź: W zakładce **Obrazy** włącz przełącznik **Dostosuj obrazy**. 
+Ogranicza wszystkie obrazy do szerokości tabeli. Po wyłączeniu każdy
+Zdjęcie w oryginalnym rozmiarze. 
 
-**Pytanie:** Kilka obrazów ma różne rozmiary.
+**Pytanie:** Kilka zdjęć ma różne rozmiary. 
 
-Odpowiedź: Zaznacz wszystkie komórki z obrazami i w zakładce **Obrazy** w sekcji
-**Rozmiar obrazu** wybierz opcję „Taka sama wysokość jak pierwszy obraz” lub „Taka sama szerokość jak pierwszy
-obraz”. Należy zaznaczyć co najmniej dwa obrazy.
+Odpowiedź: Zaznacz wszystkie komórki obrazów i wybierz je w zakładce **Obrazy** pod
+**Rozmiar obrazu** "Taka sama wysokość jak pierwszy obraz" lub "Taka sama szerokość jak pierwszy obraz"
+Obraz". Co najmniej dwa obrazy muszą być podświetlone. 
 
-**Pytanie:** Jeden z czytelników posortował tabelę inaczej niż ja ją zapisałem
-.
+**Pytanie:** Czytelnik uporządkował tabelę inaczej niż ja ją zapisałem
+. 
 
-Odpowiedź: Na opublikowanej stronie każdy czytelnik może samodzielnie zmienić kolejność, klikając
-nagłówek kolumny. Dotyczy to wyłącznie jego widoku
-i nie zmienia zapisanej tabeli. Sortowanie ustawione w edytorze
-pozostaje widokiem początkowym.
+Odpowiedź: Na opublikowanej stronie każda osoba czytająca może kliknąć
+do samego nagłówka kolumny. Dotyczy to tylko ich widoku
+i nie zmienia zapisanej tabeli. Twój zestaw sortowania w edytorze
+Widok startowy pozostaje. 
 
-**Pytanie:** Czy mogę umieścić link w komórce?
+**Pytanie:** Czy mogę umieścić link w komórce? 
 
-Odpowiedź: Nie. Komórki mogą zawierać tekst, obrazy oraz indeksy górne i dolne,
-ale nie zawierają linków. Linki należy umieścić w elemencie tekstowym obok tabeli.
+Odpowiedź: Nie. Komórki przyjmują tekst, obrazy oraz indeksy górne/dolne, 
+ale nie ma linków. Linki należą do elementu tekstowego obok tabeli. 
 
-**Pytanie:** Czy istnieje funkcja „Cofnij”?
+**Pytanie:** Czy istnieje coś takiego jak "cofnij"? 
 
-Odpowiedź: Nie. Dlatego w przypadku większych zmian należy zapisywać na bieżąco — a
-przed importem należy pamiętać, że zastąpi on całą tabelę.
+Odpowiedź: Nie. Dlatego oszczędzaj pomiędzy na większe remonty — i
+Przed importem pamiętaj, że wymienia cały stół. 
 
-**Pytanie:** Co stanie się z moją tabelą podczas automatycznego tłumaczenia
-strony?
+**Pytanie:** Co dzieje się z moim stołem podczas automatycznego tłumaczenia
+Strony? 
 
-Odpowiedź: Tłumaczone są wyłącznie treści komórek. Połączone komórki,
-formatowanie, obrazy i sortowanie pozostają niezmienione.
+Odpowiedź: Tłumaczona jest tylko zawartość komórek. Połączone komórki, 
+Formatowanie, obrazy i sortowanie pozostają bez zmian. 
 
-**Pytanie:** Tabela jest zbyt szeroka na telefonie komórkowym.
+**Pytanie:** Tabela jest za szeroka na telefonie. 
 
-Odpowiedź: Można ją przesuwać w bok. W przypadku wąskich ekranów pomocne jest
-łączenie kolumn, stosowanie krótszych nagłówków lub usuwanie dużych
-obrazów z komórek.
+Odpowiedź: Można go przesunąć na bok. Przy wąskich ekranach pomaga 
+Łącz kolumny, używaj krótszych nagłówków lub dużych
+Żeby robić zdjęcia z cel.

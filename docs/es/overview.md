@@ -1,34 +1,34 @@
-# Tabla
+# Mesa
 
-El widget de tabla permite insertar una tabla real en la página, con un
-editor de tablas propio que funciona como un pequeño programa de hojas de cálculo.
-Las celdas se pueden formatear, unir, rellenar con imágenes y ordenar,
-sin necesidad de tener conocimientos de HTML.
+El widget de tabla trae una tabla real a la página — con un
+Editor de tablas propio, que funciona como un programa de tablas pequeñas. 
+Las celdas pueden formatearse, unirse, rellenarse con imágenes y ordenarse, 
+sin ningún conocimiento de HTML. 
 
-Ideal para todo tipo de datos tabulares: tablas comparativas, listas de personas de contacto,
-cifras clave, horarios de apertura, turnos de trabajo, listas de precios.
+Adecuado para todo en forma de tablas: tablas comparativas, listas de contactos, 
+Cifras clave, horarios, horarios de turnos, resumen de precios. 
 
-## Así se estructura una tabla
+## Así es como se estructura una mesa
 
-- La **primera fila** es el encabezado. Aparece resaltada
-  y siempre permanece en la parte superior al ordenar.
-- La **primera columna** es el encabezado de las filas y también aparece
-  resaltada.
-- La **celda superior izquierda** es la esquina entre ambas y suele quedar
-  vacía. Es normal, no es un error.
-- El encabezado y la primera columna no se pueden eliminar. Si no los necesitas,
-  déjalos en blanco.
+- La **primera línea** es el encabezado. Está resaltado
+  Y siempre se mantiene al frente al clasificar. 
+- La **primera columna** es la etiqueta de la fila y también es
+  resaltado. 
+- La **celda superior izquierda** es la esquina entre ambas y normalmente permanece
+  vacío. Esto es normal, no es un error. 
+- El encabezado y la primera columna no pueden ser eliminados. Si no los necesitas, 
+  los deja vacíos. 
 
 ## Lo que ven los lectores
 
-La tabla terminada. Si es más ancha que la pantalla, se puede
-desplazar lateralmente. Si es más larga que el número de filas establecido,
-al principio solo se ven las primeras filas y un botón situado debajo muestra el
-resto. Al hacer clic en el encabezado de una columna, la tabla se ordena para el
-lector o la lectora, lo que no modifica la tabla guardada.
+La mesa terminada. Si es más ancha que la pantalla, puede ser
+de lado. Si es más largo que el número establecido de líneas,
+al principio solo se ven las primeras líneas y un botón debajo oculta el
+descanso. Al hacer clic en una cabecera de columna, se ordena la tabla para el
+Persona que lee — esto no cambia la tabla guardada. 
 
-## Dónde trabajar
+## Donde trabajas
 
-No en el campo **Datos de la tabla**, sino en el **Editor de tablas**, que
-se abre encima. El campo de abajo solo contiene la forma técnicamente almacenada
-de la tabla y nunca se edita manualmente.
+No en el campo **Table Data**, sino en el **Editor de Tablas**, que está ubicado en el
+arriba de ella. El campo de abajo contiene solo la forma técnicamente almacenada
+de la tabla y nunca se edita a mano.

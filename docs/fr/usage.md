@@ -1,93 +1,93 @@
-# Étape par étape
+# Pas à pas
 
-## Créer un premier tableau
+## Crée ta première table
 
-1. Placez le widget **Tableau** sur la page et ouvrez les paramètres du widget
-  . L'**éditeur de tableau** s'affiche automatiquement au-dessus du champ
-  « Données du tableau ».
-2. **Double-cliquez** dans une cellule et saisissez le texte. Cliquez sur
-   une autre cellule pour valider la saisie.
-3. Remplissez la **première ligne** avec les en-têtes de colonnes.
-4. S'il manque des lignes ou des colonnes : onglet **Cellules** → **Insérer** → par exemple « Ligne
-   en dessous » ou « Colonne à droite ».
-5. Cliquez sur **Enregistrer** en haut à droite. Ce n’est qu’alors que le tableau apparaîtra dans le
-   widget.
-6. Cliquez sur **Fermer** pour quitter l’éditeur et enregistrer la page.
+1. Placer le widget **Table** sur la page et ajuster les paramètres du widget
+   . L'**Éditeur de tableau** apparaîtra automatiquement au-dessus de
+   « Données de table ». 
+2. **Double-cliquer** dans une cellule et tapez le texte. En cliquant sur
+   une autre cellule prend le relais de l’entrée. 
+3. Remplir la **première ligne** avec les en-têtes de colonnes. 
+4. Lignes ou colonnes manquantes : onglet **Cellules** → **Insérer** → par exemple « Ligne
+   ci-dessous » ou « Colonne à droite ». 
+5. Cliquez sur **Enregistrer** en haut à droite. Ce n’est qu’à ce moment-là que la table atterrira dans le
+   Widget. 
+6. Quittez l’éditeur avec **Fermer** et enregistrez la page. 
 
-Si la mention **« Modifications non enregistrées »** apparaît à côté des boutons, cela signifie que les modifications n’ont pas encore
-été enregistrées — cliquez d’abord sur « Enregistrer », puis sur « Fermer ».
+Si ça indique **« Modifications non sauvegardées »** à côté des boutons, ce n’est pas encore le cas
+— puis cliquez sur « Enregistrer », puis sur « Fermer ». 
 
-## Importer un tableau existant depuis Excel ou un fichier CSV
+## Copier une table existante depuis Excel ou CSV
 
-1. Dans l’éditeur de tableau, ouvrez l’onglet **Données**.
-2. Cliquez sur **Importer** et sélectionnez le fichier (`.csv`, `.xlsx` ou
-   `.xls`).
-3. Vérifiez le résultat : l’importation **remplace l’intégralité du tableau**, rien n’est
-   ajouté à la fin. Les cellules fusionnées, le gras/italique/
-   soulignés, les couleurs, les tailles de police, l’alignement ainsi que les caractères en
-   exposant et en indice sont conservés. Dans le cas d’un classeur Excel, la **première
-   feuille de calcul** est utilisée.
-4. **Enregistrer**.
+1. Ouvrez l’onglet **Data** dans l’éditeur de tableaux. 
+2. Cliquez sur **Importer** et sélectionnez le fichier ('.csv', '.xlsx' ou
+   '.xls'). 
+3. Vérifiez le résultat : L’importation **remplace la table complète**, ce sera
+   Rien d’ajouté. Depuis Excel, les cellules connectées restent, gras/italique/ 
+   souligner, couleurs, tailles de police, alignement, et portrait et
+   sous-scripts. Dans le cas d’un carnet Excel, le **premier
+   Tableur**. 
+4. **Sauvegarder**. 
 
-Il est également possible de **copier-coller** directement des cellules depuis Excel :
-double-cliquez dans une cellule puis collez — le bloc s'étendra à partir de cet emplacement
-sur plusieurs cellules.
+Sinon, les cellules peuvent aussi être **copiées et collées** directement depuis Excel : 
+double-cliquez et collez dans une cellule — le bloc commencera à ce point
+Dispersés sur plusieurs cellules. 
 
-## Mettre en forme des cellules
+## Formater les cellules
 
-1. Sélectionner les cellules à mettre en forme : cliquer, faire glisser en maintenant le bouton de la souris
-   enfoncé, sélectionner une plage avec la touche **Maj** ou ajouter d’autres plages avec **Ctrl/Cmd**
-  . Les poignées situées sur les bords permettent de sélectionner des
-   lignes entières, des colonnes ou l’ensemble du tableau.
-2. Onglet **Police** pour la taille de police, le gras, l’italique, le soulignement,
-   le barré, les indices et exposants, ainsi que la couleur de la police et de l’arrière-plan.
-3. Onglet **Alignement** pour l'alignement à gauche/au centre/à droite et en haut/au centre/en bas.
-4. **Enregistrer**.
+1. Sélectionnez les cellules à formater : cliquer, maintenir le bouton de la souris enfoncé
+   , utilise **Shift** pour dessiner une zone ou **Ctrl/Cmd** 
+   des zones supplémentaires. Les poignées sur le bord peuvent être utilisées pour
+   Sélectionnez les lignes, colonnes ou la table entière. 
+2. Tab **Font** pour la taille de la police, gras, italique, souligné, 
+   Barrure, exposant/sous-scripte, police et couleur d’arrière-plan. 
+3. Onglet **Orientation** pour gauche/centre/droite et haut/centre/bas. 
+4. **Sauvegarder**. 
 
-Pour appliquer une mise en forme à d'autres cellules :
+Pour transférer une mise en forme dans d’autres cellules : 
 
-1. Sélectionnez une cellule déjà formatée.
-2. Cliquez sur l’onglet **Données** → **Format**.
-3. Sélectionnez les cellules cibles — elles reprendront le format.
+1. Sélectionnez une cellule déjà formatée. 
+2. Cliquez sur l’onglet **Data** → **Format**. 
+3. Sélectionnez les cellules cibles — elles adopteront le format. 
 
-## Fusionner des cellules
+## Fusionner les cellules
 
-1. Sélectionnez les cellules à fusionner.
-2. Onglet **Cellules** → **Fusionner**.
-3. Annuler l’opération avec **Détacher**.
+1. Sélectionner les cellules à joindre. 
+2. Onglet **Cellules** → **Connecter**. 
+3. Annuler avec **Résolvre**. 
 
 ## Insérer une image dans une cellule
 
-1. Sélectionnez la cellule.
-2. Onglet **Images** → **Image**. La sélection de médias s’ouvre ; sélectionnez-y une
-   image existante ou téléchargez-en une nouvelle.
-3. Si plusieurs images ont des tailles différentes : sélectionner toutes les cellules contenant des images et
-  , via **Taille de l’image**, choisir soit « Même hauteur que la première image », soit « Même
-  largeur que la première image » (cela nécessite au moins deux images).
-  **Taille par défaut** permet de réinitialiser.
-4. Si une image dépasse les limites du tableau, activez dans l’onglet **Images** le bouton **Ajuster les images**
-   — toutes les images resteront alors dans les limites de la
-   largeur du tableau.
+1. Sélectionnez la cellule. 
+2. onglet **Images** → **Image**. La sélection média s’ouvre ; il y a un
+   Sélectionnez une image existante ou téléchargez-en une nouvelle. 
+3. Si plusieurs images ont des tailles différentes : sélectionner toutes les cellules d’image et
+   via **Image Size** soit « Même hauteur que la première image » ou « Même
+   Largeur comme première image » (cela nécessite au moins deux images). 
+   **Taille standard** réinitialisée. 
+4. Si une image fait exploser la table, dans l’onglet **Images** on change **Images
+   ajuster** — alors toutes les images restent dans le
+   Largeur de table. 
 
-## Trier le tableau
+## Table de tri
 
-1. Sélectionnez la colonne selon laquelle vous souhaitez effectuer le tri.
-2. Onglet **Données** → **Trier** → « Par ordre croissant (cette colonne) » ou
-   « Par ordre décroissant (cette colonne) ».
-3. **Enregistrer**. Ce tri est le tri par défaut pour tous les
-   lecteurs ; l’en-tête reste toujours en haut.
+1. Sélectionnez la colonne par laquelle vous souhaitez trier. 
+2. Onglet **Data** → **Tri** → « Ascendant (cette colonne) » ou
+   « Descendant (cette colonne) ». 
+3. **Sauvegarder**. Ce tri est le tri de départ pour tous
+   lecteurs ; l’en-tête reste toujours en haut. 
 
-## Réduire un tableau long
+## S’effondre la longue table
 
-1. Ouvrez l’onglet **Données**.
-2. Sous **Lignes visibles**, saisissez le nombre de lignes de données qui doivent être
-   immédiatement visibles. La valeur par défaut est 5 ; `0` affiche toujours toutes les lignes.
-3. **Enregistrer**. Un bouton apparaît alors sous le tableau sur la page :
-   « Afficher N lignes supplémentaires » ou « Afficher moins de lignes ».
+1. Ouvrez l’onglet **Data**. 
+2. Sous **Lignes visibles**, entrez le nombre de lignes de données qui seront immédiatement
+   devrait être visible. Le numéro par défaut est 5 ; « 0 » affiche toujours toutes les lignes. 
+3. **Enregistrer**. Un bouton apparaîtra alors sur la page sous le tableau
+   « Afficher plus de N lignes » ou « Afficher moins de lignes ». 
 
-## Supprimer la mise en forme
+## Supprimer à nouveau la mise en forme
 
-1. Sélectionnez les cellules concernées.
-2. Onglet **Données** → **Mise en forme**, puis sélectionnez l’option appropriée :
-   tout supprimer, uniquement la mise en forme du texte ou uniquement les tailles d’image.
-3. **Enregistrer**.
+1. Marquez les cellules concernées. 
+2. Onglet **Data** → **Formating** et sélectionne l’entrée appropriée : 
+   Supprimez tout, seulement la mise en forme du texte ou uniquement les tailles d’images. 
+3. **Sauver**.

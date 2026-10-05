@@ -1,6 +1,6 @@
 {
   "title": "Tabella",
-  "summary": "Inserisce una tabella modificabile, con un editor dedicato, importazione da Excel/CSV e immagini nelle celle.",
+  "summary": "Incorpora una formattable — con un proprio editor, importazione Excel/CSV e immagini nelle celle.",
   "pages": [
     {
       "id": "overview",

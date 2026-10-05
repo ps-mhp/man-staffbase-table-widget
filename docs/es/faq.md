@@ -1,91 +1,91 @@
 # Preguntas frecuentes
 
 **Pregunta:** En lugar del editor de tablas, solo veo un campo de texto con
-un contenido críptico que comienza por `b64:`.
+contenido críptico que empieza por 'b64:'. 
 
-Respuesta: Ese es el campo **Datos de la tabla**, es decir, la forma almacenada de la
-tabla que normalmente queda oculto tras el editor. Nunca edites este texto
-manualmente. Al hacer clic en **Editar tabla** o al volver a abrir el
-cuadro de diálogo, volverá a aparecer el editor. La codificación protege la tabla para que no
-se vea dañada por la traducción automática de la página.
+Respuesta: Este es el campo **Table Data** — la forma almacenada de la
+Tabla que normalmente cubre el editor. Nunca uses este texto a mano
+Editar. Haz clic en **Tabla de edición** o vuelve a abrir la
+El diálogo recupera el editor. La codificación protege la tabla de ser
+traducción automática de páginas. 
 
-**Pregunta:** Mis cambios han desaparecido al cerrar.
+**Pregunta:** Mis cambios se han ido después de cerrar. 
 
-Respuesta: **Cerrar** no guarda. Antes de cerrar, haz siempre clic en
-**Guardar**; mientras aparezca «Cambios no guardados» junto a los botones,
-hay algo abierto.
+Respuesta: **Cerrar** no guarda. Siempre configurar antes de cerrar
+**Guardar** — siempre que "Cambios no guardados" esté junto a los botones
+es algo abierto. 
 
-**Pregunta:** ¿Cómo escribo en una celda?
+**Pregunta:** ¿Cómo escribo en una celda? 
 
-Respuesta: **Haz doble clic** en la celda y, a continuación, escribe. Un simple clic
-solo selecciona la celda (para aplicar formatos), pero no la abre para
-editarla.
+Respuesta: **Doble clic** en la celda y luego toque. Un simple clic
+solo selecciona la celda (para formatear), no la abre para
+Edito. 
 
-**Pregunta:** No puedo borrar la primera fila ni la primera columna.
+**Pregunta:** No puedo borrar la primera fila ni columna. 
 
-Respuesta: Así está previsto: la primera fila es el encabezado y la primera
-columna, la etiqueta de la fila. Si no las necesitas, simplemente déjalas
-en blanco.
+Respuesta: Así es como se pretende: La primera línea es el encabezado, la primera es el
+columna la etiqueta de fila. Si no se necesitan, simplemente vacía
+. 
 
-**Pregunta:** ¿Qué formatos de archivo puedo importar?
+**Pregunta:** ¿Qué formatos de archivo puedo importar? 
 
-Respuesta: `.csv`, así como `.xlsx`/`.xls`. En el caso de CSV, el punto y coma y la coma se
-reconocen automáticamente como separadores. En el caso de Excel, se importa la primera hoja de cálculo
-, incluyendo las celdas unidas, el formato de texto, los colores, los tamaños de fuente
-y la alineación. Una importación **sustituye siempre toda la tabla**.
+Respuesta: '.csv' y '.xlsx'/'.xls'. En CSV, se utilizan punto y coma como como
+los separadores se detectan automáticamente. En Excel, la primera hoja de cálculo
+incluyendo celdas conectadas, formato de texto, colores, tamaños de fuente
+y alineación. Un importado **siempre reemplaza toda la tabla**. 
 
-**Pregunta:** Aparece el mensaje «Importación fallida».
+**Pregunta:** Aparece "Importación fallida". 
 
-Respuesta: No se ha podido leer el archivo. Comprueba si realmente se trata de un
-archivo `.csv`, `.xlsx` o `.xls` (y no, por ejemplo, un archivo renombrado o
-protegido con contraseña) y si contiene datos. Si es necesario,
-guárdalo de nuevo en Excel como `.xlsx`.
+Respuesta: El archivo no pudo ser leído. Comprueba si realmente hay un
+'.csv', '.xlsx' o '.xls' (no es un renombrado o
+archivo protegido por contraseña) y si contiene contenido. En Excel si es necesario
+Guarda como '.xlsx' otra vez. 
 
-**Pregunta:** No se muestran todas las filas en la página.
+**Pregunta:** No todas las filas se muestran en la página. 
 
-Respuesta: Se trata de la configuración **Líneas visibles** (pestaña «Datos»),
-configurada por defecto en 5 filas de datos. El resto aparece al hacer clic en el botón situado debajo
-de la tabla. Si se desea que se vean todas las filas desde el principio, establece el valor en `0`
-.
+Respuesta: Esta es la configuración de **Filas visibles** (pestaña "Datos"), 
+preestablecido a 5 filas de datos. El resto aparece mediante el botón de abajo
+tabla. Si quieres que todas las filas sean visibles desde el principio, pon el valor en '0'
+. 
 
-**Pregunta:** Una imagen desborda toda la tabla.
+**Pregunta:** Una foto hace explotar toda la mesa. 
 
-Respuesta: En la pestaña **Imágenes**, activa la opción **Ajustar imágenes**.
-Esto limita todas las imágenes al ancho de la tabla. Si está desactivada, cada
-imagen aparecerá en su tamaño original.
+Respuesta: En la pestaña **Imágenes**, activa el interruptor de **Ajustar imágenes**. 
+Limita todas las imágenes al ancho de la tabla. Cuando está apagado, cada
+Imagen en su tamaño original. 
 
-**Pregunta:** Varias imágenes tienen tamaños diferentes.
+**Pregunta:** Varias fotos tienen diferentes tamaños. 
 
-Respuesta: Selecciona todas las celdas de imagen y, en la pestaña **Imágenes**, en
-**Tamaño de imagen**, selecciona «Misma altura que la primera imagen» o «Misma anchura que la primera
-imagen». Deben estar seleccionadas al menos dos imágenes.
+Respuesta: Selecciona todas las celdas de imagen y seleccionalas en la pestaña **Imágenes** debajo
+**Tamaño de la imagen** "Misma altura que la primera imagen" o "Mismo ancho que la primera imagen"
+Imagen". Al menos dos imágenes deben estar resaltadas. 
 
-**Pregunta:** Un lector tiene la tabla ordenada de forma diferente a como la guardé
-yo.
+**Pregunta:** Un lector ordenó la tabla de forma diferente a como la guardé
+. 
 
-Respuesta: En la página publicada, cualquier lector puede reordenarla por sí mismo haciendo clic
-en el encabezado de una columna. Esto solo afecta a su vista
-y no modifica la tabla guardada. El orden establecido en el editor
-sigue siendo la vista inicial.
+Respuesta: En la página publicada, cualquier persona que lea puede hacer clic en la
+a un encabezado de columna en sí. Esto solo se aplica a su vista
+y no cambia la tabla guardada. Tu conjunto de ordenación en el editor
+la vista de salida permanece. 
 
-**Pregunta:** ¿Puedo insertar un enlace en una celda?
+**Pregunta:** ¿Puedo poner un enlace en una celda? 
 
-Respuesta: No. Las celdas admiten texto, imágenes y caracteres en superíndice o subíndice,
-pero no enlaces. Los enlaces deben colocarse en un elemento de texto junto a la tabla.
+Respuesta: No. Las celdas toman texto, imágenes y superíndices/subíndices, 
+Pero no hay enlaces. Los enlaces deben estar en un elemento de texto junto a la mesa. 
 
-**Pregunta:** ¿Hay una opción de «Deshacer»?
+**Pregunta:** ¿Existe algo llamado "deshacer"? 
 
-Respuesta: No. Por eso, en caso de modificaciones importantes, guarda el documento de vez en cuando y,
-antes de importar, recuerda que la importación sustituirá toda la tabla.
+Respuesta: No. Por lo tanto, guarda entre medias para grandes reformas — y
+Antes de importar, recuerda que reemplaza toda la mesa. 
 
-**Pregunta:** ¿Qué ocurre con mi tabla al traducir automáticamente
-la página?
+**Pregunta:** ¿Qué pasa con mi mesa durante la traducción automática?
+¿del sitio? 
 
-Respuesta: Solo se traducen los contenidos de las celdas. Las celdas unidas,
-los formatos, las imágenes y la ordenación se mantienen sin cambios.
+Respuesta: Solo se traduce el contenido de las celdas. Celdas conectadas, 
+El formato, las imágenes y la ordenación permanecen sin cambios. 
 
-**Pregunta:** La tabla queda demasiado ancha en el móvil.
+**Pregunta:** La mesa es demasiado ancha en móvil. 
 
-Respuesta: Se puede desplazar lateralmente. Para pantallas estrechas, resulta útil
-agrupar columnas, utilizar encabezados más cortos o eliminar las imágenes grandes
-de las celdas.
+Respuesta: Se puede empujar lateralmente. Para pantallas estrechas, ayuda 
+Fusionar columnas, usar encabezados más cortos o usar grandes
+Para sacar fotos de las celdas.
