@@ -31,6 +31,8 @@ import {
   setSort,
   setFitImages,
   setVisibleRows,
+  setExportMode,
+  ExportMode,
   cellFormat,
   isCovered,
   mergeAt,
@@ -658,6 +660,7 @@ export const TableEditor = ({
   const toggleFitImages = (): void => onChange(setFitImages(value, !value.fitImages));
 
   const changeVisibleRows = (rows: number): void => onChange(setVisibleRows(value, rows));
+  const changeExportMode = (mode: ExportMode): void => onChange(setExportMode(value, mode));
 
   /**
    * Without a selection this resets the whole table — the diagnostic case,
@@ -789,6 +792,8 @@ export const TableEditor = ({
         onToggleFitImages={toggleFitImages}
         visibleRows={value.visibleRows}
         onChangeVisibleRows={changeVisibleRows}
+        exportMode={value.exportMode}
+        onChangeExportMode={changeExportMode}
         onClearFormatting={clearFormats}
         hasClearTarget={ranges.length > 0}
         onSave={onSave}

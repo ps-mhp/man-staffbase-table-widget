@@ -17,6 +17,7 @@ import { ReactElement, useRef } from "react";
 import { Dropdown } from "./controls";
 import { IconChevron, IconClearFormat, IconPainter, IconSort, IconUpload } from "./icons";
 import { TableToolbarProps } from "./props";
+import { ExportMode } from "../table-model";
 
 export type DataTabProps = Pick<
   TableToolbarProps,
@@ -29,6 +30,8 @@ export type DataTabProps = Pick<
   | "onUpload"
   | "visibleRows"
   | "onChangeVisibleRows"
+  | "exportMode"
+  | "onChangeExportMode"
   | "onClearFormatting"
   | "hasClearTarget"
 >;
@@ -44,6 +47,8 @@ export function DataTab({
   onUpload,
   visibleRows,
   onChangeVisibleRows,
+  exportMode,
+  onChangeExportMode,
   onClearFormatting,
   hasClearTarget,
 }: DataTabProps): ReactElement {
@@ -106,6 +111,22 @@ export function DataTab({
           }}
         />
         <span>Sichtbare Zeilen</span>
+      </label>
+
+      <label
+        className="tw-rb__rows-limit"
+        title="Export der veröffentlichten Tabelle als Excel- oder CSV-Datei. In der Staffbase-App wird der Export nicht angezeigt."
+      >
+        <span>Export</span>
+        <select
+          data-testid="toolbar-export-mode"
+          value={exportMode}
+          onChange={(event) => onChangeExportMode(event.target.value as ExportMode)}
+        >
+          <option value="off">Aus</option>
+          <option value="all">Ganze Tabelle</option>
+          <option value="select">Mit Zeilenauswahl</option>
+        </select>
       </label>
 
       <Dropdown

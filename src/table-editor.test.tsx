@@ -78,6 +78,7 @@ const TOOLBAR_TAB: Record<string, string> = {
   "toolbar-image-fit": "Bilder",
   "toolbar-painter": "Daten",
   "toolbar-visible-rows": "Daten",
+  "toolbar-export-mode": "Daten",
   "toolbar-upload": "Daten",
   "toolbar-clear-format": "Daten",
   "toolbar-clear-format-all": "Daten",
@@ -811,5 +812,20 @@ describe("retired lowercase mark", () => {
     expect(container.querySelector(".text-lowercase")).toBeNull();
     expect(cellDiv("Zeile 1, Spalte 1").innerHTML).toBe("MAN Truck");
     expect(cellDiv("Zeile 1, Spalte 2").innerHTML).toBe("m<sup>2</sup>");
+  });
+});
+
+describe("export mode", () => {
+  it("shows the stored mode and reports a changed one", () => {
+    const onChange = jest.fn();
+    render(<TableEditor value={model([["", "A"], ["x", "1"]], { exportMode: "all" })} onChange={onChange} />);
+
+    const select = toolbar("toolbar-export-mode");
+    expect(select).toHaveValue("all");
+    expect(select.closest("label")).toHaveAttribute("title", expect.stringContaining("In der Staffbase-App wird der Export nicht angezeigt."));
+
+    fireEvent.change(select, { target: { value: "select" } });
+
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ exportMode: "select" }));
   });
 });

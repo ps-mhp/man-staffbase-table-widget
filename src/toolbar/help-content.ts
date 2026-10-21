@@ -141,6 +141,10 @@ export const HELP_TOPICS: HelpTopic[] = [
         text: "Legt fest, wie viele Datenzeilen die veröffentlichte Tabelle zeigt, bevor sie sich hinter einem Button einklappt. Der Wert 0 zeigt immer alle Zeilen.",
       },
       {
+        title: "Export",
+        text: "Bietet Lesern der veröffentlichten Tabelle einen Download als Excel- (.xlsx) oder CSV-Datei an. „Ganze Tabelle“ exportiert alle Zeilen, „Mit Zeilenauswahl“ fügt eine Spalte mit Kästchen hinzu — exportiert werden dann die gewählten Zeilen, ohne Auswahl alle. In der Staffbase-App wird der Export nicht angezeigt.",
+      },
+      {
         title: "Formatierung entfernen",
         text: "Setzt wahlweise alle Formatierungen, nur die Textformatierung oder nur die Bildgrößen zurück — auf die Markierung, oder ohne Markierung auf die ganze Tabelle.",
       },

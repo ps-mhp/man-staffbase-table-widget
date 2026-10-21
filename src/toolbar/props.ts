@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-import { CellFormat, TextAlign, VerticalAlign } from "../table-model";
+import { CellFormat, ExportMode, TextAlign, VerticalAlign } from "../table-model";
 import { ClearScope } from "../clear-format";
 
 /** The toolbar's tabs, in the order they appear. */
@@ -68,6 +68,9 @@ export interface TableToolbarProps {
    */
   visibleRows: number;
   onChangeVisibleRows: (rows: number) => void;
+  /** Download offered by the published table (see `TableModel.exportMode`). */
+  exportMode: ExportMode;
+  onChangeExportMode: (mode: ExportMode) => void;
   /**
    * Resets formatting — on the selection, or on the whole table when nothing
    * is selected, which is why these stay enabled without a selection.
