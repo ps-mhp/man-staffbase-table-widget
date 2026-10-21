@@ -79,16 +79,16 @@ export interface TableModel {
   visibleRows: number;
   /**
    * Download of the table as .xlsx/.csv in the published widget: `off`, the
-   * whole `table`, or `select` — with a checkbox column to pick rows. Never
+   * whole table (`all`), or `select` — with a checkbox column to pick rows. Never
    * shown in the native Staffbase apps (see `native-app.ts`).
    */
   exportMode: ExportMode;
 }
 
-export type ExportMode = "off" | "table" | "select";
+export type ExportMode = "off" | "all" | "select";
 
 const parseExportMode = (value: unknown): ExportMode =>
-  value === "table" || value === "select" ? value : "off";
+  value === "all" || value === "select" ? value : "off";
 
 export const formatKey = (row: number, col: number): string => `${row},${col}`;
 

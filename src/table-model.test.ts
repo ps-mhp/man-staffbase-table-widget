@@ -396,7 +396,7 @@ describe("exportMode", () => {
   it("reads the known modes and rejects anything else", () => {
     const read = (exportMode: unknown) =>
       parseTableModel(JSON.stringify({ data: [["", "A"]], exportMode })).exportMode;
-    expect(read("table")).toBe("table");
+    expect(read("all")).toBe("all");
     expect(read("select")).toBe("select");
     expect(read("everything")).toBe("off");
   });
