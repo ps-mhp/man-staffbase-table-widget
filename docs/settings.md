@@ -23,12 +23,13 @@ bearbeiten** zurück.
 | Ausrichtung | Linksbündig, Zentriert, Rechtsbündig sowie Oben, Mittig, Unten. |
 | Zellen | Verbinden, Lösen, Einfügen (Zeile oberhalb/unterhalb, Spalte links/rechts), Löschen (Zeile(n), Spalte(n)). |
 | Bilder | Bild in Zelle einfügen, Bildgrößen angleichen (gleiche Höhe/Breite wie erstes Bild, Standardgröße), Schalter „Bilder anpassen“. |
-| Daten | Sortieren (aufsteigend, absteigend, Sortierung entfernen), Format kopieren, Sichtbare Zeilen, Formatierung entfernen, Importieren. |
+| Daten | Sortieren (aufsteigend, absteigend, Sortierung entfernen), Format kopieren, Sichtbare Zeilen, Export, Formatierung entfernen, Importieren. |
 
 ## Einstellungen mit Nebenwirkung
 
 | Einstellung | Beschreibung |
 | --- | --- |
 | Sichtbare Zeilen (Reiter „Daten“) | Anzahl der Datenzeilen, die auf der Seite sofort zu sehen sind; der Rest liegt hinter einem Einblenden-Button. Voreinstellung 5, `0` bedeutet „immer alle Zeilen“. Die Kopfzeile zählt nicht mit. |
+| Export (Reiter „Daten“) | *Aus* (Voreinstellung), *Ganze Tabelle* oder *Mit Zeilenauswahl*. Über der Tabelle erscheinen dann die Buttons „Excel (.xlsx)“ und „CSV“; mit Zeilenauswahl kommt links eine Spalte mit Kästchen hinzu, exportiert werden die gewählten Zeilen (ohne Auswahl alle). In der Staffbase-App (iOS/Android) wird der Export nicht angezeigt. |
 | Bilder anpassen (Reiter „Bilder“) | Eingeschaltet bleiben alle Bilder innerhalb der Tabellenbreite. Ausgeschaltet erscheint jedes Bild in seiner Originalgröße — und kann die Tabelle sprengen. |
 | Format kopieren (Reiter „Daten“) | Überträgt das Format der aktuellen Markierung auf die als Nächstes markierten Zellen. |

@@ -85,6 +85,20 @@ To transfer a formatting to other cells:
 3. **Save**. A button will then appear on the page below the table
    "Show more N rows" or "Show fewer rows". 
 
+## Offer the table as a download
+
+1. Open the **Data** tab.
+2. Under **Export**, choose:
+   - **Whole table** — readers always download the whole table.
+   - **With row selection** — each row gets a checkbox; the selected rows
+     are exported, or the whole table if none is selected.
+3. **Save**. The buttons "Excel (.xlsx)" and "CSV" appear above the table.
+   The Excel file keeps formatting and merged cells and can be imported here
+   again; the CSV file opens directly in German Excel.
+
+The export is not shown in the Staffbase app — files cannot be downloaded
+reliably there. It is available in the mobile browser.
+
 ## Remove formatting again
 
 1. Mark the affected cells. 

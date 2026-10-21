@@ -48,6 +48,13 @@ voreingestellt auf 5 Datenzeilen. Der Rest erscheint über den Button unter
 der Tabelle. Sollen von Anfang an alle Zeilen zu sehen sein, den Wert auf `0`
 setzen.
 
+**Frage:** Warum sehe ich in der App keinen Export?
+
+Antwort: In der Staffbase-App (iOS/Android) blendet die Tabelle den Export und
+die Kästchen zur Zeilenauswahl bewusst aus, weil Downloads dort nicht
+zuverlässig funktionieren. Im Browser — auch auf dem Telefon — ist der Export
+vorhanden.
+
 **Frage:** Ein Bild sprengt die ganze Tabelle.
 
 Antwort: Im Reiter **Bilder** den Schalter **Bilder anpassen** einschalten.

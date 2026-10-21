@@ -23,12 +23,13 @@ edit** back.
 | Orientation | Left-aligned, centered, right-aligned as well as top, center, bottom. |
 | Cells | Join, Detach, Insert (Row Top/Bottom, Column Left/Right), Delete (Row(s), Column(s)). |
 | Images | Insert image into cell, adjust image sizes (same height/width as first image, default size), "Adjust images" button. |
-| Data | Sort (ascending, descending, remove sorting), copy format, visible lines, remove formatting, import. |
+| Data | Sort (ascending, descending, remove sorting), copy format, visible lines, export, remove formatting, import. |
 
 ## Settings with side effects
 
 | Setting | Description |
 | --- | --- |
 | Visible rows (tab "Data") | Number of data rows that can be seen immediately on the page; the rest is behind a show button. Default 5, '0' means "always all rows". The header does not count. |
+| Export (tab "Data") | *Off* (default), *Whole table* or *With row selection*. Buttons "Excel (.xlsx)" and "CSV" then appear above the table; with row selection a column of checkboxes is added on the left and the selected rows are exported (all rows if none is selected). The export is not shown in the Staffbase app (iOS/Android). |
 | Adjusting Images (Pictures tab) | When switched on, all images remain within the table width. When switched off, each image appears in its original size — and can blow up the table. |
 | Copy Format (Data tab) | Transfers the format of the current selection to the cells selected next. |

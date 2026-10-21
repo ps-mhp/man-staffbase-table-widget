@@ -85,6 +85,21 @@ Um eine Formatierung auf weitere Zellen zu übertragen:
 3. **Speichern**. Auf der Seite erscheint dann unter der Tabelle ein Button
    „Weitere N Zeilen einblenden“ bzw. „Weniger Zeilen anzeigen“.
 
+## Tabelle zum Download anbieten
+
+1. Reiter **Daten** öffnen.
+2. Unter **Export** wählen:
+   - **Ganze Tabelle** — Leser:innen laden immer die ganze Tabelle herunter.
+   - **Mit Zeilenauswahl** — vor jeder Zeile steht ein Kästchen; exportiert
+     werden die gewählten Zeilen, ohne Auswahl die ganze Tabelle.
+3. **Speichern**. Über der Tabelle erscheinen die Buttons „Excel (.xlsx)“ und
+   „CSV“. Die Excel-Datei behält Formatierung und verbundene Zellen und lässt
+   sich hier wieder importieren; die CSV-Datei öffnet sich in deutschem Excel
+   direkt.
+
+In der Staffbase-App wird der Export nicht angezeigt — dort lassen sich
+Dateien nicht zuverlässig herunterladen. Im mobilen Browser ist er da.
+
 ## Formatierung wieder entfernen
 
 1. Die betroffenen Zellen markieren.
