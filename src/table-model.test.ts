@@ -30,6 +30,7 @@ import {
   setSort,
   setFitImages,
   setVisibleRows,
+  setExportMode,
   cellFormat,
   normalizeRange,
 } from "./table-model";
@@ -41,6 +42,7 @@ const model = (data: string[][], overrides: Partial<TableModel> = {}): TableMode
   sort: null,
   fitImages: true,
   visibleRows: DEFAULT_VISIBLE_ROWS,
+  exportMode: "off",
   ...overrides,
 });
 
@@ -382,5 +384,30 @@ describe("visibleRows", () => {
   it("normalizes a nonsensical limit rather than storing it", () => {
     expect(setVisibleRows(model([["", "A"]]), -1).visibleRows).toBe(DEFAULT_VISIBLE_ROWS);
     expect(setVisibleRows(model([["", "A"]]), 4.7).visibleRows).toBe(4);
+  });
+});
+
+describe("exportMode", () => {
+  it("defaults to off, also for legacy arrays", () => {
+    expect(parseTableModel(undefined).exportMode).toBe("off");
+    expect(parseTableModel(JSON.stringify([["", "A"]])).exportMode).toBe("off");
+  });
+
+  it("reads the known modes and rejects anything else", () => {
+    const read = (exportMode: unknown) =>
+      parseTableModel(JSON.stringify({ data: [["", "A"]], exportMode })).exportMode;
+    expect(read("table")).toBe("table");
+    expect(read("select")).toBe("select");
+    expect(read("everything")).toBe("off");
+  });
+
+  it("keeps the compact array shape when off", () => {
+    expect(JSON.parse(serializeTableModel(model([["", "A"]])))).toEqual([["", "A"]]);
+  });
+
+  it("writes and round-trips a mode", () => {
+    const raw = serializeTableModel(setExportMode(model([["", "A"]]), "select"));
+    expect(JSON.parse(raw)).toMatchObject({ exportMode: "select" });
+    expect(parseTableModel(raw).exportMode).toBe("select");
   });
 });

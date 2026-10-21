@@ -38,6 +38,7 @@ const model = (data: string[][], overrides: Partial<TableModel> = {}): TableMode
   sort: null,
   fitImages: true,
   visibleRows: DEFAULT_VISIBLE_ROWS,
+  exportMode: "off",
   ...overrides,
 });
 
@@ -719,6 +720,7 @@ describe("row limit", () => {
     sort: null,
     fitImages: true,
     visibleRows: DEFAULT_VISIBLE_ROWS,
+    exportMode: "off",
   });
 
   it("shows the stored limit", () => {

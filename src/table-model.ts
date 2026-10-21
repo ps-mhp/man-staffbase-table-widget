@@ -77,7 +77,18 @@ export interface TableModel {
    * counted and never hidden.
    */
   visibleRows: number;
+  /**
+   * Download of the table as .xlsx/.csv in the published widget: `off`, the
+   * whole `table`, or `select` — with a checkbox column to pick rows. Never
+   * shown in the native Staffbase apps (see `native-app.ts`).
+   */
+  exportMode: ExportMode;
 }
+
+export type ExportMode = "off" | "table" | "select";
+
+const parseExportMode = (value: unknown): ExportMode =>
+  value === "table" || value === "select" ? value : "off";
 
 export const formatKey = (row: number, col: number): string => `${row},${col}`;
 
@@ -116,7 +127,7 @@ const isValidMerge = (m: unknown): m is Merge =>
  *    today, because it is the only form the translation pipeline cannot
  *    corrupt;
  *  - a JSON **object** with `data`/`merges`/`formats`/`sort`/`fitImages`/
- *    `visibleRows`;
+ *    `visibleRows`/`exportMode`;
  *  - a legacy JSON **array** (`string[][]`), read as a model with no merges,
  *    formats or preset sort, so existing instances render exactly as before.
  *
@@ -130,6 +141,7 @@ export function parseTableModel(raw: string | undefined | null): TableModel {
     sort: null,
     fitImages: true,
     visibleRows: DEFAULT_VISIBLE_ROWS,
+    exportMode: "off",
   });
 
   if (!raw) return empty(parseTableData(raw));
@@ -198,6 +210,7 @@ export function parseTableModel(raw: string | undefined | null): TableModel {
     fitImages: obj.fitImages !== false,
     visibleRows:
       obj.visibleRows === undefined ? DEFAULT_VISIBLE_ROWS : clampVisibleRows(obj.visibleRows),
+    exportMode: parseExportMode(obj.exportMode),
   };
 }
 
@@ -216,8 +229,9 @@ export function serializeTableModel(model: TableModel): string {
   // and every plain one written after it — in the compact array form.
   const hasImageFit = model.fitImages === false;
   const hasRowLimit = model.visibleRows !== DEFAULT_VISIBLE_ROWS;
+  const hasExport = model.exportMode !== "off";
 
-  if (!hasMerges && !hasFormats && !hasSort && !hasImageFit && !hasRowLimit) {
+  if (!hasMerges && !hasFormats && !hasSort && !hasImageFit && !hasRowLimit && !hasExport) {
     return JSON.stringify(model.data);
   }
   return JSON.stringify({
@@ -227,6 +241,7 @@ export function serializeTableModel(model: TableModel): string {
     sort: model.sort,
     ...(hasImageFit ? { fitImages: false } : {}),
     ...(hasRowLimit ? { visibleRows: model.visibleRows } : {}),
+    ...(hasExport ? { exportMode: model.exportMode } : {}),
   });
 }
 
@@ -480,6 +495,11 @@ export function setFitImages(model: TableModel, fitImages: boolean): TableModel 
 /** Sets how many data rows show before the table collapses; `0` shows all. */
 export function setVisibleRows(model: TableModel, visibleRows: number): TableModel {
   return { ...model, visibleRows: clampVisibleRows(visibleRows) };
+}
+
+/** Sets whether — and how — the published table offers a download. */
+export function setExportMode(model: TableModel, exportMode: ExportMode): TableModel {
+  return { ...model, exportMode };
 }
 
 export const cellFormat = (model: TableModel, row: number, col: number): CellFormat =>

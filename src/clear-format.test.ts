@@ -28,6 +28,7 @@ const model = (data: string[][], extra: Partial<TableModel> = {}): TableModel =>
   sort: null,
   fitImages: true,
   visibleRows: DEFAULT_VISIBLE_ROWS,
+  exportMode: "off",
   ...extra,
 });
 

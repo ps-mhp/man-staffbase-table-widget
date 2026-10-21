@@ -43,6 +43,7 @@ const emptyModel = (data: string[][]): TableModel => ({
   sort: null,
   fitImages: true,
   visibleRows: DEFAULT_VISIBLE_ROWS,
+  exportMode: "off",
 });
 
 /** Pads every row to the widest row length so the grid stays rectangular. */
@@ -225,5 +226,5 @@ export async function importXlsx(buffer: ArrayBuffer): Promise<TableModel> {
     data.push(row);
   }
 
-  return { data: rectangular(data), merges, formats, sort: null, fitImages: true, visibleRows: DEFAULT_VISIBLE_ROWS };
+  return { data: rectangular(data), merges, formats, sort: null, fitImages: true, visibleRows: DEFAULT_VISIBLE_ROWS, exportMode: "off" };
 }
