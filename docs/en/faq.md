@@ -48,11 +48,12 @@ preset to 5 data rows. The rest appears via the button under
 table. If you want all rows to be visible from the beginning, set the value to '0'
 . 
 
-**Question:** Why is there no export in the app?
+**Question:** Why don't I see an export in the app? 
 
-Answer: In the Staffbase app (iOS/Android) the table deliberately hides the
-export and the row-selection checkboxes, because downloads do not work
-reliably there. In the browser — on the phone too — the export is available.
+Answer: In the Staffbase app (iOS/Android), the table hides the export and
+the boxes for line selection are deliberately selected, because downloads are not available there.
+function reliably. In the browser — even on the phone — the export
+available. 
 
 **Question:** One picture blows up the whole table. 
 

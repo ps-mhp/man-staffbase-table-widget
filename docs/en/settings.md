@@ -30,6 +30,6 @@ edit** back.
 | Setting | Description |
 | --- | --- |
 | Visible rows (tab "Data") | Number of data rows that can be seen immediately on the page; the rest is behind a show button. Default 5, '0' means "always all rows". The header does not count. |
-| Export (tab "Data") | *Off* (default), *Whole table* or *With row selection*. Buttons "Excel (.xlsx)" and "CSV" then appear above the table; with row selection a column of checkboxes is added on the left and the selected rows are exported (all rows if none is selected). The export is not shown in the Staffbase app (iOS/Android). |
+| Export (tab "Data") | *Off* (default), *Whole table* or *With row selection*. The buttons "Excel (.xlsx)" and "CSV" then appear above the table; with row selection, a column with boxes is added on the left, the selected rows are exported (without selecting all). In the Staffbase app (iOS/Android) the export is not displayed. |
 | Adjusting Images (Pictures tab) | When switched on, all images remain within the table width. When switched off, each image appears in its original size — and can blow up the table. |
 | Copy Format (Data tab) | Transfers the format of the current selection to the cells selected next. |

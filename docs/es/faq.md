@@ -48,6 +48,13 @@ preestablecido a 5 filas de datos. El resto aparece mediante el botón de abajo
 tabla. Si quieres que todas las filas sean visibles desde el principio, pon el valor en '0'
 . 
 
+**Pregunta:** ¿Por qué no veo una exportación en la app? 
+
+Respuesta: En la app Staffbase (iOS/Android), la tabla oculta la exportación y
+Las cajas para la selección de líneas se seleccionan deliberadamente, porque no hay descargas disponibles allí.
+Funcionan de forma fiable. En el navegador — incluso en el teléfono — la exportación
+Disponible. 
+
 **Pregunta:** Una foto hace explotar toda la mesa. 
 
 Respuesta: En la pestaña **Imágenes**, activa el interruptor de **Ajustar imágenes**. 

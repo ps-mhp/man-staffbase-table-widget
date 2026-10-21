@@ -48,6 +48,13 @@ impostato a 5 righe dati. Il resto appare tramite il pulsante sottostante
 tabella. Se vuoi che tutte le righe siano visibili dall'inizio, imposta il valore a '0'
 . 
 
+**Domanda:** Perché non vedo un'esportazione nell'app? 
+
+Risposta: Nell'app Staffbase (iOS/Android), la tabella nasconde l'esportazione e
+Le caselle per la selezione delle righe sono selezionate deliberatamente, perché i download non sono disponibili lì.
+funziona in modo affidabile. Nel browser — anche sul telefono — l'esportazione
+disponibile. 
+
 **Domanda:** Una foto fa esplodere tutto il tavolo. 
 
 Risposta: Nella scheda **Immagini**, attiva l'interruttore **Regola immagini**. 

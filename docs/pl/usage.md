@@ -85,6 +85,21 @@ Aby przenieść formatowanie do innych komórek:
 3. **Zapisz**. Następnie na stronie pod stołem pojawi się przycisk
    "Pokaż więcej N wierszy" lub "Pokaż mniej wierszy". 
 
+## Tabela ofert do pobrania
+
+1. Otwórz zakładkę **Data**. 
+2. W sekcji **Eksport** wybierz: 
+   - **Cały stół** — Czytelnicy zawsze pobierają cały stół. 
+   - **Z wybieraniem wiersza** — przed każdą linią znajduje się ramka; eksportowane
+     wybrane wiersze, bez zaznaczania całej tabeli. 
+3. **Zapisz**. Nad stołem znajdują się przyciski "Excel (.xlsx)" oraz
+   CSV. Plik Excel zachowuje formatowanie i połączone komórki, co pozwala
+   import tutaj ponownie; plik CSV otwiera się w niemieckim Excelu
+   bezpośrednio. 
+
+Eksport nie jest wyświetlany w aplikacji Staffbase — tam możesz
+Pobieraj pliki niezawodnie. Jest dostępny w przeglądarce mobilnej. 
+
 ## Usuń formatowanie ponownie
 
 1. Oznacz dotknięte komórki. 

@@ -85,6 +85,21 @@ Om een opmaak over te zetten naar andere cellen:
 3. **Opslaan**. Er verschijnt dan een knop op de pagina onder de tabel
    "Meer N rijen tonen" of "Minder rijen tonen". 
 
+## Aanbiedingstabel voor download
+
+1. Open het **Data**-tabblad. 
+2. Selecteer onder **Exporteren**: 
+   - **Hele tafel** — Lezers downloaden altijd de hele tabel. 
+   - **Met rijselectie** — er is een vakje voor elke regel; geëxporteerd
+     de geselecteerde rijen, zonder de hele tabel te selecteren. 
+3. **Opslaan**. Boven de tabel verschijnen de knoppen "Excel (.xlsx)" en
+   CSV. Het Excel-bestand behoudt de opmaak en samengevoegde cellen, en maakt het mogelijk
+   importeren hier opnieuw; het CSV-bestand opent in Duits Excel
+   direct. 
+
+De export wordt niet weergegeven in de Staffbase-app — daar kan je dat wel
+Download bestanden betrouwbaar. Het staat in de mobiele browser. 
+
 ## Verwijder opnieuw de opmaak
 
 1. Markeer de getroffen cellen. 

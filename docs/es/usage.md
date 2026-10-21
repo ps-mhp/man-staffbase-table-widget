@@ -85,6 +85,21 @@ Para transferir un formato a otras celdas:
 3. **Guardar**. A continuación, aparecerá un botón en la página debajo de la tabla
    "Mostrar más filas N" o "Mostrar menos filas". 
 
+## Tabla de ofertas para descargar
+
+1. Abre la pestaña **Datos**. 
+2. En **Exportar** seleccionar: 
+   - **Tabla completa** — Los lectores siempre descargan la tabla completa. 
+   - **Con selección de fila** — hay un recuadro delante de cada línea; exportado
+     las filas seleccionadas, sin seleccionar toda la tabla. 
+3. **Guardar**. Encima de la tabla aparecen los botones "Excel (.xlsx)" y
+   CSV. El archivo de Excel conserva el formato y las celdas fusionadas, y permite
+   importar aquí de nuevo; el archivo CSV se abre en Excel alemán
+   directamente. 
+
+La exportación no se muestra en la app Staffbase — allí puedes
+Descarga archivos de forma fiable. Está ahí en el navegador móvil. 
+
 ## Quitar el formato otra vez
 
 1. Marcar las células afectadas. 

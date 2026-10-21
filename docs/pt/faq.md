@@ -48,6 +48,13 @@ preset para 5 linhas de dados. O restante aparece pelo botão abaixo
 tabela. Se você quiser que todas as linhas fiquem visíveis desde o início, defina o valor para '0'
 . 
 
+**Pergunta:** Por que não vejo uma exportação no app? 
+
+Resposta: No app Staffbase (iOS/Android), a tabela esconde a exportação e
+As caixas para seleção de linhas são selecionadas deliberadamente, pois os downloads não estão disponíveis lá.
+funcionar de forma confiável. No navegador — até mesmo no celular — a exportação
+disponível. 
+
 **Pergunta:** Uma foto explode a mesa inteira. 
 
 Resposta: Na aba **Imagens**, ative o botão de **Ajustar imagens**. 

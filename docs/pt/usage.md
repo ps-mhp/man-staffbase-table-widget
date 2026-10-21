@@ -85,6 +85,21 @@ Para transferir uma formatação para outras células:
 3. **Salvar**. Um botão então aparecerá na página abaixo da tabela
    "Mostrar mais N linhas" ou "Mostrar menos linhas". 
 
+## Tabela de ofertas para download
+
+1. Abra a aba **Data**. 
+2. Em **Export**, selecionar: 
+   - **Tabela inteira** — Leitores sempre baixam a tabela inteira. 
+   - **Com seleção de linha** — há uma caixa na frente de cada linha; exportado
+     as linhas selecionadas, sem selecionar toda a tabela. 
+3. **Salvar**. Acima da tabela aparecem os botões "Excel (.xlsx)" e
+   CSV. O arquivo Excel mantém a formatação e as células mescladas, e permite
+   importar aqui novamente; o arquivo CSV abre no Excel alemão
+   diretamente. 
+
+A exportação não é exibida no aplicativo Staffbase — lá você pode
+Baixe arquivos de forma confiável. Está lá no navegador móvel. 
+
 ## Remover a formatação novamente
 
 1. Marque as células afetadas. 

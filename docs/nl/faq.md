@@ -48,6 +48,13 @@ Vooraf ingesteld op 5 datarijen. De rest verschijnt via de knop eronder
 tabel. Als je wilt dat alle rijen vanaf het begin zichtbaar zijn, zet dan de waarde op '0'
 . 
 
+**Vraag:** Waarom zie ik geen export in de app? 
+
+Antwoord: In de Staffbase-app (iOS/Android) verbergt de tabel de export en
+De vakjes voor regelselectie zijn bewust geselecteerd, omdat downloads daar niet beschikbaar zijn.
+Functioneren betrouwbaar. In de browser — zelfs op de telefoon — exporteert de export
+beschikbaar. 
+
 **Vraag:** Eén foto blaast de hele tafel op. 
 
 Antwoord: Zet in het **Afbeeldingen**-tabblad de **Afbeeldingen aanpassen**-schakelaar aan. 

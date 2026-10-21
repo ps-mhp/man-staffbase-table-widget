@@ -48,6 +48,13 @@ Ustawione na 5 wierszy danych. Reszta pojawia się za pomocą przycisku poniżej
 tabela. Jeśli chcesz, aby wszystkie wiersze były widoczne od początku, ustaw wartość na '0'
 . 
 
+**Pytanie:** Dlaczego nie widzę eksportu w aplikacji? 
+
+Odpowiedź: W aplikacji Staffbase (iOS/Android) tabela ukrywa eksport i
+Pola wyboru linii są celowo wybierane, ponieważ nie są tam dostępne pliki do pobrania.
+działają niezawodnie. W przeglądarce — nawet na telefonie — eksport
+dostępne. 
+
 **Pytanie:** Jedno zdjęcie wybucha na całym stole. 
 
 Odpowiedź: W zakładce **Obrazy** włącz przełącznik **Dostosuj obrazy**. 

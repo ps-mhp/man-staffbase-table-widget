@@ -85,6 +85,21 @@ Per trasferire una formattazione ad altre celle:
 3. **Salva**. Un pulsante apparirà quindi sulla pagina sotto la tabella
    "Mostra più N righe" o "Mostra meno righe". 
 
+## Tabella delle offerte per il download
+
+1. Apri la scheda **Data**. 
+2. Sotto **Esporta** seleziona: 
+   - **Tabellone intera** — I lettori scaricano sempre tutta la tabella. 
+   - **Con la selezione della riga** — c'è una casella davanti a ogni riga; esportato
+     le righe selezionate, senza selezionare l'intera tabella. 
+3. **Salva**. Sopra la tabella compaiono i pulsanti "Excel (.xlsx)" e
+   CSV. Il file Excel mantiene la formattazione e le celle unite, e consente
+   importare di nuovo qui; il file CSV si apre in Excel tedesco
+   direttamente. 
+
+L'esportazione non viene visualizzata nell'app Staffbase — lì puoi
+Scarica file in modo affidabile. È lì nel browser mobile. 
+
 ## Rimuovi di nuovo la formattazione
 
 1. Segna le cellule interessate. 

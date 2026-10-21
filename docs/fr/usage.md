@@ -85,6 +85,21 @@ Pour transférer une mise en forme dans d’autres cellules :
 3. **Enregistrer**. Un bouton apparaîtra alors sur la page sous le tableau
    « Afficher plus de N lignes » ou « Afficher moins de lignes ». 
 
+## Tableau des offres à télécharger
+
+1. Ouvrez l’onglet **Data**. 
+2. Sous **Exporter**, sélectionnez : 
+   - **Tableau entier** — Les lecteurs téléchargent toujours le tableau entier. 
+   - **Avec sélection de ligne** — il y a une case devant chaque ligne ; exporté
+     les lignes sélectionnées, sans sélectionner toute la table. 
+3. **Sauvegarder**. Au-dessus du tableau apparaissent les boutons « Excel (.xlsx) » et
+   CSV. Le fichier Excel conserve la mise en forme et les cellules fusionnées, et permet
+   importer ici à nouveau ; le fichier CSV s’ouvre dans Excel allemand
+   directement. 
+
+L’exportation n’est pas affichée dans l’application Staffbase — là-bas, vous pouvez
+Téléchargez les fichiers de manière fiable. C’est là dans le navigateur mobile. 
+
 ## Supprimer à nouveau la mise en forme
 
 1. Marquez les cellules concernées. 

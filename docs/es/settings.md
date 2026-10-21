@@ -23,12 +23,13 @@ edición** de vuelta.
 | Orientación | Alineado a la izquierda, centrado, alineado a la derecha, así como arriba, centro, abajo. |
 | Celdas | Unir, desacoplar, insertar (fila arriba/abajo, columna izquierda/derecha), eliminar (fila(s), columna(s)). |
 | Imágenes | Inserta la imagen en la celda, ajusta el tamaño de la imagen (misma altura/ancho que la primera imagen, tamaño por defecto), botón de "Ajustar imágenes". |
-| Datos | Ordenar (ascendente, descendente, eliminar ordenación), copiar formato, líneas visibles, eliminar formato, importar. |
+| Datos | Ordenar (ascendente, descendente, eliminar ordenar), copiar formato, líneas visibles, exportar, eliminar formateo, importar. |
 
 ## Ajustes con efectos secundarios
 
 | Ambientación | Descripción |
 | --- | --- |
 | Filas visibles (pestaña "Datos") | Número de filas de datos que pueden verse inmediatamente en la página; el resto está detrás de un botón de mostrar. Por defecto 5, '0' significa "siempre todas las filas". El encabezado no cuenta. |
+| Exportar (pestaña "Datos") | *Apagado* (por defecto), *Tabla completa* o *Con selección de filas*. Los botones "Excel (.xlsx)" y "CSV" aparecen entonces sobre la tabla; con la selección de filas, se añade una columna con cuadros a la izquierda, las filas seleccionadas se exportan (sin seleccionar todas). En la app Staffbase (iOS/Android) la exportación no se muestra. |
 | Ajustando imágenes (pestaña Imágenes) | Cuando está activada, todas las imágenes permanecen dentro del ancho de la tabla. Cuando está desactivada, cada imagen aparece en su tamaño original — y puede ampliar la tabla. |
 | Copiar Formato (pestaña de datos) | Transfiere el formato de la selección actual a las celdas seleccionadas a continuación. |

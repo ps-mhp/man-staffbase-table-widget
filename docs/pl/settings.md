@@ -23,12 +23,13 @@ Edycja** z powrotem.
 | Orientacja | Lewo wyrównane, wyśrodkowane, prawoprawne, a także górne, środkowe, dolne. |
 | Komórki | Łącz, odłącz, wstaw (wiersz górny/dolny, kolumna lewa/prawa), usuń (wiersz(y), kolumny). |
 | Obrazy | Wstaw obraz do komórki, dostosuj rozmiar obrazu (ta sama wysokość/szerokość co pierwszy obraz, domyślny rozmiar), przycisk "Dostosuj obrazy". |
-| Dane | Sortuj (rosnąco, malejąco, usuń sortowanie), kopiuj format, widoczne linie, usuń formatowanie, importuj. |
+| Dane | Sortuj (rosnąco, malejąco, usuń sortowanie), kopiuj format, widoczne linie, eksportuj, usuń formatowanie, importuj. |
 
 ## Ustawienia z efektami ubocznymi
 
 | Miejsce akcji | Opis |
 | --- | --- |
 | Widoczne wiersze (zakładka "Dane") | Liczba wierszy danych, które można zobaczyć natychmiast na stronie; reszta znajduje się za przyciskiem pokazuj. Domyślnie 5, '0' oznacza "zawsze wszystkie wiersze". Nagłówek się nie liczy. |
+| Eksport (zakładka "Dane") | *Wyłączone* (domyślne), *Cała tabela* lub *Z zaznaczeniem wierszy*. Przyciski "Excel (.xlsx)" i "CSV" pojawiają się nad tabelą; przy wyborze wiersza po lewej stronie dodaje się kolumnę z polami, wybrane wiersze są eksportowane (bez zaznaczania wszystkich). W aplikacji Staffbase (iOS/Android) eksport nie jest wyświetlany. |
 | Regulacja obrazów (zakładka Obrazy) | Po włączeniu wszystkie obrazy pozostają w szerokości tabeli. Po wyłączeniu każdy obraz pojawia się w oryginalnym rozmiarze — i może powiększyć tabelę. |
 | Format kopiowania (zakładka Dane) | Przenosi format aktualnego wyboru do wybranych kolejnych komórek. |

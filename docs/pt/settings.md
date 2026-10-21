@@ -23,12 +23,13 @@ edit** de volta.
 | Orientação | Alinhado à esquerda, centralizado, alinhado à direita, assim como em cima, centro, baixo. |
 | Células | Join, Separar, Inserir (linha acima/inferior, coluna esquerda/direita), Delete (linha(s), coluna(s)). |
 | Imagens | Insira a imagem na célula, ajuste o tamanho da imagem (mesma altura/largura da primeira imagem, tamanho padrão), botão "Ajustar imagens". |
-| Dados | Ordenar (ascendente, descendente, remover ordenação), copiar formatar, linhas visíveis, remover formatação, importar. |
+| Dados | Ordenar (ascendente, descendente, remover ordenação), copiar formatar, linhas visíveis, exportar, remover formatação, importar. |
 
 ## Configurações com efeitos colaterais
 
 | Cenário | Descrição |
 | --- | --- |
 | Linhas visíveis (aba "Dados") | Número de linhas de dados que podem ser vistas imediatamente na página; o restante está atrás de um botão mostrar. Padrão 5, '0' significa "sempre todas as linhas". O cabeçalho não conta. |
+| Exportar (aba "Data") | *Desligado* (padrão), *Tabela inteira* ou *Com seleção de linhas*. Os botões "Excel (.xlsx)" e "CSV" então aparecem acima da tabela; com seleção de linhas, uma coluna com caixas é adicionada à esquerda, as linhas selecionadas são exportadas (sem selecionar todas). No aplicativo Staffbase (iOS/Android) a exportação não é exibida. |
 | Ajustando Imagens (Aba Imagens) | Quando ativada, todas as imagens permanecem dentro da largura da tabela. Quando desligada, cada imagem aparece em seu tamanho original — e pode ampliar a tabela. |
 | Copiar Formato (aba Data) | Transfere o formato da seleção atual para as células selecionadas a seguir. |

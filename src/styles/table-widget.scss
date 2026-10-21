@@ -48,12 +48,37 @@ $head-ink: #161616;
     // hinzufügt. Breite Tabellen scrollen weiterhin seitlich (mobil wie
     // desktop).
     overflow: auto;
+    // Kein Zurückschwingen der Seite, wenn die Tabelle am Rand angekommen
+    // ist: auf dem Telefon löste das waagerechte Wischen sonst die
+    // Zurück-Geste des Browsers aus, mitten im Lesen der Tabelle.
+    overscroll-behavior-x: contain;
     width: 100%;
     max-width: 100%;
     // Bezugsgröße für `cqw` — die Bilddeckelung und die erste Spalte messen
     // diesen Container, nicht ihre Zelle.
     container-type: inline-size;
     background: transparent;
+
+    // Zeigt auf dem Telefon an, dass seitlich noch etwas steht. Dort blendet
+    // die Bildlaufleiste aus, und am 15.10.2026 bei 393x852 war an einer
+    // abgeschnittenen Tabelle nicht zu erkennen, dass sie weitergeht; auf dem
+    // Schreibtisch sagt es die Leiste selbst, deshalb bleibt es schmalen
+    // Bildschirmen vorbehalten.
+    //
+    // Der Kniff kommt ohne JavaScript aus und — anders als ein fester
+    // Verlauf — ohne falschen Alarm: die beiden deckenden Verläufe liegen
+    // `local` und wandern mit dem Inhalt, die beiden Schatten liegen `scroll`
+    // und bleiben am Rand. Am linken Anschlag deckt der erste Verlauf den
+    // linken Schatten zu, am rechten der zweite den rechten; dazwischen
+    // stehen beide. Passt die Tabelle ganz ins Bild, decken beide Verläufe
+    // beide Schatten — es ist dann nichts zu sehen.
+    @media (max-width: 767px) {
+      background:
+        linear-gradient(to right, #{man("surface")}, transparent) left center / 24px 100% no-repeat local,
+        linear-gradient(to left, #{man("surface")}, transparent) right center / 24px 100% no-repeat local,
+        radial-gradient(farthest-side at 0 50%, #{man-alpha("slate-900", 0.16)}, transparent) left center / 12px 100% no-repeat scroll,
+        radial-gradient(farthest-side at 100% 50%, #{man-alpha("slate-900", 0.16)}, transparent) right center / 12px 100% no-repeat scroll;
+    }
   }
 
   &__table {

@@ -48,6 +48,13 @@ préréglé à 5 lignes de données. Le reste apparaît via le bouton en dessous
 table. Si vous voulez que toutes les lignes soient visibles dès le début, mettez la valeur à '0'
 . 
 
+**Question :** Pourquoi je ne vois pas d’export dans l’application ? 
+
+Réponse : Dans l’application Staffbase (iOS/Android), le tableau masque l’export et
+Les cases pour la sélection des lignes sont délibérément sélectionnées, car les téléchargements n’y sont pas disponibles.
+fonctionnent de manière fiable. Dans le navigateur — même sur le téléphone — l’export
+disponible. 
+
 **Question :** Une photo fait exploser toute la table. 
 
 Réponse : Dans l’onglet **Images**, activez l’interrupteur **Ajuster les images**. 

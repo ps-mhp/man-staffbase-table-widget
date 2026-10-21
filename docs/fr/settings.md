@@ -23,12 +23,13 @@ exclusivement via l'**Éditeur de table**, qui est automatiquement
 | Orientation | Aligné à gauche, centré, aligné à droite ainsi qu’en haut, centre, bas. |
 | Cellules | Joindre, détacher, insérer (ligne haut/bas, colonne gauche/droite), supprimer (ligne(s), colonne(s)). |
 | Images | Insérer l’image dans la cellule, ajuster la taille des images (même hauteur/largeur que la première image, taille par défaut), bouton « Ajuster les images ». |
-| Données | Trier (ascendant, descendant, retirer le tri), copier format, lignes visibles, supprimer la mise en forme, importer. |
+| Données | Trier (ascendant, descendant, supprimer le tri), copier le format, lignes visibles, exporter, supprimer la mise en forme, importer. |
 
 ## Réglages avec effets secondaires
 
 | Cadre | Description |
 | --- | --- |
 | Lignes visibles (onglet « Données ») | Nombre de lignes de données visibles immédiatement sur la page ; le reste se trouve derrière un bouton d’affichage. Par défaut 5, « 0 » signifie « toujours toutes les lignes ». L’en-tête ne compte pas. |
+| Export (onglet « Données ») | *Off* (par défaut), *Tableau entier* ou *Avec sélection de lignes*. Les boutons « Excel (.xlsx) » et « CSV » apparaissent alors au-dessus du tableau ; avec la sélection des lignes, une colonne avec des cases est ajoutée à gauche, les lignes sélectionnées sont exportées (sans toutes sélectionner). Dans l’application Staffbase (iOS/Android), l’exportation n’est pas affichée. |
 | Ajustement des images (onglet Images) | Lorsqu’elle est activée, toutes les images restent dans la largeur de la table. Lorsqu’elles sont désactivées, chaque image apparaît à sa taille d’origine — et peut agrandir la table. |
 | Copie du format (onglet Données) | Transfert du format de la sélection actuelle vers les cellules sélectionnées ensuite. |
