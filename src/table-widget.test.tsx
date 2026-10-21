@@ -1,9 +1,22 @@
 import React from "react";
-import { screen, render, fireEvent } from "@testing-library/react";
+import { screen, render, fireEvent, waitFor, within } from "@testing-library/react";
 
 import { TableWidget } from "./table-widget";
+import { downloadFile } from "./download";
+import { toXlsx } from "./table-export";
+import { isNativeApp } from "@shared/staffbase/native-app";
 import { serializeTableData } from "./table-json";
 import { IMAGE_FIT_CLASS, IMAGE_NO_FIT_CLASS } from "./image-fit";
+
+jest.mock("./download", () => ({
+  ...jest.requireActual("./download"),
+  downloadFile: jest.fn(),
+}));
+jest.mock("./table-export", () => {
+  const actual = jest.requireActual("./table-export");
+  return { ...actual, toXlsx: jest.fn(actual.toXlsx) };
+});
+jest.mock("@shared/staffbase/native-app", () => ({ isNativeApp: jest.fn(() => false) }));
 
 describe("TableWidget", () => {
   it("renders the default table when no data is provided", () => {
@@ -424,5 +437,122 @@ describe("TableWidget", () => {
 
       expect(screen.getByText("5").closest("td")).toHaveAttribute("rowspan", "3");
     });
+  });
+});
+
+describe("TableWidget row selection and export", () => {
+  const data = [
+    ["", "Q1"],
+    ["Umsatz", "100"],
+    ["Kosten", "50"],
+    ["Gewinn", "50"],
+  ];
+  const table = (exportMode: string, extra: object = {}) =>
+    JSON.stringify({ data, exportMode, ...extra });
+  const downloaded = () => (downloadFile as jest.Mock).mock.calls.at(-1) as [string, string, string];
+  const csvLines = () => downloaded()[0].replace("\uFEFF", "").trim().split("\r\n");
+
+  beforeEach(() => {
+    (downloadFile as jest.Mock).mockClear();
+    (isNativeApp as jest.Mock).mockReturnValue(false);
+  });
+
+  it("offers neither checkboxes nor downloads when export is off", () => {
+    render(<TableWidget contentLanguage="de_DE" tabledata={serializeTableData(data)} />);
+    expect(screen.queryByRole("checkbox")).toBeNull();
+    expect(screen.queryByRole("button", { name: /Excel/ })).toBeNull();
+  });
+
+  it("downloads the whole table in mode all, without counter or checkboxes", () => {
+    render(<TableWidget contentLanguage="de_DE" tabledata={table("all")} />);
+    expect(screen.queryByRole("checkbox")).toBeNull();
+    expect(screen.queryByText(/ausgewählt/)).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Ganze Tabelle als CSV exportieren" }));
+
+    expect(csvLines()).toEqual([";Q1", "Umsatz;100", "Kosten;50", "Gewinn;50"]);
+    expect(downloaded()[1]).toMatch(/^tabelle-\d{4}-\d{2}-\d{2}\.csv$/);
+  });
+
+  it("selects rows, keeps the selection across sorting and exports only it", () => {
+    render(<TableWidget contentLanguage="de_DE" tabledata={table("select")} />);
+    const all = screen.getByRole("checkbox", { name: "Alle Zeilen auswählen" }) as HTMLInputElement;
+    expect(screen.getByText("Keine Zeile ausgewählt")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("checkbox", { name: "Zeile auswählen: Kosten" }));
+
+    expect(all.indeterminate).toBe(true);
+    expect(all.checked).toBe(false);
+    expect(screen.getByText("1 Zeile ausgewählt")).toBeInTheDocument();
+    expect(screen.getByRole("rowheader", { name: "Kosten" }).closest("tr")).toHaveClass("table-widget__row--selected");
+
+    fireEvent.click(screen.getByRole("columnheader", { name: "Q1" }));
+    expect(screen.getByRole("checkbox", { name: "Zeile auswählen: Kosten" })).toBeChecked();
+
+    fireEvent.click(screen.getByRole("button", { name: "Auswahl (1 Zeile) als CSV exportieren" }));
+    expect(csvLines()).toEqual([";Q1", "Kosten;50"]);
+  });
+
+  it("does not sort when the select-all header is clicked", () => {
+    render(<TableWidget contentLanguage="de_DE" tabledata={table("select")} />);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Alle Zeilen auswählen" }));
+    const titles = screen.getAllByRole("rowheader").map((cell) => cell.textContent);
+    expect(titles).toEqual(["Umsatz", "Kosten", "Gewinn"]);
+  });
+
+  it("selects every row, collapsed ones included, and clears them again", () => {
+    render(<TableWidget contentLanguage="de_DE" tabledata={table("select", { visibleRows: 1 })} />);
+    const all = screen.getByRole("checkbox", { name: "Alle Zeilen auswählen" });
+
+    fireEvent.click(all);
+    expect(all).toBeChecked();
+    expect(screen.getByText("3 Zeilen ausgewählt")).toBeInTheDocument();
+
+    fireEvent.click(all);
+    expect(all).not.toBeChecked();
+    expect(screen.getByText("Keine Zeile ausgewählt")).toBeInTheDocument();
+  });
+
+  it("selects all from a partial selection", () => {
+    render(<TableWidget contentLanguage="de_DE" tabledata={table("select")} />);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Zeile auswählen: Umsatz" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Alle Zeilen auswählen" }));
+    expect(screen.getByText("3 Zeilen ausgewählt")).toBeInTheDocument();
+  });
+
+  it("shows no selection and no export inside the native app", () => {
+    (isNativeApp as jest.Mock).mockReturnValue(true);
+    render(<TableWidget contentLanguage="de_DE" tabledata={table("select")} />);
+    expect(screen.queryByRole("checkbox")).toBeNull();
+    expect(screen.queryByRole("button", { name: /exportieren/ })).toBeNull();
+  });
+
+  it("downloads an xlsx file", async () => {
+    render(<TableWidget contentLanguage="de_DE" tabledata={table("all")} />);
+    fireEvent.click(screen.getByRole("button", { name: "Ganze Tabelle als Excel exportieren" }));
+    await waitFor(() => expect(downloadFile).toHaveBeenCalled());
+    expect(downloaded()[1]).toMatch(/\.xlsx$/);
+  });
+
+  it("reports a failed export and frees the button", async () => {
+    jest.spyOn(console, "error").mockImplementation(() => undefined);
+    (toXlsx as jest.Mock).mockRejectedValueOnce(new Error("boom"));
+    render(<TableWidget contentLanguage="de_DE" tabledata={table("all")} />);
+    const button = screen.getByRole("button", { name: "Ganze Tabelle als Excel exportieren" });
+
+    fireEvent.click(button);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Export fehlgeschlagen. Bitte erneut versuchen.");
+    expect(button).not.toBeDisabled();
+    expect(downloadFile).not.toHaveBeenCalled();
+    (console.error as jest.Mock).mockRestore();
+  });
+
+  it("puts the bar outside the scrolling wrapper", () => {
+    const { container } = render(<TableWidget contentLanguage="de_DE" tabledata={table("select")} />);
+    const bar = container.querySelector(".table-widget__export") as HTMLElement;
+    expect(bar.closest(".table-widget-scroll")).toBeNull();
+    expect(within(bar).getAllByRole("button")).toHaveLength(2);
+    expect(container.firstElementChild).toHaveClass("table-widget--selectable");
   });
 });

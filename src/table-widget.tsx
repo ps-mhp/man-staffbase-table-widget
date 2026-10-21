@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-import React, { ReactElement, useId, useMemo, useState } from "react";
+import React, { ReactElement, useEffect, useId, useMemo, useRef, useState } from "react";
 import { BlockAttributes } from "widget-sdk";
 import {
   parseTableModel,
@@ -33,6 +33,9 @@ import {
   hiddenRowCount,
   visibleRowOrder,
 } from "./row-collapse";
+import { isNativeApp } from "@shared/staffbase/native-app";
+import { CSV_MIME, XLSX_MIME, buildExportGrid, toCsv, toXlsx } from "./table-export";
+import { downloadFile, exportFileName } from "./download";
 
 /**
  * React Component
@@ -50,6 +53,18 @@ const CELL_HEAD = `${CELL} ${CELL}--head`;
 const CELL_ROWHEAD = `${CELL} ${CELL}--rowhead`;
 const CELL_FIRST = `${CELL}--first`;
 const CELL_GAP = `${CELL}--gap`;
+const CELL_SELECT = `${CELL} ${CELL}--select`;
+const CELL_SELECT_HEAD = `${CELL_SELECT} ${CELL}--select-head`;
+const ROW_SELECTED = "table-widget__row--selected";
+
+type ExportFormat = "xlsx" | "csv";
+const FORMAT_LABEL: Record<ExportFormat, string> = { xlsx: "Excel", csv: "CSV" };
+const FORMAT_BUTTON: Record<ExportFormat, string> = { xlsx: "Excel (.xlsx)", csv: "CSV" };
+
+const rowsLabel = (count: number): string => (count === 1 ? "1 Zeile" : `${count} Zeilen`);
+
+const selectionLabel = (count: number): string =>
+  count === 0 ? "Keine Zeile ausgewählt" : `${rowsLabel(count)} ausgewählt`;
 
 /** The extra top padding that separates the first body row from the header. */
 const gapClass = (displayIndex: number): string => (displayIndex === 0 ? ` ${CELL_GAP}` : "");
@@ -81,6 +96,18 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
   // it unique when a page carries several tables.
   const bodyId = `table-widget-body-${useId()}`;
 
+  // In der Staffbase-App gibt es weder Auswahl noch Download: Blob-Downloads
+  // sind in deren WebViews nicht verlässlich.
+  const exportMode = isNativeApp() ? "off" : model.exportMode;
+  const selectable = exportMode === "select";
+  // Wie `expanded` ein Lesezustand: nichts davon wird gespeichert. Schlüssel
+  // ist der ursprüngliche Zeilenindex, so übersteht die Auswahl Sortieren
+  // und Einklappen.
+  const [selected, setSelected] = useState<ReadonlySet<number>>(() => new Set());
+  const [busy, setBusy] = useState<ExportFormat | null>(null);
+  const [failed, setFailed] = useState(false);
+  const selectAllRef = useRef<HTMLInputElement>(null);
+
   const [sort, setSort] = useState<SortState | null>(
     model.sort ? { col: model.sort.col, asc: model.sort.dir === "asc" } : null,
   );
@@ -107,6 +134,55 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
   const shownOrder = visibleRowOrder(bodyOrder, limit, expanded);
   const hidden = hiddenRowCount(bodyOrder.length, limit);
 
+  // Nur Zeilen, die es noch gibt — die Vorschau im Editor kann Zeilen
+  // löschen, während eine Auswahl steht.
+  const chosen = bodyOrder.filter((row) => selected.has(row));
+  const allChosen = bodyOrder.length > 0 && chosen.length === bodyOrder.length;
+  const someChosen = chosen.length > 0 && !allChosen;
+
+  useEffect(() => {
+    // `indeterminate` gibt es nur als DOM-Eigenschaft, nicht als Attribut.
+    if (selectAllRef.current) selectAllRef.current.indeterminate = someChosen;
+  }, [someChosen, selectable]);
+
+  const toggleRow = (row: number): void => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (!next.delete(row)) next.add(row);
+      return next;
+    });
+  };
+
+  // Teilauswahl → alle, alle → keine (Craft/Gmail).
+  const toggleAll = (): void => {
+    setSelected(allChosen ? new Set() : new Set(bodyOrder));
+  };
+
+  const rowTitle = (row: number): string => {
+    const merge = model.merges.find((m) => m.col === 0 && row >= m.row && row < m.row + m.rowSpan);
+    return richTextToPlain(data[merge ? merge.row : row]?.[0] ?? "").trim();
+  };
+
+  const runExport = async (format: ExportFormat): Promise<void> => {
+    setBusy(format);
+    setFailed(false);
+    try {
+      const grid = buildExportGrid({ model, rowOrder: bodyOrder, selected: selectable ? new Set(chosen) : null });
+      if (format === "csv") downloadFile(toCsv(grid), exportFileName("csv"), CSV_MIME);
+      else downloadFile(await toXlsx(grid), exportFileName("xlsx"), XLSX_MIME);
+    } catch (error) {
+      console.error("Tabellen-Export fehlgeschlagen", error);
+      setFailed(true);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const exportLabel = (format: ExportFormat): string =>
+    selectable && chosen.length > 0
+      ? `Auswahl (${rowsLabel(chosen.length)}) als ${FORMAT_LABEL[format]} exportieren`
+      : `Ganze Tabelle als ${FORMAT_LABEL[format]} exportieren`;
+
   const toggleSort = (col: number): void => {
     setSort((prev) => (prev && prev.col === col ? { col, asc: !prev.asc } : { col, asc: true }));
   };
@@ -132,7 +208,37 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
   };
 
   return (
-    <div className="table-widget">
+    <div className={`table-widget${selectable ? " table-widget--selectable" : ""}`}>
+      {exportMode !== "off" && (
+        <div className="table-widget__export">
+          {selectable && (
+            <p className="table-widget__export-count" aria-live="polite">
+              {selectionLabel(chosen.length)}
+            </p>
+          )}
+          <div className="table-widget__export-actions">
+            {(["xlsx", "csv"] as const).map((format) => (
+              <button
+                key={format}
+                type="button"
+                className="table-widget__export-button"
+                onClick={() => void runExport(format)}
+                disabled={busy !== null}
+                aria-busy={busy === format}
+                aria-label={exportLabel(format)}
+                title={exportLabel(format)}
+              >
+                {busy === format ? "Wird erstellt …" : FORMAT_BUTTON[format]}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      {failed && (
+        <p className="table-widget__export-error" role="alert">
+          Export fehlgeschlagen. Bitte erneut versuchen.
+        </p>
+      )}
     <div className={`table-widget-scroll ${model.fitImages ? IMAGE_FIT_CLASS : IMAGE_NO_FIT_CLASS}`}>
       {/* The widget carries its own stylesheet instead of writing to
           `document.head`, so it comes and goes with the component. The image
@@ -143,6 +249,17 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
       <table className="table-widget__table">
         <thead>
           <tr>
+            {selectable && (
+              <th scope="col" className={CELL_SELECT_HEAD}>
+                <input
+                  ref={selectAllRef}
+                  type="checkbox"
+                  aria-label="Alle Zeilen auswählen"
+                  checked={allChosen}
+                  onChange={toggleAll}
+                />
+              </th>
+            )}
             {headerRow.map((cell, colIndex) => {
               if (isCovered(model, 0, colIndex)) return null;
               const headerFormat = cellFormat(model, 0, colIndex);
@@ -171,7 +288,17 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
           {shownOrder.map((rowIndex, displayIndex) => {
             const row = data[rowIndex];
             return (
-              <tr key={rowIndex}>
+              <tr key={rowIndex} className={selectable && selected.has(rowIndex) ? ROW_SELECTED : undefined}>
+                {selectable && (
+                  <td className={`${CELL_SELECT}${gapClass(displayIndex)}`}>
+                    <input
+                      type="checkbox"
+                      aria-label={`Zeile auswählen: ${rowTitle(rowIndex) || bodyOrder.indexOf(rowIndex) + 1}`}
+                      checked={selected.has(rowIndex)}
+                      onChange={() => toggleRow(rowIndex)}
+                    />
+                  </td>
+                )}
                 {row.map((cell, colIndex) => {
                   if (isCovered(model, rowIndex, colIndex)) return null;
                   const cellFmt = cellFormat(model, rowIndex, colIndex);

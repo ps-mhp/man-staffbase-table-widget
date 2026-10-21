@@ -83,11 +83,31 @@ describe("table stylesheet after Craft", () => {
     expect(head).not.toMatch(/font-size|padding/);
   });
 
-  it("marks the sortable header on hover like Craft, but draws no row hover", () => {
+  it("marks the sortable header on hover like Craft", () => {
     expect(css).toMatch(
       /@media \(hover: hover\)\s*\{\s*\.table-widget__cell--head:hover\s*\{\s*background:\s*var\(--man-border, #cbd3dc\);\s*\}/,
     );
-    expect(css).not.toMatch(/tr:hover|tbody[^{]*:hover|__cell:hover|__cell--rowhead:hover/);
+  });
+
+  it("tints a body row on hover with Craft's row-hover surface, pointer devices only, never a selected row", () => {
+    expect(css).toMatch(
+      /@media \(hover: hover\)\s*\{\s*\.table-widget__table > tbody > tr:not\(\.table-widget__row--selected\):hover > \.table-widget__cell\s*\{\s*background:\s*var\(--man-slate-50, #eaedf3\);\s*\}/,
+    );
+    expect(css).not.toMatch(/thead[^{]*:hover/);
+  });
+
+  it("tints a selected row with Craft's selected surface", () => {
+    expect(rule(".table-widget__row--selected > .table-widget__cell")).toMatch(
+      /background:\s*var\(--man-red-50, #fde2e8\)/,
+    );
+  });
+
+  it("moves the sticky row titles right of the select column", () => {
+    expect(rule(".table-widget--selectable .table-widget__cell--first")).toMatch(/left:\s*48px/);
+    const order = (needle: string) => css.lastIndexOf(needle);
+    expect(order(".table-widget--selectable .table-widget__cell--first")).toBeGreaterThan(
+      order(".table-widget__cell--head.table-widget__cell--first"),
+    );
   });
 
   it("keeps the old 16px sides on narrow screens, so a table gets no wider there", () => {

@@ -20,8 +20,9 @@
 // in Man Europe Bold 16px mit einer 2px-Linie in Haarlinienfarbe darunter; die
 // Rumpfzellen stehen in Man Europe Regular 16px auf der Wirtsfläche, getrennt
 // durch 1px-Haarlinien. Zeilenhöhe 48px (12px Polster um 24px Zeile), seitlich
-// 20px. Kein Zeilen-Hover, kein Zebra-Streifen (Craft kennt ihn nur als
-// Option, die dieses Widget nicht anbietet). Dazu `tabular-nums` für
+// 20px. Rumpfzeilen färben beim Hover wie in der Craft-UI (#EAEDF3), eine
+// ausgewählte Zeile rosa (#FDE2E8); kein Zebra-Streifen (Craft kennt ihn nur
+// als Option, die dieses Widget nicht anbietet). Dazu `tabular-nums` für
 // Zahlenspalten. Farben/Abstände laufen über `man(...)`, damit sich ein
 // MAN-Token-Update hier automatisch nachzieht.
 
@@ -156,6 +157,56 @@ $head-ink: #161616;
     z-index: 3;
   }
 
+  // Zeilen-Hover der Craft-UI (`table-row-hover`, #EAEDF3) und die
+  // ausgewählte Zeile (`table-row-background-selected`, #FDE2E8). Die Fläche
+  // geht auf die Zellen, nicht aufs `tr`: die klebenden Spalten sind deckend
+  // und stünden sonst weiss aus der Zeile heraus. Ein im Editor gesetzter
+  // Zellhintergrund ist ein Inline-Style und bleibt sichtbar — gewollt.
+  // Hover nur mit echtem Zeiger und nie über einer ausgewählten Zeile; die
+  // behält ihre Fläche, Craft kennt keinen eigenen Selected-Hover.
+  &__table > tbody > tr > &__cell {
+    transition: background-color man("duration") linear;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+
+  @media (hover: hover) {
+    &__table > tbody > tr:not(.table-widget__row--selected):hover > &__cell {
+      background: man("slate-50");
+    }
+  }
+
+  &__row--selected > &__cell {
+    background: man("red-50");
+  }
+
+  // Auswahlspalte (Craft `craft-table__action-column`), nur im Exportmodus
+  // „Mit Zeilenauswahl“. 48px wie die Zeilenhöhe: 20px Kästchen, 14px
+  // seitlich. Sie klebt links vor den Zeilentiteln, deckend wie diese.
+  &__cell--select {
+    width: 20px;
+    padding-inline: 14px;
+    vertical-align: middle;
+    background: man("surface");
+    position: sticky;
+    left: 0;
+    z-index: 1;
+
+    input {
+      @include man-checkbox($important: true);
+    }
+  }
+
+  // Kopf der Auswahlspalte: das Band der Kopfzeile, aber ohne Sortier-Klick
+  // und ohne dessen Hover — deshalb nicht `&__cell--head`.
+  &__cell--select-head {
+    background: man("surface-sunken");
+    border-bottom: man("border-width-strong") solid man("border");
+    z-index: 3;
+  }
+
   // Luft zwischen Kopf- und erster Rumpfzeile.
   &__cell--gap {
     padding-top: 16px;
@@ -170,5 +221,51 @@ $head-ink: #161616;
     @include man-button("s", "secondary", $important: true);
     display: flex !important;
     margin: man("space-3") auto 0 !important;
+  }
+
+  // Mit Auswahlspalte klebt die Zeilentitelspalte rechts von ihr. Steht nach
+  // den Regeln mit `left: 0`, die sonst gleich stark wären.
+  &--selectable &__cell--first {
+    left: 48px;
+  }
+
+  // Export-Leiste über der Tabelle, ausserhalb des Scroll-Wrappers, damit sie
+  // beim seitlichen Scrollen stehen bleibt. Links der Zähler (nur mit
+  // Zeilenauswahl), rechts die sekundären Craft-Knöpfe in Grösse s.
+  &__export {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: man("space-2") man("space-3");
+    margin-bottom: man("space-3");
+
+    @media (max-width: 767px) {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  &__export-count {
+    margin: 0;
+    color: man("text");
+    @include man-type("body-s");
+  }
+
+  &__export-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: man("space-2");
+    margin-left: auto;
+  }
+
+  &__export-button {
+    @include man-button("s", "secondary", $important: true);
+  }
+
+  &__export-error {
+    margin: 0 0 man("space-3");
+    color: man("error");
+    @include man-type("body-s");
   }
 }
