@@ -12,12 +12,13 @@
  */
 
 import * as React from "react";
-import { ReactElement, useEffect } from "react";
+import { ReactElement, useEffect, useRef } from "react";
 
 import helpDrawerCss from "../styles/help-drawer.scss";
 import { IconClose } from "./icons";
 import { HelpTab } from "./tab-help";
 import { useHotStyle } from "@shared/hot-style";
+import { eventRootOf } from "@shared/shadow-dom";
 
 export interface HelpDrawerProps {
   open: boolean;
@@ -35,17 +36,21 @@ export interface HelpDrawerProps {
  */
 export function HelpDrawer({ open, onClose }: HelpDrawerProps): ReactElement {
   const hotHelpDrawerCss = useHotStyle(helpDrawerCss, "table-widget", "styles/help-drawer.scss");
+  const drawerRef = useRef<HTMLDivElement>(null);
+  // Escape is heard at the editor's root: in the config modal every key stops
+  // at the shadow host, so `document` would never hear it.
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (event: KeyboardEvent): void => {
       if (event.key === "Escape") onClose();
     };
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
+    const root = eventRootOf(drawerRef.current);
+    root.addEventListener("keydown", onKeyDown as EventListener);
+    return () => root.removeEventListener("keydown", onKeyDown as EventListener);
   }, [open, onClose]);
 
   return (
-    <div className={`tw-rb__help-drawer${open ? " tw-rb__help-drawer--open" : ""}`}>
+    <div ref={drawerRef} className={`tw-rb__help-drawer${open ? " tw-rb__help-drawer--open" : ""}`}>
       <style>{hotHelpDrawerCss}</style>
       <div
         className="tw-rb__help-drawer-inner"

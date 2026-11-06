@@ -1,10 +1,11 @@
 import React from "react";
-import { screen, render, fireEvent, waitFor } from "@testing-library/react";
+import { act, screen, render, fireEvent, waitFor } from "@testing-library/react";
 
 import { TableEditor } from "./table-editor";
 import { TableModel } from "./table-model";
 import * as tableImport from "./table-import";
 import { MediaClient, MediaItem } from "@shared/media/media-client";
+import { CONFIG_MODAL_HOST_ATTRIBUTE, ConfigModal } from "@shared/ui/config-modal";
 import { DEFAULT_IMAGE_WIDTH } from "./cell-image";
 import { IMAGE_FIT_CLASS, IMAGE_NO_FIT_CLASS } from "./image-fit";
 
@@ -827,5 +828,27 @@ describe("export mode", () => {
     fireEvent.change(select, { target: { value: "select" } });
 
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ exportMode: "select" }));
+  });
+});
+
+describe("in the config modal's shadow root", () => {
+  it("opens the context menu next to the editor, not in document.body", async () => {
+    render(
+      <ConfigModal>
+        <TableEditor value={sample()} onChange={jest.fn()} />
+      </ConfigModal>,
+    );
+    const root = document.querySelector(`[${CONFIG_MODAL_HOST_ATTRIBUTE}]`)!.shadowRoot!;
+    const td = root.querySelector<HTMLElement>('[aria-label="Zeile 2, Spalte 1"]')!.closest("td")!;
+
+    await act(async () => {
+      fireEvent.mouseDown(td);
+      fireEvent.contextMenu(td);
+    });
+
+    const menu = root.querySelector('[data-testid="table-editor-menu"]');
+    expect(menu).not.toBeNull();
+    expect(root.querySelector(".man-ui")!.contains(menu)).toBe(true);
+    expect(screen.queryByTestId("table-editor-menu")).toBeNull();
   });
 });

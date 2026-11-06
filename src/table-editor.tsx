@@ -61,6 +61,8 @@ import imageNoFitCss from "./styles/image-no-fit.scss";
 import { ClearScope, clearFormatting } from "./clear-format";
 import tableEditorCss from "./styles/table-editor.scss";
 import { useHotStyle } from "@shared/hot-style";
+import { activeElementOf, eventRootOf, selectionOf } from "@shared/shadow-dom";
+import { usePortalContainer } from "@shared/ui/portal-container";
 
 /**
  * The widget's own `version` from its `package.json`, injected by
@@ -181,7 +183,9 @@ function EditableCell({
 
   useEffect(() => {
     const el = ref.current;
-    if (el && el !== document.activeElement && el.innerHTML !== html) {
+    // Not while the cell is being typed in — asked of the cell's own root: in
+    // the config modal's shadow root `document.activeElement` is the host.
+    if (el && el !== activeElementOf(el) && el.innerHTML !== html) {
       el.innerHTML = html;
       setSelectedImg(null);
     }
@@ -190,12 +194,12 @@ function EditableCell({
   // When a cell enters edit mode, focus it and drop the caret at the end.
   useEffect(() => {
     const el = ref.current;
-    if (editing && el && el !== document.activeElement) {
+    if (editing && el && el !== activeElementOf(el)) {
       el.focus();
       const range = document.createRange();
       range.selectNodeContents(el);
       range.collapse(false);
-      const sel = window.getSelection();
+      const sel = selectionOf(el);
       sel?.removeAllRanges();
       sel?.addRange(range);
     }
@@ -348,6 +352,11 @@ export const TableEditor = ({
   const [editing, setEditing] = useState<[number, number] | null>(null);
   const activeCell = useRef<[number, number] | null>(null);
   const isDragging = useRef(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  // The menus go where the editor is — into the config modal's shadow root,
+  // with the editor's stylesheet — not into `document.body`, where they would
+  // be unstyled and every click in them would close the Studio's dialog.
+  const portalContainer = usePortalContainer();
   // The cell an inserted/pasted/uploaded image lands in, and picker visibility.
   const [pickerOpen, setPickerOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
@@ -368,8 +377,10 @@ export const TableEditor = ({
     const stop = (): void => {
       isDragging.current = false;
     };
-    document.addEventListener("mouseup", stop);
-    return () => document.removeEventListener("mouseup", stop);
+    // At the editor's root: in the config modal every click stops at the host.
+    const root = eventRootOf(rootRef.current);
+    root.addEventListener("mouseup", stop);
+    return () => root.removeEventListener("mouseup", stop);
   }, []);
 
   const isSelected = (row: number, col: number): boolean =>
@@ -619,7 +630,8 @@ export const TableEditor = ({
    */
   const applyVertAlign = (command: "superscript" | "subscript"): void => {
     const cell = activeCell.current;
-    const el = document.activeElement as HTMLElement | null;
+    const root = rootRef.current;
+    const el = root === null ? null : (activeElementOf(root) as HTMLElement | null);
     if (!cell || !el || !el.isContentEditable) return;
     if (typeof document.execCommand === "function") {
       document.execCommand(command);
@@ -747,7 +759,7 @@ export const TableEditor = ({
     );
 
   return (
-    <div className="table-editor" data-testid="table-editor">
+    <div className="table-editor" data-testid="table-editor" ref={rootRef}>
       {/* The editor carries its own stylesheet rather than writing to
           `document.head`: it is mounted into someone else's dialog and should
           leave nothing behind when it goes. */}
@@ -879,7 +891,7 @@ export const TableEditor = ({
           </div>
         </ContextMenu.Trigger>
 
-        <ContextMenu.Portal>
+        <ContextMenu.Portal container={portalContainer}>
           <ContextMenu.Content className="table-editor__menu" data-testid="table-editor-menu">
             <MenuItem testId="insert-row-above" onSelect={insertRowAbove} disabled={selection === null}>Zeile oberhalb einfügen</MenuItem>
             <MenuItem testId="insert-row-below" onSelect={insertRowBelow} disabled={selection === null}>Zeile unterhalb einfügen</MenuItem>
@@ -896,7 +908,7 @@ export const TableEditor = ({
             <ContextMenu.Separator className="table-editor__menu-separator" />
             <ContextMenu.Sub>
               <ContextMenu.SubTrigger className="table-editor__menu-item" data-testid="text-options">Textoptionen ▸</ContextMenu.SubTrigger>
-              <ContextMenu.Portal>
+              <ContextMenu.Portal container={portalContainer}>
                 <ContextMenu.SubContent className="table-editor__menu">
                   <MenuItem testId="fmt-bold" onSelect={() => toggleKey("bold")}>Fett</MenuItem>
                   <MenuItem testId="fmt-italic" onSelect={() => toggleKey("italic")}>Kursiv</MenuItem>
@@ -915,7 +927,7 @@ export const TableEditor = ({
             </ContextMenu.Sub>
             <ContextMenu.Sub>
               <ContextMenu.SubTrigger className="table-editor__menu-item" data-testid="sort-options">Sortierung ▸</ContextMenu.SubTrigger>
-              <ContextMenu.Portal>
+              <ContextMenu.Portal container={portalContainer}>
                 <ContextMenu.SubContent className="table-editor__menu">
                   <MenuItem testId="sort-asc" onSelect={doSort("asc")} disabled={selection === null}>Aufsteigend (diese Spalte)</MenuItem>
                   <MenuItem testId="sort-desc" onSelect={doSort("desc")} disabled={selection === null}>Absteigend (diese Spalte)</MenuItem>
