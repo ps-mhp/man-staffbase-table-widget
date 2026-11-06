@@ -14,6 +14,7 @@
 import { screen, waitFor } from "@testing-library/dom";
 import { installDevHarness } from "dev/bootstrap";
 import { configurationSchema, uiSchema } from "./configuration-schema";
+import { queryInModal } from "@shared/ui/config-modal.testing";
 
 describe("Widget test", () => {
   let stopTableEditorInjector: () => void;
@@ -52,7 +53,7 @@ describe("Widget test", () => {
 
   it("mounts the grid editor into the config dialog rendered by the dev harness", async () => {
     await waitFor(() => {
-      expect(document.querySelector('[data-testid="table-editor"]')).not.toBeNull();
+      expect(queryInModal('[data-testid="table-editor"]')).not.toBeNull();
     });
 
     const textarea = document.querySelector<HTMLTextAreaElement>("#root_tabledata");

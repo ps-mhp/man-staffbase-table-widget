@@ -6,6 +6,7 @@ import validator from "@rjsf/validator-ajv8";
 import { startTableEditorInjector } from "./table-editor-injector";
 import { configurationSchema, uiSchema } from "./configuration-schema";
 import { parseTableModel } from "./table-model";
+import { queryAllInModal, queryDeep, queryInModal, settleModal } from "@shared/ui/config-modal.testing";
 
 describe("startTableEditorInjector", () => {
   it("injects a grid editor next to the tabledata textarea and hides the textarea", async () => {
@@ -17,10 +18,11 @@ describe("startTableEditorInjector", () => {
     await act(async () => {
       stop = startTableEditorInjector(container);
     });
+    await settleModal();
 
     const textarea = container.querySelector<HTMLTextAreaElement>("#root_tabledata")!;
     expect(textarea.style.display).toBe("none");
-    expect(document.body.querySelector('[data-testid="table-editor"]')).not.toBeNull();
+    expect(queryInModal('[data-testid="table-editor"]')).not.toBeNull();
 
     await act(async () => {
       stop();
@@ -42,9 +44,10 @@ describe("startTableEditorInjector", () => {
     await act(async () => {
       stop = startTableEditorInjector(container);
     });
+    await settleModal();
 
-    expect(document.body.querySelector('[aria-label="Zeile 1, Spalte 2"]')).toHaveTextContent("X");
-    expect(document.body.querySelector('[aria-label="Zeile 2, Spalte 1"]')).toHaveTextContent("Y");
+    expect(queryInModal('[aria-label="Zeile 1, Spalte 2"]')).toHaveTextContent("X");
+    expect(queryInModal('[aria-label="Zeile 2, Spalte 1"]')).toHaveTextContent("Y");
 
     await act(async () => {
       stop();
@@ -61,8 +64,9 @@ describe("startTableEditorInjector", () => {
     await act(async () => {
       stop = startTableEditorInjector(container);
     });
+    await settleModal();
 
-    const cell = document.body.querySelector<HTMLDivElement>('[aria-label="Zeile 2, Spalte 1"]')!;
+    const cell = queryInModal<HTMLDivElement>('[aria-label="Zeile 2, Spalte 1"]')!;
     await act(async () => {
       cell.innerHTML = "Geänderte Zeile";
       cell.dispatchEvent(new Event("input", { bubbles: true }));
@@ -70,7 +74,7 @@ describe("startTableEditorInjector", () => {
 
     // Edits stay in the modal's draft until they are saved.
     await act(async () => {
-      (document.body.querySelector('[data-testid="toolbar-done"]') as HTMLButtonElement).click();
+      (queryInModal('[data-testid="toolbar-done"]') as HTMLButtonElement).click();
     });
 
     const submitBtn = container.querySelector('button[type="submit"]') as HTMLButtonElement;
@@ -100,6 +104,7 @@ describe("startTableEditorInjector", () => {
     await act(async () => {
       stop = startTableEditorInjector(container);
     });
+    await settleModal();
 
     await act(async () => {
       // Trigger additional, unrelated DOM mutations to force the MutationObserver callback
@@ -110,7 +115,7 @@ describe("startTableEditorInjector", () => {
       await Promise.resolve();
     });
 
-    expect(document.body.querySelectorAll('[data-testid="table-editor"]').length).toBe(1);
+    expect(queryAllInModal('[data-testid="table-editor"]').length).toBe(1);
 
     await act(async () => {
       stop();
@@ -131,13 +136,14 @@ describe("startTableEditorInjector", () => {
     await act(async () => {
       stop = startTableEditorInjector(container);
     });
-    expect(document.body.querySelector('[data-testid="table-editor"]')).not.toBeNull();
+    await settleModal();
+    expect(queryInModal('[data-testid="table-editor"]')).not.toBeNull();
 
     await act(async () => {
       stop();
     });
 
-    expect(document.body.querySelector('[data-testid="table-editor"]')).toBeNull();
+    expect(queryInModal('[data-testid="table-editor"]')).toBeNull();
   });
 
   it("opens the table editor in a large modal as soon as it is injected", async () => {
@@ -149,8 +155,9 @@ describe("startTableEditorInjector", () => {
     await act(async () => {
       stop = startTableEditorInjector(container);
     });
+    await settleModal();
 
-    const modal = document.body.querySelector('[data-testid="table-editor-modal"]');
+    const modal = queryInModal('[data-testid="table-editor-modal"]');
     expect(modal).not.toBeNull();
     expect(within(modal as HTMLElement).getByTestId("table-editor")).toBeInTheDocument();
     expect(within(modal as HTMLElement).getByTestId("toolbar-done")).toBeInTheDocument();
@@ -160,17 +167,11 @@ describe("startTableEditorInjector", () => {
     });
   });
 
-  it("renders the modal as a portal directly on document.body, not nested inside the form container", async () => {
-    // Regression test for: Staffbase wraps the config dialog in a Radix
-    // popover that sets `transform: translate(...)` on an ancestor. Per the
-    // CSS spec, a `transform` on an ancestor makes it the containing block
-    // for `position: fixed` descendants, so a modal nested inline inside the
-    // form (as returned directly from InjectedEditor's render tree) gets
-    // clipped to the small popover box instead of covering the viewport,
-    // appearing as a blank white area. Rendering the modal as a React portal
-    // to `document.body` escapes any such ancestor, keeping `position:
-    // fixed` targeting the real viewport regardless of where the injector
-    // mounts inside the form.
+  it("renders the modal into a shadow root on its own host, not nested inside the form container", async () => {
+    // Staffbase's config dialog sets `transform` and `filter` on its popover;
+    // a modal nested inline in the form would be clipped to that small box.
+    // The modal's host lives outside the form — here on `document.body`, in
+    // the Studio in the dialog's top layer.
     const { container } = render(
       <Form schema={configurationSchema} uiSchema={uiSchema} validator={validator} onSubmit={jest.fn()} />,
     );
@@ -179,20 +180,17 @@ describe("startTableEditorInjector", () => {
     await act(async () => {
       stop = startTableEditorInjector(container);
     });
+    await settleModal();
 
-    expect(container.querySelector('[data-testid="table-editor-modal"]')).toBeNull();
-
-    const portaledModal = document.body.querySelector(
-      ':scope > [data-testid="table-editor-modal"]',
-    );
-    expect(portaledModal).not.toBeNull();
-    expect(within(portaledModal as HTMLElement).getByTestId("table-editor")).toBeInTheDocument();
+    expect(container.querySelector("[data-man-config-modal-host]")).toBeNull();
+    expect(document.body.querySelector(":scope > [data-man-config-modal-host]")).not.toBeNull();
+    expect(within(queryInModal('[data-testid="table-editor-modal"]') as HTMLElement).getByTestId("table-editor")).toBeInTheDocument();
 
     await act(async () => {
       stop();
     });
 
-    expect(document.body.querySelector('[data-testid="table-editor-modal"]')).toBeNull();
+    expect(queryInModal('[data-testid="table-editor-modal"]')).toBeNull();
   });
 
   it("does not let clicks inside the portaled modal bubble to a document-level outside-click dismiss handler", async () => {
@@ -239,12 +237,13 @@ describe("startTableEditorInjector", () => {
     await act(async () => {
       stop = startTableEditorInjector(container);
     });
+    await settleModal();
 
-    const cell = document.body.querySelector<HTMLDivElement>(
+    const cell = queryInModal<HTMLDivElement>(
       '[aria-label="Zeile 1, Spalte 1"]',
     )!;
     await act(async () => {
-      cell.dispatchEvent(new Event("pointerdown", { bubbles: true, cancelable: true }));
+      cell.dispatchEvent(new Event("pointerdown", { bubbles: true, cancelable: true, composed: true }));
     });
 
     expect(onDismiss).not.toHaveBeenCalled();
@@ -296,8 +295,9 @@ describe("startTableEditorInjector", () => {
     await act(async () => {
       stop = startTableEditorInjector(container);
     });
+    await settleModal();
 
-    const cell = document.body.querySelector<HTMLDivElement>(
+    const cell = queryInModal<HTMLDivElement>(
       '[aria-label="Zeile 1, Spalte 1"]',
     )!;
     await act(async () => {
@@ -321,15 +321,16 @@ describe("startTableEditorInjector", () => {
     await act(async () => {
       stop = startTableEditorInjector(container);
     });
+    await settleModal();
 
     await act(async () => {
-      within(document.body.querySelector('[data-testid="table-editor-modal"]') as HTMLElement)
+      within(queryInModal('[data-testid="table-editor-modal"]') as HTMLElement)
         .getByTestId("toolbar-done")
         .click();
     });
 
-    expect(document.body.querySelector('[data-testid="table-editor-modal"]')).toBeNull();
-    const reopenButton = container.querySelector('[data-testid="table-editor-reopen"]');
+    expect(queryInModal('[data-testid="table-editor-modal"]')).toBeNull();
+    const reopenButton = queryDeep(container, '[data-testid="table-editor-reopen"]');
     expect(reopenButton).not.toBeNull();
     expect(reopenButton?.textContent).toContain("Tabelle bearbeiten");
 
@@ -347,24 +348,26 @@ describe("startTableEditorInjector", () => {
     await act(async () => {
       stop = startTableEditorInjector(container);
     });
+    await settleModal();
 
-    const cell = document.body.querySelector<HTMLDivElement>('[aria-label="Zeile 2, Spalte 1"]')!;
+    const cell = queryInModal<HTMLDivElement>('[aria-label="Zeile 2, Spalte 1"]')!;
     await act(async () => {
       cell.innerHTML = "Bearbeitete Zeile";
       cell.dispatchEvent(new Event("input", { bubbles: true }));
     });
 
     await act(async () => {
-      within(document.body.querySelector('[data-testid="table-editor-modal"]') as HTMLElement)
+      within(queryInModal('[data-testid="table-editor-modal"]') as HTMLElement)
         .getByTestId("toolbar-done")
         .click();
     });
 
     await act(async () => {
-      (container.querySelector('[data-testid="table-editor-reopen"]') as HTMLButtonElement).click();
+      (queryDeep(container, '[data-testid="table-editor-reopen"]') as HTMLButtonElement).click();
     });
+    await settleModal();
 
-    const modal = document.body.querySelector('[data-testid="table-editor-modal"]');
+    const modal = queryInModal('[data-testid="table-editor-modal"]');
     expect(modal).not.toBeNull();
     expect(
       within(modal as HTMLElement).getByLabelText("Zeile 2, Spalte 1"),
