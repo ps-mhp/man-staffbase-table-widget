@@ -2,9 +2,12 @@
 
 Staffbase-Widget zum Einbetten und Bearbeiten von Tabellen.
 
-Die Werkzeugleiste des Editors besteht aus dem Button **Speichern** und den
-Tabs **Schrift**, **Ausrichtung**, **Zellen**, **Bilder** und **Daten**. Der
-gewählte Tab bleibt beim Wechsel der Zellauswahl bestehen.
+Der Editor läuft im gemeinsamen Rahmen von `@man/config-ui` (Kopf mit
+Schließen, Status, Vorschau-Umschalter, Rückgängig, Hilfe, Abbrechen und
+Übernehmen). Darin: die Tabs **Schrift**, **Ausrichtung**, **Zellen**,
+**Bilder** und **Daten** über dem Gitter und rechts das Panel **Tabelle** für
+erste Sortierung, sichtbare Zeilen, Export und „Bilder anpassen“. Der gewählte
+Tab bleibt beim Wechsel der Zellauswahl bestehen.
 
 Dieses Repository enthält nur Quellcode und das gebaute Bundle. Es ist **nicht
 eigenständig baubar** — Toolchain und geteilter Code liegen im Meta-Repo:
@@ -24,8 +27,9 @@ Der Quellcode liegt danach unter `src/widgets/table-widget/`.
 
 Die Styles stehen als SCSS unter `src/styles/`: `tokens`/`mixins` als gemeinsame
 Grundlage, dazu je ein Stylesheet für Werkzeugleiste (`ribbon`), Editor
-(`table-editor`), veröffentlichte Tabelle (`table-widget`), Medienauswahl
-(`media-picker`) und Bilddeckelung (`image-fit`/`image-no-fit`). Jede
+(`table-editor`), veröffentlichte Tabelle (`table-widget`) und Bilddeckelung
+(`image-fit`/`image-no-fit`); Panel und Rahmen kommen mit Tailwind aus
+`@man/config-ui`. Jede
 Komponente importiert ihr Stylesheet als String und rendert es selbst als
 `<style>`.
 

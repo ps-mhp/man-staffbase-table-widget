@@ -11,9 +11,10 @@ der automatischen Seitenübersetzung zerstört zu werden.
 
 **Frage:** Meine Änderungen sind nach dem Schließen weg.
 
-Antwort: **Schließen** speichert nicht. Vor dem Schließen immer auf
-**Speichern** klicken — solange „Ungespeicherte Änderungen“ neben den Buttons
-steht, ist etwas offen.
+Antwort: **Schließen** übernimmt nicht. Mit offenen Änderungen fragt der
+Editor nach — dort **Übernehmen** wählen, nicht **Verwerfen**. Solange am
+Titel „… – nicht übernommen“ steht, ist etwas offen. Danach die Seite im
+Studio mit **Speichern** sichern.
 
 **Frage:** Wie schreibe ich in eine Zelle?
 
@@ -43,7 +44,7 @@ erneut als `.xlsx` speichern.
 
 **Frage:** Auf der Seite werden nicht alle Zeilen angezeigt.
 
-Antwort: Das ist die Einstellung **Sichtbare Zeilen** (Reiter „Daten“),
+Antwort: Das ist die Einstellung **Sichtbare Zeilen** (Panel „Tabelle“ rechts),
 voreingestellt auf 5 Datenzeilen. Der Rest erscheint über den Button unter
 der Tabelle. Sollen von Anfang an alle Zeilen zu sehen sein, den Wert auf `0`
 setzen.
@@ -57,7 +58,7 @@ vorhanden.
 
 **Frage:** Ein Bild sprengt die ganze Tabelle.
 
-Antwort: Im Reiter **Bilder** den Schalter **Bilder anpassen** einschalten.
+Antwort: Rechts im Panel **Tabelle** den Schalter **Bilder anpassen** einschalten.
 Er begrenzt alle Bilder auf die Tabellenbreite. Ausgeschaltet erscheint jedes
 Bild in seiner Originalgröße.
 
@@ -72,8 +73,8 @@ habe.
 
 Antwort: Auf der veröffentlichten Seite kann jede lesende Person durch Klick
 auf eine Spaltenüberschrift selbst umsortieren. Das gilt nur für ihre Ansicht
-und ändert die gespeicherte Tabelle nicht. Ihre im Editor gesetzte Sortierung
-bleibt die Startansicht.
+und ändert die gespeicherte Tabelle nicht. Die im Editor gesetzte **Erste
+Sortierung** (Panel „Tabelle“) bleibt die Startansicht.
 
 **Frage:** Kann ich einen Link in eine Zelle setzen?
 
