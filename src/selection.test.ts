@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-import { cellsInRange, cellsInRanges, clampRanges } from "./selection";
+import { cellName, cellsInRange, cellsInRanges, clampRanges } from "./selection";
 
 describe("cellsInRange", () => {
   it("lists the cells row by row", () => {
@@ -67,5 +67,16 @@ describe("clampRanges", () => {
     const ranges = [{ top: 0, left: 0, bottom: 1, right: 1 }];
 
     expect(clampRanges(ranges, 3, 3)).toBe(ranges);
+  });
+});
+
+describe("cellName", () => {
+  it("nennt Zellen wie Excel", () => {
+    expect(cellName(0, 0)).toBe("A1");
+    expect(cellName(2, 1)).toBe("B3");
+    expect(cellName(9, 25)).toBe("Z10");
+    expect(cellName(0, 26)).toBe("AA1");
+    expect(cellName(0, 27)).toBe("AB1");
+    expect(cellName(0, 52)).toBe("BA1");
   });
 });

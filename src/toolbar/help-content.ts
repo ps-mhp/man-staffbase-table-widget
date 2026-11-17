@@ -120,7 +120,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     entries: [
       {
         title: "Bild einfügen",
-        text: "Fügt ein Bild in die markierte Zelle ein.",
+        text: "Öffnet rechts die Mediathek für die markierte Zelle. Ein Bild lässt sich von dort auch direkt auf jede Zelle ziehen.",
       },
       {
         title: "Bildgröße angleichen",

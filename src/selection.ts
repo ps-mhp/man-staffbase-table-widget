@@ -71,3 +71,16 @@ export function clampRanges(ranges: CellRange[], rows: number, cols: number): Ce
       right: Math.min(range.right, cols - 1),
     }));
 }
+
+/** Spaltenbuchstaben wie in Excel: 0 → A, 25 → Z, 26 → AA. */
+function columnLetters(col: number): string {
+  const letter = String.fromCharCode(65 + (col % 26));
+  return col < 26 ? letter : `${columnLetters(Math.floor(col / 26) - 1)}${letter}`;
+}
+
+/**
+ * Der Name einer Zelle wie in Excel, etwa „B3“ für Zeile 2, Spalte 1
+ * (beide ab 0). Er steht im Titel der Mediathek-Leiste: die Leiste deckt den
+ * Inspektor zu, und ohne Namen wüsste niemand mehr, wohin das Bild geht.
+ */
+export const cellName = (row: number, col: number): string => `${columnLetters(col)}${row + 1}`;

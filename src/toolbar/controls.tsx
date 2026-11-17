@@ -12,10 +12,10 @@
  */
 
 import * as React from "react";
-import { ReactElement, useCallback, useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
+import { useEscapeLayer } from "@man/config-ui/shell/escape-layers";
 
 import { IconChevron } from "./icons";
-import { useEscapeLayer } from "../escape-layer";
 import { activeElementOf, eventRootOf } from "@shared/shadow-dom";
 
 /** White box with a red diagonal slash — the "no colour set" (Standard) look. */
@@ -93,16 +93,28 @@ export function Dropdown({
 
   // Escape schließt das Menü, nicht den Rahmen darum. Stand der Fokus im Menü,
   // ginge er mit ihm verloren – dann zurück an den Knopf, der es öffnete.
-  const closeByEscape = useCallback((): void => {
+  const closeByEscape = (): void => {
     const wrapper = ref.current;
     const focusInside = wrapper !== null && wrapper.contains(activeElementOf(wrapper));
     setOpen(false);
     if (focusInside) wrapper.querySelector<HTMLButtonElement>("button")?.focus();
-  }, []);
-  useEscapeLayer(open, ref, closeByEscape);
+  };
+  // Im Rahmen fragt dessen Escape zuerst die jüngste Ebene – auch wenn der
+  // Fokus gar nicht im Menü steht.
+  useEscapeLayer(open, closeByEscape);
 
   return (
-    <div ref={ref} className="tw-rb__dropdown">
+    <div
+      ref={ref}
+      className="tw-rb__dropdown"
+      // Außerhalb eines Rahmens gibt es keine Ebenen; da reicht Escape mit dem
+      // Fokus im Menü. `preventDefault`: der Rahmen lässt es dann liegen.
+      onKeyDown={(event) => {
+        if (!open || event.key !== "Escape" || event.defaultPrevented) return;
+        event.preventDefault();
+        closeByEscape();
+      }}
+    >
       {trigger(() => setOpen((o) => !o), open)}
       {open && (
         <div className="tw-rb__menu" data-testid={testId}>

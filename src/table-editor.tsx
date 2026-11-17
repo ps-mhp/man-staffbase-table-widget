@@ -12,7 +12,7 @@
  */
 
 import * as React from "react";
-import { ReactElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ReactElement, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import * as ContextMenu from "@radix-ui/react-context-menu";
 import { ConfigWorkspace } from "@man/config-ui/layout/config-workspace";
 import {
@@ -41,6 +41,7 @@ import { TableToolbar } from "./table-toolbar";
 import { importTableFile } from "./table-import";
 import { MediaClient, createMediaClient } from "@shared/media/media-client";
 import { PickedImage } from "@shared/media/media-picker";
+import { useMediaPanel } from "@shared/media/use-media-panel";
 import {
   buildImageMarkup,
   countCellImages,
@@ -60,8 +61,8 @@ import { activeElementOf, eventRootOf } from "@shared/shadow-dom";
 import { usePortalContainer } from "@shared/ui/portal-container";
 import { EditableCell } from "./editable-cell";
 import { GridContextMenu, GridMenuActions } from "./grid-context-menu";
-import { CellImagePicker } from "./cell-image-picker";
-import { cellsInRanges, clampRanges } from "./selection";
+import { CellDropZone } from "./cell-drop-zone";
+import { cellName, cellsInRanges, clampRanges } from "./selection";
 import { TableInspector } from "./table-inspector";
 import { TablePreview } from "./table-preview";
 
@@ -96,6 +97,12 @@ export interface TableEditorProps {
  * up as a compile error rather than as silently unstyled markup.
  */
 const CELL = "table-editor__cell";
+
+/** The markup of an inserted image: its own width, capped at the default. */
+const imageMarkup = (image: PickedImage): string => {
+  const width = image.width ? Math.min(image.width, DEFAULT_IMAGE_WIDTH) : DEFAULT_IMAGE_WIDTH;
+  return buildImageMarkup({ src: image.url, alt: image.alt, width });
+};
 
 /**
  * Returns the first image file found on a clipboard payload (either as a
@@ -169,10 +176,16 @@ export const TableEditor = ({
   // with the editor's stylesheet — not into `document.body`, where they would
   // be unstyled and every click in them would close the Studio's dialog.
   const portalContainer = usePortalContainer();
-  // The cell an inserted/pasted/uploaded image lands in, and picker visibility.
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const closePicker = useCallback((): void => setPickerOpen(false), []);
-  const imageTarget = useRef<[number, number] | null>(null);
+  // Im Rahmen die Mediathek-Leiste rechts, sonst das Overlay (`media.overlay`).
+  const media = useMediaPanel(client);
+  // Der jüngste Stand für alles, was erst nach einer Anfrage ankommt – ein
+  // abgelegtes, gewähltes oder eingefügtes Bild. Bis dahin kann sich die
+  // Tabelle geändert haben; geschrieben wird in sie, nicht in den Stand beim
+  // Ablegen.
+  const latest = useRef({ value, onChange });
+  useLayoutEffect(() => {
+    latest.current = { value, onChange };
+  });
   const [copiedPattern, setCopiedPattern] = useState<{
     rows: number;
     cols: number;
@@ -280,34 +293,40 @@ export const TableEditor = ({
 
   // --- Image insertion (picker, clipboard upload) ---
 
-  const imageMarkup = (image: PickedImage): string => {
-    const width = image.width ? Math.min(image.width, DEFAULT_IMAGE_WIDTH) : DEFAULT_IMAGE_WIDTH;
-    return buildImageMarkup({ src: image.url, alt: image.alt, width });
-  };
-
-  /** Appends the image to the target cell's content (images flow inline). */
-  const insertImageIntoCell = (row: number, col: number, image: PickedImage): void => {
+  /**
+   * Appends the image to the target cell's content (images flow inline) – in
+   * the latest model, see `latest`. A cell that no longer exists is skipped.
+   * The ref is advanced right away, so two images arriving before the next
+   * render both land.
+   */
+  const insertImageIntoCell = useCallback((row: number, col: number, image: PickedImage): void => {
     const markup = imageMarkup(image);
-    if (!markup) return;
-    const existing = data[row]?.[col] ?? "";
-    handleInput(row, col, existing ? `${existing}${markup}` : markup);
-  };
+    const { value: current, onChange: change } = latest.current;
+    const existing = current.data[row]?.[col];
+    if (!markup || existing === undefined) return;
+    const next = { ...current, data: updateCell(current.data, row, col, existing ? `${existing}${markup}` : markup) };
+    latest.current = { value: next, onChange: change };
+    change(next);
+  }, []);
 
   /** The cell an image should target: the one being edited, else the selection. */
   const currentImageTarget = (): [number, number] | null =>
     editing ?? (selection ? [selection.top, selection.left] : null);
 
+  /**
+   * „Bild“ im Reiter und im Kontextmenü. Die Zelle wird beim Öffnen
+   * festgehalten: die Leiste bleibt offen, während man weiter markiert, und
+   * das Bild gehört in die Zelle, für die man sie geöffnet hat.
+   */
   const openImagePicker = (): void => {
     const target = currentImageTarget();
     if (!target) return;
-    imageTarget.current = target;
-    setPickerOpen(true);
-  };
-
-  const handlePickImage = (image: PickedImage): void => {
-    const target = imageTarget.current;
-    if (target) insertImageIntoCell(target[0], target[1], image);
-    setPickerOpen(false);
+    const [row, col] = target;
+    media.openMedia({
+      title: `Bild für Zelle ${cellName(row, col)}`,
+      accept: "images",
+      onSelect: (picked) => insertImageIntoCell(row, col, picked),
+    });
   };
 
   /**
@@ -653,9 +672,6 @@ export const TableEditor = ({
               const merge = mergeAt(value, rowIndex, colIndex);
               const isHeader = rowIndex === 0 || colIndex === 0;
               return (
-                // Eine Zelle als Ablageziel für Bilder (Ziehen aus der
-                // Medienleiste) gehört an dieses `td`: es trägt Zeile und
-                // Spalte und nimmt schon Maus und Kontextmenü an.
                 <td
                   key={colIndex}
                   colSpan={merge && merge.colSpan > 1 ? merge.colSpan : undefined}
@@ -673,16 +689,19 @@ export const TableEditor = ({
                   onDoubleClick={() => handleCellDoubleClick(rowIndex, colIndex)}
                   onContextMenu={() => handleCellContextMenu(rowIndex, colIndex)}
                 >
-                  <EditableCell
-                    html={sanitizeRichText(cell)}
-                    ariaLabel={`Zeile ${rowIndex + 1}, Spalte ${colIndex + 1}`}
-                    editing={isEditing(rowIndex, colIndex)}
-                    format={formatToStyle(cellFormat(value, rowIndex, colIndex))}
-                    onInput={(next) => handleInput(rowIndex, colIndex, next)}
-                    onPaste={(e) => handlePaste(e, rowIndex, colIndex)}
-                    onStopEdit={() => setEditing((cur) => (cur && cur[0] === rowIndex && cur[1] === colIndex ? null : cur))}
-                    onEscape={leaveEdit}
-                  />
+                  {/* Jede Zelle nimmt Bilder aus der Mediathek-Leiste an. */}
+                  <CellDropZone client={client} onImage={(image) => insertImageIntoCell(rowIndex, colIndex, image)}>
+                    <EditableCell
+                      html={sanitizeRichText(cell)}
+                      ariaLabel={`Zeile ${rowIndex + 1}, Spalte ${colIndex + 1}`}
+                      editing={isEditing(rowIndex, colIndex)}
+                      format={formatToStyle(cellFormat(value, rowIndex, colIndex))}
+                      onInput={(next) => handleInput(rowIndex, colIndex, next)}
+                      onPaste={(e) => handlePaste(e, rowIndex, colIndex)}
+                      onStopEdit={() => setEditing((cur) => (cur && cur[0] === rowIndex && cur[1] === colIndex ? null : cur))}
+                      onEscape={leaveEdit}
+                    />
+                  </CellDropZone>
                 </td>
               );
             })}
@@ -724,9 +743,7 @@ export const TableEditor = ({
         </div>
       </ConfigWorkspace>
 
-      {pickerOpen && (
-        <CellImagePicker client={client} anchor={rootRef} onPick={handlePickImage} onClose={closePicker} />
-      )}
+      {media.overlay}
     </div>
   );
 };

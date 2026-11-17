@@ -28,7 +28,7 @@ Editor. Gesichert ist sie erst mit **Speichern** im Studio. Wer mit offenen
 
 | Taste | Wirkung |
 | --- | --- |
-| Esc | Schließt, was gerade offen ist: Bearbeiten einer Zelle, Kontextmenü, ein Menü der Reiter, die Medienauswahl, die Hilfe — und erst danach den Editor (mit Rückfrage). |
+| Esc | Schließt, was gerade offen ist: Bearbeiten einer Zelle, Kontextmenü, ein Menü der Reiter, die Mediathek-Leiste, die Hilfe — und erst danach den Editor (mit Rückfrage). |
 | ⌘/Strg S | Übernehmen, Editor bleibt offen |
 | ⌘/Strg ↵ | Übernehmen und schließen |
 | ⌘/Strg Z | Rückgängig. In einer Zelle, in die gerade getippt wird, nimmt es nur Getipptes zurück. |
@@ -94,9 +94,11 @@ Um eine Formatierung auf weitere Zellen zu übertragen:
 ## Bild in eine Zelle einfügen
 
 1. Die Zelle markieren.
-2. Reiter **Bilder** → **Bild**. Die Medienauswahl öffnet sich; dort ein
-   vorhandenes Bild wählen oder ein neues hochladen. **Esc** schließt sie
-   wieder, ohne etwas einzufügen.
+2. Reiter **Bilder** → **Bild**. Rechts öffnet sich die Mediathek als Leiste
+   „Bild für Zelle B3“; dort ein vorhandenes Bild wählen oder ein neues
+   hochladen. **Esc** schließt sie wieder, ohne etwas einzufügen. Schneller
+   geht es per Ziehen: ein Bild aus der Leiste direkt auf eine beliebige
+   Zelle ziehen und dort loslassen.
 3. Sind mehrere Bilder unterschiedlich groß: alle Bildzellen markieren und
    über **Bildgröße** entweder „Gleiche Höhe wie erstes Bild“ oder „Gleiche
    Breite wie erstes Bild“ wählen (dafür braucht es mindestens zwei Bilder).

@@ -14,19 +14,19 @@
 /**
  * Tasten im Rahmen: der Rahmen hört Escape und ⌘Z an seiner Wurzel. Was der
  * Editor selbst mit Escape schließt – Zelle, Kontextmenü, Ribbon-Menü,
- * Medienauswahl, Auswahlliste –, darf den Rahmen nicht mitschließen; ⌘Z in
- * einer Zelle gehört der Zelle.
+ * Mediathek-Leiste, Auswahlliste –, darf den Rahmen nicht mitschließen; ⌘Z in
+ * einer Zelle gehört der Zelle. Dazu der Klickweg in die Mediathek-Leiste.
  */
 
 import * as React from "react";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ConfigShell } from "@man/config-ui/shell/config-shell";
 
 import { TableEditor } from "./table-editor";
 import { DEFAULT_VISIBLE_ROWS } from "./row-collapse";
 import { TableModel } from "./table-model";
-import { MediaClient } from "@shared/media/media-client";
+import { stubMediaClient } from "@shared/media/media-client.testing";
 
 const sample = (): TableModel => ({
   data: [
@@ -41,17 +41,10 @@ const sample = (): TableModel => ({
   exportMode: "off",
 });
 
-const stubMediaClient = (): MediaClient =>
-  ({
-    listMedia: jest.fn(async () => ({ items: [], total: 0, nextOffset: null })),
-    searchMedia: jest.fn(async () => ({ items: [], nextCursor: null })),
-    listCollections: jest.fn(async () => []),
-    currentUserId: jest.fn(async () => null),
-  }) as unknown as MediaClient;
-
-function renderInShell(): { onClose: jest.Mock; undo: jest.Mock } {
+function renderInShell(): { onClose: jest.Mock; undo: jest.Mock; onChange: jest.Mock } {
   const onClose = jest.fn();
   const undo = jest.fn();
+  const onChange = jest.fn();
   render(
     <ConfigShell
       widgetName="Tabelle"
@@ -62,15 +55,23 @@ function renderInShell(): { onClose: jest.Mock; undo: jest.Mock } {
       onDiscard={jest.fn()}
       onClose={onClose}
     >
-      <TableEditor value={sample()} onChange={jest.fn()} mediaClient={stubMediaClient()} />
+      <TableEditor value={sample()} onChange={onChange} mediaClient={stubMediaClient()} />
     </ConfigShell>,
   );
-  return { onClose, undo };
+  return { onClose, undo, onChange };
 }
 
 const cellDiv = (label: string): HTMLElement => screen.getByLabelText(label);
 const cellTd = (label: string): HTMLElement => cellDiv(label).closest("td")!;
 const escape = (target: Element): boolean => fireEvent.keyDown(target, { key: "Escape" });
+const mediaPanel = (): HTMLElement | null => screen.queryByRole("complementary", { name: "Bild für Zelle B2" });
+
+/** Markiert B2 und klickt im Reiter „Bilder“ auf „Bild“. */
+function openMediaForB2(): void {
+  fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
+  fireEvent.click(screen.getByRole("tab", { name: "Bilder" }));
+  fireEvent.click(screen.getByTestId("toolbar-image-button"));
+}
 
 describe("Escape im Rahmen", () => {
   it("schließt den Rahmen, wenn nichts anderes offen ist", () => {
@@ -135,17 +136,20 @@ describe("Escape im Rahmen", () => {
     expect(document.activeElement).toBe(trigger);
   });
 
-  it("schließt die Medienauswahl, nicht den Rahmen", () => {
+  it("schließt die Mediathek-Leiste, nicht den Rahmen", async () => {
     const { onClose } = renderInShell();
-    fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
-    fireEvent.click(screen.getByRole("tab", { name: "Bilder" }));
-    fireEvent.click(screen.getByTestId("toolbar-image-button"));
-    expect(screen.getByTestId("media-picker")).toBeInTheDocument();
+    openMediaForB2();
+    expect(mediaPanel()).toBeInTheDocument();
+    await screen.findByTestId("media-picker-item-a");
 
-    escape(screen.getByTestId("media-picker-search"));
+    // Der Fokus steht im Gitter, nicht in der Leiste: der Rahmen schließt
+    // dann die oberste Leiste, nicht sich selbst.
+    escape(screen.getByTestId("table-editor-grid"));
 
     expect(onClose).not.toHaveBeenCalled();
-    expect(screen.queryByTestId("media-picker")).toBeNull();
+    expect(mediaPanel()).toBeNull();
+    // Zurück ist das Panel „Tabelle“, über dem die Leiste lag.
+    expect(screen.getByRole("complementary", { name: "Tabelle" })).toBeInTheDocument();
   });
 
   it("schließt eine Auswahlliste im Panel, nicht den Rahmen", async () => {
@@ -178,5 +182,22 @@ describe("⌘Z im Rahmen", () => {
     fireEvent.keyDown(screen.getByTestId("table-editor-grid"), { key: "z", metaKey: true });
 
     expect(undo).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("Mediathek-Leiste im Rahmen", () => {
+  it("öffnet sich für die markierte Zelle und setzt das gewählte Bild dort ein", async () => {
+    const { onChange } = renderInShell();
+    openMediaForB2();
+    // Im Rahmen angedockt statt als Overlay über dem Editor.
+    expect(mediaPanel()!.querySelector("[data-layout='panel']")).not.toBeNull();
+
+    fireEvent.click(await screen.findByTestId("media-picker-item-a"));
+
+    await waitFor(() => expect(onChange).toHaveBeenCalled());
+    const model = onChange.mock.calls.at(-1)![0] as TableModel;
+    expect(model.data[1][1]).toContain('src="https://cdn.example.test/a.png?token=1"');
+    expect(model.data[1][1].startsWith("100")).toBe(true);
+    expect(mediaPanel()).toBeNull();
   });
 });
