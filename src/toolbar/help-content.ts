@@ -17,7 +17,7 @@ export interface HelpEntry {
   text: string;
 }
 
-/** One entry in the topic list (left column) of the help tab. */
+/** One topic of the help, shown as a collapsible section. */
 export interface HelpTopic {
   id: string;
   label: string;
@@ -25,13 +25,13 @@ export interface HelpTopic {
 }
 
 /**
- * The help tab's content, grouped exactly like the toolbar's own tabs so a
- * reader can jump from "what does this button do" straight to the ribbon tab
- * that has it.
+ * The help's content, grouped like the toolbar's own tabs so a reader can
+ * jump from "what does this button do" straight to the ribbon tab that has
+ * it – plus „Tabelle“ for the panel on the right.
  *
- * Kept as data rather than JSX so the search can walk it without touching
- * React, and so wording stays in one place instead of scattered across the
- * rendering code.
+ * Kept as data rather than JSX so wording stays in one place instead of
+ * scattered across the rendering code (`table-editor-help.tsx`). Tasten,
+ * Übernehmen und Rückgängig erklärt der Rahmen selbst.
  */
 export const HELP_TOPICS: HelpTopic[] = [
   {
@@ -39,16 +39,24 @@ export const HELP_TOPICS: HelpTopic[] = [
     label: "Start",
     entries: [
       {
+        title: "Aufbau",
+        text: "Oben die Reiter Schrift, Ausrichtung, Zellen, Bilder und Daten mit ihren Werkzeugen, darunter die Tabelle. Rechts das Panel „Tabelle“ mit den Einstellungen, die für die ganze Tabelle gelten.",
+      },
+      {
+        title: "Zellen bearbeiten",
+        text: "Doppelklick in eine Zelle startet die Eingabe; ein Klick auf eine andere Zelle oder Escape beendet sie. ⌘/Strg Z nimmt in der Zelle Getipptes zurück, außerhalb einen ganzen Schritt.",
+      },
+      {
+        title: "Markieren",
+        text: "Klicken und ziehen, mit Umschalt einen Bereich aufziehen, mit ⌘/Strg weitere Bereiche dazunehmen. Die Griffe am Rand markieren ganze Zeilen, Spalten oder die ganze Tabelle. Rechtsklick öffnet das Kontextmenü.",
+      },
+      {
         title: "Zwischen Reitern wechseln",
         text: "Mit den Pfeiltasten (links/rechts) springt die Tastatur-Fokusmarke von einem Reiter zum nächsten, auch über den Rand der Leiste hinweg zurück zum ersten Reiter.",
       },
       {
-        title: "Speichern und Schließen",
-        text: "„Speichern“ übergibt den aktuellen Stand der Tabelle an das Formularfeld. „Schließen“ verwirft nichts von sich aus, verlässt den Dialog aber ohne zu speichern — ungespeicherte Änderungen zeigt der Hinweis „Ungespeicherte Änderungen“ neben den beiden Buttons.",
-      },
-      {
-        title: "Tabellen importieren",
-        text: "Der Daten-Reiter enthält den Button „Importieren“, mit dem sich Tabellen aus .csv- und .xlsx/.xls-Dateien einlesen lassen.",
+        title: "Vorschau",
+        text: "Desktop, Tablet und Mobil im Kopf zeigen die Tabelle so, wie Leser sie sehen – mit Einklappen, Export und erster Sortierung. Editor führt zurück zur Bearbeitung.",
       },
     ],
   },
@@ -118,10 +126,6 @@ export const HELP_TOPICS: HelpTopic[] = [
         title: "Bildgröße angleichen",
         text: "Gleicht die Höhe oder Breite mehrerer markierter Bilder an das zuerst markierte Bild an. Dafür müssen mindestens zwei Bilder markiert sein. „Standardgröße“ setzt die Größe wieder zurück.",
       },
-      {
-        title: "Bilder anpassen",
-        text: "Schalter, der Bilder auf die Breite der Tabelle begrenzt. Ausgeschaltet werden Bilder immer in ihrer eigenen, ursprünglichen Größe angezeigt.",
-      },
     ],
   },
   {
@@ -129,12 +133,26 @@ export const HELP_TOPICS: HelpTopic[] = [
     label: "Daten",
     entries: [
       {
-        title: "Sortieren",
-        text: "Sortiert die Tabelle auf- oder absteigend nach der Spalte der aktuellen Markierung. „Sortierung entfernen“ stellt die ursprüngliche Reihenfolge wieder her.",
-      },
-      {
         title: "Format kopieren",
         text: "Übernimmt die Formatierung der markierten Zelle und wendet sie auf die nächste Markierung an (Format-Pinsel).",
+      },
+      {
+        title: "Formatierung entfernen",
+        text: "Setzt wahlweise alle Formatierungen, nur die Textformatierung oder nur die Bildgrößen zurück — auf die Markierung, oder ohne Markierung auf die ganze Tabelle.",
+      },
+      {
+        title: "Tabelle importieren",
+        text: "Liest eine Tabelle aus einer .csv- oder .xlsx/.xls-Datei ein und ersetzt damit den aktuellen Inhalt.",
+      },
+    ],
+  },
+  {
+    id: "table",
+    label: "Tabelle (Panel rechts)",
+    entries: [
+      {
+        title: "Erste Sortierung",
+        text: "Spalte und Richtung, nach der die Tabelle beim Öffnen sortiert ist; die Kopfzeile bleibt oben. Leser sortieren per Klick auf eine Überschrift um. Dasselbe geht über das Kontextmenü → Sortierung für die Spalte unter der Maus. „Keine“ zeigt die Zeilen in ihrer Reihenfolge.",
       },
       {
         title: "Sichtbare Zeilen",
@@ -145,12 +163,8 @@ export const HELP_TOPICS: HelpTopic[] = [
         text: "Bietet Lesern der veröffentlichten Tabelle einen Download als Excel- (.xlsx) oder CSV-Datei an. „Ganze Tabelle“ exportiert alle Zeilen, „Mit Zeilenauswahl“ fügt eine Spalte mit Kästchen hinzu — exportiert werden dann die gewählten Zeilen, ohne Auswahl alle. In der Staffbase-App wird der Export nicht angezeigt.",
       },
       {
-        title: "Formatierung entfernen",
-        text: "Setzt wahlweise alle Formatierungen, nur die Textformatierung oder nur die Bildgrößen zurück — auf die Markierung, oder ohne Markierung auf die ganze Tabelle.",
-      },
-      {
-        title: "Tabelle importieren",
-        text: "Liest eine Tabelle aus einer .csv- oder .xlsx/.xls-Datei ein und ersetzt damit den aktuellen Inhalt.",
+        title: "Bilder anpassen",
+        text: "Schalter, der Bilder auf die Breite der Tabelle begrenzt. Ausgeschaltet werden Bilder immer in ihrer eigenen, ursprünglichen Größe angezeigt.",
       },
     ],
   },

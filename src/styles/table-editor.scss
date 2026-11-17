@@ -26,7 +26,22 @@
   flex: 1 1 auto;
   height: 100%;
   min-height: 0;
+  min-width: 0;
   max-width: 100%;
+  // Escape in einer Zelle legt den Fokus hierher, damit die Tasten des Rahmens
+  // weiter ankommen; ein Ring um den ganzen Editor sagte dabei nichts.
+  outline: none;
+
+  // Die Hauptfläche im Rahmen: Reiter oben, Gitter darunter. Dieselbe Spalte
+  // wie oben, eine Ebene tiefer – `ConfigWorkspace` legt das Panel „Tabelle“
+  // daneben.
+  &__main {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    min-width: 0;
+  }
 
   // Die Container-Query-Box muss ein eigenes, gestrecktes Element sein:
   // `container-type: inline-size` schließt die Inline-Achse ein, sodass die
@@ -35,45 +50,13 @@
   &__fit-scope {
     flex: 1 1 auto;
     min-height: 0;
-    // In der Zeile aus `&__grid-area` muss auch die Inline-Achse schrumpfen
-    // dürfen — ohne das bliebe das Gitter bei seiner Inhaltsbreite und würde
-    // den Drawer aus dem Editor herausdrücken statt ihm Platz zu machen.
+    // Auch die Inline-Achse muss schrumpfen dürfen — sonst bliebe das Gitter
+    // bei seiner Inhaltsbreite und drückte das Panel „Tabelle“ aus dem Bild,
+    // statt selbst seitlich zu scrollen.
     min-width: 0;
     display: flex;
     flex-direction: column;
     container-type: inline-size;
-  }
-
-  // Rahmen für den Hilfe-Drawer: eine Flex-Reihe, in der das Gitter (`flex: 1
-  // 1 auto`) und der Drawer sich die Breite teilen. Öffnet der Drawer,
-  // schrumpft das Gitter automatisch mit — kein Overlay, die Tabelle bleibt
-  // bedienbar.
-  &__grid-area {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    flex: 1 1 auto;
-    min-height: 0;
-  }
-
-  &__footer-area {
-    border-radius: 0 0 8px 8px;
-    background: $surface-header;
-    display: flex;
-    align-items: center;
-    justify-content: end;
-    padding: 6px 10px;
-
-    .table-editor__footer-item {
-      font-size: 12px;
-      color: $text-muted;
-
-      &--version {
-        background: $surface-handle;
-        border-radius: 20px;
-        padding: 4px 8px;
-      }
-    }
   }
 
   // Der einzige scrollende Bereich des Editors. Er füllt die Breite, die er

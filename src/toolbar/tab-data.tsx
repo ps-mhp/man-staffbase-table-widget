@@ -15,40 +15,29 @@ import * as React from "react";
 import { ReactElement, useRef } from "react";
 
 import { Dropdown } from "./controls";
-import { IconChevron, IconClearFormat, IconPainter, IconSort, IconUpload } from "./icons";
+import { IconChevron, IconClearFormat, IconPainter, IconUpload } from "./icons";
 import { TableToolbarProps } from "./props";
-import { ExportMode } from "../table-model";
 
 export type DataTabProps = Pick<
   TableToolbarProps,
   | "hasSelection"
   | "painterActive"
-  | "onSortAsc"
-  | "onSortDesc"
-  | "onClearSort"
   | "onCopyFormat"
   | "onUpload"
-  | "visibleRows"
-  | "onChangeVisibleRows"
-  | "exportMode"
-  | "onChangeExportMode"
   | "onClearFormatting"
   | "hasClearTarget"
 >;
 
-/** Actions on the table as a whole: order, import, and resetting formatting. */
+/**
+ * Actions on the table's content: copying and resetting formatting, import.
+ * Erste Sortierung, sichtbare Zeilen und Export sind Einstellungen der ganzen
+ * Tabelle und stehen im Panel „Tabelle“ rechts.
+ */
 export function DataTab({
   hasSelection,
   painterActive,
-  onSortAsc,
-  onSortDesc,
-  onClearSort,
   onCopyFormat,
   onUpload,
-  visibleRows,
-  onChangeVisibleRows,
-  exportMode,
-  onChangeExportMode,
   onClearFormatting,
   hasClearTarget,
 }: DataTabProps): ReactElement {
@@ -63,71 +52,10 @@ export function DataTab({
 
   return (
     <>
-      <Dropdown
-        testId="toolbar-sort-menu"
-        trigger={(toggle) => (
-          <button type="button" className="tw-rb__big" data-testid="toolbar-sort" title="Sortierung" disabled={disabled} onClick={toggle}>
-            <IconSort />
-            <span className="tw-rb__label">Sortieren <IconChevron /></span>
-          </button>
-        )}
-      >
-        {(close) => (
-          <>
-            <button type="button" className="tw-rb__menu-item" data-testid="toolbar-sort-asc" onClick={() => { onSortAsc(); close(); }}>
-              Aufsteigend (diese Spalte)
-            </button>
-            <button type="button" className="tw-rb__menu-item" data-testid="toolbar-sort-desc" onClick={() => { onSortDesc(); close(); }}>
-              Absteigend (diese Spalte)
-            </button>
-            <button type="button" className="tw-rb__menu-item" data-testid="toolbar-sort-clear" onClick={() => { onClearSort(); close(); }}>
-              Sortierung entfernen
-            </button>
-          </>
-        )}
-      </Dropdown>
-
       <button type="button" className="tw-rb__big" data-testid="toolbar-painter" title="Format kopieren" disabled={disabled && !painterActive} onClick={onCopyFormat} style={painterActive ? { color: "#0a63b0", background: "#e8f2fc", borderColor: "#9ecbf0" } : undefined}>
         <IconPainter />
         <span>Format</span>
       </button>
-
-      <label
-        className="tw-rb__rows-limit"
-        title="Zeilen, die die veröffentlichte Tabelle zeigt, bevor sie hinter einem Button einklappt. 0 zeigt alle Zeilen."
-      >
-        <input
-          type="number"
-          min={0}
-          step={1}
-          data-testid="toolbar-visible-rows"
-          value={visibleRows}
-          onChange={(event) => {
-            // An emptied field reads as NaN. Treating that as 0 would
-            // silently switch collapsing off mid-typing, so it is ignored
-            // until a number is there.
-            const next = event.target.valueAsNumber;
-            if (Number.isFinite(next)) onChangeVisibleRows(next);
-          }}
-        />
-        <span>Sichtbare Zeilen</span>
-      </label>
-
-      <label
-        className="tw-rb__rows-limit"
-        title="Export der veröffentlichten Tabelle als Excel- oder CSV-Datei. In der Staffbase-App wird der Export nicht angezeigt."
-      >
-        <span>Export</span>
-        <select
-          data-testid="toolbar-export-mode"
-          value={exportMode}
-          onChange={(event) => onChangeExportMode(event.target.value as ExportMode)}
-        >
-          <option value="off">Aus</option>
-          <option value="all">Ganze Tabelle</option>
-          <option value="select">Mit Zeilenauswahl</option>
-        </select>
-      </label>
 
       <Dropdown
         testId="toolbar-clear-format-menu"

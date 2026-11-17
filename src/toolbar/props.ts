@@ -11,12 +11,18 @@
  * limitations under the License.
  */
 
-import { CellFormat, ExportMode, TextAlign, VerticalAlign } from "../table-model";
+import { CellFormat, TextAlign, VerticalAlign } from "../table-model";
 import { ClearScope } from "../clear-format";
 
 /** The toolbar's tabs, in the order they appear. */
 export type TabId = "font" | "align" | "cells" | "images" | "data";
 
+/**
+ * Alles, was an Zellen und Markierung hängt. Einstellungen der ganzen Tabelle
+ * (erste Sortierung, sichtbare Zeilen, Export, Bilder anpassen) stehen im
+ * Panel „Tabelle“ rechts (`table-inspector.tsx`), Speichern, Schließen und
+ * Hilfe im Kopf des Rahmens.
+ */
 export interface TableToolbarProps {
   hasSelection: boolean;
   activeFormat: CellFormat;
@@ -43,9 +49,6 @@ export interface TableToolbarProps {
   onMerge: () => void;
   onUnmerge: () => void;
   canUnmerge: boolean;
-  onSortAsc: () => void;
-  onSortDesc: () => void;
-  onClearSort: () => void;
   onCopyFormat: () => void;
   onUpload: (file: File) => void;
   onInsertImage: () => void;
@@ -57,30 +60,10 @@ export interface TableToolbarProps {
   onEqualizeImageWidth: () => void;
   onResetImageSize: () => void;
   /**
-   * Whether images are capped to the width of the rendered table. Applies to
-   * the whole table, so the switch stays enabled without a selection.
-   */
-  fitImages: boolean;
-  onToggleFitImages: () => void;
-  /**
-   * Data rows shown before the published table collapses behind a button;
-   * `0` shows all of them. A table-wide setting, like {@link fitImages}.
-   */
-  visibleRows: number;
-  onChangeVisibleRows: (rows: number) => void;
-  /** Download offered by the published table (see `TableModel.exportMode`). */
-  exportMode: ExportMode;
-  onChangeExportMode: (mode: ExportMode) => void;
-  /**
    * Resets formatting — on the selection, or on the whole table when nothing
    * is selected, which is why these stay enabled without a selection.
    */
   onClearFormatting: (scope: ClearScope) => void;
   /** True while a selection limits the reset to part of the table. */
   hasClearTarget: boolean;
-  onSave?: () => void;
-  onClose?: () => void;
-  dirty?: boolean;
-  /** Opens the help drawer over the grid, next to Speichern/Schließen. */
-  onOpenHelp?: () => void;
 }

@@ -12,9 +12,11 @@
  */
 
 import * as React from "react";
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { ReactElement, useCallback, useEffect, useRef, useState } from "react";
 
 import { IconChevron } from "./icons";
+import { useEscapeLayer } from "../escape-layer";
+import { activeElementOf, eventRootOf } from "@shared/shadow-dom";
 
 /** White box with a red diagonal slash — the "no colour set" (Standard) look. */
 const STANDARD_BAR =
@@ -77,17 +79,27 @@ export function Dropdown({
 
   useEffect(() => {
     if (!open) return;
-    // Use the capture phase: the injected editor can live inside a modal that
-    // stops propagation of bubble-phase pointer events at document.body (to
-    // avoid dismissing the host popover). A capture-phase listener on
-    // document still fires before that, so an outside click reliably closes
-    // this dropdown.
-    const onDoc = (e: MouseEvent): void => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    // An der Wurzel des Editors, in der Capture-Phase: das Config-Modal hält
+    // Klicks am Host an, und an `document` hieße das Ziel aus dem Shadow Root
+    // nur „Host“ – jeder Klick ins Menü zählte dort als „außerhalb“.
+    // `composedPath` sieht durch den Shadow Root hindurch.
+    const root = eventRootOf(ref.current);
+    const onMouseDown = (event: Event): void => {
+      if (ref.current && !event.composedPath().includes(ref.current)) setOpen(false);
     };
-    document.addEventListener("mousedown", onDoc, true);
-    return () => document.removeEventListener("mousedown", onDoc, true);
+    root.addEventListener("mousedown", onMouseDown, true);
+    return () => root.removeEventListener("mousedown", onMouseDown, true);
   }, [open]);
+
+  // Escape schließt das Menü, nicht den Rahmen darum. Stand der Fokus im Menü,
+  // ginge er mit ihm verloren – dann zurück an den Knopf, der es öffnete.
+  const closeByEscape = useCallback((): void => {
+    const wrapper = ref.current;
+    const focusInside = wrapper !== null && wrapper.contains(activeElementOf(wrapper));
+    setOpen(false);
+    if (focusInside) wrapper.querySelector<HTMLButtonElement>("button")?.focus();
+  }, []);
+  useEscapeLayer(open, ref, closeByEscape);
 
   return (
     <div ref={ref} className="tw-rb__dropdown">

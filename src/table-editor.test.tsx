@@ -1,5 +1,7 @@
 import React from "react";
-import { act, screen, render, fireEvent, waitFor } from "@testing-library/react";
+import { act, screen, render, fireEvent, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { ConfigShellProvider, ConfigView } from "@man/config-ui/shell/shell-context";
 
 import { TableEditor } from "./table-editor";
 import { TableModel } from "./table-model";
@@ -76,10 +78,7 @@ const TOOLBAR_TAB: Record<string, string> = {
   "toolbar-image-equal-height": "Bilder",
   "toolbar-image-equal-width": "Bilder",
   "toolbar-image-reset-size": "Bilder",
-  "toolbar-image-fit": "Bilder",
   "toolbar-painter": "Daten",
-  "toolbar-visible-rows": "Daten",
-  "toolbar-export-mode": "Daten",
   "toolbar-upload": "Daten",
   "toolbar-clear-format": "Daten",
   "toolbar-clear-format-all": "Daten",
@@ -515,35 +514,25 @@ describe("TableEditor", () => {
       expect(scope?.contains(frame)).toBe(true);
     });
 
-    it("toggles the fit option without touching the cells", () => {
+    it("toggles the fit option from the panel without touching the cells", async () => {
       const onChange = jest.fn();
       render(<TableEditor value={withImages()} onChange={onChange} measure={measure} />);
 
-      const toggle = toolbar("toolbar-image-fit");
-      expect(toggle).toHaveAttribute("aria-checked", "true");
+      const toggle = screen.getByRole("switch", { name: "Bilder anpassen" });
+      expect(toggle).toBeChecked();
       // Table-wide, so it works without a selection.
-      fireEvent.click(toggle);
+      await userEvent.click(toggle);
 
       const arg = onChange.mock.calls.at(-1)![0] as TableModel;
       expect(arg.fitImages).toBe(false);
       expect(arg.data).toEqual(withImages().data);
     });
 
-    it("turns the fit option back on", () => {
-      const onChange = jest.fn();
-      render(
-        <TableEditor
-          value={{ ...withImages(), fitImages: false }}
-          onChange={onChange}
-          measure={measure}
-        />,
-      );
+    it("no longer offers the fit option in the Bilder tab", () => {
+      render(<TableEditor value={withImages()} onChange={jest.fn()} measure={measure} />);
+      fireEvent.click(screen.getByRole("tab", { name: "Bilder" }));
 
-      const toggle = toolbar("toolbar-image-fit");
-      expect(toggle).toHaveAttribute("aria-checked", "false");
-      fireEvent.click(toggle);
-
-      expect((onChange.mock.calls.at(-1)![0] as TableModel).fitImages).toBe(true);
+      expect(screen.queryByTestId("toolbar-image-fit")).toBeNull();
     });
 
     it("offers only the reset option while a single image is selected", () => {
@@ -734,14 +723,14 @@ describe("row limit", () => {
       />,
     );
 
-    expect(toolbar("toolbar-visible-rows")).toHaveValue(3);
+    expect(screen.getByLabelText("Sichtbare Zeilen")).toHaveValue(3);
   });
 
   it("reports a changed limit", () => {
     const onChange = jest.fn();
     render(<TableEditor value={longModel(10)} onChange={onChange} measure={measure} />);
 
-    fireEvent.change(toolbar("toolbar-visible-rows"), { target: { value: "2" } });
+    fireEvent.change(screen.getByLabelText("Sichtbare Zeilen"), { target: { value: "2" } });
 
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ visibleRows: 2 }));
   });
@@ -751,7 +740,7 @@ describe("row limit", () => {
     const onChange = jest.fn();
     render(<TableEditor value={longModel(10)} onChange={onChange} measure={measure} />);
 
-    fireEvent.change(toolbar("toolbar-visible-rows"), { target: { value: "" } });
+    fireEvent.change(screen.getByLabelText("Sichtbare Zeilen"), { target: { value: "" } });
 
     expect(onChange).not.toHaveBeenCalled();
   });
@@ -817,17 +806,65 @@ describe("retired lowercase mark", () => {
 });
 
 describe("export mode", () => {
-  it("shows the stored mode and reports a changed one", () => {
+  it("shows the stored mode in the panel and reports a changed one", async () => {
     const onChange = jest.fn();
     render(<TableEditor value={model([["", "A"], ["x", "1"]], { exportMode: "all" })} onChange={onChange} />);
 
-    const select = toolbar("toolbar-export-mode");
-    expect(select).toHaveValue("all");
-    expect(select.closest("label")).toHaveAttribute("title", expect.stringContaining("In der Staffbase-App wird der Export nicht angezeigt."));
-
-    fireEvent.change(select, { target: { value: "select" } });
+    const trigger = screen.getByRole("combobox", { name: "Export" });
+    expect(trigger).toHaveTextContent("Ganze Tabelle");
+    await userEvent.click(trigger);
+    await userEvent.click(await screen.findByRole("option", { name: "Mit Zeilenauswahl" }));
 
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ exportMode: "select" }));
+  });
+
+  it("no longer offers sorting, row limit or export in the Daten tab", () => {
+    render(<TableEditor value={sample()} onChange={jest.fn()} />);
+    fireEvent.click(screen.getByRole("tab", { name: "Daten" }));
+
+    for (const testId of ["toolbar-sort", "toolbar-visible-rows", "toolbar-export-mode"]) {
+      expect(screen.queryByTestId(testId)).toBeNull();
+    }
+    expect(screen.getByTestId("toolbar-upload")).toBeInTheDocument();
+  });
+});
+
+describe("im Rahmen", () => {
+  const inView = (view: ConfigView, value: TableModel): void => {
+    render(
+      <ConfigShellProvider value={{ view, setView: jest.fn(), preview: true, issuesVisible: false }}>
+        <TableEditor value={value} onChange={jest.fn()} />
+      </ConfigShellProvider>,
+    );
+  };
+
+  it("zeichnet keine eigenen Knöpfe zum Speichern, Schließen oder für die Hilfe", () => {
+    render(<TableEditor value={sample()} onChange={jest.fn()} />);
+
+    for (const testId of ["toolbar-done", "toolbar-close", "toolbar-help", "toolbar-title", "toolbar-dirty", "help-drawer"]) {
+      expect(screen.queryByTestId(testId)).toBeNull();
+    }
+    expect(screen.queryByText("MAN Table Editor")).toBeNull();
+    expect(screen.queryByRole("button", { name: /^(Speichern|Schließen|Hilfe)$/ })).toBeNull();
+  });
+
+  it("zeigt im Editor Reiter, Gitter und das Panel „Tabelle“", () => {
+    inView("editor", sample());
+
+    expect(screen.getByRole("tablist", { name: "Werkzeuggruppen" })).toBeInTheDocument();
+    expect(screen.getByTestId("table-editor-grid")).toBeInTheDocument();
+    expect(screen.getByRole("complementary", { name: "Tabelle" })).toBeInTheDocument();
+    expect(screen.queryByTestId("table-preview")).toBeNull();
+  });
+
+  it("zeigt in der Ansicht Tablet den Entwurf als Leseansicht, das Panel bleibt", () => {
+    inView("tablet", model([["", "Wert"], ["Entwurf", "42"]], { visibleRows: 0 }));
+
+    const preview = screen.getByTestId("table-preview");
+    expect(screen.getByRole("region", { name: "Vorschau Tablet" })).toContainElement(preview);
+    expect(within(preview).getByRole("rowheader", { name: "Entwurf" })).toBeInTheDocument();
+    expect(screen.queryByTestId("table-editor-grid")).toBeNull();
+    expect(screen.getByRole("complementary", { name: "Tabelle" })).toBeInTheDocument();
   });
 });
 

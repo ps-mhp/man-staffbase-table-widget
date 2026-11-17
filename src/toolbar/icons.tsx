@@ -25,28 +25,6 @@ const svgBase = {
   strokeLinejoin: "round" as const,
 };
 
-export const IconSave = (): ReactElement => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-    <path d="M5 3h11l3 3v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
-    <path d="M8 3v5h6V3" />
-    <path d="M8 21v-6h8v6" />
-  </svg>
-);
-
-export const IconClose = (): ReactElement => (
-  <svg {...svgBase} aria-hidden>
-    <path d="M4 4l8 8M12 4l-8 8" />
-  </svg>
-);
-
-export const IconHelp = (): ReactElement => (
-  <svg {...svgBase} aria-hidden>
-    <circle cx="8" cy="8" r="6.3" />
-    <path d="M6 6.2c.2-1 1-1.6 2-1.6 1.1 0 2 .7 2 1.7 0 .9-.6 1.3-1.4 1.8-.6.4-.9.7-.9 1.4" />
-    <circle cx="7.8" cy="11.4" r="0.15" fill="currentColor" stroke="none" />
-  </svg>
-);
-
 export const IconSuperscript = (): ReactElement => (
   <svg {...svgBase} aria-hidden>
     <path d="M2 13L8 5M8 13L2 5" />
@@ -91,12 +69,6 @@ export const IconDelete = (): ReactElement => (
   <svg {...svgBase} aria-hidden>
     <rect x="2" y="2" width="12" height="12" rx="1" opacity="0.5" />
     <path d="M5 8h6" />
-  </svg>
-);
-export const IconSort = (): ReactElement => (
-  <svg {...svgBase} aria-hidden>
-    <path d="M4 3v10M2 11l2 2 2-2" />
-    <path d="M9 5h5M9 8h4M9 11h3" strokeWidth={1.2} />
   </svg>
 );
 export const IconPainter = (): ReactElement => (

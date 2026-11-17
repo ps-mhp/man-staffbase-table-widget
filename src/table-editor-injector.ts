@@ -12,13 +12,46 @@
  */
 
 import * as React from "react";
+import { Table2 } from "lucide-react";
 
-import { startFieldModalInjector } from "@shared/config-modal";
-import { TableEditor } from "./table-editor";
+import { FieldModalShellOptions, startFieldModalInjector } from "@shared/config-modal";
+import { tableChangesStatus } from "./editor-status";
 import { TableModel, parseTableModel, encodeTableAttribute } from "./table-model";
 
 /** The schema property whose field the editor takes over. */
 const FIELD_KEY = "tabledata";
+
+/**
+ * Der Editor kommt erst, wenn ein Dialog ihn zeigt: er baut auf
+ * `@man/config-ui` (Radix, react-aria, Tailwind) und bringt Kontextmenü,
+ * Medienauswahl und Import mit – nichts davon gehört ins Seitenbündel, das
+ * jede Leserin lädt. Hier bleibt nur, was der Rahmen braucht, bevor der
+ * Editor da ist: Name, Icon, Status.
+ */
+const loadEditor = () => import("./table-editor");
+
+const LazyTableEditor = React.lazy(() => loadEditor().then((module) => ({ default: module.TableEditor })));
+
+/** Die Hilfe aus demselben Chunk wie der Editor; ihr Text ist zu lang fürs Seitenbündel. */
+const LazyTableEditorHelp = React.lazy(() =>
+  loadEditor().then((module) => ({ default: module.TableEditorHelp })),
+);
+
+const LOADING = React.createElement("p", { className: "p-6 text-sm text-muted-foreground" }, "Editor wird geladen …");
+
+/**
+ * Was der gemeinsame Rahmen von der Tabelle wissen muss. Offengelegt für
+ * Tests. Keine Prüfung: jedes Modell lässt sich schreiben, `parseTableModel`
+ * rückt beim Lesen alles zurecht.
+ */
+export const tableEditorShell: FieldModalShellOptions<TableModel> = {
+  widgetName: "Tabelle",
+  title: "Tabelle bearbeiten",
+  icon: Table2,
+  preview: true,
+  help: React.createElement(React.Suspense, { fallback: null }, React.createElement(LazyTableEditorHelp)),
+  statusText: tableChangesStatus,
+};
 
 /**
  * Watches for the widget's configuration dialog and injects the grid editor in
@@ -26,7 +59,11 @@ const FIELD_KEY = "tabledata";
  *
  * Everything about surviving the host's dialog — the portal, the dismiss
  * isolation, the write-back through the native setter — lives in
- * `@shared/config-modal`; what remains here is the table itself.
+ * `@shared/config-modal`; Kopf, Übernehmen, Rückgängig, Hilfe und Rückfrage
+ * im Rahmen von `@man/config-ui`. What remains here is the table itself.
+ *
+ * Kein `panelClassName` mehr: im Rahmen ist das Panel immer Vollbild ohne
+ * Polster, die Option gilt dort nicht.
  *
  * @param root the subtree to watch; defaults to the document. Exposed so tests
  * can scope the observer to a detached container.
@@ -41,10 +78,8 @@ export function startTableEditorInjector(root: ParentNode = document): () => voi
     reopenTestId: "table-editor-reopen",
     parse: parseTableModel,
     serialize: encodeTableAttribute,
-    // The editor draws its own frame — toolbar and grid share an edge — so the
-    // panel's form-style padding would only push that frame away from it.
-    panelClassName: "p-0",
-    render: ({ value, onChange, onSave, onClose, dirty }) =>
-      React.createElement(TableEditor, { value, onChange, onSave, onClose, dirty }),
+    shell: tableEditorShell,
+    render: ({ value, onChange }) =>
+      React.createElement(React.Suspense, { fallback: LOADING }, React.createElement(LazyTableEditor, { value, onChange })),
   });
 }

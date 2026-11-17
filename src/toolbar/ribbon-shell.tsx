@@ -14,7 +14,6 @@
 import * as React from "react";
 import { ReactElement } from "react";
 
-import { IconClose, IconHelp, IconSave } from "./icons";
 import ribbonCss from "../styles/ribbon.scss";
 import { useHotStyle } from "@shared/hot-style";
 
@@ -28,29 +27,20 @@ export interface RibbonShellProps {
   tabs: RibbonTab[];
   activeTab: string;
   onSelectTab: (id: string) => void;
-  /** Omitted where the editor is not shown in a dialog that can be saved. */
-  onSave?: () => void;
-  /** Omitted with `onSave`; closing is the dialog's business, not the grid's. */
-  onClose?: () => void;
-  /** Shows that the draft holds edits the form field has not seen yet. */
-  dirty?: boolean;
-  /** Opens the help drawer over the grid. Independent of `onSave`/`onClose`. */
-  onOpenHelp?: () => void;
 }
 
 /**
- * The toolbar's frame: a control bar with the dialog's buttons, the tab strip
- * below it, and the active tab's panel underneath.
+ * The toolbar's frame: the tab strip and the active tab's panel underneath.
  *
- * Nothing here writes to the widget's configuration: "Speichern" hands the
- * draft over, "Schließen" leaves it be. The note beside them is the only
- * clue that the two differ, so it stays visible for as long as they do.
+ * Eine eigene Bedienleiste mit Titel, Speichern, Hilfe und Schließen gibt es
+ * nicht mehr: das alles steht im Kopf des Rahmens von `@man/config-ui`, für
+ * jedes Widget gleich.
  *
  * Only the active panel is rendered. Keeping the inactive ones mounted but
  * hidden would leave their buttons in the tab order, so a keyboard user would
  * walk through controls they cannot see.
  */
-export function RibbonShell({ tabs, activeTab, onSelectTab, onSave, onClose, dirty, onOpenHelp }: RibbonShellProps): ReactElement {
+export function RibbonShell({ tabs, activeTab, onSelectTab }: RibbonShellProps): ReactElement {
   const hotRibbonCss = useHotStyle(ribbonCss, "table-widget", "styles/ribbon.scss");
   const active = tabs.find((tab) => tab.id === activeTab) ?? tabs[0];
 
@@ -65,52 +55,6 @@ export function RibbonShell({ tabs, activeTab, onSelectTab, onSave, onClose, dir
   return (
     <div className="tw-rb" data-testid="table-toolbar">
       <style>{hotRibbonCss}</style>
-
-      {(onSave || onOpenHelp) && (
-        <div className="tw-rb__controls">
-          {onSave && (
-            <button
-              type="button"
-              className="tw-rb__ctl tw-rb__ctl--primary"
-              data-testid="toolbar-done"
-              title="Speichern"
-              onClick={onSave}
-            >
-              <IconSave />
-            </button>
-          )}
-          <div className="tw-rb__title" data-testid="toolbar-title">
-            MAN Table Editor
-          </div>
-          {onOpenHelp && (
-            <button
-              type="button"
-              className="tw-rb__ctl tw-rb__ctl-help"
-              data-testid="toolbar-help"
-              title="Hilfe"
-              onClick={onOpenHelp}
-            >
-              <IconHelp />
-            </button>
-          )}
-          {onClose && (
-            <button
-              type="button"
-              className="tw-rb__ctl tw-rb__ctl-close"
-              data-testid="toolbar-close"
-              title="Schließen"
-              onClick={onClose}
-            >
-              <IconClose />
-            </button>
-          )}
-          {dirty && (
-            <span className="tw-rb__dirty" data-testid="toolbar-dirty">
-              Ungespeicherte Änderungen
-            </span>
-          )}
-        </div>
-      )}
 
       <div className="tw-rb__tabs">
         <div className="tw-rb__tablist" role="tablist" aria-label="Werkzeuggruppen" onKeyDown={onKeyDown}>

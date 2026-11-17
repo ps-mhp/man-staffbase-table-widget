@@ -12,8 +12,9 @@
  */
 
 import * as React from "react";
-import { ReactElement, useEffect, useMemo, useRef, useState } from "react";
+import { ReactElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as ContextMenu from "@radix-ui/react-context-menu";
+import { ConfigWorkspace } from "@man/config-ui/layout/config-workspace";
 import {
   TableModel,
   CellRange,
@@ -29,10 +30,6 @@ import {
   unmergeCells,
   setFormat,
   setSort,
-  setFitImages,
-  setVisibleRows,
-  setExportMode,
-  ExportMode,
   cellFormat,
   isCovered,
   mergeAt,
@@ -41,13 +38,11 @@ import { updateCell, parsePastedText, pasteBlock } from "./grid-operations";
 import { sanitizeRichText } from "./rich-text";
 import { formatToStyle, formatToCellStyle } from "./cell-style";
 import { TableToolbar } from "./table-toolbar";
-import { HelpDrawer } from "./toolbar/help-drawer";
 import { importTableFile } from "./table-import";
 import { MediaClient, createMediaClient } from "@shared/media/media-client";
-import { MediaPicker, PickedImage } from "@shared/media/media-picker";
+import { PickedImage } from "@shared/media/media-picker";
 import {
   buildImageMarkup,
-  clampImageWidth,
   countCellImages,
   equalizedWidths,
   listCellImages,
@@ -61,26 +56,29 @@ import imageNoFitCss from "./styles/image-no-fit.scss";
 import { ClearScope, clearFormatting } from "./clear-format";
 import tableEditorCss from "./styles/table-editor.scss";
 import { useHotStyle } from "@shared/hot-style";
-import { activeElementOf, eventRootOf, selectionOf } from "@shared/shadow-dom";
+import { activeElementOf, eventRootOf } from "@shared/shadow-dom";
 import { usePortalContainer } from "@shared/ui/portal-container";
+import { EditableCell } from "./editable-cell";
+import { GridContextMenu, GridMenuActions } from "./grid-context-menu";
+import { CellImagePicker } from "./cell-image-picker";
+import { cellsInRanges, clampRanges } from "./selection";
+import { TableInspector } from "./table-inspector";
+import { TablePreview } from "./table-preview";
 
 /**
- * The widget's own `version` from its `package.json`, injected by
- * `webpack.DefinePlugin` in `webpack.common.ts`. `release.sh` bumps
- * `package.json` before building, so the value baked in here is always the
- * version the resulting bundle gets tagged and released under.
+ * Mitgeliefert für den Rahmen: der Injektor lädt die Hilfe aus diesem Modul
+ * nach, damit sie im selben Chunk wie der Editor liegt und nicht im
+ * Seitenbündel, das jede Leserin lädt.
  */
-declare const __WIDGET_VERSION__: string;
+export { TableEditorHelp } from "./table-editor-help";
 
 export interface TableEditorProps {
   value: TableModel;
+  /**
+   * Bekommt jedes neue Modell. Im Rahmen ist das der Entwurf: übernommen wird
+   * erst über „Übernehmen“ im Kopf, den der Editor nicht selbst zeichnet.
+   */
   onChange: (model: TableModel) => void;
-  /** Optional: when provided, the toolbar shows the dialog's control bar. */
-  onSave?: () => void;
-  /** Optional: closes the dialog; asked for by the control bar's second button. */
-  onClose?: () => void;
-  /** Marks the control bar while edits are waiting to be saved. */
-  dirty?: boolean;
   /**
    * Media API client used by the image picker and clipboard-image upload.
    * Defaults to a same-origin {@link createMediaClient}; injectable for tests.
@@ -98,37 +96,6 @@ export interface TableEditorProps {
  * up as a compile error rather than as silently unstyled markup.
  */
 const CELL = "table-editor__cell";
-const MENU_ITEM = "table-editor__menu-item";
-
-const cellsInRange = (range: CellRange): Array<[number, number]> => {
-  const cells: Array<[number, number]> = [];
-  for (let r = range.top; r <= range.bottom; r++) {
-    for (let c = range.left; c <= range.right; c++) {
-      cells.push([r, c]);
-    }
-  }
-  return cells;
-};
-
-/**
- * The cells of several (possibly overlapping) selected ranges, in selection
- * order: range by range, and row-major inside each range. Duplicates are
- * dropped, so a cell keeps the position of its *first* selection — that order
- * is what makes "the first marked image" well-defined.
- */
-const cellsInRanges = (ranges: ReadonlyArray<CellRange>): Array<[number, number]> => {
-  const seen = new Set<string>();
-  const cells: Array<[number, number]> = [];
-  for (const range of ranges) {
-    for (const [row, col] of cellsInRange(range)) {
-      const key = `${row},${col}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-      cells.push([row, col]);
-    }
-  }
-  return cells;
-};
 
 /**
  * Returns the first image file found on a clipboard payload (either as a
@@ -151,167 +118,6 @@ const firstImageFile = (clipboard: DataTransfer | null): File | null => {
 };
 
 /**
- * A single cell's content. It is only `contenteditable` while it is the cell
- * being edited (entered via double-click); the rest of the time editing is
- * off so that mouse drags select cells instead of text/caret. Content is set
- * imperatively (never while focused) so React re-renders don't reset the
- * caret, and is read back out as sanitized inline markup (only `<sup>`/`<sub>`
- * survive).
- */
-function EditableCell({
-  html,
-  ariaLabel,
-  editing,
-  format,
-  onInput,
-  onPaste,
-  onStopEdit,
-}: {
-  html: string;
-  ariaLabel: string;
-  editing: boolean;
-  format: React.CSSProperties;
-  onInput: (value: string) => void;
-  onPaste: (event: React.ClipboardEvent<HTMLDivElement>) => void;
-  onStopEdit: () => void;
-}): ReactElement {
-  const ref = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [selectedImg, setSelectedImg] = useState<HTMLImageElement | null>(null);
-  // Bumped to re-render (reposition the resize handle) during a drag.
-  const [, setTick] = useState(0);
-
-  useEffect(() => {
-    const el = ref.current;
-    // Not while the cell is being typed in — asked of the cell's own root: in
-    // the config modal's shadow root `document.activeElement` is the host.
-    if (el && el !== activeElementOf(el) && el.innerHTML !== html) {
-      el.innerHTML = html;
-      setSelectedImg(null);
-    }
-  }, [html]);
-
-  // When a cell enters edit mode, focus it and drop the caret at the end.
-  useEffect(() => {
-    const el = ref.current;
-    if (editing && el && el !== activeElementOf(el)) {
-      el.focus();
-      const range = document.createRange();
-      range.selectNodeContents(el);
-      range.collapse(false);
-      const sel = selectionOf(el);
-      sel?.removeAllRanges();
-      sel?.addRange(range);
-    }
-  }, [editing]);
-
-  // Leaving edit mode always clears any image resize selection/handle.
-  useEffect(() => {
-    if (!editing) setSelectedImg(null);
-  }, [editing]);
-
-  /**
-   * Drags the bottom-right handle to resize the selected image. `preventDefault`
-   * on the initiating mousedown keeps the contenteditable focused (so the cell
-   * doesn't blur/close mid-drag), and the new width is persisted on release by
-   * reading the sanitized markup back out.
-   *
-   * The move/up listeners are attached in the **capture** phase: when the
-   * editor runs inside the injected config-dialog modal, a bubble-phase
-   * `mouseup` listener on `document.body` stops propagation for events inside
-   * the modal (to keep the host popover from dismissing). A bubble-phase
-   * listener on `document` would therefore never receive the `mouseup` and the
-   * drag would never end; capturing runs before that `stopPropagation`.
-   */
-  const startResize = (event: React.MouseEvent): void => {
-    event.preventDefault();
-    event.stopPropagation();
-    const img = selectedImg;
-    if (!img) return;
-    const startX = event.clientX;
-    const startWidth = img.getBoundingClientRect().width || img.offsetWidth || 100;
-
-    const onMove = (moveEvent: MouseEvent): void => {
-      const width = clampImageWidth(startWidth + (moveEvent.clientX - startX));
-      img.style.width = `${width}px`;
-      img.style.height = "auto";
-      setTick((t) => t + 1);
-    };
-    const onUp = (): void => {
-      document.removeEventListener("mousemove", onMove, true);
-      document.removeEventListener("mouseup", onUp, true);
-      onInput(sanitizeRichText(ref.current?.innerHTML ?? ""));
-    };
-    document.addEventListener("mousemove", onMove, true);
-    document.addEventListener("mouseup", onUp, true);
-  };
-
-  const handlePos = ((): { left: number; top: number } | null => {
-    const img = selectedImg;
-    const cont = containerRef.current;
-    if (!editing || !img || !cont || !cont.contains(img)) return null;
-    const imgRect = img.getBoundingClientRect();
-    const contRect = cont.getBoundingClientRect();
-    return { left: imgRect.right - contRect.left, top: imgRect.bottom - contRect.top };
-  })();
-
-  return (
-    <div ref={containerRef} className="table-editor__cell-box">
-      <div
-        ref={ref}
-        role="textbox"
-        contentEditable={editing}
-        suppressContentEditableWarning
-        aria-label={ariaLabel}
-        className={`table-editor__editable${editing ? " table-editor__editable--editing" : ""}`}
-        style={format}
-        onPaste={onPaste}
-        onBlur={onStopEdit}
-        onInput={() => onInput(sanitizeRichText(ref.current?.innerHTML ?? ""))}
-        onClick={(event) => {
-          const target = event.target as HTMLElement;
-          setSelectedImg(editing && target.tagName === "IMG" ? (target as HTMLImageElement) : null);
-        }}
-      />
-      {handlePos && (
-        <div
-          data-testid="image-resize-handle"
-          aria-label="Bildgröße ändern"
-          onMouseDown={startResize}
-          className="table-editor__image-handle"
-          // Follows the image it belongs to, so its position is data, not style.
-          style={{ left: handlePos.left - 6, top: handlePos.top - 6 }}
-        />
-      )}
-    </div>
-  );
-}
-
-/** A Radix context-menu item with the shared styling. */
-function MenuItem({
-  children,
-  onSelect,
-  disabled,
-  testId,
-}: {
-  children: React.ReactNode;
-  onSelect: () => void;
-  disabled?: boolean;
-  testId?: string;
-}): ReactElement {
-  return (
-    <ContextMenu.Item
-      disabled={disabled}
-      data-testid={testId}
-      className={`${MENU_ITEM}${disabled ? ` ${MENU_ITEM}--disabled` : ""}`}
-      onSelect={onSelect}
-    >
-      {children}
-    </ContextMenu.Item>
-  );
-}
-
-/**
  * Editable grid used to build/maintain the widget's table inside the
  * Staffbase config dialog. Fully controlled: the parent owns the
  * {@link TableModel} and receives every change via `onChange`.
@@ -321,13 +127,16 @@ function MenuItem({
  * incl. per-character super-/sub-script, a preset sort), a format painter and
  * CSV/XLSX upload. Row 0 and column 0 are the frozen header row/column and
  * are never deletable.
+ *
+ * Im Rahmen von `@man/config-ui` (`ConfigWorkspace`): Hauptfläche mit Reitern
+ * und Gitter, rechts das Panel „Tabelle“ für die Einstellungen der ganzen
+ * Tabelle, in den Geräte-Ansichten statt des Gitters die Leseansicht.
+ * Übernehmen, Rückgängig, Hilfe und Schließen zeichnet der Rahmen. Nachgeladen
+ * wird der Editor nur im Studio (`table-editor-injector.ts`).
  */
 export const TableEditor = ({
   value,
   onChange,
-  onSave,
-  onClose,
-  dirty = false,
   mediaClient,
   measure = measureImage,
 }: TableEditorProps): ReactElement => {
@@ -346,7 +155,10 @@ export const TableEditor = ({
    * one that structural operations (insert/delete/merge/sort) act on, while
    * formatting and the image tools act on every selected cell.
    */
-  const [ranges, setRanges] = useState<CellRange[]>([]);
+  const [storedRanges, setRanges] = useState<CellRange[]>([]);
+  // Rückgängig im Rahmen kann Zeilen und Spalten unter der Markierung
+  // wegnehmen; zugeschnitten zeigt sie nie ins Leere.
+  const ranges = useMemo(() => clampRanges(storedRanges, rowCount, colCount), [storedRanges, rowCount, colCount]);
   const selection = ranges.length > 0 ? ranges[ranges.length - 1] : null;
   const [anchor, setAnchor] = useState<[number, number] | null>(null);
   const [editing, setEditing] = useState<[number, number] | null>(null);
@@ -359,7 +171,7 @@ export const TableEditor = ({
   const portalContainer = usePortalContainer();
   // The cell an inserted/pasted/uploaded image lands in, and picker visibility.
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [helpOpen, setHelpOpen] = useState(false);
+  const closePicker = useCallback((): void => setPickerOpen(false), []);
   const imageTarget = useRef<[number, number] | null>(null);
   const [copiedPattern, setCopiedPattern] = useState<{
     rows: number;
@@ -496,6 +308,16 @@ export const TableEditor = ({
     const target = imageTarget.current;
     if (target) insertImageIntoCell(target[0], target[1], image);
     setPickerOpen(false);
+  };
+
+  /**
+   * Escape in einer Zelle: Bearbeiten beenden und den Fokus an den Editor
+   * geben. Ohne ihn stünde der Fokus nirgends, und die Tasten des Rahmens
+   * (⌘S, Escape zum Schließen) kämen nicht mehr an.
+   */
+  const leaveEdit = (): void => {
+    setEditing(null);
+    rootRef.current?.focus();
   };
 
   /** Uploads a clipboard/paste image, publishes it, and inserts it. */
@@ -664,15 +486,10 @@ export const TableEditor = ({
   const doMerge = withSelection((sel) => onChange(mergeCells(value, sel)));
   const doUnmerge = withSelection((sel) => onChange(unmergeCells(value, sel.top, sel.left)));
 
-  const doSort = (dir: "asc" | "desc") => (): void => {
+  const doSort = (dir: "asc" | "desc"): void => {
     if (selection) onChange(setSort(value, { col: selection.left, dir }));
   };
   const clearSort = (): void => onChange(setSort(value, null));
-
-  const toggleFitImages = (): void => onChange(setFitImages(value, !value.fitImages));
-
-  const changeVisibleRows = (rows: number): void => onChange(setVisibleRows(value, rows));
-  const changeExportMode = (mode: ExportMode): void => onChange(setExportMode(value, mode));
 
   /**
    * Without a selection this resets the whole table — the diagnostic case,
@@ -758,203 +575,157 @@ export const TableEditor = ({
         m.col + m.colSpan - 1 >= selection.left,
     );
 
+  const menuActions: GridMenuActions = {
+    insertRowAbove,
+    insertRowBelow,
+    insertColLeft,
+    insertColRight,
+    deleteRows: doDeleteRows,
+    deleteCols: doDeleteCols,
+    merge: doMerge,
+    unmerge: doUnmerge,
+    insertImage: openImagePicker,
+    toggle: toggleKey,
+    format: applyFormat,
+    sort: doSort,
+    clearSort,
+  };
+
+  const toolbar = (
+    <TableToolbar
+      hasSelection={selection !== null}
+      activeFormat={anchorFormat}
+      painterActive={painterActive}
+      insert={{ row: fullRowSelected, col: fullColSelected }}
+      onToggle={toggleKey}
+      onAlign={(align: TextAlign) => applyFormat({ align })}
+      onVerticalAlign={(valign: VerticalAlign) => applyFormat({ valign })}
+      onColor={(color) => applyFormat({ color })}
+      onClearColor={() => applyFormat({ color: undefined })}
+      onBackground={(background) => applyFormat({ background })}
+      onClearBackground={() => applyFormat({ background: undefined })}
+      onFontSize={(size) => applyFormat({ fontSize: size ?? undefined })}
+      onFontSizeStep={stepFontSize}
+      onSuperscript={() => applyVertAlign("superscript")}
+      onSubscript={() => applyVertAlign("subscript")}
+      onInsertRowAbove={insertRowAbove}
+      onInsertRowBelow={insertRowBelow}
+      onInsertColLeft={insertColLeft}
+      onInsertColRight={insertColRight}
+      onDeleteRows={doDeleteRows}
+      onDeleteCols={doDeleteCols}
+      onMerge={doMerge}
+      onUnmerge={doUnmerge}
+      canUnmerge={canUnmerge}
+      onCopyFormat={handleCopyFormat}
+      onUpload={handleUpload}
+      onInsertImage={openImagePicker}
+      hasSelectedImages={selectedImageCount > 0}
+      canEqualizeImages={selectedImageCount > 1}
+      onEqualizeImageHeight={() => void resizeImages("height")}
+      onEqualizeImageWidth={() => void resizeImages("width")}
+      onResetImageSize={() => void resizeImages("default")}
+      onClearFormatting={clearFormats}
+      hasClearTarget={ranges.length > 0}
+    />
+  );
+
+  const grid = (
+    <table className="table-editor__grid" data-testid="table-editor-grid">
+      <thead>
+        <tr>
+          <th className="table-editor__handle __selectAll" data-testid="select-all" onClick={selectAll} aria-label="Alles auswählen" />
+          {Array.from({ length: colCount }, (_, col) => (
+            <th key={col} className="table-editor__handle" data-testid={`col-handle-${col}`} aria-label={`Spalte ${col + 1} auswählen`} onClick={() => selectColumn(col)}>
+              ▽
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {data.map((row, rowIndex) => (
+          <tr key={rowIndex}>
+            <th className="table-editor__handle" data-testid={`row-handle-${rowIndex}`} aria-label={`Zeile ${rowIndex + 1} auswählen`} onClick={() => selectRow(rowIndex)}>
+              ▷
+            </th>
+            {row.map((cell, colIndex) => {
+              if (isCovered(value, rowIndex, colIndex)) return null;
+              const merge = mergeAt(value, rowIndex, colIndex);
+              const isHeader = rowIndex === 0 || colIndex === 0;
+              return (
+                // Eine Zelle als Ablageziel für Bilder (Ziehen aus der
+                // Medienleiste) gehört an dieses `td`: es trägt Zeile und
+                // Spalte und nimmt schon Maus und Kontextmenü an.
+                <td
+                  key={colIndex}
+                  colSpan={merge && merge.colSpan > 1 ? merge.colSpan : undefined}
+                  rowSpan={merge && merge.rowSpan > 1 ? merge.rowSpan : undefined}
+                  className={[
+                    CELL,
+                    isHeader ? `${CELL}--head` : "",
+                    isSelected(rowIndex, colIndex) ? `${CELL}--selected` : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  style={formatToCellStyle(cellFormat(value, rowIndex, colIndex))}
+                  onMouseDown={(e) => handleCellMouseDown(e, rowIndex, colIndex)}
+                  onMouseEnter={() => handleCellMouseEnter(rowIndex, colIndex)}
+                  onDoubleClick={() => handleCellDoubleClick(rowIndex, colIndex)}
+                  onContextMenu={() => handleCellContextMenu(rowIndex, colIndex)}
+                >
+                  <EditableCell
+                    html={sanitizeRichText(cell)}
+                    ariaLabel={`Zeile ${rowIndex + 1}, Spalte ${colIndex + 1}`}
+                    editing={isEditing(rowIndex, colIndex)}
+                    format={formatToStyle(cellFormat(value, rowIndex, colIndex))}
+                    onInput={(next) => handleInput(rowIndex, colIndex, next)}
+                    onPaste={(e) => handlePaste(e, rowIndex, colIndex)}
+                    onStopEdit={() => setEditing((cur) => (cur && cur[0] === rowIndex && cur[1] === colIndex ? null : cur))}
+                    onEscape={leaveEdit}
+                  />
+                </td>
+              );
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+
   return (
-    <div className="table-editor" data-testid="table-editor" ref={rootRef}>
+    // `tabIndex={-1}`: Ziel des Fokus nach Escape in einer Zelle (`leaveEdit`).
+    <div className="table-editor" data-testid="table-editor" ref={rootRef} tabIndex={-1}>
       {/* The editor carries its own stylesheet rather than writing to
           `document.head`: it is mounted into someone else's dialog and should
           leave nothing behind when it goes. */}
       <style>{hotTableEditorCss}</style>
-      <TableToolbar
-        hasSelection={selection !== null}
-        activeFormat={anchorFormat}
-        painterActive={painterActive}
-        insert={{ row: fullRowSelected, col: fullColSelected }}
-        onToggle={toggleKey}
-        onAlign={(align: TextAlign) => applyFormat({ align })}
-        onVerticalAlign={(valign: VerticalAlign) => applyFormat({ valign })}
-        onColor={(color) => applyFormat({ color })}
-        onClearColor={() => applyFormat({ color: undefined })}
-        onBackground={(background) => applyFormat({ background })}
-        onClearBackground={() => applyFormat({ background: undefined })}
-        onFontSize={(size) => applyFormat({ fontSize: size ?? undefined })}
-        onFontSizeStep={stepFontSize}
-        onSuperscript={() => applyVertAlign("superscript")}
-        onSubscript={() => applyVertAlign("subscript")}
-        onInsertRowAbove={insertRowAbove}
-        onInsertRowBelow={insertRowBelow}
-        onInsertColLeft={insertColLeft}
-        onInsertColRight={insertColRight}
-        onDeleteRows={doDeleteRows}
-        onDeleteCols={doDeleteCols}
-        onMerge={doMerge}
-        onUnmerge={doUnmerge}
-        canUnmerge={canUnmerge}
-        onSortAsc={doSort("asc")}
-        onSortDesc={doSort("desc")}
-        onClearSort={clearSort}
-        onCopyFormat={handleCopyFormat}
-        onUpload={handleUpload}
-        onInsertImage={openImagePicker}
-        hasSelectedImages={selectedImageCount > 0}
-        canEqualizeImages={selectedImageCount > 1}
-        onEqualizeImageHeight={() => void resizeImages("height")}
-        onEqualizeImageWidth={() => void resizeImages("width")}
-        onResetImageSize={() => void resizeImages("default")}
-        fitImages={value.fitImages}
-        onToggleFitImages={toggleFitImages}
-        visibleRows={value.visibleRows}
-        onChangeVisibleRows={changeVisibleRows}
-        exportMode={value.exportMode}
-        onChangeExportMode={changeExportMode}
-        onClearFormatting={clearFormats}
-        hasClearTarget={ranges.length > 0}
-        onSave={onSave}
-        onClose={onClose}
-        dirty={dirty}
-        onOpenHelp={() => setHelpOpen(true)}
-      />
-
-      {/* Bounds the help drawer to the grid: it slides in over this box and
-          nothing above it, so the wrapper only needs `position: relative`
-          around the grid's own container-query box. */}
-      <div className="table-editor__grid-area">
-      {/* The container query box has to be a separate, stretched element.
-          `container-type: inline-size` contains the inline axis, so the box's
-          own width can no longer be derived from its contents — putting it on
-          the shrink-to-fit frame below collapsed that frame to zero width. */}
-      <div
-        className={`table-editor__fit-scope ${value.fitImages ? IMAGE_FIT_CLASS : IMAGE_NO_FIT_CLASS}`}
+      <ConfigWorkspace
+        className="min-h-0 flex-1"
+        inspector={<TableInspector value={value} onChange={onChange} />}
+        preview={<TablePreview model={value} />}
       >
-        {value.fitImages ? <style>{hotImageFitCss}</style> : <style>{hotImageNoFitCss}</style>}
-        <ContextMenu.Root>
-        <ContextMenu.Trigger asChild>
-          <div
-            className="table-editor__grid-wrap"
-            data-testid="table-editor-grid-wrap"
-            onMouseUp={handleCellMouseUp}
-          >
-            <table className="table-editor__grid" data-testid="table-editor-grid">
-            <thead>
-              <tr>
-                <th className="table-editor__handle __selectAll" data-testid="select-all" onClick={selectAll} aria-label="Alles auswählen" />
-                {Array.from({ length: colCount }, (_, col) => (
-                  <th key={col} className="table-editor__handle" data-testid={`col-handle-${col}`} aria-label={`Spalte ${col + 1} auswählen`} onClick={() => selectColumn(col)}>
-                    ▽
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((row, rowIndex) => (
-                <tr key={rowIndex}>
-                  <th className="table-editor__handle" data-testid={`row-handle-${rowIndex}`} aria-label={`Zeile ${rowIndex + 1} auswählen`} onClick={() => selectRow(rowIndex)}>
-                    ▷
-                  </th>
-                  {row.map((cell, colIndex) => {
-                    if (isCovered(value, rowIndex, colIndex)) return null;
-                    const merge = mergeAt(value, rowIndex, colIndex);
-                    const isHeader = rowIndex === 0 || colIndex === 0;
-                    return (
-                      <td
-                        key={colIndex}
-                        colSpan={merge && merge.colSpan > 1 ? merge.colSpan : undefined}
-                        rowSpan={merge && merge.rowSpan > 1 ? merge.rowSpan : undefined}
-                        className={[
-                          CELL,
-                          isHeader ? `${CELL}--head` : "",
-                          isSelected(rowIndex, colIndex) ? `${CELL}--selected` : "",
-                        ]
-                          .filter(Boolean)
-                          .join(" ")}
-                        style={formatToCellStyle(cellFormat(value, rowIndex, colIndex))}
-                        onMouseDown={(e) => handleCellMouseDown(e, rowIndex, colIndex)}
-                        onMouseEnter={() => handleCellMouseEnter(rowIndex, colIndex)}
-                        onDoubleClick={() => handleCellDoubleClick(rowIndex, colIndex)}
-                        onContextMenu={() => handleCellContextMenu(rowIndex, colIndex)}
-                      >
-                        <EditableCell
-                          html={sanitizeRichText(cell)}
-                          ariaLabel={`Zeile ${rowIndex + 1}, Spalte ${colIndex + 1}`}
-                          editing={isEditing(rowIndex, colIndex)}
-                          format={formatToStyle(cellFormat(value, rowIndex, colIndex))}
-                          onInput={(next) => handleInput(rowIndex, colIndex, next)}
-                          onPaste={(e) => handlePaste(e, rowIndex, colIndex)}
-                          onStopEdit={() => setEditing((cur) => (cur && cur[0] === rowIndex && cur[1] === colIndex ? null : cur))}
-                        />
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="table-editor__main">
+          {toolbar}
+          {/* The container query box has to be a separate, stretched element.
+              `container-type: inline-size` contains the inline axis, so the box's
+              own width can no longer be derived from its contents — putting it on
+              the shrink-to-fit frame below collapsed that frame to zero width. */}
+          <div className={`table-editor__fit-scope ${value.fitImages ? IMAGE_FIT_CLASS : IMAGE_NO_FIT_CLASS}`}>
+            {value.fitImages ? <style>{hotImageFitCss}</style> : <style>{hotImageNoFitCss}</style>}
+            <ContextMenu.Root>
+              <ContextMenu.Trigger asChild>
+                <div className="table-editor__grid-wrap" data-testid="table-editor-grid-wrap" onMouseUp={handleCellMouseUp}>
+                  {grid}
+                </div>
+              </ContextMenu.Trigger>
+              <GridContextMenu container={portalContainer} hasSelection={selection !== null} actions={menuActions} />
+            </ContextMenu.Root>
           </div>
-        </ContextMenu.Trigger>
-
-        <ContextMenu.Portal container={portalContainer}>
-          <ContextMenu.Content className="table-editor__menu" data-testid="table-editor-menu">
-            <MenuItem testId="insert-row-above" onSelect={insertRowAbove} disabled={selection === null}>Zeile oberhalb einfügen</MenuItem>
-            <MenuItem testId="insert-row-below" onSelect={insertRowBelow} disabled={selection === null}>Zeile unterhalb einfügen</MenuItem>
-            <MenuItem testId="insert-col-left" onSelect={insertColLeft} disabled={selection === null}>Spalte links einfügen</MenuItem>
-            <MenuItem testId="insert-col-right" onSelect={insertColRight} disabled={selection === null}>Spalte rechts einfügen</MenuItem>
-            <ContextMenu.Separator className="table-editor__menu-separator" />
-            <MenuItem testId="delete-rows" onSelect={doDeleteRows} disabled={selection === null}>Zeile(n) löschen</MenuItem>
-            <MenuItem testId="delete-cols" onSelect={doDeleteCols} disabled={selection === null}>Spalte(n) löschen</MenuItem>
-            <ContextMenu.Separator className="table-editor__menu-separator" />
-            <MenuItem testId="merge-cells" onSelect={doMerge} disabled={selection === null}>Zellen verbinden</MenuItem>
-            <MenuItem testId="unmerge-cells" onSelect={doUnmerge} disabled={selection === null}>Verbindung aufheben</MenuItem>
-            <ContextMenu.Separator className="table-editor__menu-separator" />
-            <MenuItem testId="insert-image" onSelect={openImagePicker} disabled={selection === null}>Bild einfügen…</MenuItem>
-            <ContextMenu.Separator className="table-editor__menu-separator" />
-            <ContextMenu.Sub>
-              <ContextMenu.SubTrigger className="table-editor__menu-item" data-testid="text-options">Textoptionen ▸</ContextMenu.SubTrigger>
-              <ContextMenu.Portal container={portalContainer}>
-                <ContextMenu.SubContent className="table-editor__menu">
-                  <MenuItem testId="fmt-bold" onSelect={() => toggleKey("bold")}>Fett</MenuItem>
-                  <MenuItem testId="fmt-italic" onSelect={() => toggleKey("italic")}>Kursiv</MenuItem>
-                  <MenuItem testId="fmt-underline" onSelect={() => toggleKey("underline")}>Unterstrichen</MenuItem>
-                  <MenuItem testId="fmt-strike" onSelect={() => toggleKey("strikethrough")}>Durchgestrichen</MenuItem>
-                  <ContextMenu.Separator className="table-editor__menu-separator" />
-                  <MenuItem testId="align-left" onSelect={() => applyFormat({ align: "left" })}>Linksbündig</MenuItem>
-                  <MenuItem testId="align-center" onSelect={() => applyFormat({ align: "center" })}>Zentriert</MenuItem>
-                  <MenuItem testId="align-right" onSelect={() => applyFormat({ align: "right" })}>Rechtsbündig</MenuItem>
-                  <ContextMenu.Separator className="table-editor__menu-separator" />
-                  <MenuItem testId="valign-top" onSelect={() => applyFormat({ valign: "top" })}>Oben ausrichten</MenuItem>
-                  <MenuItem testId="valign-middle" onSelect={() => applyFormat({ valign: "middle" })}>Mittig ausrichten</MenuItem>
-                  <MenuItem testId="valign-bottom" onSelect={() => applyFormat({ valign: "bottom" })}>Unten ausrichten</MenuItem>
-                </ContextMenu.SubContent>
-              </ContextMenu.Portal>
-            </ContextMenu.Sub>
-            <ContextMenu.Sub>
-              <ContextMenu.SubTrigger className="table-editor__menu-item" data-testid="sort-options">Sortierung ▸</ContextMenu.SubTrigger>
-              <ContextMenu.Portal container={portalContainer}>
-                <ContextMenu.SubContent className="table-editor__menu">
-                  <MenuItem testId="sort-asc" onSelect={doSort("asc")} disabled={selection === null}>Aufsteigend (diese Spalte)</MenuItem>
-                  <MenuItem testId="sort-desc" onSelect={doSort("desc")} disabled={selection === null}>Absteigend (diese Spalte)</MenuItem>
-                  <MenuItem testId="sort-clear" onSelect={clearSort}>Sortierung entfernen</MenuItem>
-                </ContextMenu.SubContent>
-              </ContextMenu.Portal>
-            </ContextMenu.Sub>
-          </ContextMenu.Content>
-        </ContextMenu.Portal>
-      </ContextMenu.Root>
-      </div>
-
-      <HelpDrawer open={helpOpen} onClose={() => setHelpOpen(false)} />
-      </div>
-
-      <div className="table-editor__footer-area">
-        <div className="table-editor__footer-item table-editor__footer-item--version">
-          v{__WIDGET_VERSION__}
         </div>
-      </div>
+      </ConfigWorkspace>
 
       {pickerOpen && (
-        <MediaPicker
-          client={client}
-          onSelect={handlePickImage}
-          onClose={() => setPickerOpen(false)}
-        />
+        <CellImagePicker client={client} anchor={rootRef} onPick={handlePickImage} onClose={closePicker} />
       )}
     </div>
   );

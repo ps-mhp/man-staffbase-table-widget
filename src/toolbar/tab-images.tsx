@@ -27,11 +27,13 @@ export type ImagesTabProps = Pick<
   | "onEqualizeImageHeight"
   | "onEqualizeImageWidth"
   | "onResetImageSize"
-  | "fitImages"
-  | "onToggleFitImages"
 >;
 
-/** Putting pictures into cells and getting them to a common size. */
+/**
+ * Putting pictures into cells and getting them to a common size. Der
+ * Schalter „Bilder anpassen“ gilt für die ganze Tabelle und steht im Panel
+ * „Tabelle“ rechts.
+ */
 export function ImagesTab({
   hasSelection,
   onInsertImage,
@@ -40,8 +42,6 @@ export function ImagesTab({
   onEqualizeImageHeight,
   onEqualizeImageWidth,
   onResetImageSize,
-  fitImages,
-  onToggleFitImages,
 }: ImagesTabProps): ReactElement {
   const disabled = !hasSelection;
 
@@ -51,7 +51,6 @@ export function ImagesTab({
         <IconImage />
         <span>Bild</span>
       </button>
-
 
       <Dropdown
         testId="toolbar-image-size-menu"
@@ -83,19 +82,6 @@ export function ImagesTab({
           </>
         )}
       </Dropdown>
-
-      <button
-        type="button"
-        role="switch"
-        aria-checked={fitImages}
-        className="tw-rb__switch"
-        data-testid="toolbar-image-fit"
-        title="Bilder auf die Breite der Tabelle begrenzen. Ausgeschaltet werden sie immer in ihrer eigenen Größe angezeigt."
-        onClick={onToggleFitImages}
-      >
-        <span className="tw-rb__switch-track" aria-hidden="true" />
-        <span>Bilder anpassen</span>
-      </button>
     </>
   );
 }

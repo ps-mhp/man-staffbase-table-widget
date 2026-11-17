@@ -25,7 +25,7 @@ import { ImagesTab } from "./toolbar/tab-images";
 export type { TableToolbarProps };
 
 /**
- * The editor's toolbar: a save button beside five tabs.
+ * The editor's toolbar: five tabs, each with its row of controls.
  *
  * Every control is a projection of the props — the only state here is which
  * tab is open. The tab deliberately does not follow the selection: an author
@@ -47,10 +47,6 @@ export const TableToolbar = (props: TableToolbarProps): ReactElement => {
       tabs={tabs}
       activeTab={tab}
       onSelectTab={(id) => setTab(id as TabId)}
-      onSave={props.onSave}
-      onClose={props.onClose}
-      dirty={props.dirty}
-      onOpenHelp={props.onOpenHelp}
     />
   );
 };
