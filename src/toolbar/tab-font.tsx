@@ -74,6 +74,7 @@ export function FontTab({
         onChange={onColor}
         onClear={onClearColor}
         glyph={<span className="text-[15px] font-bold">A</span>}
+        standardBar="var(--foreground)"
       />
       <ColorButton
         testId="toolbar-bg"
@@ -83,6 +84,7 @@ export function FontTab({
         onChange={onBackground}
         onClear={onClearBackground}
         glyph={<PaintBucket className="size-4" aria-hidden />}
+        standardBar="transparent"
       />
       <ToolSeparator />
       <ToolSelect

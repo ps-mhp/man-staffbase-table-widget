@@ -47,6 +47,11 @@ export interface ColorButtonProps {
   testId: string;
   /** Das Zeichen über dem Farbbalken: „A“ oder ein Icon. */
   glyph: React.ReactNode;
+  /**
+   * Der Balken ohne gesetzte Farbe: für Schrift die Textfarbe des Rahmens
+   * (die Zelle erbt die Schriftfarbe der Seite), für den Hintergrund keiner.
+   */
+  standardBar: string;
 }
 
 /**
@@ -59,7 +64,7 @@ export interface ColorButtonProps {
  * Browsern die Möglichkeit, den Dialog zu öffnen. Aus der Tab-Folge ist er
  * genommen – der Knopf davor öffnet ihn.
  */
-export function ColorButton({ value, onChange, onClear, disabled, label, testId, glyph }: ColorButtonProps): ReactElement {
+export function ColorButton({ value, onChange, onClear, disabled, label, testId, glyph, standardBar }: ColorButtonProps): ReactElement {
   const inputRef = useRef<HTMLInputElement>(null);
   const openPicker = (): void => inputRef.current?.click();
 
@@ -68,7 +73,7 @@ export function ColorButton({ value, onChange, onClear, disabled, label, testId,
       <ToolButton label={`${label}: ${value ?? "Standard"}`} title={label} disabled={disabled} onClick={openPicker}>
         <span aria-hidden className="inline-flex flex-col items-center gap-0.5 leading-none">
           {glyph}
-          <span className="h-[3px] w-4 rounded-full" style={{ background: value ?? STANDARD_SWATCH }} />
+          <span className="h-[3px] w-4 rounded-full" style={{ background: value ?? standardBar }} />
         </span>
       </ToolButton>
       <input
