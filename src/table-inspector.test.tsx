@@ -167,6 +167,14 @@ describe("TableInspector", () => {
     });
   });
 
+  it("zieht Pill-Gruppen nicht über die ganze Spalte", () => {
+    render(<TableInspector value={model({ sort: { col: 1, dir: "asc" } })} onChange={jest.fn()} />);
+
+    // Im Flex-Stapel des Panels würden sie sonst gestreckt; der Screen zeigt sie inhaltsbreit.
+    expect(screen.getByRole("radiogroup", { name: "Export" })).toHaveClass("self-start");
+    expect(screen.getByRole("radiogroup", { name: "Richtung der ersten Sortierung" })).toHaveClass("self-start");
+  });
+
   it("nennt die Version des Widgets", () => {
     render(<TableInspector value={model()} onChange={jest.fn()} />);
 

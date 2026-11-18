@@ -99,6 +99,7 @@ function SortSettings({ value, onChange }: TableInspectorProps): ReactElement {
       {sort !== null && (
         <Segmented
           aria-label="Richtung der ersten Sortierung"
+          className="self-start"
           options={DIRECTIONS}
           value={sort.dir}
           onChange={(dir) => onChange(setSort(value, { col: sort.col, dir }))}
@@ -129,7 +130,11 @@ function VisibleRowsField({ value, onChange }: TableInspectorProps): ReactElemen
   );
 }
 
-/** Pills statt Auswahlliste: drei Wahlen, alle auf einen Blick. */
+/**
+ * Pills statt Auswahlliste: drei Wahlen, alle auf einen Blick. Wie jede
+ * Pill-Gruppe im Panel so breit wie ihr Inhalt (`self-start`), nicht über
+ * die ganze Spalte gezogen.
+ */
 function ExportField({ value, onChange }: TableInspectorProps): ReactElement {
   const id = useId();
   return (
@@ -140,6 +145,7 @@ function ExportField({ value, onChange }: TableInspectorProps): ReactElement {
       <Segmented
         aria-label="Export"
         aria-describedby={`${id}-hint`}
+        className="self-start"
         options={EXPORT_OPTIONS}
         value={value.exportMode}
         onChange={(mode) => onChange(setExportMode(value, mode))}
