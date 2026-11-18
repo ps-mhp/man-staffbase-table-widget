@@ -15,6 +15,7 @@ import * as React from "react";
 import { ReactElement, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import * as ContextMenu from "@radix-ui/react-context-menu";
 import { ConfigWorkspace } from "@man/config-ui/layout/config-workspace";
+import { StatusBar } from "@man/config-ui/toolbar/status-bar";
 import {
   TableModel,
   CellRange,
@@ -62,7 +63,9 @@ import { usePortalContainer } from "@shared/ui/portal-container";
 import { EditableCell } from "./editable-cell";
 import { GridContextMenu, GridMenuActions } from "./grid-context-menu";
 import { CellDropZone } from "./cell-drop-zone";
-import { cellName, cellsInRanges, clampRanges } from "./selection";
+import { cellName, cellsInRanges, clampRanges, fullLines } from "./selection";
+import { ColumnHeaders, RowHeader } from "./grid-headers";
+import { gridHint, gridStatusText } from "./grid-status";
 import { TableInspector } from "./table-inspector";
 import { TablePreview } from "./table-preview";
 
@@ -649,24 +652,26 @@ export const TableEditor = ({
     />
   );
 
+  // Ganz markierte Spalten und Zeilen zeigt ihr Rand; die aktuelle Zelle (in
+  // Bearbeitung, sonst der Anfang der Markierung) trägt einen Rahmen.
+  const full = fullLines(ranges, rowCount, colCount);
+  const current = editing ?? (selection ? anchor : null);
+  const isCurrent = (row: number, col: number): boolean =>
+    current !== null && current[0] === row && current[1] === col;
+
   const grid = (
     <table className="table-editor__grid" data-testid="table-editor-grid">
-      <thead>
-        <tr>
-          <th className="table-editor__handle __selectAll" data-testid="select-all" onClick={selectAll} aria-label="Alles auswählen" />
-          {Array.from({ length: colCount }, (_, col) => (
-            <th key={col} className="table-editor__handle" data-testid={`col-handle-${col}`} aria-label={`Spalte ${col + 1} auswählen`} onClick={() => selectColumn(col)}>
-              ▽
-            </th>
-          ))}
-        </tr>
-      </thead>
+      <ColumnHeaders
+        colCount={colCount}
+        fullColumns={full.cols}
+        allSelected={full.cols.size === colCount && colCount > 0}
+        onSelectAll={selectAll}
+        onSelectColumn={selectColumn}
+      />
       <tbody>
         {data.map((row, rowIndex) => (
           <tr key={rowIndex}>
-            <th className="table-editor__handle" data-testid={`row-handle-${rowIndex}`} aria-label={`Zeile ${rowIndex + 1} auswählen`} onClick={() => selectRow(rowIndex)}>
-              ▷
-            </th>
+            <RowHeader row={rowIndex} full={full.rows.has(rowIndex)} onSelect={() => selectRow(rowIndex)} />
             {row.map((cell, colIndex) => {
               if (isCovered(value, rowIndex, colIndex)) return null;
               const merge = mergeAt(value, rowIndex, colIndex);
@@ -680,6 +685,7 @@ export const TableEditor = ({
                     CELL,
                     isHeader ? `${CELL}--head` : "",
                     isSelected(rowIndex, colIndex) ? `${CELL}--selected` : "",
+                    isCurrent(rowIndex, colIndex) ? `${CELL}--current` : "",
                   ]
                     .filter(Boolean)
                     .join(" ")}
@@ -740,6 +746,11 @@ export const TableEditor = ({
               <GridContextMenu container={portalContainer} hasSelection={selection !== null} actions={menuActions} />
             </ContextMenu.Root>
           </div>
+          <StatusBar
+            data-testid="table-editor-status"
+            start={gridStatusText(rowCount, colCount, ranges)}
+            end={gridHint({ editing: editing !== null, painterActive })}
+          />
         </div>
       </ConfigWorkspace>
 

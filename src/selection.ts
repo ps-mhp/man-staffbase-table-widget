@@ -72,8 +72,11 @@ export function clampRanges(ranges: CellRange[], rows: number, cols: number): Ce
     }));
 }
 
-/** Spaltenbuchstaben wie in Excel: 0 → A, 25 → Z, 26 → AA. */
-function columnLetters(col: number): string {
+/**
+ * Spaltenbuchstaben wie in Excel: 0 → A, 25 → Z, 26 → AA. Sie stehen über
+ * dem Gitter und in der Spaltenwahl der ersten Sortierung.
+ */
+export function columnLetters(col: number): string {
   const letter = String.fromCharCode(65 + (col % 26));
   return col < 26 ? letter : `${columnLetters(Math.floor(col / 26) - 1)}${letter}`;
 }
@@ -84,3 +87,28 @@ function columnLetters(col: number): string {
  * Inspektor zu, und ohne Namen wüsste niemand mehr, wohin das Bild geht.
  */
 export const cellName = (row: number, col: number): string => `${columnLetters(col)}${row + 1}`;
+
+/** „B2“ für eine Zelle, „B2:B4“ für einen Bereich – wie in der Statuszeile. */
+export function rangeName(range: CellRange): string {
+  const start = cellName(range.top, range.left);
+  const single = range.top === range.bottom && range.left === range.right;
+  return single ? start : `${start}:${cellName(range.bottom, range.right)}`;
+}
+
+/**
+ * Die Spalten, die eine Markierung von oben bis unten umfasst, und die
+ * Zeilen, die sie von links bis rechts umfasst. Ihre Buchstaben und Nummern
+ * am Rand des Gitters zeigen das.
+ */
+export function fullLines(ranges: ReadonlyArray<CellRange>, rows: number, cols: number): { rows: Set<number>; cols: Set<number> } {
+  const full = { rows: new Set<number>(), cols: new Set<number>() };
+  for (const range of ranges) {
+    if (range.top === 0 && range.bottom === rows - 1) {
+      for (let c = range.left; c <= range.right; c++) full.cols.add(c);
+    }
+    if (range.left === 0 && range.right === cols - 1) {
+      for (let r = range.top; r <= range.bottom; r++) full.rows.add(r);
+    }
+  }
+  return full;
+}

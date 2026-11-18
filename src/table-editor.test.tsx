@@ -55,6 +55,10 @@ const sample = (): TableModel =>
 const cellDiv = (label: string): HTMLElement => screen.getByLabelText(label);
 const cellTd = (label: string): HTMLElement => cellDiv(label).closest("td")!;
 
+/** Markierte Zellen tragen den Schleier aus `table-editor.scss` über diese Klasse. */
+const SELECTED = "table-editor__cell--selected";
+const CURRENT = "table-editor__cell--current";
+
 /** Right-clicks a cell (after selecting it) and returns the context menu. */
 const openMenuOnCell = (label: string): HTMLElement => {
   const td = cellTd(label);
@@ -114,14 +118,91 @@ describe("TableEditor", () => {
     render(<TableEditor value={sample()} onChange={jest.fn()} />);
     const td = cellTd("Zeile 2, Spalte 2");
     fireEvent.mouseDown(td);
-    expect(td).toHaveStyle({ background: "#eaf4ff" });
+    expect(td).toHaveClass(SELECTED);
   });
 
   it("selects a whole column via the column handle", () => {
     render(<TableEditor value={sample()} onChange={jest.fn()} />);
     fireEvent.click(screen.getByTestId("col-handle-1"));
-    expect(cellTd("Zeile 1, Spalte 2")).toHaveStyle({ background: "#eaf4ff" });
-    expect(cellTd("Zeile 2, Spalte 2")).toHaveStyle({ background: "#eaf4ff" });
+    expect(cellTd("Zeile 1, Spalte 2")).toHaveClass(SELECTED);
+    expect(cellTd("Zeile 2, Spalte 2")).toHaveClass(SELECTED);
+  });
+
+  describe("Rand und Statuszeile", () => {
+    it("beschriftet Spalten mit Buchstaben und Zeilen mit Nummern", () => {
+      render(<TableEditor value={sample()} onChange={jest.fn()} />);
+
+      expect(screen.getByRole("button", { name: "Spalte B auswählen" })).toHaveTextContent("B");
+      expect(screen.getByTestId("col-handle-2")).toHaveTextContent("C");
+      expect(screen.getByRole("button", { name: "Zeile 3 auswählen" })).toHaveTextContent("3");
+      expect(screen.getByTestId("col-handle-0").closest("th")).toHaveAttribute("scope", "col");
+      expect(screen.getByTestId("row-handle-0").closest("th")).toHaveAttribute("scope", "row");
+    });
+
+    it("markiert über die Nummer eine Zeile und zeigt das am Rand", () => {
+      render(<TableEditor value={sample()} onChange={jest.fn()} />);
+
+      fireEvent.click(screen.getByTestId("row-handle-1"));
+
+      expect(cellTd("Zeile 2, Spalte 1")).toHaveClass(SELECTED);
+      expect(cellTd("Zeile 2, Spalte 3")).toHaveClass(SELECTED);
+      expect(cellTd("Zeile 3, Spalte 1")).not.toHaveClass(SELECTED);
+      expect(screen.getByTestId("row-handle-1").closest("th")).toHaveClass("table-editor__head--active");
+      expect(screen.getByTestId("col-handle-1").closest("th")).not.toHaveClass("table-editor__head--active");
+    });
+
+    it("markiert über das Eckfeld die ganze Tabelle", () => {
+      render(<TableEditor value={sample()} onChange={jest.fn()} />);
+
+      fireEvent.click(screen.getByRole("button", { name: "Alles auswählen" }));
+
+      expect(cellTd("Zeile 1, Spalte 1")).toHaveClass(SELECTED);
+      expect(cellTd("Zeile 3, Spalte 3")).toHaveClass(SELECTED);
+      expect(screen.getByRole("status")).toHaveTextContent("Auswahl A1:C3");
+    });
+
+    it("markiert per Rechtsklick auf einen Buchstaben die Spalte für das Kontextmenü", () => {
+      const onChange = jest.fn();
+      render(<TableEditor value={sample()} onChange={onChange} />);
+
+      fireEvent.contextMenu(screen.getByTestId("col-handle-2"));
+      fireEvent.click(screen.getByTestId("delete-cols"));
+
+      expect((onChange.mock.calls[0][0] as TableModel).data[0]).toEqual(["", "Q1"]);
+    });
+
+    it("rahmt die aktuelle Zelle, nicht den Rest der Markierung", () => {
+      render(<TableEditor value={sample()} onChange={jest.fn()} />);
+
+      fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
+      fireEvent.mouseDown(cellTd("Zeile 3, Spalte 2"), { shiftKey: true });
+
+      expect(cellTd("Zeile 2, Spalte 2")).toHaveClass(CURRENT);
+      expect(cellTd("Zeile 3, Spalte 2")).not.toHaveClass(CURRENT);
+      expect(cellTd("Zeile 3, Spalte 2")).toHaveClass(SELECTED);
+    });
+
+    it("zeigt Größe, Auswahl und einen Hinweis unter dem Gitter", () => {
+      render(<TableEditor value={sample()} onChange={jest.fn()} />);
+      const status = screen.getByTestId("table-editor-status");
+
+      expect(status).toHaveTextContent("3 Zeilen · 3 Spalten");
+      expect(status).toHaveTextContent("Zeile 1 und Spalte A sind Überschriften");
+      fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
+      fireEvent.mouseDown(cellTd("Zeile 3, Spalte 2"), { shiftKey: true });
+      expect(status).toHaveTextContent("3 Zeilen · 3 Spalten · Auswahl B2:B3");
+
+      fireEvent.doubleClick(cellTd("Zeile 2, Spalte 2"));
+      expect(status).toHaveTextContent("Esc beendet die Eingabe");
+    });
+
+    it("setzt Kopfzeile und Zeilentitel fett wie auf der Seite", () => {
+      render(<TableEditor value={sample()} onChange={jest.fn()} />);
+
+      expect(cellTd("Zeile 1, Spalte 2")).toHaveClass("table-editor__cell--head");
+      expect(cellTd("Zeile 2, Spalte 1")).toHaveClass("table-editor__cell--head");
+      expect(cellTd("Zeile 2, Spalte 2")).not.toHaveClass("table-editor__cell--head");
+    });
   });
 
   it("inserts a row below via the context menu", () => {
@@ -444,8 +525,8 @@ describe("TableEditor", () => {
       fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
       addToSelection("Zeile 2, Spalte 3");
 
-      expect(cellTd("Zeile 2, Spalte 2")).toHaveStyle({ background: "#eaf4ff" });
-      expect(cellTd("Zeile 2, Spalte 3")).toHaveStyle({ background: "#eaf4ff" });
+      expect(cellTd("Zeile 2, Spalte 2")).toHaveClass(SELECTED);
+      expect(cellTd("Zeile 2, Spalte 3")).toHaveClass(SELECTED);
     });
 
     it("applies a format to every cell of a multi-cell selection", () => {

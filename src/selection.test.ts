@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-import { cellName, cellsInRange, cellsInRanges, clampRanges } from "./selection";
+import { cellName, cellsInRange, cellsInRanges, clampRanges, columnLetters, fullLines, rangeName } from "./selection";
 
 describe("cellsInRange", () => {
   it("lists the cells row by row", () => {
@@ -78,5 +78,40 @@ describe("cellName", () => {
     expect(cellName(0, 26)).toBe("AA1");
     expect(cellName(0, 27)).toBe("AB1");
     expect(cellName(0, 52)).toBe("BA1");
+  });
+});
+
+describe("columnLetters", () => {
+  it("zählt Spalten wie Excel", () => {
+    expect([0, 1, 25, 26, 51].map(columnLetters)).toEqual(["A", "B", "Z", "AA", "AZ"]);
+  });
+});
+
+describe("rangeName", () => {
+  it("nennt eine Zelle beim Namen und einen Bereich von Ecke zu Ecke", () => {
+    expect(rangeName({ top: 1, left: 1, bottom: 1, right: 1 })).toBe("B2");
+    expect(rangeName({ top: 1, left: 1, bottom: 3, right: 1 })).toBe("B2:B4");
+  });
+});
+
+describe("fullLines", () => {
+  it("findet ganz markierte Spalten und Zeilen", () => {
+    const full = fullLines(
+      [
+        { top: 0, left: 1, bottom: 2, right: 2 },
+        { top: 1, left: 0, bottom: 1, right: 2 },
+      ],
+      3,
+      3,
+    );
+
+    expect(Array.from(full.cols)).toEqual([1, 2]);
+    expect(Array.from(full.rows)).toEqual([1]);
+  });
+
+  it("findet nichts in einem Bereich mitten im Gitter", () => {
+    const full = fullLines([{ top: 1, left: 1, bottom: 1, right: 1 }], 3, 3);
+
+    expect(full.cols.size + full.rows.size).toBe(0);
   });
 });

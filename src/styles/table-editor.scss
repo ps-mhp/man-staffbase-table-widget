@@ -59,59 +59,125 @@
     container-type: inline-size;
   }
 
-  // Der einzige scrollende Bereich des Editors. Er füllt die Breite, die er
-  // bekommt — im Konfigurationsdialog die volle Panelbreite —, eine schmalere
-  // Tabelle lässt daneben einfach Platz.
+  // Der einzige scrollende Bereich des Editors, auf der grauen Bühne des
+  // Rahmens. Er füllt die Breite, die er bekommt; eine schmalere Tabelle lässt
+  // daneben einfach Platz.
+  //
+  // Farben ab hier aus den Tokens von `@man/config-ui` (`.man-ui`, Wurzel des
+  // Config-Modals), damit Gitter, Leisten und Panel dieselbe Palette sprechen.
   &__grid-wrap {
     flex: 1 1 auto;
     min-height: 0;
     max-width: 100%;
     overflow: auto;
-    // Sitzt bündig unter der Leiste: die geteilte Kante bleibt gerade, nur die
-    // freien Ecken unten sind gerundet.
-    background: $surface;
-    padding: 10px;
+    background: var(--secondary);
+    padding: 16px;
   }
 
   &__grid {
     border-collapse: collapse;
+    background: var(--background);
+    color: var(--foreground);
+    font-size: 14px;
+    line-height: 1.43;
   }
 
-  // Die Griffe am Rand, über die ganze Zeilen und Spalten ausgewählt werden.
-  &__handle {
-    background: $surface-handle;
-    cursor: pointer;
-    padding: 6px;
-    font-size: 11px;
-    color: $text-handle;
-    text-align: center;
+  // Der Rand: Buchstaben über den Spalten, Nummern vor den Zeilen, das
+  // Eckfeld. Jeder ist ein Knopf (`grid-headers.tsx`), der die ganze Zelle des
+  // Randes füllt.
+  &__head {
+    height: 40px;
+    padding: 0;
+    border: 1px solid var(--border);
+    background: var(--secondary);
+    color: var(--secondary-foreground);
+    font-size: 12px;
+    font-weight: 700;
+    text-align: left;
     user-select: none;
 
-    &.__selectAll {
-      border-top-left-radius: 20px;
-      border-right: 1px solid $border-menu;
-      border-bottom: 1px solid $border-menu;
+    &--row,
+    &--corner {
+      width: 40px;
+      min-width: 40px;
+      text-align: center;
+      color: var(--muted-foreground);
+      font-weight: 400;
+    }
+
+    // Ganz markierte Spalte oder Zeile.
+    &--active {
+      background: var(--primary-soft);
+      color: var(--primary);
+    }
+  }
+
+  &__handle {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: 100%;
+    min-height: 40px;
+    padding: 0 12px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: inherit;
+    cursor: pointer;
+    outline: none;
+
+    .table-editor__head--row &,
+    .table-editor__head--corner & {
+      justify-content: center;
+      padding: 0;
+    }
+
+    &:hover {
+      background: var(--stage);
+    }
+
+    &:focus-visible {
+      box-shadow: inset 0 0 0 2px var(--ring);
     }
   }
 
   &__cell {
-    border: 1px solid $border-grid;
+    border: 1px solid var(--border);
     padding: 0;
     position: relative;
     min-width: 70px;
   }
 
-  // Auswahl. Als Innenschatten gezeichnet, damit die Zelle dabei nicht um die
-  // Rahmenbreite springt.
-  &__cell--selected {
-    background: $accent-selection;
+  // Kopfzeile und Zeilentitel sind auf der Seite fett (`th`); hier auch.
+  &__cell--head {
+    font-weight: 700;
+  }
+
+  // Die Auswahl liegt als Schleier über der Zelle, nicht als Hintergrund:
+  // eine Zelle mit eigener Hintergrundfarbe (inline aus dem Modell) bliebe
+  // sonst unmarkiert.
+  &__cell--selected::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--primary);
+    opacity: 0.1;
+    pointer-events: none;
+  }
+
+  // Die aktuelle Zelle: in Bearbeitung, sonst der Anfang der Markierung.
+  &__cell--current {
+    outline: 2px solid var(--primary);
+    outline-offset: -2px;
   }
 
   &__editable {
     min-width: 70px;
-    min-height: 20px;
+    min-height: 40px;
     box-sizing: border-box;
-    padding: 6px 8px;
+    padding: 10px 12px;
     outline: none;
     font: inherit;
     white-space: pre-wrap;
@@ -132,39 +198,59 @@
     position: absolute;
     width: 12px;
     height: 12px;
-    background: $accent;
-    border: 2px solid $surface;
+    background: var(--primary);
+    border: 2px solid var(--background);
     border-radius: 2px;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 0 0 1px var(--ring);
     cursor: nwse-resize;
     z-index: 5;
   }
 
+  // Das Kontextmenü, gestaltet wie die Listen der Werkzeugleiste (`ToolMenu`).
   &__menu {
-    min-width: 220px;
-    background: $surface;
-    border-radius: $radius-menu;
+    min-width: 240px;
+    background: var(--popover);
+    color: var(--popover-foreground);
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) + 2px);
     padding: 4px;
-    box-shadow: $shadow-context-menu;
-    font-size: 13px;
+    box-shadow: $shadow-menu;
+    font-size: 14px;
     z-index: 2000;
   }
 
   &__menu-item {
-    padding: 6px 10px;
-    border-radius: $radius-small;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 36px;
+    padding: 0 10px;
+    border-radius: var(--radius);
     cursor: pointer;
     outline: none;
     user-select: none;
 
+    &[data-highlighted],
+    &[data-state="open"] {
+      background: var(--accent);
+    }
+
     &--disabled {
       opacity: 0.4;
+      cursor: not-allowed;
     }
+  }
+
+  &__menu-chevron {
+    width: 16px;
+    height: 16px;
+    color: var(--muted-foreground);
   }
 
   &__menu-separator {
     height: 1px;
-    background: $border-soft;
+    background: var(--border);
     margin: 4px 0;
   }
 }

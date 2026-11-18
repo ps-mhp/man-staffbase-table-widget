@@ -20,10 +20,14 @@
 import * as React from "react";
 import { ReactElement } from "react";
 import * as ContextMenu from "@radix-ui/react-context-menu";
+import { ChevronRight } from "lucide-react";
 
 import { CellFormat } from "./table-model";
 
 const MENU_ITEM = "table-editor__menu-item";
+
+/** Der Pfeil eines Untermenüs, rechts am Eintrag. */
+const SubChevron = (): ReactElement => <ChevronRight aria-hidden className="table-editor__menu-chevron" />;
 
 /** A Radix context-menu item with the shared styling. */
 function MenuItem({
@@ -77,7 +81,7 @@ function TextOptions({ container, actions }: SubMenuProps): ReactElement {
   const { toggle, format } = actions;
   return (
     <ContextMenu.Sub>
-      <ContextMenu.SubTrigger className={MENU_ITEM} data-testid="text-options">Textoptionen ▸</ContextMenu.SubTrigger>
+      <ContextMenu.SubTrigger className={MENU_ITEM} data-testid="text-options">Textoptionen<SubChevron /></ContextMenu.SubTrigger>
       <ContextMenu.Portal container={container}>
         <ContextMenu.SubContent className="table-editor__menu">
           <MenuItem testId="fmt-bold" onSelect={() => toggle("bold")}>Fett</MenuItem>
@@ -102,7 +106,7 @@ function TextOptions({ container, actions }: SubMenuProps): ReactElement {
 function SortOptions({ container, actions, disabled }: SubMenuProps): ReactElement {
   return (
     <ContextMenu.Sub>
-      <ContextMenu.SubTrigger className={MENU_ITEM} data-testid="sort-options">Sortierung ▸</ContextMenu.SubTrigger>
+      <ContextMenu.SubTrigger className={MENU_ITEM} data-testid="sort-options">Sortierung<SubChevron /></ContextMenu.SubTrigger>
       <ContextMenu.Portal container={container}>
         <ContextMenu.SubContent className="table-editor__menu">
           <MenuItem testId="sort-asc" onSelect={() => actions.sort("asc")} disabled={disabled}>Aufsteigend (diese Spalte)</MenuItem>
