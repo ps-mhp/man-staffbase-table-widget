@@ -5,8 +5,11 @@ Staffbase-Widget zum Einbetten und Bearbeiten von Tabellen.
 Der Editor läuft im gemeinsamen Rahmen von `@man/config-ui` (Kopf mit
 Schließen, Status, Vorschau-Umschalter, Rückgängig, Hilfe, Abbrechen und
 Übernehmen). Darin: die Tabs **Schrift**, **Ausrichtung**, **Zellen**,
-**Bilder** und **Daten** über dem Gitter und rechts das Panel **Tabelle** für
-erste Sortierung, sichtbare Zeilen, Export und „Bilder anpassen“. Der gewählte
+**Bilder** und **Daten** mit „Importieren“ daneben, darunter die
+Werkzeugleiste des Tabs, das Gitter mit Spaltenbuchstaben und Zeilennummern
+und eine Statuszeile; rechts das Panel **Tabelle** für erste Sortierung,
+sichtbare Zeilen, Export und „Bilder anpassen“. Reiter, Werkzeugleiste,
+Werkzeuge und Statuszeile sind Bausteine aus `@man/config-ui`. Der gewählte
 Tab bleibt beim Wechsel der Zellauswahl bestehen.
 
 Dieses Repository enthält nur Quellcode und das gebaute Bundle. Es ist **nicht
@@ -26,10 +29,10 @@ scripts/sync.sh table-widget
 Der Quellcode liegt danach unter `src/widgets/table-widget/`.
 
 Die Styles stehen als SCSS unter `src/styles/`: `tokens`/`mixins` als gemeinsame
-Grundlage, dazu je ein Stylesheet für Werkzeugleiste (`ribbon`), Editor
-(`table-editor`), veröffentlichte Tabelle (`table-widget`) und Bilddeckelung
-(`image-fit`/`image-no-fit`); Panel und Rahmen kommen mit Tailwind aus
-`@man/config-ui`. Jede
+Grundlage, dazu je ein Stylesheet für Editor-Gitter (`table-editor`, Farben
+aus den Tokens von `@man/config-ui`), veröffentlichte Tabelle (`table-widget`)
+und Bilddeckelung (`image-fit`/`image-no-fit`); Werkzeugleisten, Panel und
+Rahmen kommen mit Tailwind aus `@man/config-ui`. Jede
 Komponente importiert ihr Stylesheet als String und rendert es selbst als
 `<style>`.
 

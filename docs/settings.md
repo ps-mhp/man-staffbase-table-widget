@@ -28,7 +28,10 @@ Die Kopfleiste ist in allen MAN-Widgets gleich.
 | Ausrichtung | Linksbündig, Zentriert, Rechtsbündig sowie Oben, Mittig, Unten. |
 | Zellen | Verbinden, Lösen, Einfügen (Zeile oberhalb/unterhalb, Spalte links/rechts), Löschen (Zeile(n), Spalte(n)). |
 | Bilder | Bild in Zelle einfügen, Bildgrößen angleichen (gleiche Höhe/Breite wie erstes Bild, Standardgröße). |
-| Daten | Format kopieren, Formatierung entfernen, Importieren. |
+| Daten | Format kopieren, Formatierung entfernen. |
+
+Rechts neben den Reitern steht **Importieren (.csv, .xlsx)**: liest eine
+Datei ein und ersetzt die ganze Tabelle.
 
 ## Panel „Tabelle“
 

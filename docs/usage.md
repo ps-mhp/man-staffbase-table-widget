@@ -10,7 +10,11 @@ das ganze Fenster.
   **Tablet** · **Mobil**. Rechts **Rückgängig**, **Wiederholen** und
   **Hilfe**, ganz rechts **Abbrechen** und **Übernehmen**.
 - **Darunter die Reiter** **Schrift**, **Ausrichtung**, **Zellen**, **Bilder**
-  und **Daten** mit ihren Werkzeugen, dann die Tabelle selbst.
+  und **Daten**, rechts daneben **Importieren (.csv, .xlsx)**. Unter den
+  Reitern die Werkzeuge des gewählten Reiters, dann die Tabelle mit
+  Spaltenbuchstaben (A, B, C …) und Zeilennummern (1, 2, 3 …) wie in Excel.
+- **Unter der Tabelle die Statuszeile:** Größe der Tabelle und die Markierung,
+  etwa „4 Zeilen · 3 Spalten · Auswahl B2:B4“, rechts ein Hinweis.
 - **Rechts das Panel „Tabelle“:** was für die ganze Tabelle gilt —
   **Erste Sortierung**, **Sichtbare Zeilen**, **Export** und **Bilder
   anpassen**.
@@ -54,15 +58,14 @@ auf **Rückgängig** nimmt den letzten Schritt zurück.
 
 ## Bestehende Tabelle aus Excel oder CSV übernehmen
 
-1. Im Tabellen-Editor den Reiter **Daten** öffnen.
-2. Auf **Importieren** klicken und die Datei wählen (`.csv`, `.xlsx` oder
-   `.xls`).
-3. Das Ergebnis prüfen: Der Import **ersetzt die komplette Tabelle**, es wird
+1. Im Tabellen-Editor rechts neben den Reitern auf **Importieren (.csv,
+   .xlsx)** klicken und die Datei wählen (`.csv`, `.xlsx` oder `.xls`).
+2. Das Ergebnis prüfen: Der Import **ersetzt die komplette Tabelle**, es wird
    nichts angehängt. Aus Excel bleiben verbundene Zellen, Fett/Kursiv/
    Unterstrichen, Farben, Schriftgrößen, Ausrichtung sowie Hoch- und
    Tiefstellungen erhalten. Bei einer Excel-Mappe wird das **erste
    Tabellenblatt** verwendet. War es die falsche Datei: **Rückgängig**.
-4. **Übernehmen**.
+3. **Übernehmen**.
 
 Alternativ lassen sich Zellen auch direkt aus Excel **kopieren und einfügen**:
 in eine Zelle doppelklicken und einfügen — der Block wird ab dieser Stelle
@@ -72,8 +75,10 @@ in eine Zelle doppelklicken und einfügen — der Block wird ab dieser Stelle
 
 1. Die zu formatierenden Zellen markieren: klicken, mit gedrückter Maustaste
    ziehen, mit **Umschalt** einen Bereich aufziehen oder mit **Strg/Cmd**
-   weitere Bereiche dazunehmen. Über die Griffe am Rand lassen sich ganze
-   Zeilen, Spalten oder die ganze Tabelle markieren.
+   weitere Bereiche dazunehmen. Ein Klick auf einen Spaltenbuchstaben oder
+   eine Zeilennummer markiert die ganze Spalte oder Zeile, das Eckfeld oben
+   links die ganze Tabelle; ein Rechtsklick dort markiert sie und öffnet das
+   Kontextmenü.
 2. Reiter **Schrift** für Schriftgröße, Fett, Kursiv, Unterstrichen,
    Durchgestrichen, Hoch-/Tiefstellen, Schrift- und Hintergrundfarbe.
 3. Reiter **Ausrichtung** für links/zentriert/rechts und oben/mittig/unten.
