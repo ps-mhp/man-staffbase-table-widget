@@ -1,98 +1,99 @@
-# FAQ
+# Veelgestelde vragen
 
-**Vraag:** In plaats van de tabeleditor zie ik alleen een tekstveld met
-cryptische inhoud die begint met 'B64:'. 
+**Vraag:** In plaats van de tabel-editor zie ik alleen een tekstveld met
+cryptische inhoud die begint met `b64:`.
 
-Antwoord: Dit is het **Tabel Data** veld — de opgeslagen vorm van de
-tabel die de editor meestal behandelt. Gebruik deze tekst nooit met de hand
-bewerken. Klik op **Tabel bewerken** of open de
-Dialoog haalt de editor op. De codering beschermt de tabel tegen het worden
-Automatische paginavertaling. 
+Antwoord: Dit is het veld **Tabelgegevens** — de opgeslagen vorm van de
+tabel die normaal gesproken door de editor wordt bedekt. Bewerk deze tekst nooit handmatig
+. Door op **Tabel bewerken** te klikken of het
+dialoogvenster opnieuw te openen, verschijnt de editor weer. De codering beschermt de tabel tegen
+beschadiging door de automatische paginavertaling.
 
-**Vraag:** Mijn wijzigingen zijn verdwenen na de overdracht. 
+**Vraag:** Mijn wijzigingen zijn verdwenen nadat ik het venster heb gesloten.
 
-Antwoord: **Sluit** slaat niet op. Altijd ingesteld vóór het sluiten
-**Opslaan** — zolang "Wijzigingen niet opgeslagen" naast de knoppen staat
-is enigszins open. 
+Antwoord: **Sluiten** slaat de wijzigingen niet op. Als er nog wijzigingen openstaan, vraagt de
+editor om bevestiging — kies daar **Toepassen**, niet **Annuleren**. Zolang er bij de
+titel „… – niet toegepast“ staat, is er nog iets open. Sla daarna de pagina in
+Studio op met **Opslaan**.
 
-**Vraag:** Hoe schrijf ik in een cel? 
+**Vraag:** Hoe schrijf ik in een cel?
 
-Antwoord: **Dubbelklik** in de cel, en dan tikken. Een simpele klik
-selecteert alleen de cel (voor opmaak), hij opent deze niet voor
-Bewerking. 
+Antwoord: **Dubbelklik** op de cel en typ vervolgens. Een enkele klik
+selecteert de cel alleen (voor opmaak), maar opent deze niet om
+te bewerken.
 
-**Vraag:** Ik kan de eerste rij of kolom niet verwijderen. 
+**Vraag:** Ik kan de eerste rij of de eerste kolom niet verwijderen.
 
-Antwoord: Zo is het bedoeld: De eerste regel is de kop, de eerste is de
-kolom het rijlabel. Als ze niet nodig zijn, leeg dan gewoon
-. 
+Antwoord: Dat is zo bedoeld: de eerste rij is de koptekst, de eerste
+kolom de kolomnaam. Als je ze niet nodig hebt, laat je ze gewoon leeg
+.
 
-**Vraag:** Welke bestandsformaten kan ik importeren? 
+**Vraag:** Welke bestandsformaten kan ik importeren?
 
-Antwoord: '.csv' en '.xlsx'/'.xls'. In CSV worden puntkomma en komma gebruikt als
-scheidingselementen worden automatisch gedetecteerd. In Excel is het eerste werkblad
-inclusief verbonden cellen, tekstopmaak, kleuren, lettergroottes
-en uitlijning. Een import **vervangt altijd de hele tafel**. 
+Antwoord: `.csv` en `.xlsx`/`.xls`. Bij CSV worden puntkomma’s en komma’s automatisch herkend als
+scheidingstekens. Bij Excel wordt het eerste werkblad
+overgenomen, inclusief gekoppelde cellen, tekstopmaak, kleuren, lettergroottes
+en uitlijning. Een import **vervangt altijd de gehele tabel**.
 
-**Vraag:** "Import mislukt" verschijnt. 
+**Vraag:** Er verschijnt „Import mislukt“.
 
-Antwoord: Het bestand kon niet worden gelezen. Controleer of er echt een
-'.csv', '.xlsx' of '.xls' bestand (geen hernoemde of
-wachtwoordbeschermd bestand) en of het inhoud bevat. In Excel indien nodig
-Sla weer op als '.xlsx'. 
+Antwoord: Het bestand kon niet worden gelezen. Controleer of het echt een
+`.csv`-, `.xlsx`- of `.xls`-bestand is (en niet bijvoorbeeld een hernoemd of
+met een wachtwoord beveiligd bestand) en of het inhoud bevat. Sla het indien nodig
+in Excel opnieuw op als `.xlsx`.
 
-**Vraag:** Niet alle rijen worden op de pagina weergegeven. 
+**Vraag:** Niet alle rijen worden op de pagina weergegeven.
 
-Antwoord: Dit is de **Zichtbare rijen**-instelling (tabblad "Data"), 
-Vooraf ingesteld op 5 datarijen. De rest verschijnt via de knop eronder
-tabel. Als je wilt dat alle rijen vanaf het begin zichtbaar zijn, zet dan de waarde op '0'
-. 
+Antwoord: Dit is de instelling **Zichtbare rijen** (paneel „Tabel“ rechts),
+standaard ingesteld op 5 gegevensrijen. De rest verschijnt via de knop onder
+de tabel. Als je vanaf het begin alle rijen wilt zien, stel de waarde dan in op `0`
+.
 
-**Vraag:** Waarom zie ik geen export in de app? 
+**Vraag:** Waarom zie ik geen exportoptie in de app?
 
-Antwoord: In de Staffbase-app (iOS/Android) verbergt de tabel de export en
-De vakjes voor regelselectie zijn bewust geselecteerd, omdat downloads daar niet beschikbaar zijn.
-Functioneren betrouwbaar. In de browser — zelfs op de telefoon — exporteert de export
-beschikbaar. 
+Antwoord: In de Staffbase-app (iOS/Android) worden de exportoptie en
+de selectievakjes voor het selecteren van rijen bewust verborgen, omdat downloads daar niet
+betrouwbaar werken. In de browser — ook op de telefoon — is de exportfunctie
+wel beschikbaar.
 
-**Vraag:** Eén foto blaast de hele tafel op. 
+**Vraag:** Een afbeelding vult de hele tabel.
 
-Antwoord: Zet in het **Afbeeldingen**-tabblad de **Afbeeldingen aanpassen**-schakelaar aan. 
-Het beperkt alle afbeeldingen tot de tabelbreedte. Wanneer uitgeschakeld, elke
-Foto in de originele grootte. 
+Antwoord: Schakel rechts in het paneel **Tabel** de schakelaar **Afbeeldingen aanpassen** in.
+Hiermee worden alle afbeeldingen beperkt tot de breedte van de tabel. Als deze optie is uitgeschakeld, wordt elke
+afbeelding in zijn oorspronkelijke grootte weergegeven.
 
-**Vraag:** Verschillende afbeeldingen zijn verschillend van grootte. 
+**Vraag:** Meerdere afbeeldingen hebben verschillende afmetingen.
 
-Antwoord: Selecteer alle afbeeldingscellen en selecteer ze in het **Afbeeldingen**-tabblad onder
-**Afbeeldingsgrootte** "Zelfde hoogte als eerste afbeelding" of "Zelfde breedte als eerste afbeelding"
-Afbeelding". Er moeten minstens twee afbeeldingen worden gemarkeerd. 
+Antwoord: Selecteer alle afbeeldingscellen en kies in het tabblad **Afbeeldingen** onder
+**Afbeeldingsgrootte** „Dezelfde hoogte als eerste afbeelding“ of „Dezelfde breedte als eerste
+afbeelding“ selecteren. Er moeten minimaal twee afbeeldingen zijn geselecteerd.
 
-**Vraag:** Een lezer heeft de tabel anders gesorteerd dan ik had opgeslagen
-. 
+**Vraag:** Een lezer heeft de tabel anders gesorteerd dan ik deze heb opgeslagen
+.
 
-Antwoord: Op de gepubliceerde pagina kan elke lezer klikken op de
-op een kolomkop zelf. Dit geldt alleen voor hun weergave
-en verandert de opgeslagen tabel niet. Je sorteerset in de editor
-De startweergave blijft bestaan. 
+Antwoord: Op de gepubliceerde pagina kan elke lezer door op
+een kolomkop te klikken zelf de sortering aanpassen. Dit geldt alleen voor zijn of haar weergave
+en verandert de opgeslagen tabel niet. De in de editor ingestelde **Eerste
+sortering** (paneel „Tabel“) blijft de startweergave.
 
-**Vraag:** Kan ik een link in een cel plaatsen? 
+**Vraag:** Kan ik een link in een cel plaatsen?
 
-Antwoord: Nee. Cellen nemen tekst, afbeeldingen en superscripts/subscripts, 
-maar geen links. Links horen in een tekstelement naast de tabel. 
+Antwoord: Nee. Cellen kunnen tekst, afbeeldingen en superscript/subscript bevatten,
+maar geen links. Links horen thuis in een tekstelement naast de tabel.
 
-**Vraag:** Bestaat er zoiets als "ongedaan maken"? 
+**Vraag:** Is er een „Ongedaan maken“-functie?
 
-Antwoord: Nee. Bewaar daarom tussendoor voor grote renovaties — en
-Onthoud voordat je importeert dat het de hele tabel vervangt. 
+Antwoord: Nee. Sla daarom bij grotere aanpassingen tussentijds op — en
+denk er vóór een import aan dat deze de gehele tabel vervangt.
 
-**Vraag:** Wat gebeurt er met mijn tafel tijdens automatische vertaling
-van de site? 
+**Vraag:** Wat gebeurt er met mijn tabel bij de automatische vertaling
+van de pagina?
 
-Antwoord: Alleen de celinhoud wordt vertaald. Verbonden cellen, 
-Opmaak, afbeeldingen en sortering blijven ongewijzigd. 
+Antwoord: Alleen de celinhoud wordt vertaald. Gekoppelde cellen,
+opmaak, afbeeldingen en de sortering blijven ongewijzigd.
 
-**Vraag:** De tafel is te breed op mobiel. 
+**Vraag:** De tabel is te breed op de mobiele telefoon.
 
-Antwoord: Het kan zijwaarts worden geduwd. Voor smalle schermen helpt het om 
-Kolommen samenvoegen, kortere koppen gebruiken, of grote
-Om foto's te maken uit de cellen.
+Antwoord: Je kunt de tabel zijdelings verschuiven. Voor smalle schermen helpt het om
+kolommen samen te voegen, kortere kopteksten te gebruiken of grote
+afbeeldingen uit de cellen te verwijderen.

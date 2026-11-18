@@ -1,108 +1,155 @@
-# Passo dopo passo
+## L'editor in sintesi
 
-## Crea il tuo primo tavolo
+L'editor di tabelle si apre con le impostazioni del widget e occupa
+l'intera finestra.
 
-1. Posizionare il widget **Tabella** sulla pagina e regolare le impostazioni del widget
-   . L'**Editor di Tabelle** apparirà automaticamente sopra il
-   "Dati della tabella". 
-2. **Doppio clic** in una cella e digita il testo. Cliccando su
-   un'altra cella prende il controllo dell'ingresso. 
-3. Riempire la **prima riga** con le intestazioni delle colonne. 
-4. Righe o colonne mancanti: tab **Celle** → **Inserimento** → ad esempio "Riga
-   sotto" o "Colonna a destra". 
-5. Clicca su **Salva** nell'angolo in alto a destra. Solo allora la tabella finirà nel
-   Widget. 
-6. Esci dall'editor con **Chiudi** e salva la pagina. 
+- **Barra di intestazione:** a sinistra **Chiudi**, accanto il titolo **Modifica tabella
+  ** e lo stato — indica se e quali modifiche non sono ancora state salvate,
+  ad esempio «3 celle modificate», «Struttura modificata» (righe, colonne,
+  celle unite) o «Impostazioni modificate». Al centro i pulsanti di commutazione **Editor** · **Desktop** ·
+  **Tablet** · **Mobile**. A destra **Annulla**, **Ripeti** e
+  **Aiuto**, all’estrema destra **Annulla** e **Applica**.
+- **Sotto, le schede** **Caratteri**, **Allineamento**, **Celle**, **Immagini**
+  e **Dati**; a destra, **Importa (.csv, .xlsx)**. Sotto le
+  schede si trovano gli strumenti della scheda selezionata, poi la tabella con
+  le lettere delle colonne (A, B, C …) e i numeri delle righe (1, 2, 3 …) come in Excel.
+- **Sotto la tabella, la riga di stato:** dimensioni della tabella e selezione,
+  ad esempio «4 righe · 3 colonne · selezione B2:B4», con una nota a destra.
+- **A destra il pannello «Tabella»:** le impostazioni valide per l’intera tabella —
+  **Primo ordinamento**, **Righe visibili**, **Esporta** e **Adatta immagini**
+  .
+- **Desktop**, **Tablet** e **Mobile** mostrano la tabella così come la vedono i lettori:
+  con le voci nascondibili, i pulsanti di esportazione e il primo ordinamento. Il pannello
+  rimane accanto; le modifiche apportate lì sono immediatamente visibili. **Editor**
+  riporta alla modalità di modifica.
 
-Se accanto ai pulsanti c'è scritto **"Modifiche non salvate"**, non è ancora stato
-— poi clicca su "Salva", poi su "Chiudi". 
+**Applica** salva la tabella nella finestra di dialogo del widget e chiude l’
+editor. Il salvataggio è effettivo solo con **Salva** in Studio. Se si chiude con delle
+modifiche aperte, verrà chiesto di scegliere tra: **Annulla**, **Continua a modificare** o
+**Applica**.
 
-## Copia una tabella esistente da Excel o CSV
+### Tasti
 
-1. Apri la scheda **Data** nell'editor di tabelle. 
-2. Clicca su **Importa** e seleziona il file ('.csv', '.xlsx' oppure
-   '.xls'). 
-3. Controlla il risultato: l'importazione **sostituisce la tabella completa**, sarà
-   Niente aggiunto. Da Excel, le celle connesse rimangono, grassetto/corsivo/ 
-   sottoline, colori, dimensioni del carattere, allineamento e ritratto e
-   pedici. Nel caso di un libro Excel, il **primo
-   Foglio di calcolo**. 
-4. **Salva**. 
+| Tasto | Effetto |
+| --- | --- |
+| Esc | Chiude ciò che è attualmente aperto: modifica di una cella, menu contestuale, un menu delle schede, la barra della libreria multimediale, la guida — e solo successivamente l’editor (con richiesta di conferma). |
+| ⌘/Ctrl S | Applica, l’editor rimane aperto |
+| ⌘/Ctrl ↵ | Applica e chiudi |
+| ⌘/Ctrl Z | Annulla. In una cella in cui si sta digitando, annulla solo ciò che è stato digitato. |
+| ⇧ ⌘/Ctrl Z, Ctrl Y | Ripeti |
+| F1 | Attiva/disattiva aiuto |
 
-In alternativa, le celle possono anche essere **copiate e incollate** direttamente da Excel: 
-Doppio clic e incolla in una cella — il blocco inizierà da quel punto
-distribuiti su più cellule. 
+## Creare la prima tabella
 
-## Formata celle
+1. Posizionare il widget **Tabella** sulla pagina e aprire le impostazioni del widget
+  . L’**editor della tabella** appare automaticamente sopra il campo
+   «Dati della tabella».
+2. **Fare doppio clic** su una cella e digitare il testo. Cliccando su
+   un’altra cella o premendo **Esc**, l’inserimento viene confermato.
+3. Compilare la **prima riga** con le intestazioni delle colonne.
+4. Se mancano righe o colonne: scheda **Celle** → **Inserisci** → ad es. «Riga
+   sotto» o «Colonna a destra».
+5. Cliccare in alto a destra su **Applica**. Solo così la tabella verrà inserita nel
+   widget.
+6. Salvare la pagina in Studio.
 
-1. Seleziona le celle da formattare: clicca, tieni premuto il tasto del mouse
-   , usa **Shift** per disegnare un'area o **Ctrl/Cmd** 
-   aree aggiuntive. Le maniglie sul bordo possono essere usate per
-   Seleziona righe, colonne o l'intera tabella. 
-2. Tab **Font** per la dimensione del carattere, grassetto, corsivo, sottolinea, 
-   Cancellazione, sovrapdice/pedice, font e colore di sfondo. 
-3. Scheda **Orientamento** per sinistra/centro/destra e alto/centro/basso. 
-4. **Salva**. 
+Se accanto al titolo compare la dicitura **«… – non applicato»**, significa che c’è ancora qualcosa da sistemare. Cliccando
+su **Annulla** si annulla l’ultima operazione.
 
-Per trasferire una formattazione ad altre celle: 
+## Importare una tabella esistente da Excel o CSV
 
-1. Seleziona una cella già formattata. 
-2. Clicca sulla scheda **Dati** → **Formatto**. 
-3. Seleziona le celle di destinazione — adotteranno il formato. 
+1. Nell’editor delle tabelle, a destra accanto alle schede, clicca su **Importa (.csv,
+   .xlsx)** e seleziona il file (`.csv`, `.xlsx` o `.xls`).
+2. Verificare il risultato: l’importazione **sostituisce l’intera tabella**, non viene
+   aggiunto nulla. Da Excel vengono mantenute le celle unite, il grassetto/corsivo/
+   sottolineati, i colori, le dimensioni dei caratteri, l’allineamento e gli
+   indici e apici. Nel caso di una cartella di Excel, viene utilizzato il **primo
+   foglio di lavoro**. Se il file selezionato non è corretto: **Annulla**.
+3. **Applica**.
 
-## Cellule di Fusione
+In alternativa, è possibile **copiare e incollare** le celle direttamente da Excel:
+fare doppio clic su una cella e incollare — il blocco verrà distribuito a partire da quel punto
+su più celle.
 
-1. Selezionare le celle da unire. 
-2. Tabula **Celle** → **Connetti**. 
-3. Annulla con **Solve**. 
+## Formattazione delle celle
 
-## Inserisci immagine in una cella
+1. Selezionare le celle da formattare: cliccare, trascinare tenendo premuto il tasto del mouse,
+   selezionare un'area con **Shift** o aggiungere altre aree con **Ctrl/Cmd**.
+   Cliccando su una lettera di colonna o Un clic su una lettera di colonna o
+   su un numero di riga seleziona l’intera colonna o riga, la cella in alto
+   a sinistra seleziona l’intera tabella; un clic con il tasto destro in quel punto la seleziona e apre il
+   menu contestuale.
+2. Scheda **Caratteri** per dimensione, grassetto, corsivo, sottolineato,
+   barrato, apice/pedice, colore del carattere e dello sfondo.
+3. Scheda **Allineamento** per sinistra/centrato/destra e in alto/al centro/in basso.
+4. **Applica**.
 
-1. Selezionare la cella. 
-2. Scheda **Immagini** → **Immagine**. Si apre la selezione dei media; c'è un
-   Seleziona un'immagine esistente o caricane una nuova. 
-3. Se diverse immagini sono di dimensioni diverse: selezionare tutte le celle immagine e
-   tramite **Dimensione dell'Immagine** o "Stessa altezza della prima immagine" o "Stessa
-   Larghezza come prima immagine" (questo richiede almeno due immagini). 
-   **Dimensione standard** si resetta. 
-4. Se un'immagine fa ingrandire la tabella, nella scheda **Immagini** si cambia **Immagini
-   aright** — quindi tutte le immagini rimangono all'interno del
-   Larghezza del tavolo. 
+Per applicare una formattazione ad altre celle:
 
-## Tabella di smistamento
+1. Selezionare una cella già formattata.
+2. Fare clic sulla scheda **Dati** → **Formato**.
+3. Selezionare le celle di destinazione: queste assumeranno la formattazione.
 
-1. Seleziona la colonna con cui vuoi ordinare. 
-2. Tab **Data** → **Ordin** → "Ascendente (questa colonna)" oppure
-   "Discendendo (questa colonna)". 
-3. **Salva**. Questo è il primo ordine per tutti
-   lettori; l'intestazione rimane sempre in alto. 
+## Unire celle
 
-## Collasso il tavolo lungo
+1. Selezionare le celle da unire.
+2. Scheda **Celle** → **Unisci**.
+3. Annullare l’operazione con **Separa**.
 
-1. Apri la scheda **Data**. 
-2. Sotto **Righe visibili**, inserisci il numero di righe di dati che saranno immediatamente
-   dovrebbe essere visibile. Il valore predefinito è 5; '0' mostra sempre tutte le linee. 
-3. **Salva**. Un pulsante apparirà quindi sulla pagina sotto la tabella
-   "Mostra più N righe" o "Mostra meno righe". 
+## Inserire un’immagine in una cella
 
-## Tabella delle offerte per il download
+1. Selezionare la cella.
+2. Scheda **Immagini** → **Immagine**. A destra si apre la libreria come barra
+   «Immagine per la cella B3»; selezionare un’immagine esistente o caricarne una nuova
+  . Premendo **Esc** si chiude la finestra senza inserire nulla. È più
+   veloce trascinare: trascinare un’immagine dalla barra direttamente su una qualsiasi
+   cella e rilasciarla lì.
+3. Se ci sono più immagini di dimensioni diverse: selezionare tutte le celle con le immagini e
+   tramite **Dimensioni immagine** scegliere “Stessa altezza della prima immagine” o “Stessa
+   larghezza della prima immagine» (per farlo sono necessarie almeno due immagini).
+   **Dimensione predefinita** ripristina le impostazioni di base.
+4. Se un’immagine supera i limiti della tabella, attivare il pulsante
+   **Adatta immagini** nel pannello **Tabella** a destra: in questo modo tutte le immagini rimarranno all’interno della
+   larghezza della tabella.
 
-1. Apri la scheda **Data**. 
-2. Sotto **Esporta** seleziona: 
-   - **Tabellone intera** — I lettori scaricano sempre tutta la tabella. 
-   - **Con la selezione della riga** — c'è una casella davanti a ogni riga; esportato
-     le righe selezionate, senza selezionare l'intera tabella. 
-3. **Salva**. Sopra la tabella compaiono i pulsanti "Excel (.xlsx)" e
-   CSV. Il file Excel mantiene la formattazione e le celle unite, e consente
-   importare di nuovo qui; il file CSV si apre in Excel tedesco
-   direttamente. 
+## Ordinare la tabella
 
-L'esportazione non viene visualizzata nell'app Staffbase — lì puoi
-Scarica file in modo affidabile. È lì nel browser mobile. 
+1. Nel pannello **Tabella** a destra, sotto **Primo ordinamento**, selezionare la colonna.
+2. Sotto, selezionare **In ordine crescente** o **In ordine decrescente**. **Nessuno** annulla l’
+  ordinamento.
+3. **Applica**. Questo ordinamento è quello iniziale per tutti i
+   lettori; l’intestazione rimane sempre in alto.
 
-## Rimuovi di nuovo la formattazione
+Metodo più rapido per la colonna sotto il cursore: clic destro sulla colonna →
+**Ordinamento** → «Crescente (questa colonna)» o «Decrescente (questa
+colonna)».
 
-1. Segna le cellule interessate. 
-2. Scheda **Data** → **Formatting** e seleziona la voce appropriata: 
-   Rimuovi tutto, solo la formattazione del testo o solo le dimensioni delle immagini. 
-3. **Salva**.
+## Comprimere una tabella lunga
+
+1. A destra nel pannello **Tabella**, sotto **Righe visibili**, inserire il numero di
+   righe di dati che devono essere immediatamente visibili. Il valore predefinito
+   è 5; `0` mostra sempre tutte le righe.
+2. Con **Desktop** o **Mobile** nella barra di intestazione, verificare come appare.
+3. **Applica**. Sulla pagina apparirà quindi sotto la tabella un pulsante
+   «Mostra altre N righe» o «Mostra meno righe».
+
+## Rendere disponibile la tabella per il download
+
+1. A destra nel pannello **Tabella**, selezionare **Esporta**:
+   - **Tutta la tabella** — I lettori scaricano sempre l’intera tabella.
+   - **Con selezione delle righe** — davanti a ogni riga c’è una casella; vengono esportate
+     le righe selezionate, mentre senza selezione viene esportata l’intera tabella.
+2. **Applica**. Sopra la tabella compaiono i pulsanti «Excel (.xlsx)» e
+   «CSV». Il file Excel mantiene la formattazione e le celle collegate e può
+   essere reimportato qui; il file CSV si apre direttamente in Excel
+   tedesco.
+
+Nell’app Staffbase l’esportazione non viene visualizzata — lì i
+file non possono essere scaricati in modo affidabile. Nel browser mobile è presente.
+
+## Rimuovere la formattazione
+
+1. Selezionare le celle interessate.
+2. Scheda **Dati** → **Formattazione** e selezionare l’opzione appropriata:
+   rimuovere tutto, solo la formattazione del testo o solo le dimensioni delle immagini.
+3. **Applica**.

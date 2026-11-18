@@ -1,6 +1,6 @@
 {
   "title": "Tabel",
-  "summary": "Ingebed van een formattabel — met een eigen editor, Excel/CSV-import en afbeeldingen in cellen.",
+  "summary": "Voeg een opmaakbare tabel in — met een eigen editor, Excel-/CSV-import en afbeeldingen in cellen.",
   "pages": [
     {
       "id": "overview",
@@ -19,7 +19,7 @@
     },
     {
       "id": "faq",
-      "title": "FAQ",
+      "title": "Veelgestelde vragen",
       "file": "faq.md"
     }
   ],

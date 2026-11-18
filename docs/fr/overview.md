@@ -1,34 +1,34 @@
-# Table
+# Tableau
 
-Le widget de table apporte une vraie table à la page — avec un
-Son propre éditeur de tableaux, qui fonctionne comme un petit programme de tableaux. 
-Les cellules peuvent être formatées, assemblées, remplies d’images et triées, 
-sans aucune connaissance de HTML. 
+Le widget « Tableau » permet d’insérer un véritable tableau sur la page — grâce à un
+éditeur de tableau dédié, qui fonctionne comme un petit logiciel de tableur.
+Les cellules peuvent être formatées, fusionnées, remplies d’images et triées,
+sans aucune connaissance en HTML.
 
-Adapté à tout en tableau : tableaux comparatifs, listes de contacts, 
-Chiffres clés, horaires d’ouverture, horaires de garde, aperçu des prix. 
+Idéal pour tout ce qui se présente sous forme de tableau : tableaux comparatifs, listes de contacts,
+indicateurs clés, horaires d'ouverture, plannings de travail, barèmes de prix.
 
-## C’est ainsi qu’une table est structurée
+## Structure d'un tableau
 
-- La **première ligne** est l’en-tête. Elle est surlignée
-  et il reste toujours en tête lors du tri. 
-- La **première colonne** est l’étiquette de ligne et est également
-  surligné. 
-- La **cellule en haut à gauche** est le coin entre les deux et reste généralement
-  vide. C’est normal, pas un bug. 
-- L’en-tête et la première colonne ne peuvent pas être supprimées. Si vous n’en avez pas besoin, 
-  Les laisse vides. 
+- La **première ligne** est l'en-tête. Elle est mise en évidence
+  et reste toujours en haut lors du tri.
+- La **première colonne** correspond à l’intitulé des lignes et est également
+  mise en évidence.
+- La **cellule en haut à gauche** se trouve à l’angle entre les deux et reste généralement
+  vide. C’est normal, ce n’est pas une erreur.
+- L’en-tête et la première colonne ne peuvent pas être supprimés. Si vous n’en avez pas besoin,
+  laissez-les vides.
 
-## Ce que voient les lecteurs
+## Ce que voient les lecteurs et lectrices
 
-La table finie. Si elle est plus large que l’écran, elle peut l’être
-de côté. Si elle est plus longue que le nombre de lignes défini,
-seules les premières lignes sont visibles au début et un bouton en dessous cache le
-rest. Cliquer sur un en-tête de colonne trie la table pour le
-Personne en lecture — cela ne change pas la table enregistrée. 
+Le tableau final. S’il est plus large que l’écran, il est possible de
+le faire défiler latéralement. Si elle est plus longue que le nombre de lignes défini,
+seules les premières lignes sont visibles dans un premier temps et un bouton situé en dessous permet d’afficher le
+reste. Un clic sur un en-tête de colonne trie le tableau pour le
+lecteur — cela ne modifie en rien le tableau enregistré.
 
-## Là où tu travailles
+## Où travailler
 
-Pas dans le champ **Données de table*, mais dans l'**Éditeur de table**, qui se trouve dans le
-au-dessus. Le champ en dessous ne contient que la forme techniquement stockée
-du tableau et n’est jamais édité à la main.
+Non pas dans le champ **Données du tableau**, mais dans l’**éditeur de tableau** qui s’
+ouvre par-dessus. Le champ situé en dessous ne contient que la forme techniquement enregistrée
+du tableau et n’est jamais modifié manuellement.

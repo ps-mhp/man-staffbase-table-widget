@@ -1,108 +1,155 @@
-# Stap voor stap
+## De editor in één oogopslag
 
-## Maak je eerste tafel aan
+De tabel-editor wordt geopend met de instellingen van de widget en vult
+het hele venster.
 
-1. Plaats de **Table**-widget op de pagina en pas de widget-instellingen aan
-   . De **Table Editor** verschijnt automatisch boven de
-   "Tafelgegevens". 
-2. **Dubbelklik** in een cel en typ de tekst in. Door op te klikken
-   Een andere cel neemt de invoer over. 
-3. Vul de **eerste rij** met kolomkoppen. 
-4. Ontbrekende rijen of kolommen: Tab **Cellen** → **Invoegen** → bijvoorbeeld "Rij"
-   onder" of "kolom rechts". 
-5. Klik rechtsboven op **Opslaan**. Pas dan landt de tabel in de
-   Widget. 
-6. Verlaat de editor met **Sluit** en sla de pagina op. 
+- **Balk bovenaan:** links **Sluiten**, daarnaast de titel **Tabel
+  bewerken** en de status — deze geeft aan of en wat er nog niet is opgeslagen,
+  bijvoorbeeld „3 cellen gewijzigd“, „Structuur gewijzigd“ (rijen, kolommen, gekoppelde
+  cellen) of „Instellingen gewijzigd“. In het midden de schakelaar **Editor** · **Desktop** ·
+  **Tablet** · **Mobiel**. Rechts **Ongedaan maken**, **Opnieuw** en
+  **Help**, helemaal rechts **Annuleren** en **Toepassen**.
+- **Daaronder de tabbladen** **Lettertype**, **Uitlijning**, **Cellen**, **Afbeeldingen**
+  en **Gegevens**, rechts daarvan **Importeren (.csv, .xlsx)**. Onder de
+  tabbladen staan de tools van het geselecteerde tabblad, daarna de tabel met
+  kolomletters (A, B, C …) en rijnummers (1, 2, 3 …) zoals in Excel.
+- **Onder de tabel de statusbalk:** grootte van de tabel en de selectie,
+  bijvoorbeeld „4 rijen · 3 kolommen · selectie B2:B4“, rechts een opmerking.
+- **Rechts het paneel „Tabel“:** wat voor de hele tabel geldt —
+  **Eerste sortering**, **Zichtbare rijen**, **Exporteren** en **Afbeeldingen
+  aanpassen**.
+- **Desktop**, **tablet** en **mobiel** tonen de tabel zoals lezers
+  deze zien — met inklapbare rijen, exportknoppen en eerste sortering. Het paneel
+  blijft ernaast staan; wat u daar wijzigt, ziet u onmiddellijk. **Editor**
+  gaat terug naar de bewerkingsmodus.
 
-Als er naast de knoppen staat **"Wijzigingen niet opgeslagen"**, is dat nog niet gebeurd
-— klik dan op "Opslaan", en vervolgens op "Sluiten". 
+**Toepassen** schrijft de tabel naar het widget-dialoogvenster en sluit de
+editor. De tabel is pas opgeslagen als u op **Opslaan** klikt in Studio. Als u sluit terwijl er
+wijzigingen openstaan, wordt u gevraagd: **Negeren**, **Bewerken** of
+**Toepassen**.
 
-## Kopieer een bestaande tabel uit Excel of CSV
+### Toetsen
 
-1. Open het **Data**-tabblad in de tabeleditor. 
-2. Klik op **Importeren** en selecteer het bestand ('.csv', '.xlsx' of
-   '.xls'). 
-3. Controleer het resultaat: De import **vervangt de complete tabel**, dan zal het zijn
-   Niets toegevoegd. Vanuit Excel blijven verbonden cellen over, vet/cursief/ 
-   Onderstrepen, kleuren, lettergroottes, uitlijning en portret en
-   subscripts. In het geval van een Excel-boek, de **eerste
-   Spreadsheet**. 
-4. **Red**. 
+| Toets | Effect |
+| --- | --- |
+| Esc | Sluit wat op dat moment openstaat: het bewerken van een cel, het contextmenu, een tabbladmenu, de mediabalk, de Help — en pas daarna de Editor (met bevestigingsvraag). |
+| ⌘/Ctrl S | Toepassen, editor blijft open |
+| ⌘/Ctrl ↵ | Toepassen en sluiten |
+| ⌘/Ctrl Z | Ongedaan maken. In een cel waarin je op dat moment typt, wordt alleen het getypte ongedaan gemaakt. |
+| ⇧ ⌘/Ctrl Z, Ctrl Y | Herhalen |
+| F1 | Help in-/uitschakelen |
 
-Alternatief kunnen cellen ook **gekopieerd en geplakt** worden direct vanuit Excel: 
-dubbelklik en plak in een cel — het blok begint op dat punt
-verspreid over meerdere cellen. 
+## Eerste tabel aanmaken
 
-## Formateercellen
+1. Plaats de widget **Tabel** op de pagina en open de widgetinstellingen
+  . De **tabel-editor** verschijnt automatisch boven het veld
+   „Tabelgegevens“.
+2. **Dubbelklik** in een cel en typ de tekst in. Door op
+   een andere cel te klikken of op **Esc** te drukken, wordt de invoer bevestigd.
+3. Vul de **eerste rij** in met de kolomkoppen.
+4. Ontbreken er rijen of kolommen: tabblad **Cellen** → **Invoegen** → bijv. „Rij
+   eronder“ of „Kolom rechts“.
+5. Klik rechtsboven op **Toepassen**. Pas dan wordt de tabel in de
+   widget geplaatst.
+6. Sla de pagina op in Studio.
 
-1. Selecteer de cellen die geformatteerd moeten worden: klik, houd de muisknop ingedrukt
-   , gebruik **Shift** om een gebied te tekenen of **Ctrl/Cmd** 
-   extra gebieden. De handvatten aan de rand kunnen worden gebruikt om
-   Selecteer rijen, kolommen of de hele tabel. 
-2. Tab **Lettertype** voor lettergrootte, vetgedrukt, cursief, onderstreep, 
-   Doorstrepen, superscript/subscript, lettertype en achtergrondkleur. 
-3. Tab **Orientatie** voor links/midden/rechts en boven/midden/onder. 
-4. **Red**. 
+Als er bij de titel **„… – niet overgenomen“** staat, is er nog iets open. Een klik
+op **Ongedaan maken** maakt de laatste stap ongedaan.
 
-Om een opmaak over te zetten naar andere cellen: 
+## Bestaande tabel uit Excel of CSV overnemen
 
-1. Selecteer een reeds geformatteerde cel. 
-2. Klik op het **Data**-tabblad → **Formatteren**. 
-3. Selecteer de doelcellen — zij nemen het formaat over. 
+1. Klik in de tabel-editor rechts naast de tabbladen op **Importeren (.csv,
+   .xlsx)** en selecteer het bestand (`.csv`, `.xlsx` of `.xls`).
+2. Controleer het resultaat: de import **vervangt de volledige tabel**, er wordt
+   niets toegevoegd. Uit Excel blijven gekoppelde cellen, vet/cursief/
+   onderstreping, kleuren, lettergroottes, uitlijning en superscript en
+   subscript behouden. Bij een Excel-werkboek wordt het **eerste
+   werkblad** gebruikt. Was het het verkeerde bestand: **Ongedaan maken**.
+3. **Toepassen**.
 
-## Merge Cells
+Als alternatief kun je cellen ook rechtstreeks uit Excel **kopiëren en plakken**:
+dubbelklik in een cel en plak — het blok wordt vanaf deze plek
+over meerdere cellen verdeeld.
 
-1. Selecteer de cellen die verbonden moeten worden. 
-2. Tab **Cellen** → **Verbinden**. 
-3. Ongedaan maken met **Oplos**. 
+## Cellen opmaken
+
+1. Selecteer de cellen die je wilt opmaken: klik, sleep met ingedrukte muisknop
+  , gebruik **Shift** om een gebied te selecteren of **Ctrl/Cmd**
+  om meer gebieden toe te voegen. Een klik op een kolomletter of
+   een regelnummer selecteert de hele kolom of regel, het hoekvakje linksboven
+   de hele tabel; een rechtsklik daarop selecteert deze en opent het
+   contextmenu.
+2. Tabblad **Lettertype** voor lettergrootte, vet, cursief, onderstrepen,
+   doorstrepen, superscript/subscript, letter- en achtergrondkleur.
+3. Tabblad **Uitlijning** voor links/gecentreerd/rechts en boven/midden/onder.
+4. **Toepassen**.
+
+Om een opmaak naar andere cellen over te nemen:
+
+1. Selecteer een reeds opgemaakte cel.
+2. Klik op het tabblad **Gegevens** → **Opmaak**.
+3. Selecteer de doelcellen — deze nemen de opmaak over.
+
+## Cellen samenvoegen
+
+1. Selecteer de cellen die je wilt samenvoegen.
+2. Tabblad **Cellen** → **Samenvoegen**.
+3. Ongedaan maken met **Scheid**.
 
 ## Afbeelding in een cel invoegen
 
-1. Selecteer de cel. 
-2. Tab **Afbeeldingen** → **Afbeelding**. De mediaselectie opent; er is een
-   Selecteer een bestaande afbeelding of upload een nieuwe. 
-3. Als meerdere afbeeldingen van verschillende groottes zijn: selecteer alle beeldcellen en
-   via **Afbeeldingsgrootte** ofwel "Zelfde hoogte als eerste afbeelding" of "Zelfde
-   Breedte als eerste afbeelding" (hiervoor zijn minstens twee afbeeldingen nodig). 
-   **Standaardmaat** resets. 
-4. Als een afbeelding de tabel opblaast, schakelt in het tabblad **Afbeeldingen** over **Afbeeldingen
-   aanpassen — dan blijven alle beelden binnen de
-   Tafelbreedte. 
+1. Selecteer de cel.
+2. Tabblad **Afbeeldingen** → **Afbeelding**. Rechts wordt de mediabibliotheek geopend als een balk
+   „Afbeelding voor cel B3“; kies daar een bestaande afbeelding of upload een nieuwe
+   afbeelding. Met **Esc** sluit je deze weer zonder iets in te voegen. Sneller
+   gaat het door te slepen: sleep een afbeelding uit de balk rechtstreeks naar een willekeurige
+   cel en laat deze daar los.
+3. Als meerdere afbeeldingen verschillende afmetingen hebben: selecteer alle afbeeldingscellen en
+   kies via **Afbeeldingsgrootte** ofwel „Dezelfde hoogte als eerste afbeelding“ of „Dezelfde
+   breedte als eerste afbeelding” (hiervoor zijn minimaal twee afbeeldingen nodig).
+   **Standaardgrootte** zet alles terug.
+4. Als een afbeelding buiten de tabel valt, schakel dan rechts in het paneel **Tabel** de schakelaar
+   **Afbeeldingen aanpassen** in — dan blijven alle afbeeldingen binnen de
+   tabelbreedte.
 
-## Sorteertafel
+## Tabel sorteren
 
-1. Selecteer de kolom waarop je wilt sorteren. 
-2. Tab **Data** → **Sorteer** → "Opstijgend (deze kolom)" of
-   "Afdalend (deze kolom)". 
-3. **Opslaan**. Deze sorteermethode is de startsorteerder voor iedereen
-   lezers; de kop blijft altijd bovenaan. 
+1. Selecteer rechts in het paneel **Tabel** onder **Eerste sortering** de kolom.
+2. Kies daaronder **Oplopend** of **Aflopend**. Met **Geen** wordt de
+   sortering weer ongedaan gemaakt.
+3. **Toepassen**. Deze sortering is de startsortering voor alle
+   lezers; de koptekst blijft daarbij altijd bovenaan staan.
 
-## Stort lange tafel in
+Sneller voor de kolom waar de muis op staat: klik met de rechtermuisknop in de kolom →
+**Sortering** → „Oplopend (deze kolom)“ of „Aflopend (deze
+kolom)“.
 
-1. Open het **Data**-tabblad. 
-2. Onder **Zichtbare rijen** voer je het aantal rijen data in dat onmiddellijk zal zijn
-   Moet zichtbaar zijn. De standaard is 5; '0' toont altijd alle regels. 
-3. **Opslaan**. Er verschijnt dan een knop op de pagina onder de tabel
-   "Meer N rijen tonen" of "Minder rijen tonen". 
+## Lange tabel samenvouwen
 
-## Aanbiedingstabel voor download
+1. Voer rechts in het paneel **Tabel** onder **Zichtbare rijen** het aantal
+   gegevensrijen in dat direct zichtbaar moet zijn. De standaardinstelling
+   is 5; `0` toont altijd alle rijen.
+2. Controleer met **Desktop** of **Mobiel** in de kopbalk hoe het eruitziet.
+3. **Toepassen**. Op de pagina verschijnt dan onder de tabel een knop
+   „N extra rijen weergeven“ of „Minder rijen weergeven“.
 
-1. Open het **Data**-tabblad. 
-2. Selecteer onder **Exporteren**: 
-   - **Hele tafel** — Lezers downloaden altijd de hele tabel. 
-   - **Met rijselectie** — er is een vakje voor elke regel; geëxporteerd
-     de geselecteerde rijen, zonder de hele tabel te selecteren. 
-3. **Opslaan**. Boven de tabel verschijnen de knoppen "Excel (.xlsx)" en
-   CSV. Het Excel-bestand behoudt de opmaak en samengevoegde cellen, en maakt het mogelijk
-   importeren hier opnieuw; het CSV-bestand opent in Duits Excel
-   direct. 
+## Tabel aanbieden om te downloaden
 
-De export wordt niet weergegeven in de Staffbase-app — daar kan je dat wel
-Download bestanden betrouwbaar. Het staat in de mobiele browser. 
+1. Kies rechts in het paneel **Tabel** onder **Exporteren**:
+   - **Volledige tabel** — Lezers downloaden altijd de volledige tabel.
+   - **Met rijselectie** — voor elke rij staat een selectievakje;
+     de geselecteerde rijen worden geëxporteerd, zonder selectie de hele tabel.
+2. **Toepassen**. Boven de tabel verschijnen de knoppen „Excel (.xlsx)“ en
+   „CSV“. Het Excel-bestand behoudt de opmaak en gekoppelde cellen en kan
+   hier weer worden geïmporteerd; het CSV-bestand wordt direct geopend in de Duitse versie van Excel
+  .
 
-## Verwijder opnieuw de opmaak
+In de Staffbase-app wordt de export niet weergegeven — daar kunnen
+bestanden niet betrouwbaar worden gedownload. In de mobiele browser is deze wel beschikbaar.
 
-1. Markeer de getroffen cellen. 
-2. Tab **Data** → **Opmaak** en selecteer de juiste invoer: 
-   Verwijder alles, alleen de tekstopmaak of alleen de afbeeldingsgroottes. 
-3. **Opslaan**.
+## Opmaak weer verwijderen
+
+1. Selecteer de betreffende cellen.
+2. Tabblad **Gegevens** → **Opmaak** en kies de juiste optie:
+   alles verwijderen, alleen de tekstopmaak of alleen de afbeeldingsafmetingen.
+3. **Toepassen**.

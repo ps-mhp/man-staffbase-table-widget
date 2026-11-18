@@ -1,35 +1,54 @@
-# Configurações
+# Definições
 
-No diálogo de configuração, tecnicamente há apenas um campo — **Table Data**. 
-Ela contém a tabela em forma salva; é editada
-exclusivamente via o **Editor de Tabelas**, que automaticamente
-. Quando o editor está fechado, o botão **Table o traz
-edit** de volta. 
+Na caixa de diálogo de configuração, existe, tecnicamente, apenas um campo — **Dados da tabela**.
+Nele encontra-se a tabela na sua forma guardada; a sua edição é feita
+exclusivamente através do **Editor de tabelas**, que se abre automaticamente
+por cima. Se o editor for fechado, o botão **Editar tabela**
+reabre-o.
 
-## Barra de cabeçalho do editor
+## Barra de título do editor
 
-| Botão | Impacto |
+A barra de título é idêntica em todos os widgets MAN.
+
+| Botão | Efeito |
 | --- | --- |
-| Salvar | Transfere o estado atual para o widget. Sem clicar nele, tudo será perdido. |
-| Ajuda | Abre a ajuda rápida para cada função diretamente no editor. |
-| Fechar | Deixa o editor **sem** salvando. |
-| "Alterações Não Salvas" | Note o texto ao lado dos botões: Ainda há algo pendente. |
+| Fechar (à esquerda) | Sai do editor. Se houver alterações pendentes, pergunta: Descartar, Continuar a editar ou Aplicar. |
+| Estado no título | «Sem alterações» ou o que estiver pendente, por exemplo, «3 células alteradas – não aplicadas», «Estrutura alterada», «Definições alteradas». |
+| Editor · Computador · Tablet · Telemóvel | Alterna entre a edição e a pré-visualização da tabela publicada, adaptada à largura do dispositivo. |
+| Anular, Repetir | Anula ou repete as ações. |
+| Ajuda | Abre à direita a ajuda rápida para cada função e os botões. |
+| Cancelar | Equivalente a «Fechar». |
+| Aplicar | Grava a tabela na caixa de diálogo do widget e fecha. A gravação só é efetivada com «Guardar» no Studio. |
 
-## Aba da barra de ferramentas
+## Separadores da barra de ferramentas
 
-| Reiter | O que tem nele |
+| Separador | O que contém |
 | --- | --- |
-| Fonte | Tamanho da fonte (padrão, 10–32), aumentar/diminuir a fonte, negrito, itálico, sublinhado, riscado, sobrescrito, subscrito, cor da fonte, cor de fundo. |
-| Orientação | Alinhado à esquerda, centralizado, alinhado à direita, assim como em cima, centro, baixo. |
-| Células | Join, Separar, Inserir (linha acima/inferior, coluna esquerda/direita), Delete (linha(s), coluna(s)). |
-| Imagens | Insira a imagem na célula, ajuste o tamanho da imagem (mesma altura/largura da primeira imagem, tamanho padrão), botão "Ajustar imagens". |
-| Dados | Ordenar (ascendente, descendente, remover ordenação), copiar formatar, linhas visíveis, exportar, remover formatação, importar. |
+| Tipo de letra | Tamanho da letra (padrão, 10–32), aumentar/diminuir o tamanho da letra, negrito, itálico, sublinhado, riscado, sobrescrito, subscrito, cor da letra, cor de fundo. |
+| Alinhamento | Alinhado à esquerda, centrado, alinhado à direita, bem como alinhado à parte superior, ao centro e à parte inferior. |
+| Células | Unir, separar, inserir (linha acima/abaixo, coluna à esquerda/direita), eliminar (linha(s), coluna(s)). |
+| Imagens | Inserir imagem na célula, ajustar o tamanho das imagens (mesma altura/largura que a primeira imagem, tamanho padrão). |
+| Dados | Copiar formato, remover formatação. |
 
-## Configurações com efeitos colaterais
+À direita das separadores encontra-se **Importar (.csv, .xlsx)**: importa um
+ficheiro e substitui toda a tabela.
 
-| Cenário | Descrição |
+## Painel «Tabela»
+
+À direita da tabela encontram-se as definições que se aplicam a toda a tabela
+. Permanece visível também na pré-visualização.
+
+| Configuração | Descrição |
 | --- | --- |
-| Linhas visíveis (aba "Dados") | Número de linhas de dados que podem ser vistas imediatamente na página; o restante está atrás de um botão mostrar. Padrão 5, '0' significa "sempre todas as linhas". O cabeçalho não conta. |
-| Exportar (aba "Data") | *Desligado* (padrão), *Tabela inteira* ou *Com seleção de linhas*. Os botões "Excel (.xlsx)" e "CSV" então aparecem acima da tabela; com seleção de linhas, uma coluna com caixas é adicionada à esquerda, as linhas selecionadas são exportadas (sem selecionar todas). No aplicativo Staffbase (iOS/Android) a exportação não é exibida. |
-| Ajustando Imagens (Aba Imagens) | Quando ativada, todas as imagens permanecem dentro da largura da tabela. Quando desligada, cada imagem aparece em seu tamanho original — e pode ampliar a tabela. |
-| Copiar Formato (aba Data) | Transfere o formato da seleção atual para as células selecionadas a seguir. |
+| Primeira ordenação | *Nenhuma* (predefinição) ou uma coluna, além de *Crescente* ou *Decrescente*. É assim que a tabela fica ordenada ao abrir; a linha de cabeçalho permanece no topo. Os leitores podem reordenar clicando num título. Também é possível definir a ordenação através do menu de contexto → Ordenação. |
+| Linhas visíveis | Número de linhas de dados que são imediatamente visíveis na página; o restante fica atrás de um botão para mostrar. Predefinição 5, `0` significa «sempre todas as linhas». A linha de cabeçalho não é contabilizada. |
+| Exportação | *Desativada* (predefinição), *Tabela completa* ou *Com seleção de linhas*. Acima da tabela, aparecem então os botões «Excel (.xlsx)» e «CSV»; com a seleção de linhas, é adicionada à esquerda uma coluna com caixas de seleção; são exportadas as linhas selecionadas (sem seleção, todas). Na aplicação Staffbase (iOS/Android), a opção de exportação não é apresentada. |
+| Ajustar imagens | Quando ativada, todas as imagens mantêm-se dentro da largura da tabela. Quando desativada, cada imagem aparece no seu tamanho original — podendo ultrapassar os limites da tabela. |
+
+Na parte inferior do painel encontra-se a versão do widget.
+
+## Outras ferramentas
+
+| Ferramenta | Descrição |
+| --- | --- |
+| Copiar formato (separador «Dados») | Transfere o formato da seleção atual para as células selecionadas a seguir. |

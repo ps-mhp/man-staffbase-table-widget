@@ -1,35 +1,54 @@
 # Instellingen
 
-In het configuratiemenu is er technisch gezien maar één veld — **Tabel Data**. 
-Het bevat de tabel in opgeslagen vorm; het is bewerkt
-uitsluitend via de **Table Editor**, die automatisch
-. Zodra de editor gesloten is, brengt de **Table-knop hem
-Edit** terug. 
+In het configuratievenster is er technisch gezien slechts één veld: **Tabelgegevens**.
+Daarin staat de tabel in opgeslagen vorm; deze kan
+uitsluitend worden bewerkt via de **tabeleditor**, die automatisch daarboven
+wordt geopend. Als de editor eenmaal is gesloten, roept de knop **Tabel
+bewerken** deze weer op.
 
-## Editor headerbalk
+## Kopbalk van de editor
 
-| Knop | Impact |
+De kopbalk is in alle MAN-widgets hetzelfde.
+
+| Knop | Effect |
 | --- | --- |
-| Opslaan | Zet de huidige staat over naar de widget. Zonder erop te klikken, gaat alles verloren. |
-| Help | Opent de snelle hulp voor elke functie direct in de editor. |
-| Sluit | Laat de editor **zonder** opslaan. |
-| "Niet-opgeslagen wijzigingen" | Let op tekst naast de knoppen: Er is nog iets in behandeling. |
+| Sluiten (links) | Sluit de editor. Als er nog wijzigingen openstaan, wordt gevraagd: Verwerpen, verder bewerken of Toepassen. |
+| Status bij de titel | „Geen wijzigingen“ of wat er openstaat, bijvoorbeeld „3 cellen gewijzigd – niet toegepast“, „Structuur gewijzigd“, „Instellingen gewijzigd“. |
+| Editor · Desktop · Tablet · Mobiel | Schakelt tussen bewerken en het voorbeeld van de gepubliceerde tabel op apparaatbreedte. |
+| Ongedaan maken, Opnieuw | Maakt stappen ongedaan of herstelt ze. |
+| Help | Opent rechts de korte helptekst bij elke functie en de knoppen. |
+| Annuleren | Hetzelfde als Sluiten. |
+| Toepassen | Schrijft de tabel naar het widgetvenster en sluit het venster. Er wordt pas opgeslagen met „Opslaan“ in Studio. |
 
-## Toolbar-tabblad
+## Tabbladen van de werkbalk
 
-| Reiter | Wat zit erin |
+| Tabblad | Wat erin staat |
 | --- | --- |
-| Lettertype | Lettergrootte (standaard, 10–32), lettertype vergroten/verkleinen, vet, cursief, onderstrepen, doorstrepen, superscript, subscript, lettertypekleur, achtergrondkleur. |
-| Oriëntatie | Links-uitgelijnd, gecentreerd, rechts-uitgelijnd, evenals boven, midden, onder. |
-| Cellen | Verbinden, loskoppelen, invoegen (rij boven/onder, kolom links/rechts), verwijderen (rij(en), kolom(en)). |
-| Afbeeldingen | Afbeelding in cel plaatsen, beeldgroottes aanpassen (zelfde hoogte/breedte als de eerste afbeelding, standaardgrootte), knop "Afbeeldingen aanpassen". |
-| Data | Sorteren (stijgend, dalend, sorteren verwijderen), kopiëren, opmaken, lijnen zichtbaar maken, exporteren, opmaak verwijderen, importeren. |
+| Lettertype | Lettergrootte (standaard, 10–32), lettertype vergroten/verkleinen, vet, cursief, onderstreept, doorgestreept, superscript, subscript, letterkleur, achtergrondkleur. |
+| Uitlijning | Links uitgelijnd, gecentreerd, rechts uitgelijnd, evenals boven, midden, onder. |
+| Cellen | Samenvoegen, splitsen, invoegen (rij boven/onder, kolom links/rechts), verwijderen (rij(en), kolom(men)). |
+| Afbeeldingen | Afbeelding in cel invoegen, afbeeldingsgrootte aanpassen (zelfde hoogte/breedte als eerste afbeelding, standaardgrootte). |
+| Gegevens | Opmaak kopiëren, opmaak verwijderen. |
 
-## Instellingen met bijwerkingen
+Rechts naast de tabbladen staat **Importeren (.csv, .xlsx)**: leest een
+bestand in en vervangt de hele tabel.
 
-| Setting | Beschrijving |
+## Paneel „Tabel“
+
+Rechts naast de tabel staan de instellingen die voor de hele tabel
+gelden. Dit blijft ook zichtbaar in het voorbeeld.
+
+| Instelling | Beschrijving |
 | --- | --- |
-| Zichtbare rijen (tabblad "Data") | Aantal datarijen dat direct op de pagina zichtbaar is; de rest bevindt zich achter een toonknop. Standaard 5, '0' betekent "altijd alle rijen". De header telt niet mee. |
-| Exporteren (tabblad "Data") | *Uit* (standaard), *Hele tabel* of *Met rijselectie*. De knoppen "Excel (.xlsx)" en "CSV" verschijnen dan boven de tabel; bij de rijselectie wordt een kolom met vakjes aan de linkerkant toegevoegd, de geselecteerde rijen worden geëxporteerd (zonder alle te selecteren). In de Staffbase-app (iOS/Android) wordt de export niet weergegeven. |
-| Afbeeldingen aanpassen (tabblad Afbeeldingen) | Wanneer ingeschakeld, blijven alle afbeeldingen binnen de tabelbreedte. Wanneer deze is uitgeschakeld, verschijnt elke afbeelding in zijn oorspronkelijke formaat — en kan de tabel vergroten. |
-| Kopieer Formaat (Gegevenstab) | Draagt het formaat van de huidige selectie over naar de volgende geselecteerde cellen. |
+| Eerste sortering | *Geen* (standaard) of een kolom, plus *Oplopend* of *Aflopend*. Zo wordt de tabel bij het openen gesorteerd; de koptekst blijft bovenaan staan. Lezers kunnen de sortering wijzigen door op een koptekst te klikken. Ook in te stellen via het contextmenu → Sorteren. |
+| Zichtbare rijen | Aantal gegevensrijen dat direct op de pagina te zien is; de rest bevindt zich achter een knop om weer te geven. Standaardinstelling 5, `0` betekent „altijd alle rijen“. De koptekst telt niet mee. |
+| Exporteren | *Uit* (standaardinstelling), *Hele tabel* of *Met rijselectie*. Boven de tabel verschijnen dan de knoppen „Excel (.xlsx)“ en „CSV“; bij „Met rijselectie“ wordt links een kolom met selectievakjes toegevoegd; de geselecteerde rijen worden geëxporteerd (zonder selectie worden alle rijen geëxporteerd). In de Staffbase-app (iOS/Android) wordt de exportoptie niet weergegeven. |
+| Afbeeldingen aanpassen | Ingeschakeld: alle afbeeldingen blijven binnen de breedte van de tabel. Uitgeschakeld: elke afbeelding wordt op zijn oorspronkelijke grootte weergegeven — en kan de tabel doen uitlopen. |
+
+Onderaan in het paneel staat de versie van de widget.
+
+## Overige hulpmiddelen
+
+| Hulpmiddel | Beschrijving |
+| --- | --- |
+| Opmaak kopiëren (tabblad „Gegevens“) | Pas de opmaak van de huidige selectie toe op de volgende geselecteerde cellen. |

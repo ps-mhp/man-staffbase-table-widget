@@ -1,108 +1,155 @@
-# Passo a passo
+## O editor num relance
 
-## Crie sua primeira mesa
+O editor de tabelas abre-se com as definições do widget e ocupa
+toda a janela.
 
-1. Coloque o widget **Table** na página e ajuste as configurações do widget
-   . O **Editor de Tabelas** aparecerá automaticamente acima do
-   "Dados da Tabela". 
-2. **Clique duas vezes** em uma célula e digite o texto. Clicando em
-   outra célula assume a entrada. 
-3. Preencha a **primeira linha** com os cabeçalhos das colunas. 
-4. Linhas ou colunas faltantes: Tab **Cells** → **Insert** → por exemplo, "Row
-   abaixo" ou "Coluna à direita". 
-5. Clique em **Salvar** no canto superior direito. Só então a tabela vai cair no
-   Widget. 
-6. Saia do editor com **Fechar** e salve a página. 
+- **Barra de título:** à esquerda, **Fechar**; ao lado, o título **Editar tabela
+  ** e o estado — que indica se há alterações que ainda não foram aplicadas e quais são,
+  por exemplo, «3 células alteradas», «Estrutura alterada» (linhas, colunas,
+  células ligadas) ou «Configurações alteradas». No centro, os botões de alternância **Editor** · **Desktop** ·
+  **Tablet** · **Móvel**. À direita, **Reverter**, **Repetir** e
+  **Ajuda**; na extrema direita, **Cancelar** e **Aplicar**.
+- **Abaixo, os separadores** **Tipo de letra**, **Alinhamento**, **Células**, **Imagens**
+  e **Dados**; à direita destes, **Importar (.csv, .xlsx)**. Por baixo dos
+  separadores, as ferramentas do separador selecionado; em seguida, a tabela com
+  letras de coluna (A, B, C …) e números de linha (1, 2, 3 …) tal como no Excel.
+- **Por baixo da tabela, a linha de estado:** dimensão da tabela e a seleção,
+  por exemplo, «4 linhas · 3 colunas · Seleção B2:B4», com uma nota à direita.
+- **À direita, o painel «Tabela»:** o que se aplica a toda a tabela —
+  **Primeira ordenação**, **Linhas visíveis**, **Exportação** e **Ajustar imagens**
+  .
+- **Desktop**, **Tablet** e **Móvel** mostram a tabela tal como os leitores
+  a vêem — com colunas recolhidas, botões de exportação e primeira ordenação. O painel
+  permanece ao lado; o que alterar aí é visível imediatamente. **Editor**
+  leva de volta à edição.
 
-Se estiver escrito **"Mudanças não salvas"** ao lado dos botões, ainda não foi
-— depois clique em "Salvar", depois em "Fechar". 
+**Aplicar** grava a tabela na caixa de diálogo do widget e fecha o
+editor. Só fica guardada com **Guardar** no Studio. Quem fechar com
+alterações pendentes será questionado: **Descartar**, **Continuar a editar** ou
+**Aplicar**.
 
-## Copiar uma tabela existente do Excel ou CSV
+### Teclas
 
-1. Abra a aba **Data** no editor de tabelas. 
-2. Clique em **Import** e selecione o arquivo ('.csv', '.xlsx' ou
-   '.xls'). 
-3. Verifique o resultado: A importação **substitui a tabela completa**, será
-   Nada adicionado. Do Excel, as células conectadas permanecem, negrito/itálico/ 
-   sublinhado, cores, tamanhos de fonte, alinhamento e retrato e
-   subscritos. No caso de um livro Excel, o **primeiro
-   Planilha**. 
-4. **Salve**. 
+| Tecla | Efeito |
+| --- | --- |
+| Esc | Fecha o que estiver aberto no momento: edição de uma célula, menu de contexto, um menu das separadores, a barra da biblioteca multimédia, a Ajuda — e só depois o Editor (com uma mensagem a perguntar). |
+| ⌘/Ctrl S | Aplicar, o editor permanece aberto |
+| ⌘/Ctrl ↵ | Aplicar e fechar |
+| ⌘/Ctrl Z | Desfazer. Numa célula em que se está a digitar, apenas desfaz o que foi digitado. |
+| ⇧ ⌘/Ctrl Z, Ctrl Y | Repetir |
+| F1 | Ativar/desativar a Ajuda |
 
-Alternativamente, as células também podem ser **copiadas e coladas** diretamente do Excel: 
-Clique duas vezes e cole em uma célula — o bloco começará nesse ponto
-espalhados por várias células. 
+## Criar a primeira tabela
+
+1. Coloque o widget **Tabela** na página e abra as definições do widget
+  . O **Editor de tabelas** aparece automaticamente acima do campo
+   «Dados da tabela».
+2. **Clique duas vezes** numa célula e introduza o texto. Ao clicar numa
+   outra célula ou ao premir **Esc**, a introdução é confirmada.
+3. Preencha a **primeira linha** com os títulos das colunas.
+4. Se faltarem linhas ou colunas: separador **Células** → **Inserir** → por exemplo, «Linha
+   abaixo» ou «Coluna à direita».
+5. Clique em **Aplicar** no canto superior direito. Só assim é que a tabela aparece no
+   widget.
+6. Guarde a página no Studio.
+
+Se aparecer o título **«… – não aplicado»**, significa que ainda falta algo. Um clique
+em **Anular** reverte o último passo.
+
+## Importar uma tabela existente do Excel ou CSV
+
+1. No editor de tabelas, à direita das guias, clique em **Importar (.csv,
+   .xlsx)** e selecione o ficheiro (`.csv`, `.xlsx` ou `.xls`).
+2. Verifique o resultado: a importação **substitui a tabela na íntegra**, não sendo
+   acrescentado nada. Do Excel, mantêm-se as células ligadas, o negrito/itálico/
+   sublinhado, cores, tamanhos de letra, alinhamento, bem como caracteres em
+  super- e sub-índice. No caso de uma pasta de trabalho do Excel, é utilizada a **primeira
+  folha de cálculo**. Se for o ficheiro errado: **Anular**.
+3. **Aplicar**.
+
+Em alternativa, também é possível **copiar e colar** células diretamente do Excel:
+clique duas vezes numa célula e cole — o bloco será distribuído a partir desse ponto
+por várias células.
 
 ## Formatar células
 
-1. Selecione as células a serem formatadas: clique, segure o botão do mouse
-   , use **Shift** para desenhar uma área ou **Ctrl/Cmd** 
-   áreas adicionais. As alças na borda podem ser usadas para
-   Selecione linhas, colunas ou toda a tabela. 
-2. Tab **Font** para tamanho da fonte, negrito, itálico, sublinhado, 
-   Riscado, sobríndice/subscrito, fonte e cor de fundo. 
-3. Aba **Orientação** para esquerda/centro/direita e cima/centro/baixo. 
-4. **Salve**. 
+1. Selecionar as células a formatar: clicar, arrastar com o botão do rato
+   premido, selecionar uma área com a tecla **Shift** ou adicionar
+   mais áreas com **Ctrl/Cmd**. Um clique numa letra de coluna ou
+   num número de linha seleciona toda a coluna ou linha; a célula do canto superior
+   esquerdo seleciona toda a tabela; um clique com o botão direito nesse local seleciona-a e abre o
+   menu de contexto.
+2. Separador **Fontes** para tamanho da fonte, negrito, itálico, sublinhado,
+   riscado, sobrescrito/subscrito, cor da fonte e do fundo.
+3. Separador **Alinhamento** para à esquerda/centrado/à direita e em cima/ao centro/em baixo.
+4. **Aplicar**.
 
-Para transferir uma formatação para outras células: 
+Para aplicar uma formatação a outras células:
 
-1. Selecione uma célula já formatada. 
-2. Clique na aba **Dados** → **Format**. 
-3. Selecione as células-alvo — elas adotarão o formato. 
+1. Selecione uma célula já formatada.
+2. Clique no separador **Dados** → **Formato**.
+3. Selecione as células de destino — estas assumirão a formatação.
 
-## Fusão de Células
+## Unir células
 
-1. Selecione as células a serem unidas. 
-2. Separar **Células** → **Conectar**. 
-3. Desfazer com **Resolver**. 
+1. Selecione as células a unir.
+2. Separador **Células** → **Unir**.
+3. Para anular, clique em **Desfazer**.
 
-## Inserir imagem em uma célula
+## Inserir uma imagem numa célula
 
-1. Selecione a célula. 
-2. Aba **Imagens** → **Imagem**. A seleção de mídia abre; há um
-   Selecione uma imagem existente ou envie uma nova. 
-3. Se várias imagens tiverem tamanhos diferentes: selecione todas as células da imagem e
-   via **Tamanho da Imagem** ou "Mesma altura da primeira imagem" ou "Igual
-   Largura como primeira imagem" (isso requer pelo menos duas imagens). 
-   **Tamanho padrão** reinicia. 
-4. Se uma imagem expandir a tabela, na aba **Imagens** o interruptor **Imagens
-   ajustar** — então todas as imagens permanecem dentro do
-   Largura da mesa. 
+1. Selecione a célula.
+2. Selecione o separador **Imagens** → **Imagem**. À direita, abre-se a biblioteca de imagens como uma barra
+   «Imagem para a célula B3»; selecione aí uma imagem existente ou carregue uma nova
+  . A tecla **Esc** fecha-a novamente, sem inserir nada. É mais
+   rápido arrastar: arraste uma imagem da barra diretamente para qualquer
+   célula e solte-a aí.
+3. Se houver várias imagens com tamanhos diferentes: selecione todas as células com imagens e
+  , em **Tamanho da imagem**, selecione «Altura igual à da primeira imagem» ou «Largura igual
+   largura da primeira imagem» (para isso, são necessárias, pelo menos, duas imagens).
+   **Tamanho padrão** reporá os valores iniciais.
+4. Se uma imagem ultrapassar os limites da tabela, ative o botão
+   **Ajustar imagens**, à direita no painel **Tabela** — assim, todas as imagens permanecerão dentro da
+   largura da tabela.
 
-## Tabela de classificação
+## Ordenar a tabela
 
-1. Selecione a coluna pela qual deseja ordenar. 
-2. Tab **Data** → **Orden** → "Ascendendo (esta coluna)" ou
-   "Descendo (esta coluna)". 
-3. **Salvar**. Esse tipo é o sorteio inicial para todos
-   leitores; o cabeçalho sempre permanece no topo. 
+1. No painel **Tabela**, à direita, em **Primeira ordenação**, selecione a coluna.
+2. Abaixo, selecione **Crescente** ou **Decrescente**. **Nenhuma** anula a
+   ordenação.
+3. **Aplicar**. Esta ordenação é a ordenação inicial para todos os
+   leitores e leitoras; o cabeçalho permanece sempre no topo.
 
-## Desabar a longa mesa
+Mais rápido para a coluna sob o cursor: clique com o botão direito na coluna →
+**Ordenação** → «Crescente (esta coluna)» ou «Decrescente (esta
+coluna)».
 
-1. Abra a aba **Data**. 
-2. Em **Linhas visíveis**, insira o número de linhas de dados que serão imediatamente
-   deve ser visível. O padrão é 5; '0' sempre mostra todas as linhas. 
-3. **Salvar**. Um botão então aparecerá na página abaixo da tabela
-   "Mostrar mais N linhas" ou "Mostrar menos linhas". 
+## Ocultar tabela longa
 
-## Tabela de ofertas para download
+1. À direita, no painel **Tabela**, em **Linhas visíveis**, introduza o número de
+   linhas de dados que devem ser visíveis de imediato. O valor predefinido
+   é 5; `0` mostra sempre todas as linhas.
+2. Com **Desktop** ou **Móvel** na barra de cabeçalho, verifique como fica.
+3. **Aplicar**. Na página, aparece então, por baixo da tabela, um botão
+   «Mostrar mais N linhas» ou «Mostrar menos linhas».
 
-1. Abra a aba **Data**. 
-2. Em **Export**, selecionar: 
-   - **Tabela inteira** — Leitores sempre baixam a tabela inteira. 
-   - **Com seleção de linha** — há uma caixa na frente de cada linha; exportado
-     as linhas selecionadas, sem selecionar toda a tabela. 
-3. **Salvar**. Acima da tabela aparecem os botões "Excel (.xlsx)" e
-   CSV. O arquivo Excel mantém a formatação e as células mescladas, e permite
-   importar aqui novamente; o arquivo CSV abre no Excel alemão
-   diretamente. 
+## Disponibilizar a tabela para download
 
-A exportação não é exibida no aplicativo Staffbase — lá você pode
-Baixe arquivos de forma confiável. Está lá no navegador móvel. 
+1. À direita, no painel **Tabela**, selecione **Exportar**:
+   - **Tabela completa** — os leitores descarregam sempre a tabela completa.
+   - **Com seleção de linhas** — há uma caixa de seleção à frente de cada linha; são exportadas
+     as linhas selecionadas; sem seleção, é exportada a tabela completa.
+2. **Aplicar**. Acima da tabela, aparecem os botões «Excel (.xlsx)» e
+   «CSV». O ficheiro Excel mantém a formatação e as células ligadas e pode
+   ser importado novamente aqui; o ficheiro CSV abre-se diretamente no Excel alemão
+  .
 
-## Remover a formatação novamente
+Na aplicação Staffbase, a exportação não é apresentada — ali,
+não é possível descarregar ficheiros de forma fiável. No navegador móvel, está disponível.
 
-1. Marque as células afetadas. 
-2. Separe **Data** → **Formatação** e selecione a entrada apropriada: 
-   Remova tudo, apenas a formatação do texto ou apenas os tamanhos das imagens. 
-3. **Salvar**.
+## Remover novamente a formatação
+
+1. Selecione as células em questão.
+2. Separador **Dados** → **Formatação** e selecione a opção adequada:
+   remover tudo, apenas a formatação do texto ou apenas os tamanhos das imagens.
+3. **Aplicar**.

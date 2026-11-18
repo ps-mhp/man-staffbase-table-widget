@@ -1,35 +1,54 @@
-# Escenarios
+# Ajustes
 
-En el diálogo de configuración, técnicamente solo hay un campo — **Table Data**. 
-Contiene la tabla en forma guardada; está editada
-exclusivamente a través del **Editor de Tablas**, que automáticamente
-. Una vez cerrado el editor, el botón **Table lo activa
-edición** de vuelta. 
+En el cuadro de diálogo de configuración solo hay un campo, técnicamente: **Datos de la tabla**.
+En él aparece la tabla tal y como está guardada; su edición se realiza
+exclusivamente a través del **editor de tablas**, que se abre automáticamente
+encima de ella. Una vez cerrado el editor, el botón **Editar tabla**
+lo vuelve a abrir.
 
-## Barra de cabecera del editor
+## Barra de título del editor
 
-| Botón | Impacto |
+La barra de título es igual en todos los widgets de MAN.
+
+| Botón | Efecto |
 | --- | --- |
-| Guardar | Transfiere el estado actual al widget. Sin hacer clic en él, todo se perderá. |
-| Ayuda | Abre la ayuda rápida de cada función directamente en el editor. |
-| Cerrar | Deja al editor **sin** guardando. |
-| "Cambios no guardados" | Nota el texto junto a los botones: Todavía hay algo pendiente. |
+| Cerrar (izquierda) | Sale del editor. Si hay cambios pendientes, pregunta: Descartar, Seguir editando o Aplicar. |
+| Estado en el título | «Sin cambios» o lo que haya pendiente, por ejemplo, «3 celdas modificadas – no aplicadas», «Estructura modificada», «Configuración modificada». |
+| Editor · Ordenador · Tableta · Móvil | Alterna entre la edición y la vista previa de la tabla publicada adaptada al ancho del dispositivo. |
+| Deshacer, Rehacer | Deshace o repite los pasos. |
+| Ayuda | Abre a la derecha la ayuda rápida sobre cada función y las teclas. |
+| Cancelar | Igual que «Cerrar». |
+| Aplicar | Escribe la tabla en el cuadro de diálogo del widget y cierra. Solo se guarda al pulsar «Guardar» en Studio. |
 
-## Pestaña de barra de herramientas
+## Pestañas de la barra de herramientas
 
-| Reiter | ¿Qué lleva dentro?
+| Pestaña | Qué contiene |
 | --- | --- |
-| Fuente | Tamaño de fuente (por defecto, 10–32), aumentar/disminuir la fuente, negrita, cursiva, subrayado, tachado, superíndice, subíndice, color de fuente, color de fondo. |
-| Orientación | Alineado a la izquierda, centrado, alineado a la derecha, así como arriba, centro, abajo. |
-| Celdas | Unir, desacoplar, insertar (fila arriba/abajo, columna izquierda/derecha), eliminar (fila(s), columna(s)). |
-| Imágenes | Inserta la imagen en la celda, ajusta el tamaño de la imagen (misma altura/ancho que la primera imagen, tamaño por defecto), botón de "Ajustar imágenes". |
-| Datos | Ordenar (ascendente, descendente, eliminar ordenar), copiar formato, líneas visibles, exportar, eliminar formateo, importar. |
+| Fuente | Tamaño de fuente (predeterminado, 10–32), aumentar/reducir el tamaño de la fuente, negrita, cursiva, subrayado, tachado, superíndice, subíndice, color de fuente, color de fondo. |
+| Alineación | Alineado a la izquierda, centrado, alineado a la derecha, así como arriba, en el centro y abajo. |
+| Celdas | Unir, separar, insertar (fila superior/inferior, columna izquierda/derecha), eliminar (fila(s), columna(s)). |
+| Imágenes | Insertar imagen en celda, ajustar el tamaño de las imágenes (misma altura/anchura que la primera imagen, tamaño predeterminado). |
+| Datos | Copiar formato, eliminar formato. |
 
-## Ajustes con efectos secundarios
+A la derecha de las pestañas aparece **Importar (.csv, .xlsx)**: lee un
+archivo y sustituye toda la tabla.
 
-| Ambientación | Descripción |
+## Panel «Tabla»
+
+A la derecha de la tabla se encuentran los ajustes que se aplican a toda la tabla
+. También permanece visible en la vista previa.
+
+| Configuración | Descripción |
 | --- | --- |
-| Filas visibles (pestaña "Datos") | Número de filas de datos que pueden verse inmediatamente en la página; el resto está detrás de un botón de mostrar. Por defecto 5, '0' significa "siempre todas las filas". El encabezado no cuenta. |
-| Exportar (pestaña "Datos") | *Apagado* (por defecto), *Tabla completa* o *Con selección de filas*. Los botones "Excel (.xlsx)" y "CSV" aparecen entonces sobre la tabla; con la selección de filas, se añade una columna con cuadros a la izquierda, las filas seleccionadas se exportan (sin seleccionar todas). En la app Staffbase (iOS/Android) la exportación no se muestra. |
-| Ajustando imágenes (pestaña Imágenes) | Cuando está activada, todas las imágenes permanecen dentro del ancho de la tabla. Cuando está desactivada, cada imagen aparece en su tamaño original — y puede ampliar la tabla. |
-| Copiar Formato (pestaña de datos) | Transfiere el formato de la selección actual a las celdas seleccionadas a continuación. |
+| Primera ordenación | *Ninguna* (predeterminada) o una columna, además de *Ascendente* o *Descendente*. Así se ordena la tabla al abrirla; la fila de encabezado permanece arriba. Los lectores pueden cambiar el orden haciendo clic en un encabezado. También se puede configurar a través del menú contextual → Ordenar. |
+| Filas visibles | Número de filas de datos que se ven inmediatamente en la página; el resto se encuentra detrás de un botón para mostrarlas. El valor predeterminado es 5; `0` significa «siempre todas las filas». La fila de encabezado no se cuenta. |
+| Exportar | *Desactivado* (valor predeterminado), *Tabla completa* o *Con selección de filas*. Sobre la tabla aparecerán entonces los botones «Excel (.xlsx)» y «CSV»; con la selección de filas, se añade a la izquierda una columna con casillas; se exportan las filas seleccionadas (sin selección, todas). En la aplicación de Staffbase (iOS/Android) no se muestra la opción de exportación. |
+| Ajustar imágenes | Si está activada, todas las imágenes se ajustan al ancho de la tabla. Si está desactivada, cada imagen aparece en su tamaño original, lo que puede hacer que la tabla se salga de los límites. |
+
+En la parte inferior del panel aparece la versión del widget.
+
+## Otras herramientas
+
+| Herramienta | Descripción |
+| --- | --- |
+| Copiar formato (pestaña «Datos») | Aplica el formato de la selección actual a las siguientes celdas seleccionadas. |

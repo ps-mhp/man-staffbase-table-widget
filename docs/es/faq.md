@@ -1,98 +1,99 @@
 # Preguntas frecuentes
 
 **Pregunta:** En lugar del editor de tablas, solo veo un campo de texto con
-contenido críptico que empieza por 'b64:'. 
+un contenido críptico que empieza por `b64:`.
 
-Respuesta: Este es el campo **Table Data** — la forma almacenada de la
-Tabla que normalmente cubre el editor. Nunca uses este texto a mano
-Editar. Haz clic en **Tabla de edición** o vuelve a abrir la
-El diálogo recupera el editor. La codificación protege la tabla de ser
-traducción automática de páginas. 
+Respuesta: Ese es el campo **Datos de la tabla**: la forma guardada de la
+tabla que el editor suele ocultar. Nunca edites este texto manualmente
+. Al hacer clic en **Editar tabla** o al volver a abrir el
+cuadro de diálogo, volverá a aparecer el editor. La codificación protege la tabla para que no
+se vea afectada por la traducción automática de la página.
 
-**Pregunta:** Mis cambios se han ido después de cerrar. 
+**Pregunta:** Mis cambios han desaparecido al cerrar.
 
-Respuesta: **Cerrar** no guarda. Siempre configurar antes de cerrar
-**Guardar** — siempre que "Cambios no guardados" esté junto a los botones
-es algo abierto. 
+Respuesta: Al **cerrar** no se guardan los cambios. Si hay cambios pendientes, el
+editor te lo preguntará; allí, selecciona **Aplicar**, no **Descartar**. Mientras en el
+título aparezca «… – no aplicado», significa que hay algo pendiente. A continuación, guarda la página en
+Studio con **Guardar**.
 
-**Pregunta:** ¿Cómo escribo en una celda? 
+**Pregunta:** ¿Cómo escribo en una celda?
 
-Respuesta: **Doble clic** en la celda y luego toque. Un simple clic
-solo selecciona la celda (para formatear), no la abre para
-Edito. 
+Respuesta: **Haz doble clic** en la celda y, a continuación, escribe. Un simple clic
+solo selecciona la celda (para aplicar formatos), pero no la abre para
+editarla.
 
-**Pregunta:** No puedo borrar la primera fila ni columna. 
+**Pregunta:** No puedo borrar la primera fila ni la primera columna.
 
-Respuesta: Así es como se pretende: La primera línea es el encabezado, la primera es el
-columna la etiqueta de fila. Si no se necesitan, simplemente vacía
-. 
+Respuesta: Así está previsto: la primera fila es el encabezado y la primera
+columna, la etiqueta de la fila. Si no las necesitas, simplemente déjalas
+en blanco.
 
-**Pregunta:** ¿Qué formatos de archivo puedo importar? 
+**Pregunta:** ¿Qué formatos de archivo puedo importar?
 
-Respuesta: '.csv' y '.xlsx'/'.xls'. En CSV, se utilizan punto y coma como como
-los separadores se detectan automáticamente. En Excel, la primera hoja de cálculo
-incluyendo celdas conectadas, formato de texto, colores, tamaños de fuente
-y alineación. Un importado **siempre reemplaza toda la tabla**. 
+Respuesta: `.csv`, así como `.xlsx`/`.xls`. En el caso de CSV, el punto y coma y la coma se
+reconocen automáticamente como separadores. En el caso de Excel, se importa la primera hoja de cálculo,
+junto con las celdas unidas, el formato de texto, los colores, los tamaños de fuente
+y la alineación. Una importación **siempre sustituye a toda la tabla**.
 
-**Pregunta:** Aparece "Importación fallida". 
+**Pregunta:** Aparece el mensaje «Importación fallida».
 
-Respuesta: El archivo no pudo ser leído. Comprueba si realmente hay un
-'.csv', '.xlsx' o '.xls' (no es un renombrado o
-archivo protegido por contraseña) y si contiene contenido. En Excel si es necesario
-Guarda como '.xlsx' otra vez. 
+Respuesta: No se ha podido leer el archivo. Comprueba si realmente se trata de un
+archivo `.csv`, `.xlsx` o `.xls` (y no, por ejemplo, un archivo renombrado o
+protegido con contraseña) y si contiene datos. Si es necesario,
+guárdalo de nuevo en Excel como `.xlsx`.
 
-**Pregunta:** No todas las filas se muestran en la página. 
+**Pregunta:** No se muestran todas las filas en la página.
 
-Respuesta: Esta es la configuración de **Filas visibles** (pestaña "Datos"), 
-preestablecido a 5 filas de datos. El resto aparece mediante el botón de abajo
-tabla. Si quieres que todas las filas sean visibles desde el principio, pon el valor en '0'
-. 
+Respuesta: Se trata de la configuración **Líneas visibles** (panel «Tabla» a la derecha),
+configurada por defecto en 5 líneas de datos. El resto aparece al hacer clic en el botón situado debajo
+de la tabla. Si quieres que se vean todas las líneas desde el principio, establece el valor en `0`
+.
 
-**Pregunta:** ¿Por qué no veo una exportación en la app? 
+**Pregunta:** ¿Por qué no veo la opción de exportar en la aplicación?
 
-Respuesta: En la app Staffbase (iOS/Android), la tabla oculta la exportación y
-Las cajas para la selección de líneas se seleccionan deliberadamente, porque no hay descargas disponibles allí.
-Funcionan de forma fiable. En el navegador — incluso en el teléfono — la exportación
-Disponible. 
+Respuesta: En la aplicación de Staffbase (iOS/Android), la tabla oculta deliberadamente la opción de exportar y
+las casillas de selección de filas, ya que las descargas no
+funcionan de forma fiable allí. En el navegador —también en el móvil— la opción de exportación
+sí está disponible.
 
-**Pregunta:** Una foto hace explotar toda la mesa. 
+**Pregunta:** Una imagen desborda toda la tabla.
 
-Respuesta: En la pestaña **Imágenes**, activa el interruptor de **Ajustar imágenes**. 
-Limita todas las imágenes al ancho de la tabla. Cuando está apagado, cada
-Imagen en su tamaño original. 
+Respuesta: En la parte derecha del panel **Tabla**, activa el botón **Ajustar imágenes**.
+Esto limita todas las imágenes al ancho de la tabla. Si está desactivado, cada
+imagen aparece en su tamaño original.
 
-**Pregunta:** Varias fotos tienen diferentes tamaños. 
+**Pregunta:** Varias imágenes tienen tamaños diferentes.
 
-Respuesta: Selecciona todas las celdas de imagen y seleccionalas en la pestaña **Imágenes** debajo
-**Tamaño de la imagen** "Misma altura que la primera imagen" o "Mismo ancho que la primera imagen"
-Imagen". Al menos dos imágenes deben estar resaltadas. 
+Respuesta: Selecciona todas las celdas con imágenes y, en la pestaña **Imágenes**, en
+**Tamaño de imagen**, selecciona «Misma altura que la primera imagen» o «Misma anchura que la primera
+imagen». Deben estar seleccionadas al menos dos imágenes.
 
-**Pregunta:** Un lector ordenó la tabla de forma diferente a como la guardé
-. 
+**Pregunta:** Un lector ha ordenado la tabla de forma diferente a como yo la guardé
+.
 
-Respuesta: En la página publicada, cualquier persona que lea puede hacer clic en la
-a un encabezado de columna en sí. Esto solo se aplica a su vista
-y no cambia la tabla guardada. Tu conjunto de ordenación en el editor
-la vista de salida permanece. 
+Respuesta: En la página publicada, cada lector puede reordenarla por sí mismo haciendo clic
+en el encabezado de una columna. Esto solo se aplica a su vista
+y no modifica la tabla guardada. La **Primera
+ordenación** establecida en el editor (panel «Tabla») sigue siendo la vista inicial.
 
-**Pregunta:** ¿Puedo poner un enlace en una celda? 
+**Pregunta:** ¿Puedo insertar un enlace en una celda?
 
-Respuesta: No. Las celdas toman texto, imágenes y superíndices/subíndices, 
-Pero no hay enlaces. Los enlaces deben estar en un elemento de texto junto a la mesa. 
+Respuesta: No. Las celdas admiten texto, imágenes y caracteres en superíndice o subíndice,
+pero no enlaces. Los enlaces deben colocarse en un elemento de texto junto a la tabla.
 
-**Pregunta:** ¿Existe algo llamado "deshacer"? 
+**Pregunta:** ¿Hay una opción de «Deshacer»?
 
-Respuesta: No. Por lo tanto, guarda entre medias para grandes reformas — y
-Antes de importar, recuerda que reemplaza toda la mesa. 
+Respuesta: No. Por eso, en caso de modificaciones importantes, guarda el trabajo de vez en cuando y,
+antes de realizar una importación, ten en cuenta que esta sustituirá toda la tabla.
 
-**Pregunta:** ¿Qué pasa con mi mesa durante la traducción automática?
-¿del sitio? 
+**Pregunta:** ¿Qué ocurre con mi tabla cuando se traduce automáticamente
+la página?
 
-Respuesta: Solo se traduce el contenido de las celdas. Celdas conectadas, 
-El formato, las imágenes y la ordenación permanecen sin cambios. 
+Respuesta: Solo se traduce el contenido de las celdas. Las celdas unidas,
+los formatos, las imágenes y la ordenación se mantienen sin cambios.
 
-**Pregunta:** La mesa es demasiado ancha en móvil. 
+**Pregunta:** La tabla queda demasiado ancha en el móvil.
 
-Respuesta: Se puede empujar lateralmente. Para pantallas estrechas, ayuda 
-Fusionar columnas, usar encabezados más cortos o usar grandes
-Para sacar fotos de las celdas.
+Respuesta: Se puede desplazar lateralmente. Para pantallas estrechas, resulta útil
+agrupar columnas, utilizar encabezados más cortos o eliminar las imágenes grandes
+de las celdas.

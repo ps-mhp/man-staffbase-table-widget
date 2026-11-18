@@ -1,6 +1,6 @@
 {
   "title": "Tabla",
-  "summary": "Incorpora una tabla de formato — con su propio editor, importación Excel/CSV e imágenes en celdas.",
+  "summary": "Incorpora una tabla con opciones de formato, con su propio editor, importación desde Excel o CSV e imágenes en las celdas.",
   "pages": [
     {
       "id": "overview",
@@ -14,7 +14,7 @@
     },
     {
       "id": "settings",
-      "title": "Escenarios",
+      "title": "Configuración",
       "file": "settings.md"
     },
     {
@@ -25,7 +25,7 @@
   ],
   "examples": [
     {
-      "title": "Tabla simple",
+      "title": "Tabla sencilla",
       "attributes": {
         "tabledata": "[[\"\",\"Name\",\"Ort\"],[\"1\",\"Anna Kaiser\",\"Berlin\"],[\"2\",\"Ben Vogel\",\"München\"]]"
       }

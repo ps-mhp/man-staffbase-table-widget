@@ -1,35 +1,54 @@
 # Settings
 
-In the configuration dialog, there is technically only one field — **Table Data**. 
-It contains the table in saved form; it is edited
-exclusively via the **Table Editor**, which automatically
-. Once the editor is closed, the **Table button brings it
-edit** back. 
+Technically, there is only one field in the configuration dialog—**Table Data**.
+This field contains the table in its saved form; it is edited
+exclusively using the **Table Editor**, which opens automatically
+above it. Once the editor is closed, the **Edit Table**
+button brings it back.
 
-## Editor header bar
+## Editor Header Bar
 
-| Button | Impact |
+The header bar is the same in all MAN widgets.
+
+| Button | Effect |
 | --- | --- |
-| Save | Transfers the current state to the widget. Without clicking on it, everything will be lost. |
-| Help | Opens the quick help for each function directly in the editor. |
-| Close | Leaves the editor **without** saving. |
-| "Unsaved Changes" | Note text next to the buttons: There is still something pending. |
+| Close (left) | Exits the editor. If there are unsaved changes, it asks: Discard, Continue editing, or Apply. |
+| Status in the title bar | “No changes” or whatever is pending, such as “3 cells changed – not applied,” “Structure changed,” “Settings changed.” |
+| Editor · Desktop · Tablet · Mobile | Switches between editing mode and the preview of the published table in device-specific width. |
+| Undo, Redo | Undoes or redoes steps. |
+| Help | Opens a quick help guide on the right for each function and the buttons. |
+| Cancel | Same as Close. |
+| Apply | Writes the table to the widget dialog and closes it. Changes are not saved until you click “Save” in Studio. |
 
-## Toolbar tab
+## Toolbar Tabs
 
-| Reiter | What's in it |
+| Tab | What it contains |
 | --- | --- |
-| Font | Font size (default, 10–32), increase/decrease font, bold, italic, underline, strikethrough, superscript, subscript, font color, background color. |
-| Orientation | Left-aligned, centered, right-aligned as well as top, center, bottom. |
-| Cells | Join, Detach, Insert (Row Top/Bottom, Column Left/Right), Delete (Row(s), Column(s)). |
-| Images | Insert image into cell, adjust image sizes (same height/width as first image, default size), "Adjust images" button. |
-| Data | Sort (ascending, descending, remove sorting), copy format, visible lines, export, remove formatting, import. |
+| Font | Font size (default, 10–32), increase/decrease font size, bold, italic, underline, strikethrough, superscript, subscript, font color, background color. |
+| Alignment | Left-aligned, Centered, Right-aligned, as well as Top, Middle, Bottom. |
+| Cells | Merge, Unmerge, Insert (row above/below, column left/right), Delete (row(s), column(s)). |
+| Images | Insert image into cell, adjust image size (same height/width as first image, default size). |
+| Data | Copy format, remove formatting. |
 
-## Settings with side effects
+To the right of the tabs is **Import (.csv, .xlsx)**: imports a
+file and replaces the entire table.
+
+## “Table” Panel
+
+To the right of the table are the settings that apply to the entire table
+. It remains visible in the preview as well.
 
 | Setting | Description |
 | --- | --- |
-| Visible rows (tab "Data") | Number of data rows that can be seen immediately on the page; the rest is behind a show button. Default 5, '0' means "always all rows". The header does not count. |
-| Export (tab "Data") | *Off* (default), *Whole table* or *With row selection*. The buttons "Excel (.xlsx)" and "CSV" then appear above the table; with row selection, a column with boxes is added on the left, the selected rows are exported (without selecting all). In the Staffbase app (iOS/Android) the export is not displayed. |
-| Adjusting Images (Pictures tab) | When switched on, all images remain within the table width. When switched off, each image appears in its original size — and can blow up the table. |
-| Copy Format (Data tab) | Transfers the format of the current selection to the cells selected next. |
+| Initial Sort | *None* (default) or a column, plus *Ascending* or *Descending*. This is how the table is sorted when opened; the header row remains at the top. Readers can reorder the table by clicking on a header. You can also set the sort order via the context menu → Sort. |
+| Visible Rows | Number of data rows immediately visible on the page; the rest are hidden behind a “Show” button. Default is 5; `0` means “always show all rows.” The header row is not included in this count. |
+| Export | *Off* (default), *Entire Table*, or *With Row Selection*. The “Excel (.xlsx)” and “CSV” buttons then appear above the table; with “Selected Rows,” a column of checkboxes appears on the left, and only the selected rows are exported (all rows are exported if nothing is selected). The export option is not displayed in the Staffbase app (iOS/Android). |
+| Adjust Images | When enabled, all images fit within the table width. When disabled, each image appears in its original size—and may cause the table to overflow. |
+
+The widget version is displayed at the bottom of the panel.
+
+## Additional Tools
+
+| Tool | Description |
+| --- | --- |
+| Copy Format (Data tab) | Applies the format of the currently selected cell to the next selected cells. |

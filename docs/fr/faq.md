@@ -1,98 +1,99 @@
 # FAQ
 
-**Question :** Au lieu de l’éditeur de tableau, je ne vois qu’un champ texte avec
-Contenu cryptique qui commence par « b64 : ». 
+**Question :** À la place de l'éditeur de tableau, je ne vois qu'un champ de texte contenant
+un contenu cryptique commençant par `b64:`.
 
-Réponse : Voici le champ **Table Data** — la forme stockée de la
-Tableau que l’éditeur couvre habituellement. N’utilisez jamais ce texte à la main
-Édition. Cliquez sur **Modifier le tableau** ou rouvrez le
-Le dialogue récupère l’éditeur. L’encodage protège la table contre l’utilisation
-Traduction automatique des pages. 
+Réponse : Il s’agit du champ **Données du tableau** — la forme enregistrée du
+tableau que l’éditeur masque normalement. Ne modifiez jamais ce texte manuellement
+. Un clic sur **Modifier le tableau** ou une nouvelle ouverture de la
+boîte de dialogue fait réapparaître l’éditeur. Le codage protège le tableau contre toute
+altération due à la traduction automatique de la page.
 
-**Question :** Mes changements ont disparu après la clôture. 
+**Question :** Mes modifications ont disparu après la fermeture.
 
-Réponse : **Fermer** ne sauvegarde pas. Toujours régler avant la clôture
-**Sauvegarder** — tant que « Modifications non enregistrées » à côté des boutons
-est quelque peu ouvert. 
+Réponse : **Fermer** n’enregistre pas les modifications. Si des modifications sont en cours, l’
+éditeur vous le signale — sélectionnez alors **Appliquer**, et non **Ignorer**. Tant que le
+titre indique « … – non appliqué », cela signifie qu’il reste des modifications en attente. Ensuite, sauvegardez la page dans
+Studio en cliquant sur **Enregistrer**.
 
-**Question :** Comment écrire dans une cellule ? 
+**Question :** Comment écrire dans une cellule ?
 
-Réponse : **Double-clic** dans la cellule, puis tape. Un simple clic
-ne sélectionne que la cellule (pour la mise en forme), elle ne l’ouvre pas pour
-Édit. 
+Réponse : **Double-cliquez** sur la cellule, puis saisissez votre texte. Un simple clic
+ne fait que sélectionner la cellule (pour la mise en forme), il ne l’ouvre pas pour la
+modification.
 
-**Question :** Je ne peux pas supprimer la première ligne ou la première colonne. 
+**Question :** Je ne parviens pas à supprimer la première ligne ou la première colonne.
 
-Réponse : Voici comment il est conçu : La première ligne est l’en-tête, la première est le
-colonne l’étiquette ligne. Si elles ne sont pas nécessaires, il suffit de vider
-. 
+Réponse : C’est voulu : la première ligne est l’en-tête, la première
+colonne l’intitulé de colonne. Si vous n’en avez pas besoin, laissez-les simplement
+vides.
 
-**Question :** Quels formats de fichiers puis-je importer ? 
+**Question :** Quels formats de fichiers puis-je importer ?
 
-Réponse : « .csv » et « .xlsx »/« .xls ». En CSV, le point-virgule et la virgule sont utilisés comme
-les séparateurs sont détectés automatiquement. Dans Excel, la première feuille de calcul
-y compris les cellules connectées, la mise en forme du texte, les couleurs, la taille des polices
-et l’alignement. Un import **remplace toujours toute la table**. 
+Réponse : `.csv` ainsi que `.xlsx`/`.xls`. Pour les fichiers CSV, le point-virgule et la virgule sont
+automatiquement reconnus comme séparateurs. Pour les fichiers Excel, la première feuille de calcul
+est reprise, y compris les cellules fusionnées, la mise en forme du texte, les couleurs, les tailles de police
+et l’alignement. Une importation **remplace toujours l’intégralité du tableau**.
 
-**Question :** « Importation échouée » apparaît. 
+**Question :** Le message « Échec de l’importation » s’affiche.
 
-Réponse : Le fichier n’a pas pu être lu. Vérifiez s’il y a vraiment un
-« .csv », « .xlsx » ou « .xls » (non renommé ou
-fichier protégé par un mot de passe) et s’il contient du contenu. Dans Excel si nécessaire
-Sauvegardez encore en tant que « .xlsx ». 
+Réponse : Le fichier n’a pas pu être lu. Vérifiez s’il s’agit bien d’un
+fichier `.csv`, `.xlsx` ou `.xls` (et non d’un fichier renommé ou
+protégé par un mot de passe) et s’il contient du contenu. Si nécessaire,
+enregistrez-le à nouveau au format `.xlsx` dans Excel.
 
-**Question :** Toutes les lignes ne sont pas affichées sur la page. 
+**Question :** Toutes les lignes ne s’affichent pas sur la page.
 
-Réponse : Voici le paramètre **Lignes visibles** (onglet « Données »), 
-préréglé à 5 lignes de données. Le reste apparaît via le bouton en dessous
-table. Si vous voulez que toutes les lignes soient visibles dès le début, mettez la valeur à '0'
-. 
+Réponse : Il s’agit du paramètre **Lignes visibles** (panneau « Tableau » à droite),
+réglé par défaut sur 5 lignes de données. Le reste s’affiche via le bouton situé sous
+le tableau. Si vous souhaitez que toutes les lignes soient visibles dès le départ, réglez la valeur sur `0`
+.
 
-**Question :** Pourquoi je ne vois pas d’export dans l’application ? 
+**Question :** Pourquoi ne vois-je pas d’option d’exportation dans l’application ?
 
-Réponse : Dans l’application Staffbase (iOS/Android), le tableau masque l’export et
-Les cases pour la sélection des lignes sont délibérément sélectionnées, car les téléchargements n’y sont pas disponibles.
-fonctionnent de manière fiable. Dans le navigateur — même sur le téléphone — l’export
-disponible. 
+Réponse : Dans l’application Staffbase (iOS/Android), le tableau masque volontairement l’option d’exportation et
+les cases de sélection des lignes, car les téléchargements ne
+fonctionnent pas de manière fiable sur cette plateforme. Dans le navigateur — même sur le téléphone —, la fonction d’exportation
+est disponible.
 
-**Question :** Une photo fait exploser toute la table. 
+**Question :** Une image déborde du tableau.
 
-Réponse : Dans l’onglet **Images**, activez l’interrupteur **Ajuster les images**. 
-Cela limite toutes les images à la largeur de la table. Lorsqu’il est désactivé, chaque
-Image à sa taille d’origine. 
+Réponse : Dans le panneau **Tableau**, à droite, activez le bouton **Ajuster les images**.
+Cela limite toutes les images à la largeur du tableau. Lorsque cette option est désactivée, chaque
+image s'affiche dans sa taille d'origine.
 
-**Question :** Plusieurs photos sont de tailles différentes. 
+**Question :** Plusieurs images ont des tailles différentes.
 
-Réponse : Sélectionnez toutes les cellules d’image et sélectionnez-les dans l’onglet **Images** ci-dessous
-**Taille de l’image** « Même hauteur que la première image » ou « Même largeur que la première image »
-Image ». Au moins deux images doivent être surlignées. 
+Réponse : Sélectionnez toutes les cellules contenant des images, puis dans l'onglet **Images**, sous
+**Taille de l’image**, sélectionnez « Même hauteur que la première image » ou « Même largeur que la première
+image ». Au moins deux images doivent être sélectionnées.
 
-**Question :** Un lecteur a trié la table différemment de la sauvegarde que je l’avais sauvegardée
-. 
+**Question :** Un lecteur a trié le tableau différemment de la façon dont je l’ai enregistré
+.
 
-Réponse : Sur la page publiée, toute personne lisant peut cliquer sur la
-à un en-tête de colonne lui-même. Cela ne s’applique qu’à leur vue
-et ne change pas la table enregistrée. Votre jeu de tri dans l’éditeur
-La vue de départ demeure. 
+Réponse : Sur la page publiée, chaque lecteur peut réorganiser lui-même le tri en cliquant
+sur un en-tête de colonne. Cela ne s’applique qu’à son affichage
+et ne modifie pas le tableau enregistré. Le **premier
+tri** défini dans l’éditeur (panneau « Tableau ») reste l’affichage par défaut.
 
-**Question :** Puis-je mettre un lien dans une cellule ? 
+**Question :** Puis-je insérer un lien dans une cellule ?
 
-Réponse : Non. Les cellules prennent le texte, les images et les exposants/indices, 
-Mais pas de liens. Les liens doivent être dans un élément de texte à côté de la table. 
+Réponse : Non. Les cellules acceptent du texte, des images ainsi que des indices et des exposants,
+mais pas de liens. Les liens doivent être placés dans un élément de texte à côté du tableau.
 
-**Question :** Existe-t-il quelque chose comme « annuler » ? 
+**Question :** Y a-t-il une fonction « Annuler » ?
 
-Réponse : Non. Par conséquent, gardez les entre-deux pour les rénovations majeures — et
-Avant d’importer, rappelez-vous qu’il remplace toute la table. 
+Réponse : Non. C’est pourquoi il faut enregistrer régulièrement lors de modifications importantes — et
+penser, avant une importation, que celle-ci remplacera l’intégralité du tableau.
 
-**Question :** Que se passe-t-il avec ma table lors de la traduction automatique
-du site ? 
+**Question :** Qu'advient-il de mon tableau lors de la traduction automatique
+de la page ?
 
-Réponse : Seuls les contenus des cellules sont traduits. Cellules connectées, 
-La mise en forme, les images et le tri restent inchangés. 
+Réponse : Seul le contenu des cellules est traduit. Les cellules fusionnées,
+les mises en forme, les images et le tri restent inchangés.
 
-**Question :** La table est trop large sur mobile. 
+**Question :** Le tableau est trop large sur mon téléphone.
 
-Réponse : Il peut être poussé latéralement. Pour les écrans étroits, cela aide à 
-Fusionner les colonnes, utiliser des titres plus courts ou utiliser des grands titres
-Pour prendre des photos hors des cellules.
+Réponse : Vous pouvez le faire défiler horizontalement. Pour les écrans étroits, il est utile de
+fusionner des colonnes, d’utiliser des en-têtes plus courts ou de retirer les grandes
+images des cellules.
