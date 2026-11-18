@@ -14,7 +14,9 @@
 /**
  * Das Panel „Tabelle“ rechts im Rahmen: was für die ganze Tabelle gilt und
  * nicht an einer Markierung hängt – erste Sortierung, sichtbare Zeilen,
- * Export, Bilder anpassen.
+ * Export, Bilder anpassen. Aufgebaut wie im Screen: ein Abschnitt für die
+ * Sortierung, darunter die Felder einzeln, kleine Wahlen als Pills, der
+ * Schalter als Zeile mit Hinweis.
  *
  * Früher standen diese Schalter zwischen den Zellwerkzeugen in den Reitern
  * „Daten“ und „Bilder“. Dort sahen sie aus, als wirkten sie auf die
@@ -23,8 +25,7 @@
  */
 
 import * as React from "react";
-import { ReactElement } from "react";
-import { ArrowDownWideNarrow, ArrowUpNarrowWide } from "lucide-react";
+import { ReactElement, useId } from "react";
 import { Field } from "@man/config-ui/form/field";
 import { FormSection } from "@man/config-ui/form/form-section";
 import { Segmented, SegmentedOption } from "@man/config-ui/form/segmented";
@@ -34,6 +35,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@man/config-ui/primitives/switch";
 
 import { richTextToPlain } from "./rich-text";
+import { columnLetters } from "./selection";
 import { ExportMode, SortSpec, TableModel, setExportMode, setFitImages, setSort, setVisibleRows } from "./table-model";
 
 /** See `webpack.common.ts`; `release.sh` bumps it before building. */
@@ -48,22 +50,24 @@ export interface TableInspectorProps {
 const NO_SORT = "none";
 
 const DIRECTIONS: readonly SegmentedOption<SortSpec["dir"]>[] = [
-  { id: "asc", label: "Aufsteigend", icon: ArrowUpNarrowWide },
-  { id: "desc", label: "Absteigend", icon: ArrowDownWideNarrow },
+  { id: "asc", label: "Aufsteigend" },
+  { id: "desc", label: "Absteigend" },
 ];
 
-const EXPORT_OPTIONS: ReadonlyArray<{ id: ExportMode; label: string }> = [
+const EXPORT_OPTIONS: readonly SegmentedOption<ExportMode>[] = [
   { id: "off", label: "Aus" },
   { id: "all", label: "Ganze Tabelle" },
   { id: "select", label: "Mit Zeilenauswahl" },
 ];
 
-const isExportMode = (value: string): value is ExportMode => EXPORT_OPTIONS.some((option) => option.id === value);
+/** Die Beschriftung eines Felds ohne `<label>`, etwa über einer Pill-Gruppe. */
+const LABEL = "text-[13px] font-semibold text-foreground";
+const HINT = "text-[13px] text-muted-foreground";
 
-/** „Spalte 2 · Umsatz“: die Nummer findet die Spalte im Gitter, die Überschrift erklärt sie. */
+/** „B · Umsatz“: der Buchstabe findet die Spalte im Gitter, die Überschrift erklärt sie. */
 function columnLabel(header: string | undefined, col: number): string {
   const text = richTextToPlain(header ?? "").trim();
-  return text === "" ? `Spalte ${col + 1}` : `Spalte ${col + 1} · ${text}`;
+  return text === "" ? `Spalte ${columnLetters(col)}` : `${columnLetters(col)} · ${text}`;
 }
 
 function SortSettings({ value, onChange }: TableInspectorProps): ReactElement {
@@ -73,12 +77,12 @@ function SortSettings({ value, onChange }: TableInspectorProps): ReactElement {
     onChange(setSort(value, key === NO_SORT ? null : { col: Number(key), dir: sort?.dir ?? "asc" }));
 
   return (
-    <FormSection title="Sortierung">
+    <FormSection
+      title="Erste Sortierung"
+      description="So ist die Tabelle beim Öffnen sortiert; Leser sortieren per Klick auf eine Überschrift um."
+    >
       <Select value={sort === null ? NO_SORT : String(sort.col)} onValueChange={chooseColumn}>
-        <Field
-          label="Erste Sortierung"
-          hint="So ist die Tabelle beim Öffnen sortiert. Leser sortieren per Klick auf eine Überschrift um; die Kopfzeile bleibt oben."
-        >
+        <Field label="Spalte">
           <SelectTrigger className="w-full">
             <SelectValue />
           </SelectTrigger>
@@ -106,16 +110,12 @@ function SortSettings({ value, onChange }: TableInspectorProps): ReactElement {
 
 function VisibleRowsField({ value, onChange }: TableInspectorProps): ReactElement {
   return (
-    <Field
-      label="Sichtbare Zeilen"
-      hint="Datenzeilen, die die Seite zeigt, bevor die Tabelle hinter einem Button einklappt. 0 zeigt alle Zeilen."
-    >
+    <Field className="max-w-[200px]" label="Sichtbare Zeilen" hint="0 zeigt alle Zeilen; sonst klappt der Rest hinter einem Button ein.">
       <Input
         type="number"
         min={0}
         step={1}
         inputMode="numeric"
-        className="w-28"
         value={value.visibleRows}
         onChange={(event) => {
           // Ein geleertes Feld liest sich als NaN. Als 0 genommen, schaltete
@@ -129,45 +129,48 @@ function VisibleRowsField({ value, onChange }: TableInspectorProps): ReactElemen
   );
 }
 
+/** Pills statt Auswahlliste: drei Wahlen, alle auf einen Blick. */
 function ExportField({ value, onChange }: TableInspectorProps): ReactElement {
+  const id = useId();
   return (
-    <Select
-      value={value.exportMode}
-      onValueChange={(mode) => {
-        if (isExportMode(mode)) onChange(setExportMode(value, mode));
-      }}
-    >
-      <Field
-        label="Export"
-        hint="Download als Excel- oder CSV-Datei über der Tabelle. In der Staffbase-App wird der Export nicht angezeigt."
-      >
-        <SelectTrigger className="w-full">
-          <SelectValue />
-        </SelectTrigger>
-      </Field>
-      <SelectContent position="popper">
-        {EXPORT_OPTIONS.map(({ id, label }) => (
-          <SelectItem key={id} value={id}>
-            {label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className="flex flex-col gap-1.5">
+      <span className={LABEL}>
+        Export
+      </span>
+      <Segmented
+        aria-label="Export"
+        aria-describedby={`${id}-hint`}
+        options={EXPORT_OPTIONS}
+        value={value.exportMode}
+        onChange={(mode) => onChange(setExportMode(value, mode))}
+      />
+      <p id={`${id}-hint`} className={HINT}>
+        Download als Excel- oder CSV-Datei über der Tabelle. In der Staffbase-App wird der Export nicht angezeigt.
+      </p>
+    </div>
   );
 }
 
-function PageSettings({ value, onChange }: TableInspectorProps): ReactElement {
+/** Ein Schalter als Zeile: Name und Hinweis links, der Schalter rechts. */
+function FitImagesRow({ value, onChange }: TableInspectorProps): ReactElement {
+  const id = useId();
   return (
-    <FormSection title="Auf der Seite">
-      <VisibleRowsField value={value} onChange={onChange} />
-      <ExportField value={value} onChange={onChange} />
-      <Field
-        label="Bilder anpassen"
-        hint="Begrenzt Bilder auf die Breite der Tabelle. Ausgeschaltet erscheint jedes Bild in seiner eigenen Größe."
-      >
-        <Switch checked={value.fitImages} onCheckedChange={(checked) => onChange(setFitImages(value, checked))} />
-      </Field>
-    </FormSection>
+    <div className="flex min-h-10 items-center justify-between gap-4">
+      <div className="flex min-w-0 flex-col gap-0.5">
+        <span id={`${id}-label`} className="text-sm font-semibold text-foreground">
+          Bilder anpassen
+        </span>
+        <span id={`${id}-hint`} className={HINT}>
+          Begrenzt Bilder auf die Breite der Tabelle; aus: jedes Bild in eigener Größe.
+        </span>
+      </div>
+      <Switch
+        aria-labelledby={`${id}-label`}
+        aria-describedby={`${id}-hint`}
+        checked={value.fitImages}
+        onCheckedChange={(checked) => onChange(setFitImages(value, checked))}
+      />
+    </div>
   );
 }
 
@@ -177,7 +180,9 @@ export function TableInspector({ value, onChange }: TableInspectorProps): ReactE
     <InspectorPanel title="Tabelle">
       <div className="flex flex-col gap-6">
         <SortSettings value={value} onChange={onChange} />
-        <PageSettings value={value} onChange={onChange} />
+        <VisibleRowsField value={value} onChange={onChange} />
+        <ExportField value={value} onChange={onChange} />
+        <FitImagesRow value={value} onChange={onChange} />
         {/* Die Version stand früher unter dem Gitter; wer einen Fehler meldet,
             findet sie hier. */}
         <p className="text-xs text-muted-foreground">{`Version ${__WIDGET_VERSION__}`}</p>

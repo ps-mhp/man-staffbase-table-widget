@@ -891,10 +891,8 @@ describe("export mode", () => {
     const onChange = jest.fn();
     render(<TableEditor value={model([["", "A"], ["x", "1"]], { exportMode: "all" })} onChange={onChange} />);
 
-    const trigger = screen.getByRole("combobox", { name: "Export" });
-    expect(trigger).toHaveTextContent("Ganze Tabelle");
-    await userEvent.click(trigger);
-    await userEvent.click(await screen.findByRole("option", { name: "Mit Zeilenauswahl" }));
+    expect(screen.getByRole("radio", { name: "Ganze Tabelle" })).toBeChecked();
+    await userEvent.click(screen.getByRole("radio", { name: "Mit Zeilenauswahl" }));
 
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ exportMode: "select" }));
   });

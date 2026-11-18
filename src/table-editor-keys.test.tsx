@@ -154,7 +154,7 @@ describe("Escape im Rahmen", () => {
 
   it("schließt eine Auswahlliste im Panel, nicht den Rahmen", async () => {
     const { onClose } = renderInShell();
-    await userEvent.click(screen.getByRole("combobox", { name: "Export" }));
+    await userEvent.click(screen.getByRole("combobox", { name: "Spalte" }));
     const listbox = await screen.findByRole("listbox");
 
     await act(async () => {

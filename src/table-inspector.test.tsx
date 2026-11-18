@@ -17,7 +17,7 @@
  */
 
 import * as React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { TableInspector } from "./table-inspector";
@@ -54,12 +54,16 @@ describe("TableInspector", () => {
   });
 
   describe("Erste Sortierung", () => {
-    it("bietet jede Spalte mit ihrer Überschrift an und setzt die gewählte aufsteigend", async () => {
+    it("bietet jede Spalte mit Buchstabe und Überschrift an und setzt die gewählte aufsteigend", async () => {
       const onChange = jest.fn();
       render(<TableInspector value={model()} onChange={onChange} />);
 
-      expect(screen.getByRole("combobox", { name: "Erste Sortierung" })).toHaveTextContent("Keine");
-      await choose("Erste Sortierung", "Spalte 3 · Q2");
+      expect(screen.getByRole("region", { name: "Erste Sortierung" })).toContainElement(screen.getByRole("combobox", { name: "Spalte" }));
+      expect(screen.getByRole("combobox", { name: "Spalte" })).toHaveTextContent("Keine");
+      await userEvent.click(screen.getByRole("combobox", { name: "Spalte" }));
+      // Ohne Überschrift bleibt der Buchstabe, wie über dem Gitter.
+      expect(await screen.findByRole("option", { name: "Spalte A" })).toBeInTheDocument();
+      await userEvent.click(screen.getByRole("option", { name: "C · Q2" }));
 
       expect(lastModel(onChange).sort).toEqual({ col: 2, dir: "asc" });
     });
@@ -84,7 +88,7 @@ describe("TableInspector", () => {
       const onChange = jest.fn();
       render(<TableInspector value={model({ sort: { col: 1, dir: "desc" } })} onChange={onChange} />);
 
-      await choose("Erste Sortierung", "Keine");
+      await choose("Spalte", "Keine");
 
       expect(lastModel(onChange).sort).toBeNull();
     });
@@ -126,12 +130,13 @@ describe("TableInspector", () => {
       const onChange = jest.fn();
       render(<TableInspector value={model({ exportMode: "all" })} onChange={onChange} />);
 
-      const trigger = screen.getByRole("combobox", { name: "Export" });
-      expect(trigger).toHaveTextContent("Ganze Tabelle");
-      expect(trigger).toHaveAccessibleDescription(
+      const group = screen.getByRole("radiogroup", { name: "Export" });
+      expect(within(group).getByRole("radio", { name: "Ganze Tabelle" })).toBeChecked();
+      expect(within(group).getAllByRole("radio").map((radio) => radio.textContent)).toEqual(["Aus", "Ganze Tabelle", "Mit Zeilenauswahl"]);
+      expect(group).toHaveAccessibleDescription(
         expect.stringContaining("In der Staffbase-App wird der Export nicht angezeigt."),
       );
-      await choose("Export", "Mit Zeilenauswahl");
+      await userEvent.click(within(group).getByRole("radio", { name: "Mit Zeilenauswahl" }));
 
       expect(lastModel(onChange).exportMode).toBe("select");
     });
@@ -145,6 +150,7 @@ describe("TableInspector", () => {
 
       const toggle = screen.getByRole("switch", { name: "Bilder anpassen" });
       expect(toggle).toBeChecked();
+      expect(toggle).toHaveAccessibleDescription(expect.stringContaining("Breite der Tabelle"));
       await userEvent.click(toggle);
 
       expect(lastModel(onChange).fitImages).toBe(false);
