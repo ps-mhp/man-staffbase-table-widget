@@ -26,20 +26,10 @@ import { startTableEditorInjector, tableEditorShell } from "./table-editor-injec
 import { configurationSchema, uiSchema } from "./configuration-schema";
 import { TableModel, parseTableModel } from "./table-model";
 import { DEFAULT_VISIBLE_ROWS } from "./row-collapse";
-import {
-  modalRoot,
-  queryAllInModal,
-  queryDeep,
-  queryInModal,
-  settleModal,
-} from "@shared/ui/config-modal.testing";
+import { modalRoot, queryAllInModal, queryDeep, queryInModal, settleModal, settleEditor } from "@shared/ui/config-modal.testing";
 
-/** Das Modal lädt nach, der Editor darin noch einmal: so oft warten, bis er da ist. */
-async function settleEditor(): Promise<void> {
-  for (let round = 0; round < 5 && queryInModal('[data-testid="table-editor"]') === null; round += 1) {
-    await settleModal();
-  }
-}
+const EDITOR_SELECTOR = '[data-testid="table-editor"]';
+const EDITOR_ROUNDS = 5;
 
 async function open(formData?: { tabledata: string }): Promise<{ container: HTMLElement; stop: () => void }> {
   const { container } = render(
@@ -49,7 +39,7 @@ async function open(formData?: { tabledata: string }): Promise<{ container: HTML
   await act(async () => {
     stop = startTableEditorInjector(container);
   });
-  await settleEditor();
+  await settleEditor(EDITOR_SELECTOR, EDITOR_ROUNDS);
   return { container, stop };
 }
 
@@ -100,7 +90,7 @@ describe("startTableEditorInjector", () => {
     await act(async () => {
       stop = startTableEditorInjector(container);
     });
-    await settleEditor();
+    await settleEditor(EDITOR_SELECTOR, EDITOR_ROUNDS);
 
     await typeIntoCell("Zeile 2, Spalte 1", "Geänderte Zeile");
     // Edits stay in the modal's draft until they are applied.
@@ -258,7 +248,7 @@ describe("startTableEditorInjector", () => {
     await act(async () => {
       stop = startTableEditorInjector(container);
     });
-    await settleEditor();
+    await settleEditor(EDITOR_SELECTOR, EDITOR_ROUNDS);
 
     const cell = queryInModal<HTMLDivElement>(
       '[aria-label="Zeile 1, Spalte 1"]',
@@ -316,7 +306,7 @@ describe("startTableEditorInjector", () => {
     await act(async () => {
       stop = startTableEditorInjector(container);
     });
-    await settleEditor();
+    await settleEditor(EDITOR_SELECTOR, EDITOR_ROUNDS);
 
     const cell = queryInModal<HTMLDivElement>(
       '[aria-label="Zeile 1, Spalte 1"]',
@@ -357,7 +347,7 @@ describe("startTableEditorInjector", () => {
     await act(async () => {
       (queryDeep(container, '[data-testid="table-editor-reopen"]') as HTMLButtonElement).click();
     });
-    await settleEditor();
+    await settleEditor(EDITOR_SELECTOR, EDITOR_ROUNDS);
 
     const modal = queryInModal('[data-testid="table-editor-modal"]');
     expect(modal).not.toBeNull();
