@@ -61,7 +61,8 @@
 
   // Der einzige scrollende Bereich des Editors, auf der grauen Bühne des
   // Rahmens. Er füllt die Breite, die er bekommt; eine schmalere Tabelle lässt
-  // daneben einfach Platz.
+  // daneben einfach Platz. Das Gitter beginnt bündig unter der Werkzeugleiste
+  // und am linken Rand, wie in einer Tabellenkalkulation – ohne Polster.
   //
   // Farben ab hier aus den Tokens von `@man/config-ui` (`.man-ui`, Wurzel des
   // Config-Modals), damit Gitter, Leisten und Panel dieselbe Palette sprechen.
@@ -71,10 +72,12 @@
     max-width: 100%;
     overflow: auto;
     background: var(--secondary);
-    padding: 16px;
   }
 
   &__grid {
+    // Oberer und linker Rand des Gitters liegen unter der Linie der
+    // Werkzeugleiste bzw. am Rand des Modals; sonst stünden dort zwei Linien.
+    margin: -1px 0 0 -1px;
     border-collapse: collapse;
     background: var(--background);
     color: var(--foreground);
