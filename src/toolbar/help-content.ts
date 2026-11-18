@@ -26,7 +26,7 @@ export interface HelpTopic {
 
 /**
  * The help's content, grouped like the toolbar's own tabs so a reader can
- * jump from "what does this button do" straight to the ribbon tab that has
+ * jump from "what does this button do" straight to the toolbar tab that has
  * it – plus „Tabelle“ for the panel on the right.
  *
  * Kept as data rather than JSX so wording stays in one place instead of
@@ -40,7 +40,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     entries: [
       {
         title: "Aufbau",
-        text: "Oben die Reiter Schrift, Ausrichtung, Zellen, Bilder und Daten mit ihren Werkzeugen, darunter die Tabelle. Rechts das Panel „Tabelle“ mit den Einstellungen, die für die ganze Tabelle gelten.",
+        text: "Oben die Reiter Schrift, Ausrichtung, Zellen, Bilder und Daten, darunter die Werkzeuge des gewählten Reiters und die Tabelle. Rechts das Panel „Tabelle“ mit den Einstellungen, die für die ganze Tabelle gelten.",
       },
       {
         title: "Zellen bearbeiten",
@@ -52,7 +52,11 @@ export const HELP_TOPICS: HelpTopic[] = [
       },
       {
         title: "Zwischen Reitern wechseln",
-        text: "Mit den Pfeiltasten (links/rechts) springt die Tastatur-Fokusmarke von einem Reiter zum nächsten, auch über den Rand der Leiste hinweg zurück zum ersten Reiter.",
+        text: "Mit den Pfeiltasten (links/rechts) springt die Tastatur-Fokusmarke von einem Reiter zum nächsten, auch über den Rand der Leiste hinweg zurück zum ersten Reiter. In der Werkzeugleiste darunter wandern dieselben Tasten von Werkzeug zu Werkzeug.",
+      },
+      {
+        title: "Tabelle importieren",
+        text: "„Importieren (.csv, .xlsx)“ rechts neben den Reitern liest eine Tabelle aus einer .csv- oder .xlsx/.xls-Datei ein und ersetzt damit den aktuellen Inhalt.",
       },
       {
         title: "Vorschau",
@@ -78,7 +82,7 @@ export const HELP_TOPICS: HelpTopic[] = [
       },
       {
         title: "Schrift- und Hintergrundfarbe",
-        text: "Öffnet je einen Farbwähler für Text- und Zellenhintergrundfarbe der Markierung. Ein Klick auf die durchgestrichene Fläche entfernt die gesetzte Farbe wieder.",
+        text: "Der Knopf öffnet einen Farbwähler für die Text- bzw. Zellenhintergrundfarbe der Markierung; der Balken darunter zeigt die gesetzte Farbe. Der Pfeil daneben bietet „Standard“, das die Farbe wieder entfernt.",
       },
     ],
   },
@@ -139,10 +143,6 @@ export const HELP_TOPICS: HelpTopic[] = [
       {
         title: "Formatierung entfernen",
         text: "Setzt wahlweise alle Formatierungen, nur die Textformatierung oder nur die Bildgrößen zurück — auf die Markierung, oder ohne Markierung auf die ganze Tabelle.",
-      },
-      {
-        title: "Tabelle importieren",
-        text: "Liest eine Tabelle aus einer .csv- oder .xlsx/.xls-Datei ein und ersetzt damit den aktuellen Inhalt.",
       },
     ],
   },

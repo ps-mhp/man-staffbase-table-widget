@@ -13,9 +13,11 @@
 
 import * as React from "react";
 import { ReactElement } from "react";
+import { Plus, TableCellsMerge, TableCellsSplit, Trash2 } from "lucide-react";
+import { ToolButton } from "@man/config-ui/toolbar/tool-button";
+import { ToolMenu, ToolMenuItem } from "@man/config-ui/toolbar/tool-menu";
+import { ToolSeparator, Toolbar } from "@man/config-ui/toolbar/toolbar";
 
-import { Dropdown, RibbonButton } from "./controls";
-import { IconChevron, IconDelete, IconInsert } from "./icons";
 import { TableToolbarProps } from "./props";
 
 export type CellsTabProps = Pick<
@@ -54,70 +56,50 @@ export function CellsTab({
   const showRow = insert.row || (!insert.row && !insert.col);
   const showCol = insert.col || (!insert.row && !insert.col);
 
+  const item = (testId: string, text: string, run: () => void, close: () => void): ReactElement => (
+    <ToolMenuItem
+      key={testId}
+      data-testid={testId}
+      onClick={() => {
+        run();
+        close();
+      }}
+    >
+      {text}
+    </ToolMenuItem>
+  );
+
   return (
-    <>
-      <RibbonButton testId="toolbar-merge" title="Zellen verbinden" disabled={disabled} onClick={onMerge}>
+    <Toolbar aria-label="Zellen">
+      <ToolButton data-testid="toolbar-merge" label="Zellen verbinden" icon={TableCellsMerge} disabled={disabled} onClick={onMerge}>
         Verbinden
-      </RibbonButton>
-      <RibbonButton testId="toolbar-unmerge" title="Verbindung aufheben" disabled={!canUnmerge} onClick={onUnmerge}>
+      </ToolButton>
+      <ToolButton data-testid="toolbar-unmerge" label="Verbindung aufheben" icon={TableCellsSplit} disabled={!canUnmerge} onClick={onUnmerge}>
         Lösen
-      </RibbonButton>
-
-      <Dropdown
-        testId="toolbar-insert-menu"
-        trigger={(toggle) => (
-          <button type="button" className="tw-rb__big" data-testid="toolbar-insert" title="Einfügen" onClick={toggle}>
-            <IconInsert />
-            <span className="tw-rb__label">Einfügen <IconChevron /></span>
-          </button>
-        )}
-      >
-        {(close) => (
-          <>
-            {showRow && (
-              <>
-                <button type="button" className="tw-rb__menu-item" data-testid="toolbar-insert-row-above" onClick={() => { onInsertRowAbove(); close(); }}>
-                  Zeile oberhalb
-                </button>
-                <button type="button" className="tw-rb__menu-item" data-testid="toolbar-insert-row-below" onClick={() => { onInsertRowBelow(); close(); }}>
-                  Zeile unterhalb
-                </button>
-              </>
-            )}
-            {showCol && (
-              <>
-                <button type="button" className="tw-rb__menu-item" data-testid="toolbar-insert-col-left" onClick={() => { onInsertColLeft(); close(); }}>
-                  Spalte links
-                </button>
-                <button type="button" className="tw-rb__menu-item" data-testid="toolbar-insert-col-right" onClick={() => { onInsertColRight(); close(); }}>
-                  Spalte rechts
-                </button>
-              </>
-            )}
-          </>
-        )}
-      </Dropdown>
-
-      <Dropdown
-        testId="toolbar-delete-menu"
-        trigger={(toggle) => (
-          <button type="button" className="tw-rb__big" data-testid="toolbar-delete" title="Löschen" disabled={disabled} onClick={toggle}>
-            <IconDelete />
-            <span className="tw-rb__label">Löschen <IconChevron /></span>
-          </button>
-        )}
-      >
-        {(close) => (
-          <>
-            <button type="button" className="tw-rb__menu-item" data-testid="toolbar-delete-rows" onClick={() => { onDeleteRows(); close(); }}>
-              Zeile(n) löschen
-            </button>
-            <button type="button" className="tw-rb__menu-item" data-testid="toolbar-delete-cols" onClick={() => { onDeleteCols(); close(); }}>
-              Spalte(n) löschen
-            </button>
-          </>
-        )}
-      </Dropdown>
-    </>
+      </ToolButton>
+      <ToolSeparator />
+      <ToolMenu testId="toolbar-insert" label="Zeile oder Spalte einfügen" icon={Plus} text="Einfügen">
+        {(close) => [
+          ...(showRow
+            ? [
+                item("toolbar-insert-row-above", "Zeile oberhalb", onInsertRowAbove, close),
+                item("toolbar-insert-row-below", "Zeile unterhalb", onInsertRowBelow, close),
+              ]
+            : []),
+          ...(showCol
+            ? [
+                item("toolbar-insert-col-left", "Spalte links", onInsertColLeft, close),
+                item("toolbar-insert-col-right", "Spalte rechts", onInsertColRight, close),
+              ]
+            : []),
+        ]}
+      </ToolMenu>
+      <ToolMenu testId="toolbar-delete" label="Zeilen oder Spalten löschen" icon={Trash2} text="Löschen" disabled={disabled}>
+        {(close) => [
+          item("toolbar-delete-rows", "Zeile(n) löschen", onDeleteRows, close),
+          item("toolbar-delete-cols", "Spalte(n) löschen", onDeleteCols, close),
+        ]}
+      </ToolMenu>
+    </Toolbar>
   );
 }

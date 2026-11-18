@@ -12,209 +12,99 @@
  */
 
 import * as React from "react";
-import { ReactElement, useEffect, useRef, useState } from "react";
-import { useEscapeLayer } from "@man/config-ui/shell/escape-layers";
+import { ReactElement, useRef } from "react";
+import { ToolButton } from "@man/config-ui/toolbar/tool-button";
+import { ToolMenu, ToolMenuItem } from "@man/config-ui/toolbar/tool-menu";
 
-import { IconChevron } from "./icons";
-import { activeElementOf, eventRootOf } from "@shared/shadow-dom";
+/**
+ * „Keine Farbe gesetzt“: weiße Fläche mit rotem Schrägstrich, aus den Tokens
+ * des Rahmens. Nur im Config-Modal zu sehen, das sie definiert.
+ */
+const STANDARD_SWATCH = "linear-gradient(to top right, var(--background) 0 40%, var(--destructive) 40% 60%, var(--background) 60% 100%)";
 
-/** White box with a red diagonal slash — the "no colour set" (Standard) look. */
-const STANDARD_BAR =
-  "linear-gradient(to top right, #fff 0 40%, #e53935 40% 60%, #fff 60% 100%)";
+/** Womit der Farbwähler startet, solange die Zelle keine Farbe hat. */
+const PICKER_START = "#233848";
 
-export function RibbonButton({
-  onClick,
-  active,
-  disabled,
-  title,
-  testId,
-  variant,
-  children,
-}: {
-  onClick: () => void;
-  active?: boolean;
-  disabled?: boolean;
-  title: string;
-  testId: string;
-  variant?: "icon" | "step";
-  children: React.ReactNode;
-}): ReactElement {
-  const className = [
-    "tw-rb__btn",
-    variant === "icon" ? "tw-rb__btn--icon" : "",
-    variant === "step" ? "tw-rb__btn--step" : "",
-    active ? "tw-rb__btn--active" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
+/** Ein Farbfeld im Menü: die gesetzte Farbe oder „Standard“. */
+function Swatch({ color }: { color: string | undefined }): ReactElement {
   return (
-    <button
-      type="button"
-      className={className}
-      title={title}
-      aria-label={title}
-      aria-pressed={active}
-      data-testid={testId}
-      disabled={disabled}
-      onMouseDown={(e) => e.preventDefault()}
-      onClick={onClick}
-    >
-      {children}
-    </button>
+    <span
+      aria-hidden
+      className="size-4 shrink-0 rounded-sm border border-input"
+      style={{ background: color ?? STANDARD_SWATCH }}
+    />
   );
 }
 
-/** A closable dropdown menu anchored to a trigger, used for Insert/Delete/Sort. */
-export function Dropdown({
-  trigger,
-  children,
-  testId,
-}: {
-  trigger: (toggle: () => void, open: boolean) => React.ReactNode;
-  children: (close: () => void) => React.ReactNode;
-  testId: string;
-}): ReactElement {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    // An der Wurzel des Editors, in der Capture-Phase: das Config-Modal hält
-    // Klicks am Host an, und an `document` hieße das Ziel aus dem Shadow Root
-    // nur „Host“ – jeder Klick ins Menü zählte dort als „außerhalb“.
-    // `composedPath` sieht durch den Shadow Root hindurch.
-    const root = eventRootOf(ref.current);
-    const onMouseDown = (event: Event): void => {
-      if (ref.current && !event.composedPath().includes(ref.current)) setOpen(false);
-    };
-    root.addEventListener("mousedown", onMouseDown, true);
-    return () => root.removeEventListener("mousedown", onMouseDown, true);
-  }, [open]);
-
-  // Escape schließt das Menü, nicht den Rahmen darum. Stand der Fokus im Menü,
-  // ginge er mit ihm verloren – dann zurück an den Knopf, der es öffnete.
-  const closeByEscape = (): void => {
-    const wrapper = ref.current;
-    const focusInside = wrapper !== null && wrapper.contains(activeElementOf(wrapper));
-    setOpen(false);
-    if (focusInside) wrapper.querySelector<HTMLButtonElement>("button")?.focus();
-  };
-  // Im Rahmen fragt dessen Escape zuerst die jüngste Ebene – auch wenn der
-  // Fokus gar nicht im Menü steht.
-  useEscapeLayer(open, closeByEscape);
-
-  return (
-    <div
-      ref={ref}
-      className="tw-rb__dropdown"
-      // Außerhalb eines Rahmens gibt es keine Ebenen; da reicht Escape mit dem
-      // Fokus im Menü. `preventDefault`: der Rahmen lässt es dann liegen.
-      onKeyDown={(event) => {
-        if (!open || event.key !== "Escape" || event.defaultPrevented) return;
-        event.preventDefault();
-        closeByEscape();
-      }}
-    >
-      {trigger(() => setOpen((o) => !o), open)}
-      {open && (
-        <div className="tw-rb__menu" data-testid={testId}>
-          {children(() => setOpen(false))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-/** Excel-style colour button: glyph over a colour bar, chevron opens options. */
-export function ColorButton({
-  value,
-  onChange,
-  onClear,
-  disabled,
-  title,
-  testId,
-  glyph,
-}: {
+export interface ColorButtonProps {
   value: string | undefined;
   onChange: (color: string) => void;
   onClear: () => void;
   disabled: boolean;
-  title: string;
+  /** „Schriftfarbe“, „Hintergrundfarbe“ – Name des Knopfs und des Farbfelds. */
+  label: string;
+  /** `data-testid` des Farbfelds; das Menü daneben heißt `${testId}-options`. */
   testId: string;
+  /** Das Zeichen über dem Farbbalken: „A“ oder ein Icon. */
   glyph: React.ReactNode;
-}): ReactElement {
+}
+
+/**
+ * Farbe wie in Office: Zeichen über einem Balken in der gesetzten Farbe,
+ * ein Klick öffnet den Farbwähler; der Pfeil daneben bietet „Standard“
+ * (Farbe entfernen) und „Farbe wählen…“.
+ *
+ * Der native Farbwähler bleibt bedienbar und wird deshalb nicht ausgeblendet,
+ * sondern auf einen unsichtbaren Punkt gelegt: `display: none` nähme manchen
+ * Browsern die Möglichkeit, den Dialog zu öffnen. Aus der Tab-Folge ist er
+ * genommen – der Knopf davor öffnet ihn.
+ */
+export function ColorButton({ value, onChange, onClear, disabled, label, testId, glyph }: ColorButtonProps): ReactElement {
   const inputRef = useRef<HTMLInputElement>(null);
-  const isStandard = !value;
+  const openPicker = (): void => inputRef.current?.click();
+
   return (
-    <div className="tw-rb__color-wrap">
-      <button
-        type="button"
-        className="tw-rb__color"
-        title={title}
-        aria-label={title}
-        disabled={disabled}
-        onMouseDown={(e) => e.preventDefault()}
-        onClick={() => inputRef.current?.click()}
-      >
-        {glyph}
-        <span
-          className="tw-rb__color-bar"
-          aria-hidden
-          style={{ background: isStandard ? STANDARD_BAR : value }}
-        />
-      </button>
+    <span className="relative inline-flex shrink-0 items-center">
+      <ToolButton label={`${label}: ${value ?? "Standard"}`} title={label} disabled={disabled} onClick={openPicker}>
+        <span aria-hidden className="inline-flex flex-col items-center gap-0.5 leading-none">
+          {glyph}
+          <span className="h-[3px] w-4 rounded-full" style={{ background: value ?? STANDARD_SWATCH }} />
+        </span>
+      </ToolButton>
       <input
         ref={inputRef}
         type="color"
+        tabIndex={-1}
         data-testid={testId}
-        aria-label={title}
+        aria-label={label}
         disabled={disabled}
-        value={value ?? "#233848"}
-        onChange={(e) => onChange(e.target.value)}
-        className="tw-rb__color-input"
+        value={value ?? PICKER_START}
+        onChange={(event) => onChange(event.target.value)}
+        className="pointer-events-none absolute bottom-0 left-0 size-px opacity-0"
       />
-      <Dropdown
-        testId={`${testId}-menu`}
-        trigger={(toggle) => (
-          <button
-            type="button"
-            className="tw-rb__caret"
-            title={`${title}: Optionen`}
-            aria-label={`${title}: Optionen`}
-            disabled={disabled}
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={toggle}
-          >
-            <IconChevron />
-          </button>
-        )}
-      >
+      <ToolMenu label={`${label}: Optionen`} testId={`${testId}-options`} disabled={disabled} className="w-5 min-w-0 px-0">
         {(close) => (
           <>
-            <button
-              type="button"
-              className="tw-rb__menu-item"
+            <ToolMenuItem
               data-testid={`${testId}-reset`}
               onClick={() => {
                 onClear();
                 close();
               }}
             >
-              <span className="tw-rb__swatch" style={{ background: STANDARD_BAR }} /> Standard
-            </button>
-            <button
-              type="button"
-              className="tw-rb__menu-item"
+              <Swatch color={undefined} /> Standard
+            </ToolMenuItem>
+            <ToolMenuItem
               onClick={() => {
                 close();
-                inputRef.current?.click();
+                openPicker();
               }}
             >
-              <span className="tw-rb__swatch" style={{ background: value ?? "#233848" }} /> Farbe wählen…
-            </button>
+              <Swatch color={value ?? PICKER_START} /> Farbe wählen…
+            </ToolMenuItem>
           </>
         )}
-      </Dropdown>
-    </div>
+      </ToolMenu>
+    </span>
   );
 }

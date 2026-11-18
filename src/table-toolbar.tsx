@@ -12,9 +12,10 @@
  */
 
 import * as React from "react";
-import { ReactElement, useState } from "react";
+import { ReactElement, useRef, useState } from "react";
+import { Button } from "@man/config-ui/primitives/button";
+import { ToolTab, ToolTabs } from "@man/config-ui/toolbar/tool-tabs";
 
-import { RibbonShell, RibbonTab } from "./toolbar/ribbon-shell";
 import { TabId, TableToolbarProps } from "./toolbar/props";
 import { AlignTab } from "./toolbar/tab-align";
 import { CellsTab } from "./toolbar/tab-cells";
@@ -24,8 +25,71 @@ import { ImagesTab } from "./toolbar/tab-images";
 
 export type { TableToolbarProps };
 
+const TABS: readonly ToolTab<TabId>[] = [
+  { id: "font", label: "Schrift" },
+  { id: "align", label: "Ausrichtung" },
+  { id: "cells", label: "Zellen" },
+  { id: "images", label: "Bilder" },
+  { id: "data", label: "Daten" },
+];
+
+function ActiveTab({ tab, props }: { tab: TabId; props: TableToolbarProps }): ReactElement {
+  switch (tab) {
+    case "align":
+      return <AlignTab {...props} />;
+    case "cells":
+      return <CellsTab {...props} />;
+    case "images":
+      return <ImagesTab {...props} />;
+    case "data":
+      return <DataTab {...props} />;
+    default:
+      return <FontTab {...props} />;
+  }
+}
+
 /**
- * The editor's toolbar: five tabs, each with its row of controls.
+ * „Importieren“ rechts neben den Reitern: ersetzt die ganze Tabelle und hängt
+ * deshalb an keinem Reiter, der von einer Markierung handelt.
+ */
+function ImportButton({ onUpload }: Pick<TableToolbarProps, "onUpload">): ReactElement {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFile = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    const file = event.target.files?.[0];
+    if (file) onUpload(file);
+    event.target.value = "";
+  };
+
+  return (
+    <>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="h-9 px-3 text-[13px] font-semibold text-primary hover:text-primary motion-reduce:transition-none"
+        data-testid="toolbar-upload-button"
+        title="Tabelle hochladen (.csv, .xlsx) – ersetzt den Inhalt"
+        onClick={() => fileInputRef.current?.click()}
+      >
+        Importieren (.csv, .xlsx)
+      </Button>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".csv,.xlsx,.xls"
+        tabIndex={-1}
+        data-testid="toolbar-upload"
+        aria-label="Tabelle hochladen"
+        onChange={handleFile}
+        className="hidden"
+      />
+    </>
+  );
+}
+
+/**
+ * The editor's toolbar: five tabs, each with its row of controls, and the
+ * import next to the tabs.
  *
  * Every control is a projection of the props — the only state here is which
  * tab is open. The tab deliberately does not follow the selection: an author
@@ -34,19 +98,9 @@ export type { TableToolbarProps };
 export const TableToolbar = (props: TableToolbarProps): ReactElement => {
   const [tab, setTab] = useState<TabId>("font");
 
-  const tabs: RibbonTab[] = [
-    { id: "font", label: "Schrift", render: () => <FontTab {...props} /> },
-    { id: "align", label: "Ausrichtung", render: () => <AlignTab {...props} /> },
-    { id: "cells", label: "Zellen", render: () => <CellsTab {...props} /> },
-    { id: "images", label: "Bilder", render: () => <ImagesTab {...props} /> },
-    { id: "data", label: "Daten", render: () => <DataTab {...props} /> },
-  ];
-
   return (
-    <RibbonShell
-      tabs={tabs}
-      activeTab={tab}
-      onSelectTab={(id) => setTab(id as TabId)}
-    />
+    <ToolTabs aria-label="Werkzeuggruppen" tabs={TABS} value={tab} onChange={setTab} actions={<ImportButton onUpload={props.onUpload} />}>
+      <ActiveTab tab={tab} props={props} />
+    </ToolTabs>
   );
 };

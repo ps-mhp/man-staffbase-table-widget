@@ -13,16 +13,17 @@
 
 import * as React from "react";
 import { ReactElement } from "react";
-
-import { RibbonButton } from "./controls";
 import {
-  IconAlignCenter,
-  IconAlignLeft,
-  IconAlignRight,
-  IconVAlignBottom,
-  IconVAlignMiddle,
-  IconVAlignTop,
-} from "./icons";
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
+  AlignVerticalJustifyCenter,
+  AlignVerticalJustifyEnd,
+  AlignVerticalJustifyStart,
+} from "lucide-react";
+import { ToolButton } from "@man/config-ui/toolbar/tool-button";
+import { ToolSeparator, Toolbar } from "@man/config-ui/toolbar/toolbar";
+
 import { TableToolbarProps } from "./props";
 
 export type AlignTabProps = Pick<
@@ -40,25 +41,14 @@ export function AlignTab({
   const disabled = !hasSelection;
 
   return (
-    <>
-      <RibbonButton testId="toolbar-align-left" variant="icon" title="Linksbündig" disabled={disabled} active={activeFormat.align === "left"} onClick={() => onAlign("left")}>
-        <IconAlignLeft />
-      </RibbonButton>
-      <RibbonButton testId="toolbar-align-center" variant="icon" title="Zentriert" disabled={disabled} active={activeFormat.align === "center"} onClick={() => onAlign("center")}>
-        <IconAlignCenter />
-      </RibbonButton>
-      <RibbonButton testId="toolbar-align-right" variant="icon" title="Rechtsbündig" disabled={disabled} active={activeFormat.align === "right"} onClick={() => onAlign("right")}>
-        <IconAlignRight />
-      </RibbonButton>
-      <RibbonButton testId="toolbar-valign-top" variant="icon" title="Oben ausrichten" disabled={disabled} active={activeFormat.valign === "top"} onClick={() => onVerticalAlign("top")}>
-        <IconVAlignTop />
-      </RibbonButton>
-      <RibbonButton testId="toolbar-valign-middle" variant="icon" title="Mittig ausrichten" disabled={disabled} active={activeFormat.valign === "middle"} onClick={() => onVerticalAlign("middle")}>
-        <IconVAlignMiddle />
-      </RibbonButton>
-      <RibbonButton testId="toolbar-valign-bottom" variant="icon" title="Unten ausrichten" disabled={disabled} active={activeFormat.valign === "bottom"} onClick={() => onVerticalAlign("bottom")}>
-        <IconVAlignBottom />
-      </RibbonButton>
-    </>
+    <Toolbar aria-label="Ausrichtung">
+      <ToolButton data-testid="toolbar-align-left" label="Linksbündig" icon={AlignLeft} disabled={disabled} pressed={activeFormat.align === "left"} onClick={() => onAlign("left")} />
+      <ToolButton data-testid="toolbar-align-center" label="Zentriert" icon={AlignCenter} disabled={disabled} pressed={activeFormat.align === "center"} onClick={() => onAlign("center")} />
+      <ToolButton data-testid="toolbar-align-right" label="Rechtsbündig" icon={AlignRight} disabled={disabled} pressed={activeFormat.align === "right"} onClick={() => onAlign("right")} />
+      <ToolSeparator />
+      <ToolButton data-testid="toolbar-valign-top" label="Oben ausrichten" icon={AlignVerticalJustifyStart} disabled={disabled} pressed={activeFormat.valign === "top"} onClick={() => onVerticalAlign("top")} />
+      <ToolButton data-testid="toolbar-valign-middle" label="Mittig ausrichten" icon={AlignVerticalJustifyCenter} disabled={disabled} pressed={activeFormat.valign === "middle"} onClick={() => onVerticalAlign("middle")} />
+      <ToolButton data-testid="toolbar-valign-bottom" label="Unten ausrichten" icon={AlignVerticalJustifyEnd} disabled={disabled} pressed={activeFormat.valign === "bottom"} onClick={() => onVerticalAlign("bottom")} />
+    </Toolbar>
   );
 }

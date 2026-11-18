@@ -13,9 +13,11 @@
 
 import * as React from "react";
 import { ReactElement } from "react";
+import { ImagePlus, Scaling } from "lucide-react";
+import { ToolButton } from "@man/config-ui/toolbar/tool-button";
+import { ToolMenu, ToolMenuItem } from "@man/config-ui/toolbar/tool-menu";
+import { Toolbar } from "@man/config-ui/toolbar/toolbar";
 
-import { Dropdown } from "./controls";
-import { IconChevron, IconImage, IconImageSize } from "./icons";
 import { TableToolbarProps } from "./props";
 
 export type ImagesTabProps = Pick<
@@ -28,6 +30,8 @@ export type ImagesTabProps = Pick<
   | "onEqualizeImageWidth"
   | "onResetImageSize"
 >;
+
+const NEEDS_TWO = "Mindestens zwei markierte Bilder nötig";
 
 /**
  * Putting pictures into cells and getting them to a common size. Der
@@ -43,45 +47,33 @@ export function ImagesTab({
   onEqualizeImageWidth,
   onResetImageSize,
 }: ImagesTabProps): ReactElement {
-  const disabled = !hasSelection;
-
   return (
-    <>
-      <button type="button" className="tw-rb__btn" data-testid="toolbar-image-button" title="Bild in Zelle einfügen" disabled={disabled} onClick={onInsertImage}>
-        <IconImage />
-        <span>Bild</span>
-      </button>
-
-      <Dropdown
-        testId="toolbar-image-size-menu"
-        trigger={(toggle) => (
-          <button
-            type="button"
-            className="tw-rb__btn"
-            data-testid="toolbar-image-size"
-            title="Größe der markierten Bilder angleichen (Maßstab ist das zuerst markierte Bild)"
-            disabled={!hasSelectedImages}
-            onClick={toggle}
-          >
-            <IconImageSize />
-            <span className="tw-rb__label">Bildgröße <IconChevron /></span>
-          </button>
-        )}
+    <Toolbar aria-label="Bilder">
+      <ToolButton data-testid="toolbar-image-button" label="Bild in Zelle einfügen" icon={ImagePlus} disabled={!hasSelection} onClick={onInsertImage}>
+        Bild
+      </ToolButton>
+      <ToolMenu
+        testId="toolbar-image-size"
+        label="Bildgröße angleichen"
+        title="Größe der markierten Bilder angleichen (Maßstab ist das zuerst markierte Bild)"
+        icon={Scaling}
+        text="Bildgröße"
+        disabled={!hasSelectedImages}
       >
         {(close) => (
           <>
-            <button type="button" className="tw-rb__menu-item" data-testid="toolbar-image-equal-height" disabled={!canEqualizeImages} title={canEqualizeImages ? undefined : "Mindestens zwei markierte Bilder nötig"} onClick={() => { onEqualizeImageHeight(); close(); }}>
+            <ToolMenuItem data-testid="toolbar-image-equal-height" disabled={!canEqualizeImages} title={canEqualizeImages ? undefined : NEEDS_TWO} onClick={() => { onEqualizeImageHeight(); close(); }}>
               Gleiche Höhe wie erstes Bild
-            </button>
-            <button type="button" className="tw-rb__menu-item" data-testid="toolbar-image-equal-width" disabled={!canEqualizeImages} title={canEqualizeImages ? undefined : "Mindestens zwei markierte Bilder nötig"} onClick={() => { onEqualizeImageWidth(); close(); }}>
+            </ToolMenuItem>
+            <ToolMenuItem data-testid="toolbar-image-equal-width" disabled={!canEqualizeImages} title={canEqualizeImages ? undefined : NEEDS_TWO} onClick={() => { onEqualizeImageWidth(); close(); }}>
               Gleiche Breite wie erstes Bild
-            </button>
-            <button type="button" className="tw-rb__menu-item" data-testid="toolbar-image-reset-size" onClick={() => { onResetImageSize(); close(); }}>
+            </ToolMenuItem>
+            <ToolMenuItem data-testid="toolbar-image-reset-size" onClick={() => { onResetImageSize(); close(); }}>
               Standardgröße
-            </button>
+            </ToolMenuItem>
           </>
         )}
-      </Dropdown>
-    </>
+      </ToolMenu>
+    </Toolbar>
   );
 }

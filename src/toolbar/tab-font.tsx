@@ -13,9 +13,11 @@
 
 import * as React from "react";
 import { ReactElement } from "react";
+import { AArrowDown, AArrowUp, Bold, Italic, PaintBucket, Strikethrough, Subscript, Superscript, Underline } from "lucide-react";
+import { ToolButton, ToolSelect } from "@man/config-ui/toolbar/tool-button";
+import { ToolSeparator, Toolbar } from "@man/config-ui/toolbar/toolbar";
 
-import { ColorButton, RibbonButton } from "./controls";
-import { IconSubscript, IconSuperscript } from "./icons";
+import { ColorButton } from "./controls";
 import { TableToolbarProps } from "./props";
 
 const FONT_SIZES = [10, 12, 14, 16, 18, 20, 24, 28, 32];
@@ -35,7 +37,10 @@ export type FontTabProps = Pick<
   | "onSubscript"
 >;
 
-/** Everything that changes how the characters in a cell look. */
+/**
+ * Everything that changes how the characters in a cell look: Auszeichnung,
+ * Farben, Größe – in dieser Reihenfolge wie im Screen, je Gruppe getrennt.
+ */
 export function FontTab({
   hasSelection,
   activeFormat,
@@ -52,11 +57,37 @@ export function FontTab({
   const disabled = !hasSelection;
 
   return (
-    <>
-      <select
-        className="tw-rb__select"
+    <Toolbar aria-label="Schrift">
+      <ToolButton data-testid="toolbar-bold" label="Fett" icon={Bold} disabled={disabled} pressed={activeFormat.bold === true} onClick={() => onToggle("bold")} />
+      <ToolButton data-testid="toolbar-italic" label="Kursiv" icon={Italic} disabled={disabled} pressed={activeFormat.italic === true} onClick={() => onToggle("italic")} />
+      <ToolButton data-testid="toolbar-underline" label="Unterstrichen" icon={Underline} disabled={disabled} pressed={activeFormat.underline === true} onClick={() => onToggle("underline")} />
+      <ToolButton data-testid="toolbar-strike" label="Durchgestrichen" icon={Strikethrough} disabled={disabled} pressed={activeFormat.strikethrough === true} onClick={() => onToggle("strikethrough")} />
+      {/* Befehle, keine Umschalter: sie wirken auf den markierten Text in der Zelle. */}
+      <ToolButton data-testid="toolbar-superscript" label="Hochstellen" icon={Superscript} disabled={disabled} onClick={onSuperscript} />
+      <ToolButton data-testid="toolbar-subscript" label="Tiefstellen" icon={Subscript} disabled={disabled} onClick={onSubscript} />
+      <ToolSeparator />
+      <ColorButton
+        testId="toolbar-color"
+        label="Schriftfarbe"
+        disabled={disabled}
+        value={activeFormat.color}
+        onChange={onColor}
+        onClear={onClearColor}
+        glyph={<span className="text-[15px] font-bold">A</span>}
+      />
+      <ColorButton
+        testId="toolbar-bg"
+        label="Hintergrundfarbe"
+        disabled={disabled}
+        value={activeFormat.background}
+        onChange={onBackground}
+        onClear={onClearBackground}
+        glyph={<PaintBucket className="size-4" aria-hidden />}
+      />
+      <ToolSeparator />
+      <ToolSelect
         data-testid="toolbar-fontsize"
-        aria-label="Schriftgröße"
+        label="Schriftgröße"
         disabled={disabled}
         value={activeFormat.fontSize ?? ""}
         onChange={(e) => onFontSize(e.target.value === "" ? null : Number(e.target.value))}
@@ -67,57 +98,9 @@ export function FontTab({
             {size}
           </option>
         ))}
-      </select>
-      <RibbonButton testId="toolbar-fontsize-inc" variant="step" title="Schrift vergrößern" disabled={disabled} onClick={() => onFontSizeStep(1)}>
-        <span className="tw-rb__glyph tw-rb__glyph--lg">A</span>
-        <span className="tw-rb__glyph tw-rb__glyph--arrow">▲</span>
-      </RibbonButton>
-      <RibbonButton testId="toolbar-fontsize-dec" variant="step" title="Schrift verkleinern" disabled={disabled} onClick={() => onFontSizeStep(-1)}>
-        <span className="tw-rb__glyph tw-rb__glyph--sm">A</span>
-        <span className="tw-rb__glyph tw-rb__glyph--arrow">▼</span>
-      </RibbonButton>
-      <RibbonButton testId="toolbar-bold" variant="icon" title="Fett" disabled={disabled} active={activeFormat.bold} onClick={() => onToggle("bold")}>
-        <strong>F</strong>
-      </RibbonButton>
-      <RibbonButton testId="toolbar-italic" variant="icon" title="Kursiv" disabled={disabled} active={activeFormat.italic} onClick={() => onToggle("italic")}>
-        <em>K</em>
-      </RibbonButton>
-      <RibbonButton testId="toolbar-underline" variant="icon" title="Unterstrichen" disabled={disabled} active={activeFormat.underline} onClick={() => onToggle("underline")}>
-        <span className="tw-rb__glyph tw-rb__glyph--underline">U</span>
-      </RibbonButton>
-      <RibbonButton testId="toolbar-strike" variant="icon" title="Durchgestrichen" disabled={disabled} active={activeFormat.strikethrough} onClick={() => onToggle("strikethrough")}>
-        <span className="tw-rb__glyph tw-rb__glyph--strike">S</span>
-      </RibbonButton>
-      <RibbonButton testId="toolbar-superscript" variant="icon" title="Hochstellen" disabled={disabled} onClick={onSuperscript}>
-        <IconSuperscript />
-      </RibbonButton>
-      <RibbonButton testId="toolbar-subscript" variant="icon" title="Tiefstellen" disabled={disabled} onClick={onSubscript}>
-        <IconSubscript />
-      </RibbonButton>
-      <ColorButton
-        testId="toolbar-bg"
-        title="Hintergrundfarbe"
-        disabled={disabled}
-        value={activeFormat.background}
-        onChange={onBackground}
-        onClear={onClearBackground}
-        glyph={
-          <span aria-hidden className="tw-rb__glyph tw-rb__glyph--icon">
-            <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden>
-              <rect x="2" y="2" width="12" height="12" rx="2" fill="currentColor" />
-            </svg>
-          </span>
-        }
-      />
-      <ColorButton
-        testId="toolbar-color"
-        title="Schriftfarbe"
-        disabled={disabled}
-        value={activeFormat.color}
-        onChange={onColor}
-        onClear={onClearColor}
-        glyph={<span aria-hidden className="tw-rb__glyph tw-rb__glyph--bold">A</span>}
-      />
-    </>
+      </ToolSelect>
+      <ToolButton data-testid="toolbar-fontsize-inc" label="Schrift vergrößern" icon={AArrowUp} disabled={disabled} onClick={() => onFontSizeStep(1)} />
+      <ToolButton data-testid="toolbar-fontsize-dec" label="Schrift verkleinern" icon={AArrowDown} disabled={disabled} onClick={() => onFontSizeStep(-1)} />
+    </Toolbar>
   );
 }
