@@ -1,6 +1,20 @@
 {
   "versions": [
     {
+      "version": "1.8.0-rc.10",
+      "date": "2026-11-23",
+      "entries": [
+        {
+          "type": "feat",
+          "text": "Icons in der Zelle folgen Fett und Kursiv"
+        },
+        {
+          "type": "feat",
+          "text": "Icons der gemeinsamen Bibliothek statt eigener Elemente"
+        }
+      ]
+    },
+    {
       "version": "1.8.0-rc.7",
       "date": "2026-11-23",
       "entries": [
@@ -231,48 +245,6 @@
         {
           "type": "fix",
           "text": "Ladereihenfolge-Kollision zwischen .tw-rb__btn und man-ed-button beheben"
-        }
-      ]
-    },
-    {
-      "version": "1.4.0-rc.21",
-      "date": "2026-08-13",
-      "entries": [
-        {
-          "type": "feat",
-          "text": "add help drawer component with styling and functionality"
-        },
-        {
-          "type": "feat",
-          "text": "put save and close in a control bar above the tabs"
-        },
-        {
-          "type": "feat",
-          "text": "toggle the lowercase mark from the toolbar"
-        },
-        {
-          "type": "feat",
-          "text": "drop the lowercase mark with the text markup"
-        },
-        {
-          "type": "feat",
-          "text": "set and clear the mark over character ranges"
-        },
-        {
-          "type": "feat",
-          "text": "let the text-lowercase class through"
-        },
-        {
-          "type": "feat",
-          "text": "group the ribbon into five tabs"
-        },
-        {
-          "type": "feat",
-          "text": "add the tabbed ribbon shell"
-        },
-        {
-          "type": "fix",
-          "text": "let the grid frame fill the modal width"
         }
       ]
     }
