@@ -57,7 +57,8 @@ const mediaTransfer = (id = "a") =>
   });
 
 const cellDiv = (label: string): HTMLElement => screen.getByLabelText(label);
-const zoneOf = (label: string): HTMLElement => cellDiv(label).closest<HTMLElement>("[data-drop-state]")!;
+/** Die Zone für Bilder; innen liegt die für Elemente aus dem Explorer. */
+const zoneOf = (label: string): HTMLElement => cellDiv(label).closest<HTMLElement>("[data-drop-state]:not([data-element-zone])")!;
 
 /** Hält die Tabelle selbst, wie der Rahmen: jede Änderung kommt als neuer Wert zurück. */
 function Harness({ client, onModel }: { client: MediaClient; onModel: (model: TableModel) => void }): React.ReactElement {

@@ -14,6 +14,11 @@
 import { gridHint, gridStatusText } from "./grid-status";
 
 describe("gridStatusText", () => {
+  it("nennt Elemente ohne Bedeutung", () => {
+    expect(gridStatusText(6, 4, [], 1)).toBe("6 Zeilen · 4 Spalten · 1 Element ohne Bedeutung");
+    expect(gridStatusText(6, 4, [], 3)).toBe("6 Zeilen · 4 Spalten · 3 Elemente ohne Bedeutung");
+  });
+
   it("nennt Zeilen und Spalten, ohne Markierung nichts weiter", () => {
     expect(gridStatusText(6, 4, [])).toBe("6 Zeilen · 4 Spalten");
     expect(gridStatusText(1, 1, [])).toBe("1 Zeile · 1 Spalte");

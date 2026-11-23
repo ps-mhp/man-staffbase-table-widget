@@ -15,6 +15,9 @@ import * as React from "react";
 import { ReactElement, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import * as ContextMenu from "@radix-ui/react-context-menu";
 import { ConfigWorkspace } from "@man/config-ui/layout/config-workspace";
+import { ELEMENT_ATTRIBUTE, InlineElement, elementMarkup } from "@man/config-ui/elements/catalog";
+import { elementStylesheet } from "@man/config-ui/elements/element-css";
+import { useElementPanel } from "@man/config-ui/elements/element-panel";
 import { StatusBar } from "@man/config-ui/toolbar/status-bar";
 import {
   TableModel,
@@ -56,9 +59,23 @@ import { IMAGE_FIT_CLASS, IMAGE_NO_FIT_CLASS } from "./image-fit";
 import imageFitCss from "./styles/image-fit.scss";
 import imageNoFitCss from "./styles/image-no-fit.scss";
 import { ClearScope, clearFormatting } from "./clear-format";
+import {
+  ElementAddress,
+  ElementPatch,
+  appendElement,
+  countMatching,
+  countWithoutMeaning,
+  elementAt,
+  meaningsByColor,
+  ownColors,
+  removeCellElement,
+  tableElements,
+  updateCellElement,
+  updateMatchingElements,
+} from "./cell-element";
 import tableEditorCss from "./styles/table-editor.scss";
 import { useHotStyle } from "@shared/hot-style";
-import { activeElementOf, eventRootOf } from "@shared/shadow-dom";
+import { activeElementOf, eventRootOf, selectionOf } from "@shared/shadow-dom";
 import { usePortalContainer } from "@shared/ui/portal-container";
 import { EditableCell } from "./editable-cell";
 import { GridContextMenu, GridMenuActions } from "./grid-context-menu";
@@ -100,6 +117,10 @@ export interface TableEditorProps {
  * up as a compile error rather than as silently unstyled markup.
  */
 const CELL = "table-editor__cell";
+
+/** Die Elemente des Explorers sehen im Gitter aus wie auf der Seite. */
+const ELEMENT_CSS = elementStylesheet();
+const ELEMENT_SELECTOR = `[${ELEMENT_ATTRIBUTE}]`;
 
 /** The markup of an inserted image: its own width, capped at the default. */
 const imageMarkup = (image: PickedImage): string => {
@@ -252,8 +273,17 @@ export const TableEditor = ({
   };
 
   const handleCellMouseDown = (event: React.MouseEvent, row: number, col: number): void => {
-    // While a cell is being edited, let the mouse drive the caret normally.
-    if (isEditing(row, col)) return;
+    const pickedHere = pickElementAt(event, row, col);
+    if (!pickedHere) setPickedElement(null);
+    // While a cell is being edited, let the mouse drive the caret normally –
+    // a click on an element leaves the cell, so its new colour shows at once.
+    if (isEditing(row, col)) {
+      if (pickedHere) {
+        event.preventDefault();
+        leaveEdit();
+      }
+      return;
+    }
 
     if (event.shiftKey) {
       event.preventDefault();
@@ -520,6 +550,146 @@ export const TableEditor = ({
   const clearFormats = (scope: ClearScope): void =>
     onChange(clearFormatting(value, cellsInRanges(ranges), scope));
 
+  // --- Elemente (Element Explorer) ---
+
+  /**
+   * Das angeklickte Element; die Leiste zeigt dann „Bearbeiten“. Form und
+   * Farbe stehen dabei: ändert sich die Zelle, zeigte die Stelle allein
+   * womöglich auf ein anderes Element.
+   */
+  const [pickedElement, setPickedElement] = useState<(ElementAddress & Pick<InlineElement, "id" | "color">) | null>(null);
+  const elements = useMemo(() => tableElements(data), [data]);
+  const meanings = useMemo(() => meaningsByColor(elements), [elements]);
+  const usedColors = useMemo(() => ownColors(elements), [elements]);
+
+  /** Wohin „Einfügen“ setzt: die bearbeitete Zelle, sonst jede markierte (verdeckte nicht). */
+  const elementTargets: Array<[number, number]> = editing
+    ? [editing]
+    : cellsInRanges(ranges).filter(([row, col]) => !isCovered(value, row, col));
+  const elementTarget =
+    elementTargets.length === 0
+      ? null
+      : elementTargets.length === 1
+        ? `Zelle ${cellName(elementTargets[0][0], elementTargets[0][1])}`
+        : `${elementTargets.length} Zellen`;
+
+  const pickedInfo = useMemo(() => {
+    if (pickedElement === null) return null;
+    const element = elementAt(data, pickedElement);
+    if (element === null || element.id !== pickedElement.id || element.color !== pickedElement.color) return null;
+    return { element, where: `Zelle ${cellName(pickedElement.row, pickedElement.col)}`, sameCount: countMatching(elements, element) };
+  }, [data, elements, pickedElement]);
+
+  /**
+   * An den Cursor – aber nur, solange er noch in der bearbeiteten Zelle
+   * steht. Die Kacheln und „Einfügen“ nehmen den Fokus nicht; wer zuvor in
+   * ein Feld der Leiste getippt hat, bekommt das Element ans Zellende.
+   *
+   * Über die Auswahl selbst statt `execCommand("insertHTML")`: Chrome
+   * schreibt dort Inline-Stile um (etwa in `rgb()`), und die Farbe ist hier
+   * Inhalt.
+   */
+  const insertElementAtCaret = (element: InlineElement): boolean => {
+    const cell = editing;
+    const root = rootRef.current;
+    const el = root === null ? null : (activeElementOf(root) as HTMLElement | null);
+    const selection = el === null ? null : selectionOf(el);
+    const editable = el !== null && (el.isContentEditable || el.getAttribute("contenteditable") === "true");
+    if (!cell || !el || !editable || !selection || selection.rangeCount === 0) return false;
+    const range = selection.getRangeAt(0);
+    if (!el.contains(range.commonAncestorContainer)) return false;
+    const node = range.createContextualFragment(elementMarkup(element)).firstChild;
+    if (node === null) return false;
+    range.deleteContents();
+    range.insertNode(node);
+    range.setStartAfter(node);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    handleInput(cell[0], cell[1], sanitizeRichText(el.innerHTML));
+    return true;
+  };
+
+  const insertElement = (element: InlineElement): void => {
+    if (insertElementAtCaret(element) || elementTargets.length === 0) return;
+    const next = elementTargets.reduce(
+      (acc, [row, col]) => updateCell(acc, row, col, appendElement(acc[row]?.[col], element)),
+      data,
+    );
+    onChange({ ...value, data: next });
+  };
+
+  /** Aus der Leiste auf eine Zelle gezogen: ans Ende genau dieser Zelle. */
+  const dropElementIntoCell = (row: number, col: number, element: InlineElement): void => {
+    const { value: current, onChange: change } = latest.current;
+    const existing = current.data[row]?.[col];
+    if (existing === undefined) return;
+    change({ ...current, data: updateCell(current.data, row, col, appendElement(existing, element)) });
+  };
+
+  const updatePickedElement = (patch: ElementPatch, all: boolean): void => {
+    if (pickedElement === null || pickedInfo === null) return;
+    const { row, col, index } = pickedElement;
+    const next = all
+      ? updateMatchingElements(data, pickedInfo.element, patch)
+      : updateCell(data, row, col, updateCellElement(data[row]?.[col], index, patch));
+    if (patch.color !== undefined) setPickedElement({ ...pickedElement, color: patch.color });
+    onChange({ ...value, data: next });
+  };
+
+  const removePickedElement = (): void => {
+    if (pickedElement === null) return;
+    const { row, col, index } = pickedElement;
+    setPickedElement(null);
+    onChange({ ...value, data: updateCell(data, row, col, removeCellElement(data[row]?.[col], index)) });
+  };
+
+  const elementPanel = useElementPanel(
+    { target: elementTarget, picked: pickedInfo, meanings, usedColors },
+    {
+      onInsert: insertElement,
+      onUpdate: updatePickedElement,
+      onRemove: removePickedElement,
+      onRelease: () => setPickedElement(null),
+      onClosed: () => setPickedElement(null),
+    },
+  );
+
+  /**
+   * Ein Klick auf ein Element im Gitter wählt es zum Bearbeiten und öffnet
+   * die Leiste. Welches es ist, sagt seine Stelle unter den Elementen der
+   * Zelle – so zählt auch `cell-element.ts`.
+   */
+  function pickElementAt(event: React.MouseEvent, row: number, col: number): boolean {
+    // Rechtsklick und Markieren mit Umschalt/⌘ bleiben, was sie sind.
+    if (event.button !== 0 || event.shiftKey || event.ctrlKey || event.metaKey) return false;
+    const cell = event.currentTarget as HTMLElement;
+    const node = (event.target as Element).closest?.(ELEMENT_SELECTOR);
+    if (!node || !cell.contains(node)) return false;
+    const index = Array.from(cell.querySelectorAll(ELEMENT_SELECTOR)).indexOf(node);
+    const element = index < 0 ? null : elementAt(data, { row, col, index });
+    if (element === null) return false;
+    setPickedElement({ row, col, index, id: element.id, color: element.color });
+    if (!elementPanel.isOpen) elementPanel.open();
+    return true;
+  }
+
+  // Das gewählte Element trägt seinen Ring im DOM der Zelle; deren Inhalt
+  // setzt `EditableCell` selbst, deshalb hier nach jedem Zeichnen.
+  useEffect(() => {
+    const root = rootRef.current;
+    if (root === null) return;
+    root.querySelectorAll("[data-man-picked]").forEach((node) => node.removeAttribute("data-man-picked"));
+    if (pickedElement === null || pickedInfo === null) return;
+    const cell = root.querySelector(`[aria-label="Zeile ${pickedElement.row + 1}, Spalte ${pickedElement.col + 1}"]`);
+    cell?.querySelectorAll(ELEMENT_SELECTOR)[pickedElement.index]?.setAttribute("data-man-picked", "");
+  });
+
+  // Weg ist weg – etwa nach Rückgängig: dann zurück zum Einfügen.
+  useEffect(() => {
+    if (pickedElement !== null && pickedInfo === null) setPickedElement(null);
+  }, [pickedElement, pickedInfo]);
+
   // --- Format painter (pattern-based, like Excel) ---
 
   /**
@@ -607,6 +777,7 @@ export const TableEditor = ({
     merge: doMerge,
     unmerge: doUnmerge,
     insertImage: openImagePicker,
+    insertElement: elementPanel.open,
     toggle: toggleKey,
     format: applyFormat,
     sort: doSort,
@@ -630,6 +801,9 @@ export const TableEditor = ({
       onFontSizeStep={stepFontSize}
       onSuperscript={() => applyVertAlign("superscript")}
       onSubscript={() => applyVertAlign("subscript")}
+      elementsOpen={elementPanel.isOpen}
+      elementsAvailable={elementPanel.available}
+      onToggleElements={elementPanel.toggle}
       onInsertRowAbove={insertRowAbove}
       onInsertRowBelow={insertRowBelow}
       onInsertColLeft={insertColLeft}
@@ -695,8 +869,12 @@ export const TableEditor = ({
                   onDoubleClick={() => handleCellDoubleClick(rowIndex, colIndex)}
                   onContextMenu={() => handleCellContextMenu(rowIndex, colIndex)}
                 >
-                  {/* Jede Zelle nimmt Bilder aus der Mediathek-Leiste an. */}
-                  <CellDropZone client={client} onImage={(image) => insertImageIntoCell(rowIndex, colIndex, image)}>
+                  {/* Jede Zelle nimmt Bilder aus der Mediathek-Leiste und Elemente aus dem Explorer an. */}
+                  <CellDropZone
+                    client={client}
+                    onImage={(image) => insertImageIntoCell(rowIndex, colIndex, image)}
+                    onElement={(element) => dropElementIntoCell(rowIndex, colIndex, element)}
+                  >
                     <EditableCell
                       html={sanitizeRichText(cell)}
                       ariaLabel={`Zeile ${rowIndex + 1}, Spalte ${colIndex + 1}`}
@@ -724,6 +902,7 @@ export const TableEditor = ({
           `document.head`: it is mounted into someone else's dialog and should
           leave nothing behind when it goes. */}
       <style>{hotTableEditorCss}</style>
+      <style>{ELEMENT_CSS}</style>
       <ConfigWorkspace
         className="min-h-0 flex-1"
         inspector={<TableInspector value={value} onChange={onChange} />}
@@ -748,7 +927,7 @@ export const TableEditor = ({
           </div>
           <StatusBar
             data-testid="table-editor-status"
-            start={gridStatusText(rowCount, colCount, ranges)}
+            start={gridStatusText(rowCount, colCount, ranges, countWithoutMeaning(elements))}
             end={gridHint({ editing: editing !== null, painterActive })}
           />
         </div>

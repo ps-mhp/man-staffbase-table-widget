@@ -15,6 +15,7 @@ import * as React from "react";
 import { ReactElement, useEffect, useRef, useState } from "react";
 
 import { MEDIA_DRAG_TYPE, hasDragType } from "@man/config-ui/drop/drag-payload";
+import { ELEMENT_DRAG_TYPE } from "@man/config-ui/elements/element-drag";
 
 import { clampImageWidth } from "./cell-image";
 import { sanitizeRichText } from "./rich-text";
@@ -80,14 +81,15 @@ function startImageResize(event: React.MouseEvent, img: HTMLImageElement, onMove
 }
 
 /**
- * Ein Medium aus der Mediathek-Leiste gehört der Ablagezone um die Zelle
- * (`CellDropZone`), nicht dem Text: eine bearbeitete Zelle nähme sonst die
- * mitgezogene Vorschau-Adresse als Text auf. `preventDefault` hält den
+ * Ein Medium aus der Mediathek-Leiste oder ein Element aus dem Explorer
+ * gehört der Ablagezone um die Zelle (`CellDropZone`), nicht dem Text: eine
+ * bearbeitete Zelle nähme sonst die mitgezogene Vorschau-Adresse oder das
+ * JSON als Text auf. `preventDefault` hält den
  * Browser davon ab; das Ereignis steigt weiter zur Zone, die das Bild
  * einsetzt. Alles andere – gezogener Text – bleibt beim Browser.
  */
 function keepMediaOutOfText(event: React.DragEvent<HTMLDivElement>): void {
-  if (hasDragType(event.dataTransfer, MEDIA_DRAG_TYPE)) event.preventDefault();
+  if (hasDragType(event.dataTransfer, MEDIA_DRAG_TYPE) || hasDragType(event.dataTransfer, ELEMENT_DRAG_TYPE)) event.preventDefault();
 }
 
 /**

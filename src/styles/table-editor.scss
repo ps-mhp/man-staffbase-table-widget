@@ -189,6 +189,23 @@
     &--editing {
       cursor: text;
     }
+
+    // Elemente aus dem Explorer: ein Klick öffnet sie zum Bearbeiten; das
+    // angeklickte trägt einen Ring wie die aktuelle Zelle.
+    [data-man-el] {
+      cursor: pointer;
+      border-radius: 2px;
+    }
+
+    [data-man-el]:hover {
+      outline: 2px solid var(--primary-soft-border);
+      outline-offset: 1px;
+    }
+
+    [data-man-el][data-man-picked] {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
   }
 
   // Bezugsrahmen für den Anfasser am ausgewählten Bild; dessen Position hängt

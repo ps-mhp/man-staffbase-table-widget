@@ -21,10 +21,15 @@ import { rangeName } from "./selection";
 
 const count = (n: number, one: string, many: string): string => `${n} ${n === 1 ? one : many}`;
 
-/** Größe der Tabelle und, falls etwas markiert ist, die Bereiche in Markierreihenfolge. */
-export function gridStatusText(rows: number, cols: number, ranges: ReadonlyArray<CellRange>): string {
+/**
+ * Größe der Tabelle und, falls etwas markiert ist, die Bereiche in
+ * Markierreihenfolge. Dazu, wie viele Elemente noch keine Bedeutung tragen:
+ * ein Hinweis, kein Fehler – übernehmen lässt sich trotzdem.
+ */
+export function gridStatusText(rows: number, cols: number, ranges: ReadonlyArray<CellRange>, elementsWithoutMeaning = 0): string {
   const parts = [count(rows, "Zeile", "Zeilen"), count(cols, "Spalte", "Spalten")];
   if (ranges.length > 0) parts.push(`Auswahl ${ranges.map(rangeName).join(", ")}`);
+  if (elementsWithoutMeaning > 0) parts.push(`${count(elementsWithoutMeaning, "Element", "Elemente")} ohne Bedeutung`);
   return parts.join(" · ");
 }
 

@@ -40,6 +40,11 @@ export interface TableToolbarProps {
   onFontSizeStep: (delta: number) => void;
   onSuperscript: () => void;
   onSubscript: () => void;
+  /** Ob die Leiste „Elemente“ offen ist. */
+  elementsOpen: boolean;
+  /** Ob es einen Rahmen gibt, der die Leiste zeigen kann. */
+  elementsAvailable: boolean;
+  onToggleElements: () => void;
   onInsertRowAbove: () => void;
   onInsertRowBelow: () => void;
   onInsertColLeft: () => void;

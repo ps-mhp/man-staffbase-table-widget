@@ -84,6 +84,14 @@ export const HELP_TOPICS: HelpTopic[] = [
         title: "Schrift- und Hintergrundfarbe",
         text: "Der Knopf öffnet einen Farbwähler für die Text- bzw. Zellenhintergrundfarbe der Markierung; der Balken darunter zeigt die gesetzte Farbe. Der Pfeil daneben bietet „Standard“, das die Farbe wieder entfernt.",
       },
+      {
+        title: "Elemente einfügen",
+        text: "„Elemente“ öffnet rechts den Katalog. Form und Farbe wählen – die MAN-CI-Farben stehen immer zur Wahl, eigene als Hex-Wert –, dazu die Bedeutung, etwa „Diesel“. „Einfügen“ setzt das Element an den Cursor der bearbeiteten Zelle, sonst ans Ende jeder markierten Zelle; Doppelklick auf die Kachel oder Ziehen in eine Zelle geht auch. Das Element steht im Text wie ein Zeichen und wächst mit der Schriftgröße.",
+      },
+      {
+        title: "Elemente einfärben",
+        text: "Ein Klick auf ein Element in der Tabelle öffnet es zum Bearbeiten: Farbe, Größe und Bedeutung wirken sofort, auf Wunsch auf alle gleichen Elemente (gleiche Form, gleiche Farbe). „Entfernen“ löscht es. Die Bedeutung lesen Screenreader vor, und sie steht im Excel-, CSV- und PowerPoint-Export; ohne Bedeutung steht dort „■“, und die Statuszeile zählt solche Elemente.",
+      },
     ],
   },
   {

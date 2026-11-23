@@ -65,6 +65,8 @@ export interface GridMenuActions {
   merge: () => void;
   unmerge: () => void;
   insertImage: () => void;
+  /** Öffnet den Element Explorer für die Markierung. */
+  insertElement: () => void;
   toggle: (key: "bold" | "italic" | "underline" | "strikethrough") => void;
   format: (patch: CellFormat) => void;
   sort: (dir: "asc" | "desc") => void;
@@ -146,6 +148,7 @@ export function GridContextMenu({ container, hasSelection, actions }: GridContex
         <MenuItem testId="unmerge-cells" onSelect={actions.unmerge} disabled={disabled}>Verbindung aufheben</MenuItem>
         <Separator />
         <MenuItem testId="insert-image" onSelect={actions.insertImage} disabled={disabled}>Bild einfügen…</MenuItem>
+        <MenuItem testId="insert-element" onSelect={actions.insertElement} disabled={disabled}>Element einfügen…</MenuItem>
         <Separator />
         <TextOptions container={container} actions={actions} disabled={disabled} />
         <SortOptions container={container} actions={actions} disabled={disabled} />

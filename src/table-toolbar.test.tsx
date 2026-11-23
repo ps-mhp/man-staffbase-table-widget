@@ -38,6 +38,9 @@ const props = (overrides: Partial<TableToolbarProps> = {}): TableToolbarProps =>
   onFontSizeStep: jest.fn(),
   onSuperscript: jest.fn(),
   onSubscript: jest.fn(),
+  elementsOpen: false,
+  elementsAvailable: true,
+  onToggleElements: jest.fn(),
   onInsertRowAbove: jest.fn(),
   onInsertRowBelow: jest.fn(),
   onInsertColLeft: jest.fn(),
@@ -97,6 +100,21 @@ describe("TableToolbar", () => {
         expect(tool).toHaveAccessibleName();
       }
     }
+  });
+
+  it("öffnet die Elemente aus dem Reiter Schrift und zeigt, ob die Leiste offen ist", () => {
+    const onToggleElements = jest.fn();
+    const { rerender } = render(<TableToolbar {...props({ onToggleElements })} />);
+    const button = screen.getByRole("button", { name: "Elemente einfügen" });
+    expect(button).toHaveTextContent("Elemente");
+    expect(button).toHaveAttribute("aria-pressed", "false");
+    fireEvent.click(button);
+    expect(onToggleElements).toHaveBeenCalled();
+
+    rerender(<TableToolbar {...props({ onToggleElements, elementsOpen: true })} />);
+    expect(screen.getByRole("button", { name: "Elemente einfügen" })).toHaveAttribute("aria-pressed", "true");
+    rerender(<TableToolbar {...props({ elementsAvailable: false })} />);
+    expect(screen.getByRole("button", { name: "Elemente einfügen" })).toBeDisabled();
   });
 
   it("zeigt Icons statt Buchstaben für die Auszeichnungen", () => {

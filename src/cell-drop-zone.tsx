@@ -23,6 +23,9 @@
 import * as React from "react";
 import { ReactElement } from "react";
 import { DropZone, dropStateOf } from "@man/config-ui/drop/drop-zone";
+import { useDropZone } from "@man/config-ui/drop/use-drop-zone";
+import { InlineElement, spokenLabel } from "@man/config-ui/elements/catalog";
+import { ELEMENT_DRAG_TYPE, parseElementDragPayload } from "@man/config-ui/elements/element-drag";
 import { MediaClient } from "@shared/media/media-client";
 import { PickedImage } from "@shared/media/media-picker";
 import { useMediaDrop } from "@shared/media/use-media-drop";
@@ -35,10 +38,30 @@ export interface CellDropZoneProps {
    * nicht in den, der beim Ablegen galt.
    */
   onImage: (image: PickedImage) => void;
+  /** Ein Element, aus dem Explorer auf die Zelle gezogen. */
+  onElement: (element: InlineElement) => void;
   children: React.ReactNode;
 }
 
-export function CellDropZone({ client, onImage, children }: CellDropZoneProps): ReactElement {
+/** Bündig in der Zelle, wie die Zone für Bilder (siehe unten). */
+const flushRing = (state: string): string => (state === "ready" ? "rounded-none outline-none" : "rounded-none outline-offset-[-3px]");
+
+/** Nimmt gezogene Elemente an; ohne Anfrage an den Server, also sofort. */
+function ElementDropZone({ onElement, children }: Pick<CellDropZoneProps, "onElement" | "children">): ReactElement {
+  const zone = useDropZone<InlineElement>({
+    type: ELEMENT_DRAG_TYPE,
+    parse: parseElementDragPayload,
+    onDrop: onElement,
+    announce: (element) => `${spokenLabel(element)} eingefügt.`,
+  });
+  return (
+    <DropZone zone={zone} data-element-zone="" label="Hier einfügen" className={flushRing(dropStateOf(zone, false))}>
+      {children}
+    </DropZone>
+  );
+}
+
+export function CellDropZone({ client, onImage, onElement, children }: CellDropZoneProps): ReactElement {
   const drop = useMediaDrop({ client, accept: "images", onPick: onImage });
   const state = dropStateOf(drop, drop.busy);
   return (
@@ -54,7 +77,7 @@ export function CellDropZone({ client, onImage, children }: CellDropZoneProps): 
         state === "ready" ? "rounded-none outline-none" : "rounded-none outline-offset-[-3px]"
       }
     >
-      {children}
+      <ElementDropZone onElement={onElement}>{children}</ElementDropZone>
       {drop.error !== null && (
         <p role="alert" className="px-2 pb-1 text-xs text-destructive">
           {drop.error}
