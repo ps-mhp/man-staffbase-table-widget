@@ -1,0 +1,280 @@
+{
+  "versions": [
+    {
+      "version": "1.8.0-rc.5",
+      "date": "2026-11-23",
+      "entries": [
+        {
+          "type": "feat",
+          "text": "Reiter \"Elemente\" statt Knopf im Reiter Schrift"
+        },
+        {
+          "type": "feat",
+          "text": "Zellen kopieren, einfuegen und ausfuellen wie in Excel"
+        },
+        {
+          "type": "feat",
+          "text": "Element Explorer im Tabellen-Editor"
+        },
+        {
+          "type": "feat",
+          "text": "Elemente aus dem Element Explorer in Zellen speichern und zeigen"
+        },
+        {
+          "type": "fix",
+          "text": "Kasten im Gitter ohne abgerundete Ecken"
+        }
+      ]
+    },
+    {
+      "version": "1.8.0-rc.3",
+      "date": "2026-11-18",
+      "entries": [
+        {
+          "type": "feat",
+          "text": "Panel „Tabelle“ wie im Screen"
+        },
+        {
+          "type": "feat",
+          "text": "Gitter mit Spaltenbuchstaben, Zeilennummern und Statuszeile"
+        },
+        {
+          "type": "feat",
+          "text": "Reiter und Werkzeugleisten im Stil des Config-Modals"
+        },
+        {
+          "type": "feat",
+          "text": "Zellbilder aus dem Medien-Panel, Ablegen auf jede Zelle"
+        },
+        {
+          "type": "feat",
+          "text": "Tabellen-Editor im gemeinsamen Rahmen von @man/config-ui"
+        },
+        {
+          "type": "fix",
+          "text": "Gitter bündig unter der Werkzeugleiste, ohne Polster"
+        },
+        {
+          "type": "fix",
+          "text": "Pill-Gruppen im Panel „Tabelle“ inhaltsbreit"
+        },
+        {
+          "type": "fix",
+          "text": "Farbbalken ohne gesetzte Farbe wie im Screen"
+        }
+      ]
+    },
+    {
+      "version": "1.8.0-rc.2",
+      "date": "2026-11-06",
+      "entries": [
+        {
+          "type": "fix",
+          "text": "Tabellen-Editor im Shadow Root des Config-Modals"
+        }
+      ]
+    },
+    {
+      "version": "1.8.0-rc.1",
+      "date": "2026-10-21",
+      "entries": [
+        {
+          "type": "feat",
+          "text": "Exportmodus im Editor"
+        },
+        {
+          "type": "feat",
+          "text": "Zeilen-Hover, Zeilenauswahl und Export-Leiste"
+        },
+        {
+          "type": "feat",
+          "text": "Datei-Download fuer den Export"
+        },
+        {
+          "type": "feat",
+          "text": "Export als XLSX und CSV"
+        },
+        {
+          "type": "feat",
+          "text": "Exportmodus im Tabellenmodell"
+        },
+        {
+          "type": "fix",
+          "text": "Exportmodus heisst all wie in der Spec"
+        }
+      ]
+    },
+    {
+      "version": "1.7.0-rc.4",
+      "date": "2026-10-14",
+      "entries": [
+        {
+          "type": "feat",
+          "text": "Inhalts-Export für die PPT Engine"
+        }
+      ]
+    },
+    {
+      "version": "1.7.0-rc.3",
+      "date": "2026-10-05",
+      "entries": [
+        {
+          "type": "feat",
+          "text": "Kleinschreib-Auszeichnung entfernen"
+        },
+        {
+          "type": "feat",
+          "text": "Tabellenkopf und Zellen nach Craft-Tabelle"
+        },
+        {
+          "type": "feat",
+          "text": "Seitenstyles nach Craft (MAN Design System)"
+        }
+      ]
+    },
+    {
+      "version": "vor-rueckbau-man-ci-editor",
+      "date": "2026-09-07",
+      "entries": [
+        {
+          "type": "feat",
+          "text": "Ribbon uebernimmt gedrueckten Zustand und schuetzt Fokus beim Tab-Wechsel"
+        },
+        {
+          "type": "feat",
+          "text": "Symbole aus dem MAN-Katalog, wo er traegt"
+        },
+        {
+          "type": "feat",
+          "text": "Kontextmenue-Stylesheet des Rasters auf MAN-Token umstellen"
+        },
+        {
+          "type": "feat",
+          "text": "Hilfe-Schublade auf die MAN-Primitiven"
+        },
+        {
+          "type": "feat",
+          "text": "Auswahllisten, Felder und Schalter auf die MAN-Primitiven"
+        },
+        {
+          "type": "feat",
+          "text": "Menues und Farbwaehler auf die MAN-Primitiven"
+        },
+        {
+          "type": "feat",
+          "text": "Ribbon-Knoepfe auf die MAN-Primitiven"
+        },
+        {
+          "type": "feat",
+          "text": "Reiterleiste des Ribbons auf das Tabs-Primitiv"
+        },
+        {
+          "type": "feat",
+          "text": "Schriftrollen statt sechs Pixelgroessen"
+        },
+        {
+          "type": "feat",
+          "text": "Fokusring, Rundungen und die letzten rohen Farben"
+        },
+        {
+          "type": "feat",
+          "text": "Redaktionsoberflaeche bezieht MAN-Editor-Token"
+        },
+        {
+          "type": "fix",
+          "text": "Pruefbefunde der Abschlusspruefung behoben"
+        },
+        {
+          "type": "fix",
+          "text": "letzte Inline-Farben der Werkzeugleiste aufgeloest"
+        },
+        {
+          "type": "fix",
+          "text": "svg-icons erben groesse per 1em, sichere katalog-glyphen ab"
+        },
+        {
+          "type": "fix",
+          "text": "min-height fuer Kontextmenue-Eintraege ergaenzen"
+        },
+        {
+          "type": "fix",
+          "text": "benenne Hervorhebungston klar, sichere Escape-Huelle ab"
+        },
+        {
+          "type": "fix",
+          "text": "Hilfetext des Bild-Schalters fuer Screenreader verdrahten"
+        },
+        {
+          "type": "fix",
+          "text": "Spezifitaet der Ribbon-Aktiv-Regel gegen man-ed-button--ghost absichern"
+        },
+        {
+          "type": "fix",
+          "text": "Ladereihenfolge-Kollision zwischen .tw-rb__btn und man-ed-button beheben"
+        }
+      ]
+    },
+    {
+      "version": "1.4.0-rc.21",
+      "date": "2026-08-13",
+      "entries": [
+        {
+          "type": "feat",
+          "text": "add help drawer component with styling and functionality"
+        },
+        {
+          "type": "feat",
+          "text": "put save and close in a control bar above the tabs"
+        },
+        {
+          "type": "feat",
+          "text": "toggle the lowercase mark from the toolbar"
+        },
+        {
+          "type": "feat",
+          "text": "drop the lowercase mark with the text markup"
+        },
+        {
+          "type": "feat",
+          "text": "set and clear the mark over character ranges"
+        },
+        {
+          "type": "feat",
+          "text": "let the text-lowercase class through"
+        },
+        {
+          "type": "feat",
+          "text": "group the ribbon into five tabs"
+        },
+        {
+          "type": "feat",
+          "text": "add the tabbed ribbon shell"
+        },
+        {
+          "type": "fix",
+          "text": "let the grid frame fill the modal width"
+        }
+      ]
+    },
+    {
+      "version": "1.4.0-rc.17",
+      "date": "2026-08-10",
+      "entries": [
+        {
+          "type": "feat",
+          "text": "collapse long tables instead of scrolling them"
+        }
+      ]
+    },
+    {
+      "version": "1.4.0-rc.16",
+      "date": "2026-08-10",
+      "entries": [
+        {
+          "type": "fix",
+          "text": "make the fit cap reach real-world image sizes"
+        }
+      ]
+    }
+  ]
+}
