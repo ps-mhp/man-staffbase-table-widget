@@ -192,9 +192,9 @@
 
     // Elemente aus dem Explorer: ein Klick öffnet sie zum Bearbeiten; das
     // angeklickte trägt einen Ring wie die aktuelle Zelle.
+    // Kein `border-radius`: er schnitte die Ecken des eckigen Kastens ab.
     [data-man-el] {
       cursor: pointer;
-      border-radius: 2px;
     }
 
     [data-man-el]:hover {
