@@ -51,6 +51,14 @@ export const HELP_TOPICS: HelpTopic[] = [
         text: "Klicken und ziehen, mit Umschalt einen Bereich aufziehen, mit ⌘/Strg weitere Bereiche dazunehmen. Die Griffe am Rand markieren ganze Zeilen, Spalten oder die ganze Tabelle. Rechtsklick öffnet das Kontextmenü.",
       },
       {
+        title: "Kopieren und Einfügen",
+        text: "⌘/Strg C kopiert die markierten Zellen samt Formatierung, ⌘/Strg X schneidet sie aus (die Werte werden geleert). ⌘/Strg V fügt ab der markierten Zelle ein; ist die Markierung ein Vielfaches des Kopierten, wird es wiederholt. Aus Excel, Numbers oder Google Sheets kopierte Zellen gehen auch – dann bleibt die Formatierung der Zielzellen. Reicht das Eingefügte über den Rand, wächst die Tabelle.",
+      },
+      {
+        title: "Ausfüllen",
+        text: "Das kleine Quadrat an der unteren rechten Ecke der Markierung ziehen: die markierten Zellen werden über die Nachbarzellen fortgeschrieben, nach unten, oben, rechts oder links – Werte und Formatierung, im Muster der Markierung. Was dort stand, wird überschrieben; ⌘/Strg Z nimmt es zurück.",
+      },
+      {
         title: "Zwischen Reitern wechseln",
         text: "Mit den Pfeiltasten (links/rechts) springt die Tastatur-Fokusmarke von einem Reiter zum nächsten, auch über den Rand der Leiste hinweg zurück zum ersten Reiter. In der Werkzeugleiste darunter wandern dieselben Tasten von Werkzeug zu Werkzeug.",
       },

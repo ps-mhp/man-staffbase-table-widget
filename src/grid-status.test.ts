@@ -13,6 +13,17 @@
 
 import { gridHint, gridStatusText } from "./grid-status";
 
+describe("gridHint – Zwischenablage und Ausfüllen", () => {
+  it("nennt das Ausfüllen vor allem anderen außer dem Bearbeiten", () => {
+    expect(gridHint({ editing: false, painterActive: true, filling: true })).toBe("Loslassen füllt die Zellen aus");
+    expect(gridHint({ editing: true, painterActive: false, filling: true })).toBe("Esc beendet die Eingabe");
+  });
+
+  it("sagt, wie es nach dem Kopieren weitergeht", () => {
+    expect(gridHint({ editing: false, painterActive: false, copied: true })).toBe("Kopiert · ⌘V fügt in die Markierung ein");
+  });
+});
+
 describe("gridStatusText", () => {
   it("nennt Elemente ohne Bedeutung", () => {
     expect(gridStatusText(6, 4, [], 1)).toBe("6 Zeilen · 4 Spalten · 1 Element ohne Bedeutung");

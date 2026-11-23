@@ -60,6 +60,17 @@ import imageFitCss from "./styles/image-fit.scss";
 import imageNoFitCss from "./styles/image-no-fit.scss";
 import { ClearScope, clearFormatting } from "./clear-format";
 import {
+  applyFill,
+  blockToHtml,
+  blockToText,
+  clearCells,
+  copyBlock,
+  fillExtension,
+  pasteCells,
+  readClipboard,
+  unionRange,
+} from "./cell-clipboard";
+import {
   ElementAddress,
   ElementPatch,
   appendElement,
@@ -220,11 +231,53 @@ export const TableEditor = ({
   const isEditing = (row: number, col: number): boolean =>
     editing !== null && editing[0] === row && editing[1] === col;
 
+  /**
+   * Der Fokus gehört dem Editor, solange Zellen markiert (nicht bearbeitet)
+   * werden: dort kommen ⌘C, ⌘X und ⌘V an. Der Mausdruck auf eine Zelle
+   * verhindert sein Standardverhalten und gäbe den Fokus sonst nirgends hin.
+   */
+  const focusGrid = (): void => {
+    const root = rootRef.current;
+    if (root !== null && activeElementOf(root) !== root) root.focus({ preventScroll: true });
+  };
+
+  // --- Ausfüllkästchen: die Markierung über Nachbarzellen fortschreiben ---
+
+  /** Das laufende Ziehen am Kästchen: Quelle und, sobald man sie verlässt, die Erweiterung. */
+  const fillDrag = useRef<{ source: CellRange; extension: CellRange | null } | null>(null);
+  const [fillPreview, setFillPreview] = useState<CellRange | null>(null);
+  /** Beendet das Ziehen – auch, wenn die Maus außerhalb des Gitters losgelassen wird. */
+  const finishFill = useRef<() => void>(() => undefined);
+  useLayoutEffect(() => {
+    finishFill.current = () => {
+      const drag = fillDrag.current;
+      if (drag === null) return;
+      fillDrag.current = null;
+      setFillPreview(null);
+      if (drag.extension === null) return;
+      const { value: current, onChange: change } = latest.current;
+      change(applyFill(current, drag.source, drag.extension));
+      const filled = unionRange(drag.source, drag.extension);
+      setAnchor([filled.top, filled.left]);
+      setRanges([filled]);
+    };
+  });
+
+  const startFill = (event: React.MouseEvent): void => {
+    if (selection === null || event.button !== 0) return;
+    // Vor der Zelle darunter: die begänne sonst eine neue Markierung.
+    event.preventDefault();
+    event.stopPropagation();
+    isDragging.current = false;
+    fillDrag.current = { source: selection, extension: null };
+  };
+
   // Stop drag-selecting when the mouse is released anywhere (also outside the
   // grid), so a drag that ends off-table doesn't get stuck.
   useEffect(() => {
     const stop = (): void => {
       isDragging.current = false;
+      finishFill.current();
     };
     // At the editor's root: in the config modal every click stops at the host.
     const root = eventRootOf(rootRef.current);
@@ -253,16 +306,19 @@ export const TableEditor = ({
   };
 
   const selectRow = (row: number): void => {
+    focusGrid();
     setAnchor([row, 0]);
     setRanges([{ top: row, left: 0, bottom: row, right: colCount - 1 }]);
   };
 
   const selectColumn = (col: number): void => {
+    focusGrid();
     setAnchor([0, col]);
     setRanges([{ top: 0, left: col, bottom: rowCount - 1, right: col }]);
   };
 
   const selectAll = (): void => {
+    focusGrid();
     setAnchor([0, 0]);
     setRanges([{ top: 0, left: 0, bottom: rowCount - 1, right: colCount - 1 }]);
   };
@@ -287,6 +343,7 @@ export const TableEditor = ({
 
     if (event.shiftKey) {
       event.preventDefault();
+      focusGrid();
       extendTo(row, col);
       isDragging.current = true;
       return;
@@ -294,12 +351,19 @@ export const TableEditor = ({
     // Selecting a different cell ends any in-progress edit.
     if (editing) setEditing(null);
     event.preventDefault();
+    focusGrid();
     selectSingle(row, col, event.ctrlKey || event.metaKey);
     isDragging.current = true;
   };
 
   /** Extends the selection while dragging with the mouse button held down. */
   const handleCellMouseEnter = (row: number, col: number): void => {
+    const drag = fillDrag.current;
+    if (drag !== null) {
+      drag.extension = fillExtension(drag.source, row, col);
+      setFillPreview(drag.extension);
+      return;
+    }
     if (isDragging.current && editing === null) extendTo(row, col);
   };
 
@@ -311,6 +375,7 @@ export const TableEditor = ({
 
   const handleCellMouseUp = (): void => {
     isDragging.current = false;
+    finishFill.current();
     if (painterActive && copiedPattern && selection) {
       applyPainter(selection);
     }
@@ -549,6 +614,45 @@ export const TableEditor = ({
    */
   const clearFormats = (scope: ClearScope): void =>
     onChange(clearFormatting(value, cellsInRanges(ranges), scope));
+
+  // --- Kopieren, Ausschneiden, Einfügen von Zellen (⌘C, ⌘X, ⌘V) ---
+
+  /** Der zuletzt kopierte Bereich, gestrichelt umrandet wie in Excel – bis sich die Tabelle ändert. */
+  const [copiedRange, setCopiedRange] = useState<CellRange | null>(null);
+  useEffect(() => setCopiedRange(null), [data]);
+
+  /**
+   * Nur, was am Editor selbst ankommt: in einer bearbeiteten Zelle oder in
+   * einem Feld der Leisten gehört die Zwischenablage dem Text.
+   */
+  const isGridClipboardEvent = (event: React.ClipboardEvent): boolean =>
+    event.target === rootRef.current && editing === null && event.clipboardData !== null;
+
+  const copySelection = (event: React.ClipboardEvent, cut: boolean): void => {
+    if (!isGridClipboardEvent(event) || selection === null) return;
+    event.preventDefault();
+    const block = copyBlock(value, selection);
+    event.clipboardData.setData("text/plain", blockToText(block));
+    event.clipboardData.setData("text/html", blockToHtml(block));
+    if (cut) onChange(clearCells(value, selection));
+    else setCopiedRange(selection);
+  };
+
+  const pasteIntoSelection = (event: React.ClipboardEvent): void => {
+    if (!isGridClipboardEvent(event) || selection === null) return;
+    event.preventDefault();
+    const block = readClipboard(event.clipboardData.getData("text/html"), event.clipboardData.getData("text/plain"));
+    if (block === null) {
+      // Ein Bild ohne Text, etwa ein Bildschirmfoto: in die erste markierte Zelle.
+      const image = firstImageFile(event.clipboardData);
+      if (image) void uploadAndInsertImage(image, selection.top, selection.left);
+      return;
+    }
+    const result = pasteCells(value, selection, block);
+    onChange(result.model);
+    setAnchor([result.range.top, result.range.left]);
+    setRanges([result.range]);
+  };
 
   // --- Elemente (Element Explorer) ---
 
@@ -833,6 +937,37 @@ export const TableEditor = ({
   const isCurrent = (row: number, col: number): boolean =>
     current !== null && current[0] === row && current[1] === col;
 
+  /** Ob eine (verbundene) Zelle den Bereich berührt. */
+  const touches = (range: CellRange | null, row: number, col: number, rowSpan: number, colSpan: number): boolean =>
+    range !== null && row <= range.bottom && row + rowSpan - 1 >= range.top && col <= range.right && col + colSpan - 1 >= range.left;
+
+  /** Gestrichelter Rand um den kopierten Bereich: je Zelle nur die Seiten am Rand. */
+  const copiedClasses = (row: number, col: number, rowSpan: number, colSpan: number): string[] => {
+    const range = copiedRange;
+    if (range === null || !touches(range, row, col, rowSpan, colSpan)) return [];
+    return [
+      `${CELL}--copied`,
+      row <= range.top ? `${CELL}--copied-top` : "",
+      row + rowSpan - 1 >= range.bottom ? `${CELL}--copied-bottom` : "",
+      col <= range.left ? `${CELL}--copied-left` : "",
+      col + colSpan - 1 >= range.right ? `${CELL}--copied-right` : "",
+    ];
+  };
+
+  /**
+   * Das Ausfüllkästchen sitzt an der Zelle mit der unteren rechten Ecke der
+   * Markierung – bei einer verbundenen Zelle an deren Anker. Nur bei genau
+   * einem Bereich und nicht beim Bearbeiten oder mit dem Format-Pinsel.
+   */
+  const fillCorner = ((): [number, number] | null => {
+    if (selection === null || ranges.length !== 1 || editing !== null || painterActive) return null;
+    const { bottom, right } = selection;
+    const merge = value.merges.find(
+      (m) => bottom >= m.row && bottom < m.row + m.rowSpan && right >= m.col && right < m.col + m.colSpan,
+    );
+    return merge ? [merge.row, merge.col] : [bottom, right];
+  })();
+
   const grid = (
     <table className="table-editor__grid" data-testid="table-editor-grid">
       <ColumnHeaders
@@ -860,6 +995,8 @@ export const TableEditor = ({
                     isHeader ? `${CELL}--head` : "",
                     isSelected(rowIndex, colIndex) ? `${CELL}--selected` : "",
                     isCurrent(rowIndex, colIndex) ? `${CELL}--current` : "",
+                    touches(fillPreview, rowIndex, colIndex, merge?.rowSpan ?? 1, merge?.colSpan ?? 1) ? `${CELL}--fill` : "",
+                    ...copiedClasses(rowIndex, colIndex, merge?.rowSpan ?? 1, merge?.colSpan ?? 1),
                   ]
                     .filter(Boolean)
                     .join(" ")}
@@ -886,6 +1023,15 @@ export const TableEditor = ({
                       onEscape={leaveEdit}
                     />
                   </CellDropZone>
+                  {fillCorner !== null && fillCorner[0] === rowIndex && fillCorner[1] === colIndex && (
+                    <span
+                      aria-hidden
+                      data-testid="fill-handle"
+                      className="table-editor__fill-handle"
+                      title="Ziehen füllt die Nachbarzellen aus"
+                      onMouseDown={startFill}
+                    />
+                  )}
                 </td>
               );
             })}
@@ -897,7 +1043,15 @@ export const TableEditor = ({
 
   return (
     // `tabIndex={-1}`: Ziel des Fokus nach Escape in einer Zelle (`leaveEdit`).
-    <div className="table-editor" data-testid="table-editor" ref={rootRef} tabIndex={-1}>
+    <div
+      className="table-editor"
+      data-testid="table-editor"
+      ref={rootRef}
+      tabIndex={-1}
+      onCopy={(event) => copySelection(event, false)}
+      onCut={(event) => copySelection(event, true)}
+      onPaste={pasteIntoSelection}
+    >
       {/* The editor carries its own stylesheet rather than writing to
           `document.head`: it is mounted into someone else's dialog and should
           leave nothing behind when it goes. */}
@@ -928,7 +1082,7 @@ export const TableEditor = ({
           <StatusBar
             data-testid="table-editor-status"
             start={gridStatusText(rowCount, colCount, ranges, countWithoutMeaning(elements))}
-            end={gridHint({ editing: editing !== null, painterActive })}
+            end={gridHint({ editing: editing !== null, painterActive, filling: fillPreview !== null, copied: copiedRange !== null })}
           />
         </div>
       </ConfigWorkspace>

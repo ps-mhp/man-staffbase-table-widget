@@ -170,6 +170,51 @@
     pointer-events: none;
   }
 
+  // Wohin das Ausfüllkästchen gerade zieht.
+  &__cell--fill {
+    outline: 2px dashed var(--primary);
+    outline-offset: -2px;
+  }
+
+  // Der kopierte Bereich: gestrichelt umrandet, je Zelle nur an den Außenseiten.
+  &__cell--copied::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border: 0 dashed var(--primary);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  &__cell--copied-top::before {
+    border-top-width: 2px;
+  }
+
+  &__cell--copied-bottom::before {
+    border-bottom-width: 2px;
+  }
+
+  &__cell--copied-left::before {
+    border-left-width: 2px;
+  }
+
+  &__cell--copied-right::before {
+    border-right-width: 2px;
+  }
+
+  // Das Ausfüllkästchen an der unteren rechten Ecke der Markierung (Excel).
+  &__fill-handle {
+    position: absolute;
+    right: -4px;
+    bottom: -4px;
+    width: 8px;
+    height: 8px;
+    background: var(--primary);
+    border: 1px solid var(--background);
+    cursor: crosshair;
+    z-index: 6;
+  }
+
   // Die aktuelle Zelle: in Bearbeitung, sonst der Anfang der Markierung.
   &__cell--current {
     outline: 2px solid var(--primary);
