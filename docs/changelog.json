@@ -1,6 +1,16 @@
 {
   "versions": [
     {
+      "version": "1.8.0-rc.6",
+      "date": "2026-11-23",
+      "entries": [
+        {
+          "type": "feat",
+          "text": "Gitter mit der Tastatur wie in Excel"
+        }
+      ]
+    },
+    {
       "version": "1.8.0-rc.5",
       "date": "2026-11-23",
       "entries": [
@@ -263,16 +273,6 @@
         {
           "type": "feat",
           "text": "collapse long tables instead of scrolling them"
-        }
-      ]
-    },
-    {
-      "version": "1.4.0-rc.16",
-      "date": "2026-08-10",
-      "entries": [
-        {
-          "type": "fix",
-          "text": "make the fit cap reach real-world image sizes"
         }
       ]
     }
