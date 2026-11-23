@@ -29,7 +29,7 @@ const count = (n: number, one: string, many: string): string => `${n} ${n === 1 
 export function gridStatusText(rows: number, cols: number, ranges: ReadonlyArray<CellRange>, elementsWithoutMeaning = 0): string {
   const parts = [count(rows, "Zeile", "Zeilen"), count(cols, "Spalte", "Spalten")];
   if (ranges.length > 0) parts.push(`Auswahl ${ranges.map(rangeName).join(", ")}`);
-  if (elementsWithoutMeaning > 0) parts.push(`${count(elementsWithoutMeaning, "Element", "Elemente")} ohne Bedeutung`);
+  if (elementsWithoutMeaning > 0) parts.push(`${count(elementsWithoutMeaning, "Icon", "Icons")} ohne Bedeutung`);
   return parts.join(" · ");
 }
 

@@ -21,8 +21,9 @@ import * as React from "react";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ConfigShell } from "@man/config-ui/shell/config-shell";
-import { elementMarkup } from "@man/config-ui/elements/catalog";
-import { ELEMENT_DRAG_TYPE } from "@man/config-ui/elements/element-drag";
+import { iconById } from "@shared/icons/catalog";
+import { ICON_DRAG_TYPE } from "@shared/icons/icon-drag";
+import { InlineIcon, iconMarkup } from "@shared/icons/icon-markup";
 import { fakeDataTransfer } from "@man/config-ui/drop/drag-testing";
 
 import { TableEditor } from "./table-editor";
@@ -30,8 +31,9 @@ import { DEFAULT_VISIBLE_ROWS } from "./row-collapse";
 import { TableModel } from "./table-model";
 import { stubMediaClient } from "@shared/media/media-client.testing";
 
-const red = elementMarkup({ id: "kasten", label: "Diesel" });
-const blank = (id = "kasten"): string => elementMarkup({ id, label: "" });
+const elementMarkup = (element: InlineIcon): string => iconMarkup(element, iconById(element.id)?.name ?? "Icon");
+const red = elementMarkup({ id: "shape/kasten", label: "Diesel" });
+const blank = (id = "shape/kasten"): string => elementMarkup({ id, label: "" });
 
 const sample = (): TableModel => ({
   data: [
@@ -64,6 +66,8 @@ function Harness({ onChange }: { onChange: (model: TableModel) => void }): React
   );
 }
 
+beforeEach(() => window.localStorage.clear());
+
 function setup() {
   const onChange = jest.fn();
   render(<Harness onChange={onChange} />);
@@ -72,8 +76,8 @@ function setup() {
 }
 
 const cellTd = (row: number, col: number): HTMLElement => screen.getByLabelText(`Zeile ${row}, Spalte ${col}`).closest("td")!;
-const panel = (): HTMLElement => screen.getByRole("complementary", { name: "Elemente" });
-const toolbar = (): HTMLElement => screen.getByRole("toolbar", { name: "Elemente" });
+const panel = (): HTMLElement => screen.getByRole("complementary", { name: "Icons" });
+const toolbar = (): HTMLElement => screen.getByRole("toolbar", { name: "Icons" });
 
 /** Markiert in der bearbeiteten Zelle die Zeichen [from, to) des ersten Textknotens. */
 function selectText(row: number, col: number, from: number, to: number): void {
@@ -85,24 +89,24 @@ function selectText(row: number, col: number, from: number, to: number): void {
   document.getSelection()!.addRange(range);
 }
 
-describe("Element Explorer im Tabellen-Editor", () => {
-  it("bringt mit dem Reiter „Elemente“ den Katalog rechts und nimmt ihn beim Verlassen mit", async () => {
+describe("Icon Explorer im Tabellen-Editor", () => {
+  it("bringt mit dem Reiter „Icons“ den Katalog rechts und nimmt ihn beim Verlassen mit", async () => {
     const { user } = setup();
-    await user.click(screen.getByRole("tab", { name: "Elemente" }));
+    await user.click(screen.getByRole("tab", { name: "Icons" }));
     expect(panel()).toBeInTheDocument();
-    expect(within(toolbar()).getByTestId("element-toolbar-scope")).toHaveTextContent("Kein Element markiert");
+    expect(within(toolbar()).getByTestId("element-toolbar-scope")).toHaveTextContent("Kein Icon markiert");
     expect(within(toolbar()).getByRole("button", { name: "Bedeutung" })).toBeDisabled();
-    expect(within(toolbar()).getByRole("button", { name: "Katalog anzeigen" })).toHaveAttribute("aria-pressed", "true");
+    expect(within(toolbar()).getByRole("button", { name: "Icons anzeigen" })).toHaveAttribute("aria-pressed", "true");
 
     await user.click(screen.getByRole("tab", { name: "Daten" }));
-    expect(screen.queryByRole("complementary", { name: "Elemente" })).toBeNull();
+    expect(screen.queryByRole("complementary", { name: "Icons" })).toBeNull();
   });
 
   it("setzt das Element in jede markierte Zelle – ohne eigene Farbe", async () => {
     const { last, user } = setup();
     fireEvent.mouseDown(cellTd(2, 3));
     fireEvent.mouseDown(cellTd(3, 3), { shiftKey: true });
-    await user.click(screen.getByRole("tab", { name: "Elemente" }));
+    await user.click(screen.getByRole("tab", { name: "Icons" }));
     await user.click(within(panel()).getByRole("button", { name: "In 2 Zellen einfügen" }));
     expect(last().data[1][2]).toBe(`–${blank()}`);
     expect(last().data[2][2]).toBe(blank());
@@ -111,27 +115,27 @@ describe("Element Explorer im Tabellen-Editor", () => {
   it("fügt ein Antriebs-Icon aus dem Katalog ein", async () => {
     const { last, user } = setup();
     fireEvent.mouseDown(cellTd(3, 3));
-    await user.click(screen.getByRole("tab", { name: "Elemente" }));
-    await user.click(within(panel()).getByRole("button", { name: "Elektro" }));
+    await user.click(screen.getByRole("tab", { name: "Icons" }));
+    await user.click(within(panel()).getByRole("button", { name: "Ladesäule" }));
     await user.click(within(panel()).getByRole("button", { name: "In Zelle C3 einfügen" }));
-    expect(last().data[2][2]).toBe(blank("elektro"));
+    expect(last().data[2][2]).toBe(blank("craft/gaspump-electric"));
   });
 
   it("markiert ein angeklicktes Element und benennt es über „Bedeutung“", async () => {
     const { last, user } = setup();
-    const element = cellTd(2, 2).querySelector("[data-man-el]")!;
+    const element = cellTd(2, 2).querySelector("[data-man-icon]")!;
     fireEvent.mouseDown(element);
 
-    expect(screen.getByRole("tab", { name: "Elemente" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: "Icons" })).toHaveAttribute("aria-selected", "true");
     expect(within(toolbar()).getByTestId("element-toolbar-scope")).toHaveTextContent("Kasten in Zelle B2");
-    expect(within(panel()).getByTestId("picked-element")).toHaveTextContent("Kasten in Zelle B2");
+    expect(within(panel()).getByTestId("picked-icon")).toHaveTextContent("Kasten in Zelle B2");
     expect(element).toHaveAttribute("data-man-picked");
 
     await user.click(within(toolbar()).getByRole("button", { name: "Bedeutung: Diesel" }));
     const field = screen.getByLabelText("Bedeutung");
     await user.clear(field);
     await user.type(field, "Diesel Euro 6{Enter}");
-    expect(last().data[1][1]).toBe(elementMarkup({ id: "kasten", label: "Diesel Euro 6" }));
+    expect(last().data[1][1]).toBe(elementMarkup({ id: "shape/kasten", label: "Diesel Euro 6" }));
     expect(last().data[2][1]).toBe(red);
   });
 
@@ -141,31 +145,31 @@ describe("Element Explorer im Tabellen-Editor", () => {
     expect(screen.getByTestId("element-meaning")).toHaveAttribute("data-disabled");
     fireEvent.keyDown(document.activeElement ?? document.body, { key: "Escape" });
 
-    const element = cellTd(3, 2).querySelector("[data-man-el]")!;
+    const element = cellTd(3, 2).querySelector("[data-man-icon]")!;
     fireEvent.mouseDown(element, { button: 2 });
     fireEvent.contextMenu(element);
     fireEvent.click(screen.getByTestId("element-meaning"));
-    expect(screen.getByRole("tab", { name: "Elemente" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: "Icons" })).toHaveAttribute("aria-selected", "true");
     expect(screen.getByLabelText("Bedeutung")).toHaveValue("Diesel");
   });
 
   it("öffnet ein Element nicht beim Erweitern der Markierung", () => {
     setup();
-    fireEvent.mouseDown(cellTd(3, 2).querySelector("[data-man-el]")!, { shiftKey: true });
-    expect(screen.queryByRole("complementary", { name: "Elemente" })).toBeNull();
+    fireEvent.mouseDown(cellTd(3, 2).querySelector("[data-man-icon]")!, { shiftKey: true });
+    expect(screen.queryByRole("complementary", { name: "Icons" })).toBeNull();
   });
 
   it("entfernt das markierte Element", async () => {
     const { last, user } = setup();
-    fireEvent.mouseDown(cellTd(3, 2).querySelector("[data-man-el]")!);
-    await user.click(within(toolbar()).getByRole("button", { name: "Element entfernen" }));
+    fireEvent.mouseDown(cellTd(3, 2).querySelector("[data-man-icon]")!);
+    await user.click(within(toolbar()).getByRole("button", { name: "Icon entfernen" }));
     expect(last().data[2][1]).toBe("");
-    expect(within(toolbar()).getByTestId("element-toolbar-scope")).toHaveTextContent("Kein Element markiert");
+    expect(within(toolbar()).getByTestId("element-toolbar-scope")).toHaveTextContent("Kein Icon markiert");
   });
 
   it("nimmt ein aus dem Katalog gezogenes Element in der Zielzelle an", async () => {
     const { last, user } = setup();
-    await user.click(screen.getByRole("tab", { name: "Elemente" }));
+    await user.click(screen.getByRole("tab", { name: "Icons" }));
     const dataTransfer = fakeDataTransfer({});
     fireEvent.dragStart(within(panel()).getByRole("button", { name: "Kasten" }), { dataTransfer });
 
@@ -174,14 +178,14 @@ describe("Element Explorer im Tabellen-Editor", () => {
     fireEvent.dragOver(target, { dataTransfer });
     fireEvent.drop(target, { dataTransfer });
 
-    expect(JSON.parse(dataTransfer.getData(ELEMENT_DRAG_TYPE))).toEqual({ id: "kasten", label: "" });
+    expect(JSON.parse(dataTransfer.getData(ICON_DRAG_TYPE))).toEqual({ id: "shape/kasten", label: "" });
     expect(last().data[0][0]).toBe(`Baureihe${blank()}`);
   });
 
   it("setzt das Element an den Cursor der bearbeiteten Zelle", async () => {
     const { last, user } = setup();
     fireEvent.mouseDown(cellTd(1, 2));
-    await user.click(screen.getByRole("tab", { name: "Elemente" }));
+    await user.click(screen.getByRole("tab", { name: "Icons" }));
     fireEvent.doubleClick(cellTd(1, 2));
     expect(screen.getByLabelText("Zeile 1, Spalte 2")).toHaveFocus();
     selectText(1, 2, 2, 2);
@@ -195,15 +199,15 @@ describe("Element Explorer im Tabellen-Editor", () => {
     fireEvent.contextMenu(cellTd(2, 3));
     fireEvent.click(screen.getByTestId("insert-element"));
     expect(panel()).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Elemente" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: "Icons" })).toHaveAttribute("aria-selected", "true");
   });
 
   it("nennt Elemente ohne Bedeutung in der Statuszeile", async () => {
     const { user } = setup();
     fireEvent.mouseDown(cellTd(3, 3));
-    await user.click(screen.getByRole("tab", { name: "Elemente" }));
+    await user.click(screen.getByRole("tab", { name: "Icons" }));
     await user.click(within(panel()).getByRole("button", { name: "In Zelle C3 einfügen" }));
-    expect(screen.getByTestId("table-editor-status")).toHaveTextContent("1 Element ohne Bedeutung");
+    expect(screen.getByTestId("table-editor-status")).toHaveTextContent("1 Icon ohne Bedeutung");
   });
 });
 

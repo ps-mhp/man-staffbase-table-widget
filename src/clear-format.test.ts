@@ -161,7 +161,7 @@ describe("clearFormatting", () => {
 
 describe("stripTextMarkup – Textteile mit Farbe oder Größe", () => {
   it("löst die Klammern auf und lässt Elemente stehen", () => {
-    const element = '<span data-man-el="kasten" role="img" aria-label="Diesel" contenteditable="false"></span>';
+    const element = '<span data-man-icon="shape/kasten" role="img" aria-label="Diesel" contenteditable="false"></span>';
     expect(stripTextMarkup(`<span style="color:#e40045">Di${element}</span>esel`)).toBe(`Di${element}esel`);
   });
 });

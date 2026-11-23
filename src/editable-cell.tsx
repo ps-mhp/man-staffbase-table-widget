@@ -15,7 +15,7 @@ import * as React from "react";
 import { ReactElement, useEffect, useRef, useState } from "react";
 
 import { MEDIA_DRAG_TYPE, hasDragType } from "@man/config-ui/drop/drag-payload";
-import { ELEMENT_DRAG_TYPE } from "@man/config-ui/elements/element-drag";
+import { ICON_DRAG_TYPE } from "@shared/icons/icon-drag";
 
 import { clampImageWidth } from "./cell-image";
 import { sanitizeRichText } from "./rich-text";
@@ -94,7 +94,7 @@ function startImageResize(event: React.MouseEvent, img: HTMLImageElement, onMove
  * einsetzt. Alles andere – gezogener Text – bleibt beim Browser.
  */
 function keepMediaOutOfText(event: React.DragEvent<HTMLDivElement>): void {
-  if (hasDragType(event.dataTransfer, MEDIA_DRAG_TYPE) || hasDragType(event.dataTransfer, ELEMENT_DRAG_TYPE)) event.preventDefault();
+  if (hasDragType(event.dataTransfer, MEDIA_DRAG_TYPE) || hasDragType(event.dataTransfer, ICON_DRAG_TYPE)) event.preventDefault();
 }
 
 /**

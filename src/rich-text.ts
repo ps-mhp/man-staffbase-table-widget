@@ -19,21 +19,15 @@
  * the text like a character (`<span data-man-el>` with a catalog ID and a
  * meaning, see `@man/config-ui/elements/catalog`), and a part of the text
  * can carry its own font colour and size (`<span style="color:#rrggbb;
- * font-size:Npx">`). Only `<sup>`, `<sub>`, safe `<img>`, catalog elements
+ * font-size:Npx">`). Only `<sup>`, `<sub>`, safe `<img>`, icons of the library (`@shared/icons`)
  * and such styled spans survive; everything else is treated as plain text. This module is the single trusted
  * place that turns arbitrary strings (author input, contenteditable
  * `innerHTML`, spreadsheet imports) into safe markup, so the widget can render
  * cells via `innerHTML` without any XSS risk.
  */
 
-import {
-  ELEMENT_ATTRIBUTE,
-  colorFromStyle,
-  elementMarkup,
-  legacyElementColor,
-  normalizeHexColor,
-  readElement,
-} from "@man/config-ui/elements/catalog";
+import { colorFromStyle, normalizeHexColor } from "@man/config-ui/toolbar/colors";
+import { ICON_ATTRIBUTE, LEGACY_ELEMENT_ATTRIBUTE, legacyIconColor, rewriteIcon } from "@shared/icons/icon-markup";
 
 /** Schriftgrößen, die ein Textteil tragen darf (px). */
 const MIN_FONT_SIZE = 6;
@@ -135,13 +129,13 @@ const serializeChildren = (node: Node): string => {
         out += "<br>";
       } else if (el.tagName === "IMG") {
         out += serializeImage(el);
-      } else if (el.tagName === "SPAN" && el.hasAttribute(ELEMENT_ATTRIBUTE)) {
-        // Rebuilt from what it says, never copied: an unknown shape leaves
-        // nothing behind. An element of rc.5/rc.6 still carries its own
+      } else if (el.tagName === "SPAN" && (el.hasAttribute(ICON_ATTRIBUTE) || el.hasAttribute(LEGACY_ELEMENT_ATTRIBUTE))) {
+        // Rebuilt from what it says, never copied: an unknown icon leaves
+        // nothing behind, an old element (`data-man-el`) comes back as an
+        // icon of the library. One of rc.5/rc.6 still carries its own
         // colour – it moves into a colour span, so it looks as before.
-        const element = readElement(el);
-        const legacy = legacyElementColor(el);
-        const markup = element === null ? "" : elementMarkup(element);
+        const legacy = legacyIconColor(el);
+        const markup = rewriteIcon(el);
         out += markup !== "" && legacy !== null ? `<span style="color:${legacy}">${markup}</span>` : markup;
       } else if ((el.tagName === "SPAN" || el.tagName === "FONT") && inlineTextStyle(el) !== "") {
         // A part of the text with its own colour or size: re-emitted with
@@ -172,7 +166,7 @@ const serializeChildren = (node: Node): string => {
 
 /**
  * Sanitizes a cell string into safe inline markup: escapes all text and
- * keeps only `<sup>`/`<sub>` tags, safe `<img>` elements, catalog elements
+ * keeps only `<sup>`/`<sub>` tags, safe `<img>` elements, icons of the library (`@shared/icons`)
  * and spans with a font colour or size. Plain text (no
  * tags) is returned escaped and otherwise unchanged, so legacy string cells
  * are unaffected.

@@ -26,7 +26,7 @@ import { IMAGE_FIT_CLASS, IMAGE_NO_FIT_CLASS } from "./image-fit";
 import imageFitCss from "./styles/image-fit.scss";
 import imageNoFitCss from "./styles/image-no-fit.scss";
 import tableWidgetCss from "./styles/table-widget.scss";
-import { elementStylesheet } from "@man/config-ui/elements/element-css";
+import { useIconStylesheet } from "@shared/icons/use-icon-stylesheet";
 import { useHotStyle } from "@shared/hot-style";
 import {
   clampRowSpan,
@@ -45,9 +45,6 @@ import { downloadFile, exportFileName } from "./download";
 export type TableWidgetProps = BlockAttributes & {
   tabledata?: string;
 };
-
-/** Elemente aus dem Element Explorer: Form aus dem Katalog, Farbe aus dem Text. */
-const ELEMENT_CSS = elementStylesheet();
 
 /**
  * Class names of `styles/table-widget.scss`. They are collected here so a
@@ -86,6 +83,8 @@ interface SortState {
 
 export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
   const model = useMemo(() => parseTableModel(tabledata), [tabledata]);
+  // Icons der Bibliothek: Form nachgeladen, nur für die Icons dieser Tabelle; Farbe aus dem Text.
+  const iconCss = useIconStylesheet(useMemo(() => model.data.flat().join(""), [model]));
   const { data } = model;
   const headerRow = data[0] ?? [];
 
@@ -251,7 +250,7 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
           rules are part of it in both states: the host page styles article
           images too, so "off" is an explicit rule rather than the absence of
           one. */}
-      <style>{`${hotTableWidgetCss}\n${model.fitImages ? hotImageFitCss : hotImageNoFitCss}\n${ELEMENT_CSS}`}</style>
+      <style>{`${hotTableWidgetCss}\n${model.fitImages ? hotImageFitCss : hotImageNoFitCss}\n${iconCss}`}</style>
       <table className="table-widget__table">
         <thead>
           <tr>

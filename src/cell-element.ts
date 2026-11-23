@@ -22,8 +22,10 @@
  * der Zelle sieht.
  */
 
-import { ELEMENT_ATTRIBUTE, InlineElement, elementMarkup, hasMeaning, readElement } from "@man/config-ui/elements/catalog";
+import { iconById } from "@shared/icons/catalog";
+import { ICON_ATTRIBUTE, InlineIcon as InlineElement, LEGACY_ELEMENT_ATTRIBUTE, hasMeaning, iconMarkup, readIcon as readElement } from "@shared/icons/icon-markup";
 
+import { cellHasElement } from "./cell-text";
 import { sanitizeRichText } from "./rich-text";
 import { TableData } from "./table-json";
 
@@ -36,10 +38,13 @@ export interface ElementAddress {
   index: number;
 }
 
-const SELECTOR = `[${ELEMENT_ATTRIBUTE}]`;
+const SELECTOR = `[${ICON_ATTRIBUTE}],[${LEGACY_ELEMENT_ATTRIBUTE}]`;
 
-/** Ohne DOM-Arbeit: steht überhaupt ein Element in der Zelle? */
-export const cellHasElement = (html: string | null | undefined): boolean => !!html && html.includes(ELEMENT_ATTRIBUTE);
+/** Das Markup; ohne Bedeutung nennt es den Namen des Icons. */
+const elementMarkup = (element: InlineElement): string => iconMarkup(element, iconById(element.id)?.name ?? "Icon");
+
+// Liegt in cell-text.ts: das Seitenbündel (Übersetzung) braucht es ohne den Icon-Katalog.
+export { cellHasElement } from "./cell-text";
 
 const parseBody = (html: string): HTMLElement => new DOMParser().parseFromString(`<body>${html}</body>`, "text/html").body;
 

@@ -15,10 +15,12 @@ import * as React from "react";
 import { ReactElement, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import * as ContextMenu from "@radix-ui/react-context-menu";
 import { ConfigWorkspace } from "@man/config-ui/layout/config-workspace";
-import { ELEMENT_ATTRIBUTE, ELEMENT_CATALOG, InlineElement, elementById, elementMarkup } from "@man/config-ui/elements/catalog";
-import { elementStylesheet } from "@man/config-ui/elements/element-css";
-import { useElementPanel } from "@man/config-ui/elements/element-panel";
 import { ElementToolbar } from "@man/config-ui/elements/element-toolbar";
+import { iconById } from "@shared/icons/catalog";
+import { iconIdsIn, iconStylesheet } from "@shared/icons/icon-css";
+import { iconSvg } from "@shared/icons/icon-drawings";
+import { ICON_ATTRIBUTE, InlineIcon as InlineElement, LEGACY_ELEMENT_ATTRIBUTE, iconMarkup } from "@shared/icons/icon-markup";
+import { useIconInsertPanel } from "@shared/icons/use-icon-insert-panel";
 import { ToolButton } from "@man/config-ui/toolbar/tool-button";
 import { ToolSeparator } from "@man/config-ui/toolbar/toolbar";
 import { Shapes, Trash2 } from "lucide-react";
@@ -131,9 +133,11 @@ export interface TableEditorProps {
  */
 const CELL = "table-editor__cell";
 
-/** Die Elemente des Explorers sehen im Gitter aus wie auf der Seite. */
-const ELEMENT_CSS = elementStylesheet();
-const ELEMENT_SELECTOR = `[${ELEMENT_ATTRIBUTE}]`;
+/** Icons im Text; alte Elemente (`data-man-el`) eingeschlossen. */
+const ELEMENT_SELECTOR = `[${ICON_ATTRIBUTE}],[${LEGACY_ELEMENT_ATTRIBUTE}]`;
+
+/** Das Markup eines Icons; ohne Bedeutung nennt es den Namen. */
+const elementMarkup = (element: InlineElement): string => iconMarkup(element, iconById(element.id)?.name ?? "Icon");
 
 /** The markup of an inserted image: its own width, capped at the default. */
 const imageMarkup = (image: PickedImage): string => {
@@ -941,7 +945,7 @@ export const TableEditor = ({
     cell?.closest("td")?.scrollIntoView?.({ block: "nearest", inline: "nearest" });
   }, [anchor]);
 
-  // --- Elemente (Element Explorer) ---
+  // --- Icons (Icon Explorer) ---
 
   /**
    * Das angeklickte Element. Die Form steht dabei: ändert sich die Zelle,
@@ -949,8 +953,10 @@ export const TableEditor = ({
    */
   const [pickedElement, setPickedElement] = useState<(ElementAddress & Pick<InlineElement, "id">) | null>(null);
   const elements = useMemo(() => tableElements(data), [data]);
+  /** Icons im Gitter sehen aus wie auf der Seite; Masken für die Icons, die in der Tabelle stehen. */
+  const iconCss = useMemo(() => iconStylesheet(iconIdsIn(data.flat().join("")), iconSvg), [data]);
   /** Die gewählte Form im Katalog. */
-  const [elementTool, setElementTool] = useState(ELEMENT_CATALOG[0].id);
+  const [elementTool, setElementTool] = useState("shape/kasten");
   /** Ob die Eingabe „Bedeutung“ offen ist – aus der Leiste oder dem Kontextmenü. */
   const [meaningOpen, setMeaningOpen] = useState(false);
 
@@ -1027,8 +1033,9 @@ export const TableEditor = ({
     onChange({ ...value, data: updateCell(data, row, col, removeCellElement(data[row]?.[col], index)) });
   };
 
-  const elementPanel = useElementPanel(
-    { target: elementTarget, picked: pickedInfo, tool: elementTool },
+  const pickedIcon = useMemo(() => (pickedInfo === null ? null : { icon: pickedInfo.element, where: pickedInfo.where }), [pickedInfo]);
+  const elementPanel = useIconInsertPanel(
+    { target: elementTarget, picked: pickedIcon, tool: elementTool },
     {
       onSelectTool: setElementTool,
       onInsert: (id) => insertElement({ id, label: "" }),
@@ -1059,16 +1066,16 @@ export const TableEditor = ({
 
   const elementsToolbar = (
     <ElementToolbar
-      scope={pickedInfo !== null ? `${elementById(pickedInfo.element.id)?.name ?? "Element"} in ${pickedInfo.where}` : "Kein Element markiert"}
+      scope={pickedInfo !== null ? `${iconById(pickedInfo.element.id)?.name ?? "Icon"} in ${pickedInfo.where}` : "Kein Icon markiert"}
       picked={pickedInfo?.element ?? null}
       onLabel={setPickedMeaning}
       meaningOpen={meaningOpen}
       onMeaningOpenChange={setMeaningOpen}
     >
-      {pickedInfo !== null && <ToolButton label="Element entfernen" icon={Trash2} onClick={removePickedElement} />}
+      {pickedInfo !== null && <ToolButton label="Icon entfernen" icon={Trash2} onClick={removePickedElement} />}
       <ToolSeparator />
       <ToolButton
-        label="Katalog anzeigen"
+        label="Icons anzeigen"
         icon={Shapes}
         pressed={elementPanel.isOpen}
         disabled={!elementPanel.available}
@@ -1380,7 +1387,7 @@ export const TableEditor = ({
           `document.head`: it is mounted into someone else's dialog and should
           leave nothing behind when it goes. */}
       <style>{hotTableEditorCss}</style>
-      <style>{ELEMENT_CSS}</style>
+      <style>{iconCss}</style>
       <ConfigWorkspace
         className="min-h-0 flex-1"
         inspector={<TableInspector value={value} onChange={onChange} />}

@@ -31,7 +31,7 @@ const TABS: readonly ToolTab<TabId>[] = [
   { id: "cells", label: "Zellen" },
   { id: "images", label: "Bilder" },
   { id: "data", label: "Daten" },
-  { id: "elements", label: "Elemente" },
+  { id: "elements", label: "Icons" },
 ];
 
 function ActiveTab({ tab, props }: { tab: TabId; props: TableToolbarProps }): ReactElement {

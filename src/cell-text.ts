@@ -17,7 +17,8 @@
  * content export and the table download; runs without DOM.
  */
 
-import { ELEMENT_ATTRIBUTE, ELEMENT_FALLBACK_TEXT, ELEMENT_UNLABELED_ATTRIBUTE, elementById, labelFromAria } from "@man/config-ui/elements/catalog";
+import { normalizeIconId } from "@shared/icons/icon-id";
+import { ICON_ATTRIBUTE, ICON_FALLBACK_TEXT, ICON_UNLABELED_ATTRIBUTE, LEGACY_ELEMENT_ATTRIBUTE } from "@shared/icons/icon-markup";
 
 const SUPERSCRIPT: Record<string, string> = {
   "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹",
@@ -48,15 +49,18 @@ const attribute = (tag: string, name: string): string | undefined => {
 const mapChars = (text: string, table: Record<string, string>) =>
   Array.from(text, (char) => table[char] ?? char).join("");
 
+/** Ohne DOM-Arbeit: steht überhaupt ein Icon (oder altes Element) in der Zelle? */
+export const cellHasElement = (html: string | null | undefined): boolean =>
+  !!html && (html.includes(ICON_ATTRIBUTE) || html.includes(LEGACY_ELEMENT_ATTRIBUTE));
+
 /**
- * Ein Element aus dem Explorer steht im Text für seine Bedeutung („Diesel“),
+ * Ein Icon steht im Text für seine Bedeutung („Diesel“),
  * ohne Bedeutung als „■“ – die Farbe trägt im Export nichts.
  */
 function elementText(tag: string): string {
-  const id = attribute(tag, ELEMENT_ATTRIBUTE);
-  if (elementById(id) === undefined) return "";
-  const unlabeled = attribute(tag, ELEMENT_UNLABELED_ATTRIBUTE) !== undefined;
-  return labelFromAria(attribute(tag, "aria-label"), unlabeled) || ELEMENT_FALLBACK_TEXT;
+  if (normalizeIconId(attribute(tag, ICON_ATTRIBUTE) ?? attribute(tag, LEGACY_ELEMENT_ATTRIBUTE)) === null) return "";
+  const unlabeled = attribute(tag, ICON_UNLABELED_ATTRIBUTE) !== undefined;
+  return (unlabeled ? "" : (attribute(tag, "aria-label") ?? "").trim()) || ICON_FALLBACK_TEXT;
 }
 
 /** Walks a stored cell; `image` decides what an `<img>` becomes. */

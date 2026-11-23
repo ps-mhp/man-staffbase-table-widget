@@ -24,8 +24,9 @@ import * as React from "react";
 import { ReactElement } from "react";
 import { DropZone, dropStateOf } from "@man/config-ui/drop/drop-zone";
 import { useDropZone } from "@man/config-ui/drop/use-drop-zone";
-import { InlineElement, spokenLabel } from "@man/config-ui/elements/catalog";
-import { ELEMENT_DRAG_TYPE, parseElementDragPayload } from "@man/config-ui/elements/element-drag";
+import { iconById } from "@shared/icons/catalog";
+import { ICON_DRAG_TYPE, parseIconDragPayload } from "@shared/icons/icon-drag";
+import { InlineIcon as InlineElement } from "@shared/icons/icon-markup";
 import { MediaClient } from "@shared/media/media-client";
 import { PickedImage } from "@shared/media/media-picker";
 import { useMediaDrop } from "@shared/media/use-media-drop";
@@ -49,10 +50,10 @@ const flushRing = (state: string): string => (state === "ready" ? "rounded-none 
 /** Nimmt gezogene Elemente an; ohne Anfrage an den Server, also sofort. */
 function ElementDropZone({ onElement, children }: Pick<CellDropZoneProps, "onElement" | "children">): ReactElement {
   const zone = useDropZone<InlineElement>({
-    type: ELEMENT_DRAG_TYPE,
-    parse: parseElementDragPayload,
+    type: ICON_DRAG_TYPE,
+    parse: parseIconDragPayload,
     onDrop: onElement,
-    announce: (element) => `${spokenLabel(element)} eingefügt.`,
+    announce: (element) => `${element.label || (iconById(element.id)?.name ?? "Icon")} eingefügt.`,
   });
   return (
     <DropZone zone={zone} data-element-zone="" label="Hier einfügen" className={flushRing(dropStateOf(zone, false))}>

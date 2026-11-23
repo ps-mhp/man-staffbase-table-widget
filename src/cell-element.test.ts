@@ -11,7 +11,8 @@
  * limitations under the License.
  */
 
-import { InlineElement, elementMarkup } from "@man/config-ui/elements/catalog";
+import { iconById } from "@shared/icons/catalog";
+import { InlineIcon as InlineElement, iconMarkup } from "@shared/icons/icon-markup";
 
 import {
   appendElement,
@@ -23,10 +24,10 @@ import {
   updateCellElement,
 } from "./cell-element";
 
-const diesel: InlineElement = { id: "kasten", label: "Diesel" };
-const etruck: InlineElement = { id: "elektro", label: "eTruck" };
-const blank: InlineElement = { id: "kasten", label: "" };
-const m = elementMarkup;
+const diesel: InlineElement = { id: "shape/kasten", label: "Diesel" };
+const etruck: InlineElement = { id: "craft/gaspump-electric", label: "eTruck" };
+const blank: InlineElement = { id: "shape/kasten", label: "" };
+const m = (element: InlineElement): string => iconMarkup(element, iconById(element.id)?.name ?? "Icon");
 
 const table = (): string[][] => [
   ["Baureihe", "Diesel"],
@@ -47,7 +48,7 @@ describe("Elemente in Zellen", () => {
 
   it("benennt und entfernt genau das n-te Element", () => {
     const cell = `${m(diesel)}/${m(diesel)}`;
-    expect(updateCellElement(cell, 1, { label: "Gas" })).toBe(`${m(diesel)}/${m({ id: "kasten", label: "Gas" })}`);
+    expect(updateCellElement(cell, 1, { label: "Gas" })).toBe(`${m(diesel)}/${m({ id: "shape/kasten", label: "Gas" })}`);
     expect(removeCellElement(cell, 0)).toBe(`/${m(diesel)}`);
   });
 

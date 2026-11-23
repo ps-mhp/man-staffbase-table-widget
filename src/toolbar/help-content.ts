@@ -40,7 +40,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     entries: [
       {
         title: "Aufbau",
-        text: "Oben die Reiter Schrift, Ausrichtung, Zellen, Bilder, Daten und Elemente, darunter die Werkzeuge des gewählten Reiters und die Tabelle. Rechts das Panel „Tabelle“ mit den Einstellungen, die für die ganze Tabelle gelten.",
+        text: "Oben die Reiter Schrift, Ausrichtung, Zellen, Bilder, Daten und Icons, darunter die Werkzeuge des gewählten Reiters und die Tabelle. Rechts das Panel „Tabelle“ mit den Einstellungen, die für die ganze Tabelle gelten.",
       },
       {
         title: "Zellen bearbeiten",
@@ -97,12 +97,12 @@ export const HELP_TOPICS: HelpTopic[] = [
         text: "Der Knopf öffnet die Farbliste: die MAN-CI-Farben, „Standard“ (entfernt die Farbe) und „Eigene Farbe …“ über den Farbwähler; der Balken zeigt die gesetzte Farbe. Schriftfarbe und Schriftgröße wirken beim Bearbeiten einer Zelle nur auf den markierten Text, sonst auf alle markierten Zellen.",
       },
       {
-        title: "Elemente einfügen",
-        text: "Der Reiter „Elemente“ zeigt rechts den Katalog: Form wählen, „Einfügen“ setzt sie an den Cursor der bearbeiteten Zelle, sonst ans Ende jeder markierten Zelle; Doppelklick auf die Kachel oder Ziehen in eine Zelle geht auch. Ein Element steht im Text wie ein Zeichen: es hat die Schriftfarbe und Schriftgröße des Texts, in dem es steht.",
+        title: "Icons einfügen",
+        text: "Der Reiter „Icons“ zeigt rechts den Icon Explorer mit Formen, Craft-Icons und der MAN-Symbolschrift: suchen, Icon wählen, „Einfügen“ setzt es an den Cursor der bearbeiteten Zelle, sonst ans Ende jeder markierten Zelle; Doppelklick auf die Kachel oder Ziehen in eine Zelle geht auch. Ein Icon steht im Text wie ein Zeichen: es hat die Schriftfarbe und Schriftgröße des Texts, in dem es steht.",
       },
       {
-        title: "Elemente färben, vergrößern, benennen",
-        text: "Farbe und Größe wie bei Text: Zelle markieren und Schriftfarbe oder Schriftgröße wählen – oder die Zelle bearbeiten, nur das Element (oder einen Textteil) markieren und dann wählen. Ein Klick auf ein Element markiert es; „Bedeutung“ in der Leiste oder im Kontextmenü benennt es, etwa „Diesel“. Die Bedeutung lesen Screenreader vor, und sie steht im Excel-, CSV- und PowerPoint-Export; ohne steht dort „■“, und die Statuszeile zählt solche Elemente. Der Papierkorb entfernt das markierte Element."
+        title: "Icons färben, vergrößern, benennen",
+        text: "Farbe und Größe wie bei Text: Zelle markieren und Schriftfarbe oder Schriftgröße wählen – oder die Zelle bearbeiten, nur das Icon (oder einen Textteil) markieren und dann wählen. Ein Klick auf ein Icon markiert es; „Bedeutung“ in der Leiste oder im Kontextmenü benennt es, etwa „Diesel“. Die Bedeutung lesen Screenreader vor, und sie steht im Excel-, CSV- und PowerPoint-Export; ohne steht dort „■“, und die Statuszeile zählt solche Icons. Der Papierkorb entfernt das markierte Icon."
       },
     ],
   },

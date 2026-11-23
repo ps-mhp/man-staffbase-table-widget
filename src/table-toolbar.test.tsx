@@ -41,7 +41,7 @@ const props = (overrides: Partial<TableToolbarProps> = {}): TableToolbarProps =>
   tab: "font",
   onTabChange: jest.fn(),
   elementsToolbar: (
-    <div role="toolbar" aria-label="Elemente">
+    <div role="toolbar" aria-label="Icons">
       <button type="button">MAN Rot</button>
     </div>
   ),
@@ -91,7 +91,7 @@ describe("TableToolbar", () => {
     render(<StatefulToolbar {...props()} />);
 
     const tabs = within(screen.getByRole("tablist", { name: "Werkzeuggruppen" })).getAllByRole("tab");
-    expect(tabs.map((tab) => tab.textContent)).toEqual(["Schrift", "Ausrichtung", "Zellen", "Bilder", "Daten", "Elemente"]);
+    expect(tabs.map((tab) => tab.textContent)).toEqual(["Schrift", "Ausrichtung", "Zellen", "Bilder", "Daten", "Icons"]);
     expect(screen.getAllByRole("toolbar")).toHaveLength(1);
     expect(screen.getByRole("toolbar", { name: "Schrift" })).toBeInTheDocument();
 
@@ -104,8 +104,8 @@ describe("TableToolbar", () => {
     render(<StatefulToolbar {...props()} />);
 
     fireEvent.keyDown(screen.getByRole("tab", { name: "Schrift" }), { key: "ArrowLeft" });
-    expect(screen.getByRole("toolbar", { name: "Elemente" })).toBeInTheDocument();
-    fireEvent.keyDown(screen.getByRole("tab", { name: "Elemente" }), { key: "ArrowRight" });
+    expect(screen.getByRole("toolbar", { name: "Icons" })).toBeInTheDocument();
+    fireEvent.keyDown(screen.getByRole("tab", { name: "Icons" }), { key: "ArrowRight" });
     expect(screen.getByRole("toolbar", { name: "Schrift" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "Schrift" })).toHaveAttribute("aria-selected", "true");
   });
@@ -121,14 +121,14 @@ describe("TableToolbar", () => {
     }
   });
 
-  it("zeigt im Reiter „Elemente“ die Leiste des Editors und meldet den Wechsel", () => {
+  it("zeigt im Reiter „Icons“ die Leiste des Editors und meldet den Wechsel", () => {
     const onTabChange = jest.fn();
     render(<StatefulToolbar {...props({ onTabChange })} />);
     expect(screen.queryByRole("button", { name: "Elemente einfügen" })).toBeNull();
 
-    openTab("Elemente");
+    openTab("Icons");
     expect(onTabChange).toHaveBeenCalledWith("elements");
-    expect(within(screen.getByRole("toolbar", { name: "Elemente" })).getByRole("button", { name: "MAN Rot" })).toBeInTheDocument();
+    expect(within(screen.getByRole("toolbar", { name: "Icons" })).getByRole("button", { name: "MAN Rot" })).toBeInTheDocument();
   });
 
   it("zeigt Icons statt Buchstaben für die Auszeichnungen", () => {

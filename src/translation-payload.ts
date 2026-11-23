@@ -15,7 +15,7 @@ import { translateHtml } from "@shared/translation/client";
 import { TableModel, formatKey } from "./table-model";
 import { TableData } from "./table-json";
 import { richTextToPlain, sanitizeRichText } from "./rich-text";
-import { cellHasElement } from "./cell-element";
+import { cellHasElement } from "./cell-text";
 
 /**
  * The wire format for the table's *own* translation request.

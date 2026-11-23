@@ -160,11 +160,18 @@ describe("hasRichText", () => {
   });
 });
 
-describe("sanitizeRichText – Elemente aus dem Explorer", () => {
-  const diesel = '<span data-man-el="kasten" role="img" aria-label="Diesel" contenteditable="false"></span>';
+describe("sanitizeRichText – Icons der Bibliothek", () => {
+  const diesel = '<span data-man-icon="shape/kasten" role="img" aria-label="Diesel" contenteditable="false"></span>';
 
-  it("behält ein gültiges Element unverändert", () => {
+  it("behält ein gültiges Icon unverändert", () => {
     expect(sanitizeRichText(`TGL ${diesel}`)).toBe(`TGL ${diesel}`);
+  });
+
+  it("schreibt alte Elemente (bis 1.8.0-rc.7) als Icons der Bibliothek", () => {
+    expect(sanitizeRichText('<span data-man-el="kasten" role="img" aria-label="Diesel" contenteditable="false"></span>')).toBe(diesel);
+    expect(sanitizeRichText('<span data-man-el="diesel" data-man-unlabeled="" role="img" aria-label="Diesel" contenteditable="false"></span>')).toBe(
+      '<span data-man-icon="craft/gaspump" data-man-unlabeled="" role="img" aria-label="Diesel" contenteditable="false"></span>',
+    );
   });
 
   it("baut ein Element aus seinen Angaben neu, statt fremde Attribute mitzunehmen", () => {
@@ -177,8 +184,9 @@ describe("sanitizeRichText – Elemente aus dem Explorer", () => {
     );
   });
 
-  it("verwirft Elemente mit unbekannter Form", () => {
+  it("verwirft Icons, die es nicht gibt", () => {
     expect(sanitizeRichText('a<span data-man-el="kreis"></span>b')).toBe("ab");
+    expect(sanitizeRichText('a<span data-man-icon="craft/nix"></span>b')).toBe("ab");
   });
 
   it("ignoriert Elemente beim Sortiertext", () => {
@@ -203,7 +211,7 @@ describe("sanitizeRichText – Farbe und Größe von Textteilen", () => {
   });
 
   it("färbt Elemente in einer Klammer mit", () => {
-    const blank = '<span data-man-el="elektro" data-man-unlabeled="" role="img" aria-label="Elektro" contenteditable="false"></span>';
+    const blank = '<span data-man-icon="craft/gaspump-electric" data-man-unlabeled="" role="img" aria-label="Ladesäule" contenteditable="false"></span>';
     expect(sanitizeRichText(`<span style="color:#e40045">(${blank})</span>`)).toBe(`<span style="color:#e40045">(${blank})</span>`);
   });
 });
