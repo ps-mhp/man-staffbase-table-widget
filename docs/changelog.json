@@ -1,6 +1,16 @@
 {
   "versions": [
     {
+      "version": "1.8.0-rc.7",
+      "date": "2026-11-23",
+      "entries": [
+        {
+          "type": "feat",
+          "text": "Schriftfarbe und -groesse fuer Textteile, Elemente wie Zeichen"
+        }
+      ]
+    },
+    {
       "version": "1.8.0-rc.6",
       "date": "2026-11-23",
       "entries": [
@@ -263,16 +273,6 @@
         {
           "type": "fix",
           "text": "let the grid frame fill the modal width"
-        }
-      ]
-    },
-    {
-      "version": "1.4.0-rc.17",
-      "date": "2026-08-10",
-      "entries": [
-        {
-          "type": "feat",
-          "text": "collapse long tables instead of scrolling them"
         }
       ]
     }
