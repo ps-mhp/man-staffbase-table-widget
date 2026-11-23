@@ -161,24 +161,49 @@ describe("hasRichText", () => {
 });
 
 describe("sanitizeRichText – Elemente aus dem Explorer", () => {
-  const diesel = '<span data-man-el="kasten" style="color:#e40045" role="img" aria-label="Diesel" contenteditable="false"></span>';
+  const diesel = '<span data-man-el="kasten" role="img" aria-label="Diesel" contenteditable="false"></span>';
 
   it("behält ein gültiges Element unverändert", () => {
     expect(sanitizeRichText(`TGL ${diesel}`)).toBe(`TGL ${diesel}`);
   });
 
   it("baut ein Element aus seinen Angaben neu, statt fremde Attribute mitzunehmen", () => {
-    expect(
-      sanitizeRichText('<span data-man-el="kasten" style="color:#E40045;background:url(x)" onclick="alert(1)" aria-label="Diesel" class="x">innen</span>'),
-    ).toBe(diesel);
+    expect(sanitizeRichText('<span data-man-el="kasten" onclick="alert(1)" aria-label="Diesel" class="x">innen</span>')).toBe(diesel);
   });
 
-  it("verwirft Elemente mit unbekannter Form oder ohne gültige Farbe", () => {
-    expect(sanitizeRichText('a<span data-man-el="kreis" style="color:#e40045"></span>b')).toBe("ab");
-    expect(sanitizeRichText('a<span data-man-el="kasten" style="color:expression(1)"></span>b')).toBe("ab");
+  it("setzt die eigene Farbe eines Elements aus rc.5/rc.6 in eine Farbklammer", () => {
+    expect(sanitizeRichText('<span data-man-el="kasten" style="color:#E40045" role="img" aria-label="Diesel"></span>')).toBe(
+      `<span style="color:#e40045">${diesel}</span>`,
+    );
+  });
+
+  it("verwirft Elemente mit unbekannter Form", () => {
+    expect(sanitizeRichText('a<span data-man-el="kreis"></span>b')).toBe("ab");
   });
 
   it("ignoriert Elemente beim Sortiertext", () => {
     expect(richTextToPlain(`${diesel} Diesel`)).toBe(" Diesel");
+  });
+});
+
+describe("sanitizeRichText – Farbe und Größe von Textteilen", () => {
+  it("behält Schriftfarbe und -größe, sonst nichts", () => {
+    expect(sanitizeRichText('<span style="color: rgb(228, 0, 69); font-size: 20px; background: url(x)">rot</span>')).toBe(
+      '<span style="color:#e40045;font-size:20px">rot</span>',
+    );
+  });
+
+  it("liest <font color> als Farbe", () => {
+    expect(sanitizeRichText('<font color="#3875B2">blau</font>')).toBe('<span style="color:#3875b2">blau</span>');
+  });
+
+  it("löst Klammern ohne gültige Angabe auf und verwirft leere", () => {
+    expect(sanitizeRichText('<span style="color:expression(1)">x</span><span style="font-size:500px">y</span>')).toBe("xy");
+    expect(sanitizeRichText('a<span style="color:#e40045"></span>b')).toBe("ab");
+  });
+
+  it("färbt Elemente in einer Klammer mit", () => {
+    const blank = '<span data-man-el="elektro" data-man-unlabeled="" role="img" aria-label="Elektro" contenteditable="false"></span>';
+    expect(sanitizeRichText(`<span style="color:#e40045">(${blank})</span>`)).toBe(`<span style="color:#e40045">(${blank})</span>`);
   });
 });

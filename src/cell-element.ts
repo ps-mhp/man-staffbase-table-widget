@@ -13,8 +13,8 @@
 
 /**
  * Elemente aus dem Element Explorer in den Zellen: einfügen, auflisten,
- * ändern, entfernen – und über die ganze Tabelle hinweg zählen und
- * umfärben. Wie `cell-image.ts` gehen alle Ergebnisse durch
+ * benennen, entfernen und über die ganze Tabelle hinweg zählen. Farbe und
+ * Größe tragen sie nicht selbst – die kommen aus der Formatierung des Texts. Wie `cell-image.ts` gehen alle Ergebnisse durch
  * {@link sanitizeRichText}; hier wird nur gebaut, nie vertraut.
  *
  * Ein Element ist über seine Stelle in der Zelle bestimmt: das n-te
@@ -22,12 +22,12 @@
  * der Zelle sieht.
  */
 
-import { ELEMENT_ATTRIBUTE, InlineElement, elementMarkup, hasMeaning, isBrandColor, readElement } from "@man/config-ui/elements/catalog";
+import { ELEMENT_ATTRIBUTE, InlineElement, elementMarkup, hasMeaning, readElement } from "@man/config-ui/elements/catalog";
 
 import { sanitizeRichText } from "./rich-text";
 import { TableData } from "./table-json";
 
-export type ElementPatch = Partial<Pick<InlineElement, "color" | "label" | "size">>;
+export type ElementPatch = Partial<Pick<InlineElement, "label">>;
 
 /** Eine Stelle in der Tabelle: Zelle und Nummer des Elements darin. */
 export interface ElementAddress {
@@ -81,42 +81,14 @@ export function removeCellElement(html: string | null | undefined, index: number
   return rewriteElements(html, (_element, at) => (at === index ? "remove" : null));
 }
 
-/** Gleiche Elemente: dieselbe Form in derselben Farbe. */
-const same = (a: InlineElement, b: Pick<InlineElement, "id" | "color">): boolean => a.id === b.id && a.color === b.color;
-
 /** Das Element an einer Stelle, oder `null`, wenn es dort keins (mehr) gibt. */
 export function elementAt(data: TableData, address: ElementAddress): InlineElement | null {
   return listCellElements(data[address.row]?.[address.col])[address.index] ?? null;
 }
 
-const mapCells = (data: TableData, fn: (html: string) => string): TableData =>
-  data.map((row) => row.map((cell) => (cellHasElement(cell) ? fn(cell) : cell)));
-
-/** Ändert alle Elemente der Tabelle mit derselben Form und Farbe wie `like`. */
-export function updateMatchingElements(data: TableData, like: Pick<InlineElement, "id" | "color">, patch: ElementPatch): TableData {
-  return mapCells(data, (cell) => rewriteElements(cell, (element) => (same(element, like) ? { ...element, ...patch } : null)));
-}
-
 /** Alle Elemente der Tabelle, in Lesereihenfolge. */
 export function tableElements(data: TableData): InlineElement[] {
   return data.flatMap((row) => row.flatMap((cell) => listCellElements(cell)));
-}
-
-export const countMatching = (elements: readonly InlineElement[], like: Pick<InlineElement, "id" | "color">): number =>
-  elements.filter((element) => same(element, like)).length;
-
-/** Je Farbe die erste vergebene Bedeutung – als Vorschlag für das nächste Element dieser Farbe. */
-export function meaningsByColor(elements: readonly InlineElement[]): Record<string, string> {
-  const meanings: Record<string, string> = {};
-  elements.forEach((element) => {
-    if (hasMeaning(element) && meanings[element.color] === undefined) meanings[element.color] = element.label.trim();
-  });
-  return meanings;
-}
-
-/** Die eigenen Farben (nicht CI) der Tabelle, jede einmal. */
-export function ownColors(elements: readonly InlineElement[]): string[] {
-  return [...new Set(elements.map((element) => element.color))].filter((color) => !isBrandColor(color));
 }
 
 /** Wie viele Elemente keine Bedeutung tragen. */

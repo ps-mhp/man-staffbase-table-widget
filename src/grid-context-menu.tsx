@@ -67,6 +67,8 @@ export interface GridMenuActions {
   insertImage: () => void;
   /** Öffnet den Element Explorer für die Markierung. */
   insertElement: () => void;
+  /** Öffnet „Bedeutung“ für das markierte Element. */
+  editMeaning: () => void;
   toggle: (key: "bold" | "italic" | "underline" | "strikethrough") => void;
   format: (patch: CellFormat) => void;
   sort: (dir: "asc" | "desc") => void;
@@ -128,10 +130,12 @@ export interface GridContextMenuProps {
    */
   container: HTMLElement | null | undefined;
   hasSelection: boolean;
+  /** Ein Element ist markiert (Klick oder Rechtsklick darauf): dann gibt es „Bedeutung …“. */
+  elementPicked?: boolean;
   actions: GridMenuActions;
 }
 
-export function GridContextMenu({ container, hasSelection, actions }: GridContextMenuProps): ReactElement {
+export function GridContextMenu({ container, hasSelection, elementPicked = false, actions }: GridContextMenuProps): ReactElement {
   const disabled = !hasSelection;
   return (
     <ContextMenu.Portal container={container}>
@@ -149,6 +153,7 @@ export function GridContextMenu({ container, hasSelection, actions }: GridContex
         <Separator />
         <MenuItem testId="insert-image" onSelect={actions.insertImage} disabled={disabled}>Bild einfügen…</MenuItem>
         <MenuItem testId="insert-element" onSelect={actions.insertElement} disabled={disabled}>Element einfügen…</MenuItem>
+        <MenuItem testId="element-meaning" onSelect={actions.editMeaning} disabled={!elementPicked}>Bedeutung des Elements…</MenuItem>
         <Separator />
         <TextOptions container={container} actions={actions} disabled={disabled} />
         <SortOptions container={container} actions={actions} disabled={disabled} />

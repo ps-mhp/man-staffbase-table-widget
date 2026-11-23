@@ -328,7 +328,8 @@ describe("TableEditor", () => {
     const onChange = jest.fn();
     render(<TableEditor value={sample()} onChange={onChange} />);
     fireEvent.mouseDown(cellTd("Zeile 2, Spalte 2"));
-    fireEvent.change(toolbar("toolbar-fontsize"), { target: { value: "20" } });
+    fireEvent.click(toolbar("toolbar-fontsize"));
+    fireEvent.click(screen.getByTestId("toolbar-fontsize-20"));
     const arg = onChange.mock.calls[0][0] as TableModel;
     expect(arg.formats["1,1"]).toEqual({ fontSize: 20 });
   });

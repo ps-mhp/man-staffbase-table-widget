@@ -40,16 +40,17 @@ const parseBody = (html: string): HTMLElement =>
   new DOMParser().parseFromString(`<body>${html}</body>`, "text/html").body;
 
 /**
- * Drops inline text markup from a cell while keeping its images and line
- * breaks: `<sup>`/`<sub>` are unwrapped rather than deleted, so the
- * characters they carried survive as plain text.
+ * Drops inline text markup from a cell while keeping its images, elements and
+ * line breaks: `<sup>`/`<sub>` and coloured or sized text spans are unwrapped
+ * rather than deleted, so the characters they carried survive as plain text.
  */
 export function stripTextMarkup(html: string | null | undefined): string {
   const value = sanitizeRichText(html);
-  if (!value || !/<(sup|sub)\b/i.test(value)) return value;
+  if (!value || !/<(sup|sub)\b|<span style=/i.test(value)) return value;
 
   const body = parseBody(value);
-  body.querySelectorAll("sup, sub").forEach((el) => {
+  // Farbe und Größe von Textteilen gehören zur Formatierung; Elemente nicht.
+  body.querySelectorAll("sup, sub, span[style]:not([data-man-el])").forEach((el) => {
     el.replaceWith(...Array.from(el.childNodes));
   });
   return sanitizeRichText(body.innerHTML);

@@ -15,17 +15,46 @@
  * A cell value may contain a *very* limited amount of inline markup: single
  * characters can be super-/sub-scripted (e.g. `m<sup>2</sup>`), an inline
  * image can be embedded (`<img>` with an `https:`/root-relative `src` and an
- * optional pixel width), and an element from the Element Explorer can stand
- * in the text like a character (`<span data-man-el>` with a catalog ID, a
- * `#rrggbb` colour and a meaning, see `@man/config-ui/elements/catalog`).
- * Only `<sup>`, `<sub>`, safe `<img>` and catalog elements survive;
- * everything else is treated as plain text. This module is the single trusted
+ * optional pixel width), an element from the Element Explorer can stand in
+ * the text like a character (`<span data-man-el>` with a catalog ID and a
+ * meaning, see `@man/config-ui/elements/catalog`), and a part of the text
+ * can carry its own font colour and size (`<span style="color:#rrggbb;
+ * font-size:Npx">`). Only `<sup>`, `<sub>`, safe `<img>`, catalog elements
+ * and such styled spans survive; everything else is treated as plain text. This module is the single trusted
  * place that turns arbitrary strings (author input, contenteditable
  * `innerHTML`, spreadsheet imports) into safe markup, so the widget can render
  * cells via `innerHTML` without any XSS risk.
  */
 
-import { ELEMENT_ATTRIBUTE, elementMarkup, readElement } from "@man/config-ui/elements/catalog";
+import {
+  ELEMENT_ATTRIBUTE,
+  colorFromStyle,
+  elementMarkup,
+  legacyElementColor,
+  normalizeHexColor,
+  readElement,
+} from "@man/config-ui/elements/catalog";
+
+/** Schriftgrößen, die ein Textteil tragen darf (px). */
+const MIN_FONT_SIZE = 6;
+const MAX_FONT_SIZE = 96;
+
+/**
+ * Schriftfarbe und -größe eines Textteils, neu geschrieben aus dem, was
+ * gültig ist: `color` als `#rrggbb`, `font-size` in ganzen px. Alles andere
+ * im `style` fällt weg. Leer, wenn nichts davon gilt.
+ */
+export function inlineTextStyle(el: Element): string {
+  const style = el.getAttribute("style") ?? "";
+  // `<font color>`: so schreiben ältere Editoren und manche Kopien die Farbe.
+  const color = colorFromStyle(style) ?? (el.tagName === "FONT" ? normalizeHexColor(el.getAttribute("color")) : null);
+  const sizeMatch = /(?:^|;)\s*font-size\s*:\s*(\d+(?:\.\d+)?)px\s*(?:;|$)/i.exec(style);
+  const size = sizeMatch === null ? null : Math.round(Number(sizeMatch[1]));
+  const parts: string[] = [];
+  if (color !== null) parts.push(`color:${color}`);
+  if (size !== null && size >= MIN_FONT_SIZE && size <= MAX_FONT_SIZE) parts.push(`font-size:${size}px`);
+  return parts.join(";");
+}
 
 const ALLOWED_TAGS = new Set(["SUP", "SUB"]);
 /** Void/inline tags that map directly to a line break. */
@@ -107,10 +136,18 @@ const serializeChildren = (node: Node): string => {
       } else if (el.tagName === "IMG") {
         out += serializeImage(el);
       } else if (el.tagName === "SPAN" && el.hasAttribute(ELEMENT_ATTRIBUTE)) {
-        // Rebuilt from what it says, never copied: an unknown shape or an
-        // invalid colour leaves nothing behind.
+        // Rebuilt from what it says, never copied: an unknown shape leaves
+        // nothing behind. An element of rc.5/rc.6 still carries its own
+        // colour – it moves into a colour span, so it looks as before.
         const element = readElement(el);
-        out += element === null ? "" : elementMarkup(element);
+        const legacy = legacyElementColor(el);
+        const markup = element === null ? "" : elementMarkup(element);
+        out += markup !== "" && legacy !== null ? `<span style="color:${legacy}">${markup}</span>` : markup;
+      } else if ((el.tagName === "SPAN" || el.tagName === "FONT") && inlineTextStyle(el) !== "") {
+        // A part of the text with its own colour or size: re-emitted with
+        // only those two properties, never with anything else.
+        const inner = serializeChildren(el);
+        if (inner !== "") out += `<span style="${inlineTextStyle(el)}">${inner}</span>`;
       } else if (ALLOWED_TAGS.has(el.tagName)) {
         // Re-emitted bare: no class or other attribute survives.
         const tag = el.tagName.toLowerCase();
@@ -135,8 +172,8 @@ const serializeChildren = (node: Node): string => {
 
 /**
  * Sanitizes a cell string into safe inline markup: escapes all text and
- * keeps only `<sup>`/`<sub>` tags, safe `<img>` elements and catalog
- * elements. Plain text (no
+ * keeps only `<sup>`/`<sub>` tags, safe `<img>` elements, catalog elements
+ * and spans with a font colour or size. Plain text (no
  * tags) is returned escaped and otherwise unchanged, so legacy string cells
  * are unaffected.
  */

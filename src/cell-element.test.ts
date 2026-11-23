@@ -15,66 +15,48 @@ import { InlineElement, elementMarkup } from "@man/config-ui/elements/catalog";
 
 import {
   appendElement,
-  countMatching,
   countWithoutMeaning,
   elementAt,
   listCellElements,
-  meaningsByColor,
-  ownColors,
   removeCellElement,
   tableElements,
   updateCellElement,
-  updateMatchingElements,
 } from "./cell-element";
 
-const red: InlineElement = { id: "kasten", color: "#e40045", label: "Diesel", size: "text" };
-const blue: InlineElement = { id: "kasten", color: "#3875b2", label: "eTruck", size: "text" };
-const green: InlineElement = { id: "kasten", color: "#12ab34", label: "", size: "text" };
+const diesel: InlineElement = { id: "kasten", label: "Diesel" };
+const etruck: InlineElement = { id: "elektro", label: "eTruck" };
+const blank: InlineElement = { id: "kasten", label: "" };
 const m = elementMarkup;
 
 const table = (): string[][] => [
-  ["Baureihe", "Diesel", "eTruck"],
-  ["TGL", m(red), "–"],
-  ["TGM", m(red), `(${m(blue)})`],
-  ["Legende", `${m(red)} = Diesel ${m(blue)} = eTruck`, m(green)],
+  ["Baureihe", "Diesel"],
+  ["TGL", m(diesel)],
+  ["TGM", `(<span style="color:#3875b2">${m(etruck)}</span>)`],
+  ["Legende", `${m(diesel)} = Diesel ${m(blank)}`],
 ];
 
 describe("Elemente in Zellen", () => {
   it("hängt ein Element ans Ende der Zelle", () => {
-    expect(appendElement("TGX (", red)).toBe(`TGX (${m(red)}`);
-    expect(appendElement("", red)).toBe(m(red));
+    expect(appendElement("TGX (", diesel)).toBe(`TGX (${m(diesel)}`);
   });
 
-  it("listet die Elemente einer Zelle in Reihenfolge", () => {
-    expect(listCellElements(`${m(red)} = Diesel ${m(blue)}`)).toEqual([red, blue]);
+  it("listet die Elemente einer Zelle, auch in farbigem Text", () => {
+    expect(listCellElements(table()[2][1])).toEqual([etruck]);
     expect(listCellElements("nur Text")).toEqual([]);
   });
 
-  it("ändert und entfernt genau das n-te Element", () => {
-    const cell = `${m(red)}/${m(red)}`;
-    expect(updateCellElement(cell, 1, { color: "#303c49", label: "Gas" })).toBe(`${m(red)}/${m({ ...red, color: "#303c49", label: "Gas" })}`);
-    expect(removeCellElement(cell, 0)).toBe(`/${m(red)}`);
+  it("benennt und entfernt genau das n-te Element", () => {
+    const cell = `${m(diesel)}/${m(diesel)}`;
+    expect(updateCellElement(cell, 1, { label: "Gas" })).toBe(`${m(diesel)}/${m({ id: "kasten", label: "Gas" })}`);
+    expect(removeCellElement(cell, 0)).toBe(`/${m(diesel)}`);
   });
 
   it("findet ein Element über Zeile, Spalte und Stelle", () => {
-    expect(elementAt(table(), { row: 3, col: 1, index: 1 })).toEqual(blue);
+    expect(elementAt(table(), { row: 3, col: 1, index: 1 })).toEqual(blank);
     expect(elementAt(table(), { row: 3, col: 1, index: 5 })).toBeNull();
-    expect(elementAt(table(), { row: 9, col: 0, index: 0 })).toBeNull();
   });
 
-  it("färbt alle gleichen Elemente der Tabelle um und lässt andere stehen", () => {
-    const next = updateMatchingElements(table(), red, { color: "#303c49" });
-    const elements = tableElements(next);
-    expect(countMatching(elements, red)).toBe(0);
-    expect(countMatching(elements, { id: "kasten", color: "#303c49" })).toBe(3);
-    expect(countMatching(elements, blue)).toBe(2);
-    expect(next[0]).toEqual(table()[0]);
-  });
-
-  it("sammelt Bedeutungen je Farbe, eigene Farben und Elemente ohne Bedeutung", () => {
-    const elements = tableElements(table());
-    expect(meaningsByColor(elements)).toEqual({ "#e40045": "Diesel", "#3875b2": "eTruck" });
-    expect(ownColors(elements)).toEqual(["#12ab34"]);
-    expect(countWithoutMeaning(elements)).toBe(1);
+  it("zählt Elemente ohne Bedeutung", () => {
+    expect(countWithoutMeaning(tableElements(table()))).toBe(1);
   });
 });

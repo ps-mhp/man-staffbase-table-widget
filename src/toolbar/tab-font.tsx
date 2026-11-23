@@ -14,10 +14,11 @@
 import * as React from "react";
 import { ReactElement } from "react";
 import { AArrowDown, AArrowUp, Bold, Italic, PaintBucket, Strikethrough, Subscript, Superscript, Underline } from "lucide-react";
-import { ToolButton, ToolSelect } from "@man/config-ui/toolbar/tool-button";
+import { ToolButton } from "@man/config-ui/toolbar/tool-button";
+import { ToolMenu, ToolMenuItem } from "@man/config-ui/toolbar/tool-menu";
 import { ToolSeparator, Toolbar } from "@man/config-ui/toolbar/toolbar";
 
-import { ColorButton } from "./controls";
+import { ColorTool } from "@man/config-ui/toolbar/color-tool";
 import { TableToolbarProps } from "./props";
 
 const FONT_SIZES = [10, 12, 14, 16, 18, 20, 24, 28, 32];
@@ -66,7 +67,7 @@ export function FontTab({
       <ToolButton data-testid="toolbar-superscript" label="Hochstellen" icon={Superscript} disabled={disabled} onClick={onSuperscript} />
       <ToolButton data-testid="toolbar-subscript" label="Tiefstellen" icon={Subscript} disabled={disabled} onClick={onSubscript} />
       <ToolSeparator />
-      <ColorButton
+      <ColorTool
         testId="toolbar-color"
         label="Schriftfarbe"
         disabled={disabled}
@@ -76,7 +77,7 @@ export function FontTab({
         glyph={<span className="text-[15px] font-bold">A</span>}
         standardBar="var(--foreground)"
       />
-      <ColorButton
+      <ColorTool
         testId="toolbar-bg"
         label="Hintergrundfarbe"
         disabled={disabled}
@@ -87,20 +88,33 @@ export function FontTab({
         standardBar="transparent"
       />
       <ToolSeparator />
-      <ToolSelect
-        data-testid="toolbar-fontsize"
-        label="Schriftgröße"
+      <ToolMenu
+        testId="toolbar-fontsize"
+        label={`Schriftgröße: ${activeFormat.fontSize ?? "Standard"}`}
+        title="Schriftgröße"
         disabled={disabled}
-        value={activeFormat.fontSize ?? ""}
-        onChange={(e) => onFontSize(e.target.value === "" ? null : Number(e.target.value))}
+        text={<span className="min-w-12 text-left">{activeFormat.fontSize ?? "Standard"}</span>}
       >
-        <option value="">Standard</option>
-        {FONT_SIZES.map((size) => (
-          <option key={size} value={size}>
-            {size}
-          </option>
-        ))}
-      </ToolSelect>
+        {(close) => (
+          <div className="flex w-32 flex-col">
+            {[undefined, ...FONT_SIZES].map((size) => (
+              <ToolMenuItem
+                key={size ?? "standard"}
+                data-testid={`toolbar-fontsize-${size ?? "standard"}`}
+                aria-pressed={activeFormat.fontSize === size}
+                // Die Liste nimmt den Fokus nicht: markierter Text in der Zelle bleibt markiert.
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => {
+                  onFontSize(size ?? null);
+                  close();
+                }}
+              >
+                {size ?? "Standard"}
+              </ToolMenuItem>
+            ))}
+          </div>
+        )}
+      </ToolMenu>
       <ToolButton data-testid="toolbar-fontsize-inc" label="Schrift vergrößern" icon={AArrowUp} disabled={disabled} onClick={() => onFontSizeStep(1)} />
       <ToolButton data-testid="toolbar-fontsize-dec" label="Schrift verkleinern" icon={AArrowDown} disabled={disabled} onClick={() => onFontSizeStep(-1)} />
     </Toolbar>

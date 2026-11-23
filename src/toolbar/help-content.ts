@@ -94,15 +94,15 @@ export const HELP_TOPICS: HelpTopic[] = [
       },
       {
         title: "Schrift- und Hintergrundfarbe",
-        text: "Der Knopf öffnet einen Farbwähler für die Text- bzw. Zellenhintergrundfarbe der Markierung; der Balken darunter zeigt die gesetzte Farbe. Der Pfeil daneben bietet „Standard“, das die Farbe wieder entfernt.",
+        text: "Der Knopf öffnet die Farbliste: die MAN-CI-Farben, „Standard“ (entfernt die Farbe) und „Eigene Farbe …“ über den Farbwähler; der Balken zeigt die gesetzte Farbe. Schriftfarbe und Schriftgröße wirken beim Bearbeiten einer Zelle nur auf den markierten Text, sonst auf alle markierten Zellen.",
       },
       {
         title: "Elemente einfügen",
-        text: "Der Reiter „Elemente“ zeigt rechts den Katalog. In seiner Werkzeugleiste Farbe (die MAN-CI-Farben stehen immer zur Wahl, eigene über den Farbwähler), Größe und Bedeutung einstellen, etwa „Diesel“; im Katalog die Form wählen. „Einfügen“ setzt das Element an den Cursor der bearbeiteten Zelle, sonst ans Ende jeder markierten Zelle; Doppelklick auf die Kachel oder Ziehen in eine Zelle geht auch. Das Element steht im Text wie ein Zeichen und wächst mit der Schriftgröße.",
+        text: "Der Reiter „Elemente“ zeigt rechts den Katalog: Form wählen, „Einfügen“ setzt sie an den Cursor der bearbeiteten Zelle, sonst ans Ende jeder markierten Zelle; Doppelklick auf die Kachel oder Ziehen in eine Zelle geht auch. Ein Element steht im Text wie ein Zeichen: es hat die Schriftfarbe und Schriftgröße des Texts, in dem es steht.",
       },
       {
-        title: "Elemente einfärben",
-        text: "Ein Klick auf ein Element in der Tabelle wechselt zum Reiter „Elemente“: die Werkzeugleiste stellt jetzt dieses Element ein. Farbe und Größe wirken sofort, die Bedeutung beim Verlassen des Felds; „Alle gleichen“ trifft auch alle Elemente gleicher Form und Farbe. Der Papierkorb entfernt es, „Fertig“ im Katalog lässt es los. Die Bedeutung lesen Screenreader vor, und sie steht im Excel-, CSV- und PowerPoint-Export; ohne Bedeutung steht dort „■“, und die Statuszeile zählt solche Elemente.",
+        title: "Elemente färben, vergrößern, benennen",
+        text: "Farbe und Größe wie bei Text: Zelle markieren und Schriftfarbe oder Schriftgröße wählen – oder die Zelle bearbeiten, nur das Element (oder einen Textteil) markieren und dann wählen. Ein Klick auf ein Element markiert es; „Bedeutung“ in der Leiste oder im Kontextmenü benennt es, etwa „Diesel“. Die Bedeutung lesen Screenreader vor, und sie steht im Excel-, CSV- und PowerPoint-Export; ohne steht dort „■“, und die Statuszeile zählt solche Elemente. Der Papierkorb entfernt das markierte Element."
       },
     ],
   },

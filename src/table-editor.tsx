@@ -15,10 +15,9 @@ import * as React from "react";
 import { ReactElement, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import * as ContextMenu from "@radix-ui/react-context-menu";
 import { ConfigWorkspace } from "@man/config-ui/layout/config-workspace";
-import { ELEMENT_ATTRIBUTE, InlineElement, elementById, elementMarkup } from "@man/config-ui/elements/catalog";
+import { ELEMENT_ATTRIBUTE, ELEMENT_CATALOG, InlineElement, elementById, elementMarkup } from "@man/config-ui/elements/catalog";
 import { elementStylesheet } from "@man/config-ui/elements/element-css";
 import { useElementPanel } from "@man/config-ui/elements/element-panel";
-import { useElementDraft } from "@man/config-ui/elements/element-draft";
 import { ElementToolbar } from "@man/config-ui/elements/element-toolbar";
 import { ToolButton } from "@man/config-ui/toolbar/tool-button";
 import { ToolSeparator } from "@man/config-ui/toolbar/toolbar";
@@ -80,17 +79,12 @@ import {
 } from "./cell-clipboard";
 import {
   ElementAddress,
-  ElementPatch,
   appendElement,
-  countMatching,
   countWithoutMeaning,
   elementAt,
-  meaningsByColor,
-  ownColors,
   removeCellElement,
   tableElements,
   updateCellElement,
-  updateMatchingElements,
 } from "./cell-element";
 import tableEditorCss from "./styles/table-editor.scss";
 import { useHotStyle } from "@shared/hot-style";
@@ -616,13 +610,66 @@ export const TableEditor = ({
   const FONT_SIZE_STEPS = [10, 12, 14, 16, 18, 20, 24, 28, 32];
   /** Grows/shrinks the selection's font size by one step (Excel A^/A˅). */
   const stepFontSize = (delta: number): void => {
-    const current = anchorFormat.fontSize ?? 14;
+    // In markiertem Text zählt die Größe dort, wo die Markierung beginnt.
+    const el = editingTextOf();
+    const selection = el === null ? null : selectionOf(el);
+    const start = selection !== null && selection.rangeCount > 0 ? selection.getRangeAt(0).startContainer : null;
+    const startElement = start === null ? null : start.nodeType === 1 ? (start as HTMLElement) : start.parentElement;
+    const inline = startElement === null ? NaN : parseFloat(getComputedStyle(startElement).fontSize);
+    const current = Number.isFinite(inline) && el !== null ? Math.round(inline) : (anchorFormat.fontSize ?? 14);
     let index = FONT_SIZE_STEPS.findIndex((s) => s >= current);
     if (index === -1) index = FONT_SIZE_STEPS.length - 1;
     if (delta > 0 && FONT_SIZE_STEPS[index] <= current) index += 1;
     if (delta < 0) index -= 1;
     const next = FONT_SIZE_STEPS[Math.max(0, Math.min(FONT_SIZE_STEPS.length - 1, index))];
-    applyFormat({ fontSize: next });
+    applyFontSize(next);
+  };
+
+  /** Der Text der bearbeiteten Zelle, wenn der Fokus (noch) in ihm steht. */
+  const editingTextOf = (): HTMLElement | null => {
+    const root = rootRef.current;
+    const el = root === null ? null : (activeElementOf(root) as HTMLElement | null);
+    if (editing === null || el === null) return null;
+    return el.isContentEditable || el.getAttribute("contenteditable") === "true" ? el : null;
+  };
+
+  /**
+   * Schriftfarbe oder -größe für den markierten Teil der bearbeiteten Zelle,
+   * wie in Excel; Elemente darin übernehmen sie wie Zeichen. `null` nimmt die
+   * Angabe wieder weg („Standard“). Ohne markierten Text: `false` – dann gilt
+   * die Formatierung der ganzen Zelle.
+   */
+  const applyInlineStyle = (property: "color" | "font-size", value: string | null): boolean => {
+    const cell = editing;
+    const el = editingTextOf();
+    const selection = el === null ? null : selectionOf(el);
+    if (cell === null || el === null || selection === null || selection.rangeCount === 0) return false;
+    const range = selection.getRangeAt(0);
+    if (range.collapsed || !el.contains(range.commonAncestorContainer)) return false;
+
+    const fragment = range.extractContents();
+    // Innen gilt nur noch die neue Angabe; alte Elemente tragen ihre Farbe selbst.
+    fragment.querySelectorAll<HTMLElement>("[style]").forEach((node) => node.style.removeProperty(property));
+    const wrapper = document.createElement("span");
+    if (value !== null) wrapper.style.setProperty(property, value);
+    wrapper.appendChild(fragment);
+    range.insertNode(wrapper);
+    const selected = document.createRange();
+    selected.selectNodeContents(wrapper);
+    selection.removeAllRanges();
+    selection.addRange(selected);
+    handleInput(cell[0], cell[1], sanitizeRichText(el.innerHTML));
+    return true;
+  };
+
+  /** Schriftfarbe: markierter Text in der Zelle, sonst die markierten Zellen. */
+  const applyTextColor = (color: string | undefined): void => {
+    if (!applyInlineStyle("color", color ?? null)) applyFormat({ color });
+  };
+
+  /** Schriftgröße: markierter Text in der Zelle, sonst die markierten Zellen. */
+  const applyFontSize = (size: number | undefined): void => {
+    if (!applyInlineStyle("font-size", size === undefined ? null : `${size}px`)) applyFormat({ fontSize: size });
   };
 
   /**
@@ -897,14 +944,15 @@ export const TableEditor = ({
   // --- Elemente (Element Explorer) ---
 
   /**
-   * Das angeklickte Element; die Leiste zeigt dann „Bearbeiten“. Form und
-   * Farbe stehen dabei: ändert sich die Zelle, zeigte die Stelle allein
-   * womöglich auf ein anderes Element.
+   * Das angeklickte Element. Die Form steht dabei: ändert sich die Zelle,
+   * zeigte die Stelle allein womöglich auf ein anderes Element.
    */
-  const [pickedElement, setPickedElement] = useState<(ElementAddress & Pick<InlineElement, "id" | "color">) | null>(null);
+  const [pickedElement, setPickedElement] = useState<(ElementAddress & Pick<InlineElement, "id">) | null>(null);
   const elements = useMemo(() => tableElements(data), [data]);
-  const meanings = useMemo(() => meaningsByColor(elements), [elements]);
-  const usedColors = useMemo(() => ownColors(elements), [elements]);
+  /** Die gewählte Form im Katalog. */
+  const [elementTool, setElementTool] = useState(ELEMENT_CATALOG[0].id);
+  /** Ob die Eingabe „Bedeutung“ offen ist – aus der Leiste oder dem Kontextmenü. */
+  const [meaningOpen, setMeaningOpen] = useState(false);
 
   /** Wohin „Einfügen“ setzt: die bearbeitete Zelle, sonst jede markierte (verdeckte nicht). */
   const elementTargets: Array<[number, number]> = editing
@@ -920,26 +968,21 @@ export const TableEditor = ({
   const pickedInfo = useMemo(() => {
     if (pickedElement === null) return null;
     const element = elementAt(data, pickedElement);
-    if (element === null || element.id !== pickedElement.id || element.color !== pickedElement.color) return null;
-    return { element, where: `Zelle ${cellName(pickedElement.row, pickedElement.col)}`, sameCount: countMatching(elements, element) };
-  }, [data, elements, pickedElement]);
+    if (element === null || element.id !== pickedElement.id) return null;
+    return { element, where: `Zelle ${cellName(pickedElement.row, pickedElement.col)}`, sameCount: 1 };
+  }, [data, pickedElement]);
 
   /**
    * An den Cursor – aber nur, solange er noch in der bearbeiteten Zelle
    * steht. Die Kacheln und „Einfügen“ nehmen den Fokus nicht; wer zuvor in
-   * ein Feld der Leiste getippt hat, bekommt das Element ans Zellende.
-   *
-   * Über die Auswahl selbst statt `execCommand("insertHTML")`: Chrome
-   * schreibt dort Inline-Stile um (etwa in `rgb()`), und die Farbe ist hier
-   * Inhalt.
+   * ein Feld getippt hat, bekommt das Element ans Zellende. Dort übernimmt
+   * es Schriftfarbe und -größe des Textteils, in dem es landet.
    */
   const insertElementAtCaret = (element: InlineElement): boolean => {
     const cell = editing;
-    const root = rootRef.current;
-    const el = root === null ? null : (activeElementOf(root) as HTMLElement | null);
+    const el = editingTextOf();
     const selection = el === null ? null : selectionOf(el);
-    const editable = el !== null && (el.isContentEditable || el.getAttribute("contenteditable") === "true");
-    if (!cell || !el || !editable || !selection || selection.rangeCount === 0) return false;
+    if (!cell || !el || !selection || selection.rangeCount === 0) return false;
     const range = selection.getRangeAt(0);
     if (!el.contains(range.commonAncestorContainer)) return false;
     const node = range.createContextualFragment(elementMarkup(element)).firstChild;
@@ -971,14 +1014,10 @@ export const TableEditor = ({
     change({ ...current, data: updateCell(current.data, row, col, appendElement(existing, element)) });
   };
 
-  const updatePickedElement = (patch: ElementPatch, all: boolean): void => {
+  const setPickedMeaning = (label: string): void => {
     if (pickedElement === null || pickedInfo === null) return;
     const { row, col, index } = pickedElement;
-    const next = all
-      ? updateMatchingElements(data, pickedInfo.element, patch)
-      : updateCell(data, row, col, updateCellElement(data[row]?.[col], index, patch));
-    if (patch.color !== undefined) setPickedElement({ ...pickedElement, color: patch.color });
-    onChange({ ...value, data: next });
+    onChange({ ...value, data: updateCell(data, row, col, updateCellElement(data[row]?.[col], index, { label })) });
   };
 
   const removePickedElement = (): void => {
@@ -988,16 +1027,11 @@ export const TableEditor = ({
     onChange({ ...value, data: updateCell(data, row, col, removeCellElement(data[row]?.[col], index)) });
   };
 
-  /** Wie das nächste Element aussieht; die Leiste des Reiters stellt es ein. */
-  const elementDraft = useElementDraft(meanings);
-  /** Ob Änderungen am gewählten Element auch alle gleichen treffen. */
-  const [elementAll, setElementAll] = useState(true);
-
   const elementPanel = useElementPanel(
-    { target: elementTarget, picked: pickedInfo, draft: elementDraft.draft },
+    { target: elementTarget, picked: pickedInfo, tool: elementTool },
     {
-      onSelectTool: elementDraft.setTool,
-      onInsert: (id) => insertElement({ ...elementDraft.draft, id }),
+      onSelectTool: setElementTool,
+      onInsert: (id) => insertElement({ id, label: "" }),
       onRelease: () => setPickedElement(null),
       onClosed: () => setPickedElement(null),
     },
@@ -1017,46 +1051,21 @@ export const TableEditor = ({
     setTab("elements");
     if (!elementPanel.isOpen) elementPanel.open();
   };
-
-  /** Ein angeklicktes Element stellt die Leiste ein, sonst das nächste. */
-  const pickedValue = pickedInfo?.element ?? null;
-  const updateElementSetting = (patch: ElementPatch): void => {
-    if (pickedValue !== null) {
-      updatePickedElement(patch, elementAll);
-      return;
-    }
-    if (patch.color !== undefined) elementDraft.setColor(patch.color);
-    if (patch.size !== undefined) elementDraft.setSize(patch.size);
-    if (patch.label !== undefined) elementDraft.setLabel(patch.label);
+  /** „Bedeutung …“ aus dem Kontextmenü: zum Reiter und die Eingabe öffnen. */
+  const editMeaning = (): void => {
+    showElements();
+    setMeaningOpen(true);
   };
-  const elementValue = pickedValue ?? elementDraft.draft;
 
   const elementsToolbar = (
     <ElementToolbar
-      value={elementValue}
-      onColor={(color) => updateElementSetting({ color })}
-      onSize={(size) => updateElementSetting({ size })}
-      onLabel={(label) => updateElementSetting({ label })}
-      labelMode={pickedValue !== null ? "commit" : "change"}
-      scope={pickedInfo !== null ? `${elementById(pickedInfo.element.id)?.name ?? "Element"} in ${pickedInfo.where}` : "Neues Element"}
-      recentColors={[...elementDraft.picked, ...usedColors]}
-      suggestion={meanings[elementValue.color]}
+      scope={pickedInfo !== null ? `${elementById(pickedInfo.element.id)?.name ?? "Element"} in ${pickedInfo.where}` : "Kein Element markiert"}
+      picked={pickedInfo?.element ?? null}
+      onLabel={setPickedMeaning}
+      meaningOpen={meaningOpen}
+      onMeaningOpenChange={setMeaningOpen}
     >
-      {pickedInfo !== null && (
-        <>
-          <ToolSeparator />
-          {pickedInfo.sameCount > 1 && (
-            <ToolButton
-              label={`Alle ${pickedInfo.sameCount} gleichen Elemente mitändern`}
-              pressed={elementAll}
-              onClick={() => setElementAll((all) => !all)}
-            >
-              Alle {pickedInfo.sameCount} gleichen
-            </ToolButton>
-          )}
-          <ToolButton label="Element entfernen" icon={Trash2} onClick={removePickedElement} />
-        </>
-      )}
+      {pickedInfo !== null && <ToolButton label="Element entfernen" icon={Trash2} onClick={removePickedElement} />}
       <ToolSeparator />
       <ToolButton
         label="Katalog anzeigen"
@@ -1071,21 +1080,22 @@ export const TableEditor = ({
   );
 
   /**
-   * Ein Klick auf ein Element im Gitter wählt es zum Bearbeiten und öffnet
-   * die Leiste. Welches es ist, sagt seine Stelle unter den Elementen der
-   * Zelle – so zählt auch `cell-element.ts`.
+   * Ein Klick auf ein Element im Gitter markiert es und öffnet den Reiter
+   * „Elemente“; ein Rechtsklick markiert es nur – das Kontextmenü bietet
+   * dann „Bedeutung …“. Welches es ist, sagt seine Stelle unter den
+   * Elementen der Zelle – so zählt auch `cell-element.ts`.
    */
   function pickElementAt(event: React.MouseEvent, row: number, col: number): boolean {
-    // Rechtsklick und Markieren mit Umschalt/⌘ bleiben, was sie sind.
-    if (event.button !== 0 || event.shiftKey || event.ctrlKey || event.metaKey) return false;
+    // Markieren mit Umschalt/⌘ bleibt, was es ist.
+    if (event.button > 2 || event.button === 1 || event.shiftKey || event.ctrlKey || event.metaKey) return false;
     const cell = event.currentTarget as HTMLElement;
     const node = (event.target as Element).closest?.(ELEMENT_SELECTOR);
     if (!node || !cell.contains(node)) return false;
     const index = Array.from(cell.querySelectorAll(ELEMENT_SELECTOR)).indexOf(node);
     const element = index < 0 ? null : elementAt(data, { row, col, index });
     if (element === null) return false;
-    setPickedElement({ row, col, index, id: element.id, color: element.color });
-    showElements();
+    setPickedElement({ row, col, index, id: element.id });
+    if (event.button === 0) showElements();
     return true;
   }
 
@@ -1193,6 +1203,7 @@ export const TableEditor = ({
     unmerge: doUnmerge,
     insertImage: openImagePicker,
     insertElement: showElements,
+    editMeaning,
     toggle: toggleKey,
     format: applyFormat,
     sort: doSort,
@@ -1208,11 +1219,11 @@ export const TableEditor = ({
       onToggle={toggleKey}
       onAlign={(align: TextAlign) => applyFormat({ align })}
       onVerticalAlign={(valign: VerticalAlign) => applyFormat({ valign })}
-      onColor={(color) => applyFormat({ color })}
-      onClearColor={() => applyFormat({ color: undefined })}
+      onColor={(color) => applyTextColor(color)}
+      onClearColor={() => applyTextColor(undefined)}
       onBackground={(background) => applyFormat({ background })}
       onClearBackground={() => applyFormat({ background: undefined })}
-      onFontSize={(size) => applyFormat({ fontSize: size ?? undefined })}
+      onFontSize={(size) => applyFontSize(size ?? undefined)}
       onFontSizeStep={stepFontSize}
       onSuperscript={() => applyVertAlign("superscript")}
       onSubscript={() => applyVertAlign("subscript")}
@@ -1389,7 +1400,12 @@ export const TableEditor = ({
                   {grid}
                 </div>
               </ContextMenu.Trigger>
-              <GridContextMenu container={portalContainer} hasSelection={selection !== null} actions={menuActions} />
+              <GridContextMenu
+                container={portalContainer}
+                hasSelection={selection !== null}
+                elementPicked={pickedInfo !== null}
+                actions={menuActions}
+              />
             </ContextMenu.Root>
           </div>
           <StatusBar

@@ -30,7 +30,8 @@ import { DEFAULT_VISIBLE_ROWS } from "./row-collapse";
 import { TableModel } from "./table-model";
 import { stubMediaClient } from "@shared/media/media-client.testing";
 
-const red = elementMarkup({ id: "kasten", color: "#e40045", label: "Diesel", size: "text" });
+const red = elementMarkup({ id: "kasten", label: "Diesel" });
+const blank = (id = "kasten"): string => elementMarkup({ id, label: "" });
 
 const sample = (): TableModel => ({
   data: [
@@ -72,45 +73,39 @@ function setup() {
 
 const cellTd = (row: number, col: number): HTMLElement => screen.getByLabelText(`Zeile ${row}, Spalte ${col}`).closest("td")!;
 const panel = (): HTMLElement => screen.getByRole("complementary", { name: "Elemente" });
-
 const toolbar = (): HTMLElement => screen.getByRole("toolbar", { name: "Elemente" });
+
+/** Markiert in der bearbeiteten Zelle die Zeichen [from, to) des ersten Textknotens. */
+function selectText(row: number, col: number, from: number, to: number): void {
+  const text = screen.getByLabelText(`Zeile ${row}, Spalte ${col}`);
+  const range = document.createRange();
+  range.setStart(text.firstChild!, from);
+  range.setEnd(text.firstChild!, to);
+  document.getSelection()!.removeAllRanges();
+  document.getSelection()!.addRange(range);
+}
 
 describe("Element Explorer im Tabellen-Editor", () => {
   it("bringt mit dem Reiter „Elemente“ den Katalog rechts und nimmt ihn beim Verlassen mit", async () => {
     const { user } = setup();
-    expect(screen.queryByRole("button", { name: "Elemente einfügen" })).toBeNull();
     await user.click(screen.getByRole("tab", { name: "Elemente" }));
     expect(panel()).toBeInTheDocument();
-    expect(within(toolbar()).getByTestId("element-toolbar-scope")).toHaveTextContent("Neues Element");
+    expect(within(toolbar()).getByTestId("element-toolbar-scope")).toHaveTextContent("Kein Element markiert");
+    expect(within(toolbar()).getByRole("button", { name: "Bedeutung" })).toBeDisabled();
     expect(within(toolbar()).getByRole("button", { name: "Katalog anzeigen" })).toHaveAttribute("aria-pressed", "true");
 
     await user.click(screen.getByRole("tab", { name: "Daten" }));
     expect(screen.queryByRole("complementary", { name: "Elemente" })).toBeNull();
   });
 
-  it("setzt das Element mit den Einstellungen der Leiste in die markierte Zelle", async () => {
-    const { last, user } = setup();
-    fireEvent.mouseDown(cellTd(2, 3));
-    await user.click(screen.getByRole("tab", { name: "Elemente" }));
-    // Rot kennt die Tabelle schon als „Diesel“: die Bedeutung kommt mit.
-    expect(within(toolbar()).getByRole("textbox", { name: "Bedeutung" })).toHaveValue("Diesel");
-    await user.click(within(panel()).getByRole("button", { name: "In Zelle C2 einfügen" }));
-    expect(last().data[1][2]).toBe(`–${red}`);
-  });
-
-  it("setzt das Element in jede markierte Zelle", async () => {
+  it("setzt das Element in jede markierte Zelle – ohne eigene Farbe", async () => {
     const { last, user } = setup();
     fireEvent.mouseDown(cellTd(2, 3));
     fireEvent.mouseDown(cellTd(3, 3), { shiftKey: true });
     await user.click(screen.getByRole("tab", { name: "Elemente" }));
-    await user.click(within(toolbar()).getByRole("button", { name: "Blau" }));
-    await user.type(within(toolbar()).getByRole("textbox", { name: "Bedeutung" }), "eTruck");
-    await user.click(within(toolbar()).getByRole("button", { name: "Größer" }));
     await user.click(within(panel()).getByRole("button", { name: "In 2 Zellen einfügen" }));
-
-    const blue = elementMarkup({ id: "kasten", color: "#3875b2", label: "eTruck", size: "large" });
-    expect(last().data[1][2]).toBe(`–${blue}`);
-    expect(last().data[2][2]).toBe(blue);
+    expect(last().data[1][2]).toBe(`–${blank()}`);
+    expect(last().data[2][2]).toBe(blank());
   });
 
   it("fügt ein Antriebs-Icon aus dem Katalog ein", async () => {
@@ -119,54 +114,53 @@ describe("Element Explorer im Tabellen-Editor", () => {
     await user.click(screen.getByRole("tab", { name: "Elemente" }));
     await user.click(within(panel()).getByRole("button", { name: "Elektro" }));
     await user.click(within(panel()).getByRole("button", { name: "In Zelle C3 einfügen" }));
-    expect(last().data[2][2]).toBe(elementMarkup({ id: "elektro", color: "#e40045", label: "Diesel", size: "text" }));
+    expect(last().data[2][2]).toBe(blank("elektro"));
   });
 
-  it("wechselt beim Klick auf ein Element zum Reiter „Elemente“ und färbt alle gleichen um", async () => {
+  it("markiert ein angeklicktes Element und benennt es über „Bedeutung“", async () => {
     const { last, user } = setup();
     const element = cellTd(2, 2).querySelector("[data-man-el]")!;
     fireEvent.mouseDown(element);
 
     expect(screen.getByRole("tab", { name: "Elemente" })).toHaveAttribute("aria-selected", "true");
     expect(within(toolbar()).getByTestId("element-toolbar-scope")).toHaveTextContent("Kasten in Zelle B2");
-    expect(within(panel()).getByTestId("picked-element")).toHaveTextContent("Kasten in Zelle B2 · MAN Rot");
+    expect(within(panel()).getByTestId("picked-element")).toHaveTextContent("Kasten in Zelle B2");
     expect(element).toHaveAttribute("data-man-picked");
 
-    await user.click(within(toolbar()).getByRole("button", { name: "Anthrazit" }));
-    const anthracite = elementMarkup({ id: "kasten", color: "#303c49", label: "Diesel", size: "text" });
-    expect(last().data[1][1]).toBe(anthracite);
-    expect(last().data[2][1]).toBe(anthracite);
+    await user.click(within(toolbar()).getByRole("button", { name: "Bedeutung: Diesel" }));
+    const field = screen.getByLabelText("Bedeutung");
+    await user.clear(field);
+    await user.type(field, "Diesel Euro 6{Enter}");
+    expect(last().data[1][1]).toBe(elementMarkup({ id: "kasten", label: "Diesel Euro 6" }));
+    expect(last().data[2][1]).toBe(red);
   });
 
-  it("öffnet ein Element nicht bei Rechtsklick oder beim Erweitern der Markierung", () => {
+  it("bietet „Bedeutung des Elements…“ im Kontextmenü nach einem Rechtsklick auf ein Element", () => {
     setup();
-    fireEvent.mouseDown(cellTd(2, 2).querySelector("[data-man-el]")!, { button: 2 });
+    fireEvent.contextMenu(cellTd(2, 3));
+    expect(screen.getByTestId("element-meaning")).toHaveAttribute("data-disabled");
+    fireEvent.keyDown(document.activeElement ?? document.body, { key: "Escape" });
+
+    const element = cellTd(3, 2).querySelector("[data-man-el]")!;
+    fireEvent.mouseDown(element, { button: 2 });
+    fireEvent.contextMenu(element);
+    fireEvent.click(screen.getByTestId("element-meaning"));
+    expect(screen.getByRole("tab", { name: "Elemente" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByLabelText("Bedeutung")).toHaveValue("Diesel");
+  });
+
+  it("öffnet ein Element nicht beim Erweitern der Markierung", () => {
+    setup();
     fireEvent.mouseDown(cellTd(3, 2).querySelector("[data-man-el]")!, { shiftKey: true });
     expect(screen.queryByRole("complementary", { name: "Elemente" })).toBeNull();
   });
 
-  it("ändert nur das angeklickte, wenn „alle gleichen“ aus ist, und entfernt es", async () => {
+  it("entfernt das markierte Element", async () => {
     const { last, user } = setup();
     fireEvent.mouseDown(cellTd(3, 2).querySelector("[data-man-el]")!);
-    await user.click(within(toolbar()).getByRole("button", { name: "Alle 2 gleichen Elemente mitändern" }));
-    await user.click(within(toolbar()).getByRole("button", { name: "Blau" }));
-
-    expect(last().data[1][1]).toBe(red);
-    expect(last().data[2][1]).toBe(elementMarkup({ id: "kasten", color: "#3875b2", label: "Diesel", size: "text" }));
-
     await user.click(within(toolbar()).getByRole("button", { name: "Element entfernen" }));
     expect(last().data[2][1]).toBe("");
-    expect(within(toolbar()).getByTestId("element-toolbar-scope")).toHaveTextContent("Neues Element");
-  });
-
-  it("übernimmt die Bedeutung eines gewählten Elements beim Verlassen des Felds", async () => {
-    const { last, user } = setup();
-    fireEvent.mouseDown(cellTd(2, 2).querySelector("[data-man-el]")!);
-    const field = within(toolbar()).getByRole("textbox", { name: "Bedeutung" });
-    await user.clear(field);
-    await user.type(field, "Diesel Euro 6{Enter}");
-    expect(last().data[1][1]).toBe(elementMarkup({ id: "kasten", color: "#e40045", label: "Diesel Euro 6", size: "text" }));
-    expect(last().data[2][1]).toBe(last().data[1][1]);
+    expect(within(toolbar()).getByTestId("element-toolbar-scope")).toHaveTextContent("Kein Element markiert");
   });
 
   it("nimmt ein aus dem Katalog gezogenes Element in der Zielzelle an", async () => {
@@ -180,8 +174,8 @@ describe("Element Explorer im Tabellen-Editor", () => {
     fireEvent.dragOver(target, { dataTransfer });
     fireEvent.drop(target, { dataTransfer });
 
-    expect(JSON.parse(dataTransfer.getData(ELEMENT_DRAG_TYPE))).toMatchObject({ id: "kasten" });
-    expect(last().data[0][0]).toBe(`Baureihe${red}`);
+    expect(JSON.parse(dataTransfer.getData(ELEMENT_DRAG_TYPE))).toEqual({ id: "kasten", label: "" });
+    expect(last().data[0][0]).toBe(`Baureihe${blank()}`);
   });
 
   it("setzt das Element an den Cursor der bearbeiteten Zelle", async () => {
@@ -189,17 +183,11 @@ describe("Element Explorer im Tabellen-Editor", () => {
     fireEvent.mouseDown(cellTd(1, 2));
     await user.click(screen.getByRole("tab", { name: "Elemente" }));
     fireEvent.doubleClick(cellTd(1, 2));
-
-    const text = screen.getByLabelText("Zeile 1, Spalte 2");
-    expect(text).toHaveFocus();
-    const range = document.createRange();
-    range.setStart(text.firstChild!, 2);
-    range.collapse(true);
-    document.getSelection()!.removeAllRanges();
-    document.getSelection()!.addRange(range);
+    expect(screen.getByLabelText("Zeile 1, Spalte 2")).toHaveFocus();
+    selectText(1, 2, 2, 2);
 
     await user.click(within(panel()).getByRole("button", { name: "In Zelle B1 einfügen" }));
-    expect(last().data[0][1]).toBe(`Di${red}esel`);
+    expect(last().data[0][1]).toBe(`Di${blank()}esel`);
   });
 
   it("bietet „Element einfügen…“ im Kontextmenü an", () => {
@@ -214,8 +202,42 @@ describe("Element Explorer im Tabellen-Editor", () => {
     const { user } = setup();
     fireEvent.mouseDown(cellTd(3, 3));
     await user.click(screen.getByRole("tab", { name: "Elemente" }));
-    await user.click(within(toolbar()).getByRole("button", { name: "Weiß" }));
     await user.click(within(panel()).getByRole("button", { name: "In Zelle C3 einfügen" }));
     expect(screen.getByTestId("table-editor-status")).toHaveTextContent("1 Element ohne Bedeutung");
+  });
+});
+
+describe("Schriftfarbe und -größe für Teile einer Zelle", () => {
+  it("färbt den markierten Text in der bearbeiteten Zelle, nicht die ganze Zelle", async () => {
+    const { last, user } = setup();
+    fireEvent.mouseDown(cellTd(1, 2));
+    fireEvent.doubleClick(cellTd(1, 2));
+    selectText(1, 2, 0, 2);
+
+    await user.click(screen.getByTestId("toolbar-color-options"));
+    await user.click(screen.getByTestId("toolbar-color-swatch-e40045"));
+    expect(last().data[0][1]).toBe('<span style="color:#e40045">Di</span>esel');
+    expect(last().formats["0,1"]).toBeUndefined();
+  });
+
+  it("vergrößert den markierten Text über die Schriftgröße", async () => {
+    const { last, user } = setup();
+    fireEvent.mouseDown(cellTd(1, 2));
+    fireEvent.doubleClick(cellTd(1, 2));
+    selectText(1, 2, 2, 6);
+
+    await user.click(screen.getByTestId("toolbar-fontsize"));
+    await user.click(screen.getByTestId("toolbar-fontsize-20"));
+    expect(last().data[0][1]).toBe('Di<span style="font-size:20px">esel</span>');
+  });
+
+  it("färbt ohne markierten Text die markierten Zellen samt ihrer Elemente", async () => {
+    const { last, user } = setup();
+    fireEvent.mouseDown(cellTd(2, 2));
+    fireEvent.mouseDown(cellTd(3, 2), { shiftKey: true });
+    await user.click(screen.getByTestId("toolbar-color-options"));
+    await user.click(screen.getByTestId("toolbar-color-swatch-3875b2"));
+    expect(last().formats["1,1"]).toEqual({ color: "#3875b2" });
+    expect(last().formats["2,1"]).toEqual({ color: "#3875b2" });
   });
 });
