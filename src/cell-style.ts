@@ -12,6 +12,8 @@
  */
 
 import * as React from "react";
+import { iconFontStyle } from "@shared/icons/icon-css";
+
 import { CellFormat } from "./table-model";
 
 /**
@@ -35,7 +37,8 @@ export function formatToStyle(format: CellFormat): React.CSSProperties {
   if (format.color) style.color = format.color;
   if (format.background) style.background = format.background;
   if (typeof format.fontSize === "number") style.fontSize = `${format.fontSize}px`;
-  return style;
+  // Icons im Text folgen Fett und Kursiv; Linien und Farbe übernehmen sie ohnehin.
+  return { ...style, ...iconFontStyle(format) } as React.CSSProperties;
 }
 
 /**
