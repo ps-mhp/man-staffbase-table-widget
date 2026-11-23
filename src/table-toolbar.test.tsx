@@ -38,9 +38,13 @@ const props = (overrides: Partial<TableToolbarProps> = {}): TableToolbarProps =>
   onFontSizeStep: jest.fn(),
   onSuperscript: jest.fn(),
   onSubscript: jest.fn(),
-  elementsOpen: false,
-  elementsAvailable: true,
-  onToggleElements: jest.fn(),
+  tab: "font",
+  onTabChange: jest.fn(),
+  elementsToolbar: (
+    <div role="toolbar" aria-label="Elemente">
+      <button type="button">MAN Rot</button>
+    </div>
+  ),
   onInsertRowAbove: jest.fn(),
   onInsertRowBelow: jest.fn(),
   onInsertColLeft: jest.fn(),
@@ -63,16 +67,31 @@ const props = (overrides: Partial<TableToolbarProps> = {}): TableToolbarProps =>
   ...overrides,
 });
 
+/** Hält den Reiter wie der Editor und meldet jeden Wechsel weiter. */
+function StatefulToolbar(initial: TableToolbarProps): React.ReactElement {
+  const [tab, setTab] = React.useState(initial.tab);
+  return (
+    <TableToolbar
+      {...initial}
+      tab={tab}
+      onTabChange={(next) => {
+        setTab(next);
+        initial.onTabChange(next);
+      }}
+    />
+  );
+}
+
 const openTab = (name: string): void => {
   fireEvent.click(screen.getByRole("tab", { name }));
 };
 
 describe("TableToolbar", () => {
-  it("zeigt fünf Reiter und darunter nur die Werkzeugleiste des gewählten", () => {
-    render(<TableToolbar {...props()} />);
+  it("zeigt sechs Reiter und darunter nur die Werkzeugleiste des gewählten", () => {
+    render(<StatefulToolbar {...props()} />);
 
     const tabs = within(screen.getByRole("tablist", { name: "Werkzeuggruppen" })).getAllByRole("tab");
-    expect(tabs.map((tab) => tab.textContent)).toEqual(["Schrift", "Ausrichtung", "Zellen", "Bilder", "Daten"]);
+    expect(tabs.map((tab) => tab.textContent)).toEqual(["Schrift", "Ausrichtung", "Zellen", "Bilder", "Daten", "Elemente"]);
     expect(screen.getAllByRole("toolbar")).toHaveLength(1);
     expect(screen.getByRole("toolbar", { name: "Schrift" })).toBeInTheDocument();
 
@@ -82,17 +101,17 @@ describe("TableToolbar", () => {
   });
 
   it("wandert mit den Pfeiltasten zwischen den Reitern und beginnt am Ende wieder vorn", () => {
-    render(<TableToolbar {...props()} />);
+    render(<StatefulToolbar {...props()} />);
 
     fireEvent.keyDown(screen.getByRole("tab", { name: "Schrift" }), { key: "ArrowLeft" });
-    expect(screen.getByRole("toolbar", { name: "Daten" })).toBeInTheDocument();
-    fireEvent.keyDown(screen.getByRole("tab", { name: "Daten" }), { key: "ArrowRight" });
+    expect(screen.getByRole("toolbar", { name: "Elemente" })).toBeInTheDocument();
+    fireEvent.keyDown(screen.getByRole("tab", { name: "Elemente" }), { key: "ArrowRight" });
     expect(screen.getByRole("toolbar", { name: "Schrift" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "Schrift" })).toHaveAttribute("aria-selected", "true");
   });
 
   it("benennt jedes Werkzeug, auch die reinen Icons", () => {
-    render(<TableToolbar {...props()} />);
+    render(<StatefulToolbar {...props()} />);
 
     for (const tab of ["Schrift", "Ausrichtung", "Zellen", "Bilder", "Daten"]) {
       openTab(tab);
@@ -102,23 +121,18 @@ describe("TableToolbar", () => {
     }
   });
 
-  it("öffnet die Elemente aus dem Reiter Schrift und zeigt, ob die Leiste offen ist", () => {
-    const onToggleElements = jest.fn();
-    const { rerender } = render(<TableToolbar {...props({ onToggleElements })} />);
-    const button = screen.getByRole("button", { name: "Elemente einfügen" });
-    expect(button).toHaveTextContent("Elemente");
-    expect(button).toHaveAttribute("aria-pressed", "false");
-    fireEvent.click(button);
-    expect(onToggleElements).toHaveBeenCalled();
+  it("zeigt im Reiter „Elemente“ die Leiste des Editors und meldet den Wechsel", () => {
+    const onTabChange = jest.fn();
+    render(<StatefulToolbar {...props({ onTabChange })} />);
+    expect(screen.queryByRole("button", { name: "Elemente einfügen" })).toBeNull();
 
-    rerender(<TableToolbar {...props({ onToggleElements, elementsOpen: true })} />);
-    expect(screen.getByRole("button", { name: "Elemente einfügen" })).toHaveAttribute("aria-pressed", "true");
-    rerender(<TableToolbar {...props({ elementsAvailable: false })} />);
-    expect(screen.getByRole("button", { name: "Elemente einfügen" })).toBeDisabled();
+    openTab("Elemente");
+    expect(onTabChange).toHaveBeenCalledWith("elements");
+    expect(within(screen.getByRole("toolbar", { name: "Elemente" })).getByRole("button", { name: "MAN Rot" })).toBeInTheDocument();
   });
 
   it("zeigt Icons statt Buchstaben für die Auszeichnungen", () => {
-    render(<TableToolbar {...props({ activeFormat: { bold: true } })} />);
+    render(<StatefulToolbar {...props({ activeFormat: { bold: true } })} />);
 
     const bold = screen.getByRole("button", { name: "Fett" });
     expect(bold).toHaveAttribute("aria-pressed", "true");
@@ -128,7 +142,7 @@ describe("TableToolbar", () => {
   });
 
   it("markiert die gewählte Ausrichtung als gedrückt", () => {
-    render(<TableToolbar {...props({ activeFormat: { align: "center", valign: "bottom" } })} />);
+    render(<StatefulToolbar {...props({ activeFormat: { align: "center", valign: "bottom" } })} />);
     openTab("Ausrichtung");
 
     expect(screen.getByRole("button", { name: "Zentriert" })).toHaveAttribute("aria-pressed", "true");
@@ -138,7 +152,7 @@ describe("TableToolbar", () => {
 
   it("nennt die gesetzte Farbe am Knopf und setzt sie über „Standard“ zurück", () => {
     const onClearColor = jest.fn();
-    render(<TableToolbar {...props({ activeFormat: { color: "#ff0000" }, onClearColor })} />);
+    render(<StatefulToolbar {...props({ activeFormat: { color: "#ff0000" }, onClearColor })} />);
 
     expect(screen.getByRole("button", { name: "Schriftfarbe: #ff0000" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Hintergrundfarbe: Standard" })).toBeInTheDocument();
@@ -150,7 +164,7 @@ describe("TableToolbar", () => {
   });
 
   it("zeigt den gedrückten Format-Pinsel, solange er wartet", () => {
-    render(<TableToolbar {...props({ painterActive: true, hasSelection: false })} />);
+    render(<StatefulToolbar {...props({ painterActive: true, hasSelection: false })} />);
     openTab("Daten");
 
     const painter = screen.getByRole("button", { name: "Format kopieren" });
@@ -160,7 +174,7 @@ describe("TableToolbar", () => {
 
   it("bietet „Importieren“ neben den Reitern an, in jedem Reiter", () => {
     const onUpload = jest.fn();
-    render(<TableToolbar {...props({ onUpload })} />);
+    render(<StatefulToolbar {...props({ onUpload })} />);
 
     const importButton = screen.getByRole("button", { name: "Importieren (.csv, .xlsx)" });
     expect(screen.getByRole("tablist")).not.toContainElement(importButton);
@@ -173,7 +187,7 @@ describe("TableToolbar", () => {
   });
 
   it("zeichnet keine eigene Bedienleiste – Speichern, Hilfe und Schließen stehen im Kopf des Rahmens", () => {
-    render(<TableToolbar {...props()} />);
+    render(<StatefulToolbar {...props()} />);
 
     for (const testId of ["toolbar-done", "toolbar-close", "toolbar-help", "toolbar-title", "toolbar-dirty"]) {
       expect(screen.queryByTestId(testId)).not.toBeInTheDocument();

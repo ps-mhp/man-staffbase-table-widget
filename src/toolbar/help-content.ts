@@ -40,7 +40,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     entries: [
       {
         title: "Aufbau",
-        text: "Oben die Reiter Schrift, Ausrichtung, Zellen, Bilder und Daten, darunter die Werkzeuge des gewählten Reiters und die Tabelle. Rechts das Panel „Tabelle“ mit den Einstellungen, die für die ganze Tabelle gelten.",
+        text: "Oben die Reiter Schrift, Ausrichtung, Zellen, Bilder, Daten und Elemente, darunter die Werkzeuge des gewählten Reiters und die Tabelle. Rechts das Panel „Tabelle“ mit den Einstellungen, die für die ganze Tabelle gelten.",
       },
       {
         title: "Zellen bearbeiten",
@@ -94,11 +94,11 @@ export const HELP_TOPICS: HelpTopic[] = [
       },
       {
         title: "Elemente einfügen",
-        text: "„Elemente“ öffnet rechts den Katalog. Form und Farbe wählen – die MAN-CI-Farben stehen immer zur Wahl, eigene als Hex-Wert –, dazu die Bedeutung, etwa „Diesel“. „Einfügen“ setzt das Element an den Cursor der bearbeiteten Zelle, sonst ans Ende jeder markierten Zelle; Doppelklick auf die Kachel oder Ziehen in eine Zelle geht auch. Das Element steht im Text wie ein Zeichen und wächst mit der Schriftgröße.",
+        text: "Der Reiter „Elemente“ zeigt rechts den Katalog. In seiner Werkzeugleiste Farbe (die MAN-CI-Farben stehen immer zur Wahl, eigene über den Farbwähler), Größe und Bedeutung einstellen, etwa „Diesel“; im Katalog die Form wählen. „Einfügen“ setzt das Element an den Cursor der bearbeiteten Zelle, sonst ans Ende jeder markierten Zelle; Doppelklick auf die Kachel oder Ziehen in eine Zelle geht auch. Das Element steht im Text wie ein Zeichen und wächst mit der Schriftgröße.",
       },
       {
         title: "Elemente einfärben",
-        text: "Ein Klick auf ein Element in der Tabelle öffnet es zum Bearbeiten: Farbe, Größe und Bedeutung wirken sofort, auf Wunsch auf alle gleichen Elemente (gleiche Form, gleiche Farbe). „Entfernen“ löscht es. Die Bedeutung lesen Screenreader vor, und sie steht im Excel-, CSV- und PowerPoint-Export; ohne Bedeutung steht dort „■“, und die Statuszeile zählt solche Elemente.",
+        text: "Ein Klick auf ein Element in der Tabelle wechselt zum Reiter „Elemente“: die Werkzeugleiste stellt jetzt dieses Element ein. Farbe und Größe wirken sofort, die Bedeutung beim Verlassen des Felds; „Alle gleichen“ trifft auch alle Elemente gleicher Form und Farbe. Der Papierkorb entfernt es, „Fertig“ im Katalog lässt es los. Die Bedeutung lesen Screenreader vor, und sie steht im Excel-, CSV- und PowerPoint-Export; ohne Bedeutung steht dort „■“, und die Statuszeile zählt solche Elemente.",
       },
     ],
   },

@@ -13,7 +13,7 @@
 
 import * as React from "react";
 import { ReactElement } from "react";
-import { AArrowDown, AArrowUp, Bold, Italic, PaintBucket, Shapes, Strikethrough, Subscript, Superscript, Underline } from "lucide-react";
+import { AArrowDown, AArrowUp, Bold, Italic, PaintBucket, Strikethrough, Subscript, Superscript, Underline } from "lucide-react";
 import { ToolButton, ToolSelect } from "@man/config-ui/toolbar/tool-button";
 import { ToolSeparator, Toolbar } from "@man/config-ui/toolbar/toolbar";
 
@@ -35,16 +35,11 @@ export type FontTabProps = Pick<
   | "onFontSizeStep"
   | "onSuperscript"
   | "onSubscript"
-  | "elementsOpen"
-  | "elementsAvailable"
-  | "onToggleElements"
 >;
 
 /**
  * Everything that changes how the characters in a cell look: Auszeichnung,
  * Farben, Größe – in dieser Reihenfolge wie im Screen, je Gruppe getrennt.
- * Zuletzt „Elemente“: Formen, die wie ein Zeichen im Text stehen; der Knopf
- * öffnet die Leiste rechts und lässt den Cursor in der Zelle.
  */
 export function FontTab({
   hasSelection,
@@ -58,9 +53,6 @@ export function FontTab({
   onFontSizeStep,
   onSuperscript,
   onSubscript,
-  elementsOpen,
-  elementsAvailable,
-  onToggleElements,
 }: FontTabProps): ReactElement {
   const disabled = !hasSelection;
 
@@ -111,18 +103,6 @@ export function FontTab({
       </ToolSelect>
       <ToolButton data-testid="toolbar-fontsize-inc" label="Schrift vergrößern" icon={AArrowUp} disabled={disabled} onClick={() => onFontSizeStep(1)} />
       <ToolButton data-testid="toolbar-fontsize-dec" label="Schrift verkleinern" icon={AArrowDown} disabled={disabled} onClick={() => onFontSizeStep(-1)} />
-      <ToolSeparator />
-      <ToolButton
-        data-testid="toolbar-elements"
-        label="Elemente einfügen"
-        title="Elemente einfügen und einfärben"
-        icon={Shapes}
-        disabled={!elementsAvailable}
-        pressed={elementsOpen}
-        onClick={onToggleElements}
-      >
-        Elemente
-      </ToolButton>
     </Toolbar>
   );
 }

@@ -12,7 +12,7 @@
  */
 
 import * as React from "react";
-import { ReactElement, useRef, useState } from "react";
+import { ReactElement, useRef } from "react";
 import { Button } from "@man/config-ui/primitives/button";
 import { ToolTab, ToolTabs } from "@man/config-ui/toolbar/tool-tabs";
 
@@ -31,6 +31,7 @@ const TABS: readonly ToolTab<TabId>[] = [
   { id: "cells", label: "Zellen" },
   { id: "images", label: "Bilder" },
   { id: "data", label: "Daten" },
+  { id: "elements", label: "Elemente" },
 ];
 
 function ActiveTab({ tab, props }: { tab: TabId; props: TableToolbarProps }): ReactElement {
@@ -43,6 +44,8 @@ function ActiveTab({ tab, props }: { tab: TabId; props: TableToolbarProps }): Re
       return <ImagesTab {...props} />;
     case "data":
       return <DataTab {...props} />;
+    case "elements":
+      return <>{props.elementsToolbar}</>;
     default:
       return <FontTab {...props} />;
   }
@@ -96,11 +99,9 @@ function ImportButton({ onUpload }: Pick<TableToolbarProps, "onUpload">): ReactE
  * who opened "Bilder" keeps working on images while clicking through cells.
  */
 export const TableToolbar = (props: TableToolbarProps): ReactElement => {
-  const [tab, setTab] = useState<TabId>("font");
-
   return (
-    <ToolTabs aria-label="Werkzeuggruppen" tabs={TABS} value={tab} onChange={setTab} actions={<ImportButton onUpload={props.onUpload} />}>
-      <ActiveTab tab={tab} props={props} />
+    <ToolTabs aria-label="Werkzeuggruppen" tabs={TABS} value={props.tab} onChange={props.onTabChange} actions={<ImportButton onUpload={props.onUpload} />}>
+      <ActiveTab tab={props.tab} props={props} />
     </ToolTabs>
   );
 };

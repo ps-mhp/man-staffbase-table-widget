@@ -15,9 +15,14 @@ import * as React from "react";
 import { ReactElement, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import * as ContextMenu from "@radix-ui/react-context-menu";
 import { ConfigWorkspace } from "@man/config-ui/layout/config-workspace";
-import { ELEMENT_ATTRIBUTE, InlineElement, elementMarkup } from "@man/config-ui/elements/catalog";
+import { ELEMENT_ATTRIBUTE, InlineElement, elementById, elementMarkup } from "@man/config-ui/elements/catalog";
 import { elementStylesheet } from "@man/config-ui/elements/element-css";
 import { useElementPanel } from "@man/config-ui/elements/element-panel";
+import { useElementDraft } from "@man/config-ui/elements/element-draft";
+import { ElementToolbar } from "@man/config-ui/elements/element-toolbar";
+import { ToolButton } from "@man/config-ui/toolbar/tool-button";
+import { ToolSeparator } from "@man/config-ui/toolbar/toolbar";
+import { Shapes, Trash2 } from "lucide-react";
 import { StatusBar } from "@man/config-ui/toolbar/status-bar";
 import {
   TableModel,
@@ -42,6 +47,7 @@ import { updateCell, parsePastedText, pasteBlock } from "./grid-operations";
 import { sanitizeRichText } from "./rich-text";
 import { formatToStyle, formatToCellStyle } from "./cell-style";
 import { TableToolbar } from "./table-toolbar";
+import { TabId } from "./toolbar/props";
 import { importTableFile } from "./table-import";
 import { MediaClient, createMediaClient } from "@shared/media/media-client";
 import { PickedImage } from "@shared/media/media-picker";
@@ -748,15 +754,86 @@ export const TableEditor = ({
     onChange({ ...value, data: updateCell(data, row, col, removeCellElement(data[row]?.[col], index)) });
   };
 
+  /** Wie das nächste Element aussieht; die Leiste des Reiters stellt es ein. */
+  const elementDraft = useElementDraft(meanings);
+  /** Ob Änderungen am gewählten Element auch alle gleichen treffen. */
+  const [elementAll, setElementAll] = useState(true);
+
   const elementPanel = useElementPanel(
-    { target: elementTarget, picked: pickedInfo, meanings, usedColors },
+    { target: elementTarget, picked: pickedInfo, draft: elementDraft.draft },
     {
-      onInsert: insertElement,
-      onUpdate: updatePickedElement,
-      onRemove: removePickedElement,
+      onSelectTool: elementDraft.setTool,
+      onInsert: (id) => insertElement({ ...elementDraft.draft, id }),
       onRelease: () => setPickedElement(null),
       onClosed: () => setPickedElement(null),
     },
+  );
+
+  /**
+   * Der gewählte Reiter. „Elemente“ bringt den Katalog rechts mit und nimmt
+   * ihn beim Verlassen wieder mit – er gehört zu diesem Reiter.
+   */
+  const [tab, setTab] = useState<TabId>("font");
+  const changeTab = (next: TabId): void => {
+    setTab(next);
+    if (next === "elements") elementPanel.open();
+    else if (elementPanel.isOpen) elementPanel.close();
+  };
+  const showElements = (): void => {
+    setTab("elements");
+    if (!elementPanel.isOpen) elementPanel.open();
+  };
+
+  /** Ein angeklicktes Element stellt die Leiste ein, sonst das nächste. */
+  const pickedValue = pickedInfo?.element ?? null;
+  const updateElementSetting = (patch: ElementPatch): void => {
+    if (pickedValue !== null) {
+      updatePickedElement(patch, elementAll);
+      return;
+    }
+    if (patch.color !== undefined) elementDraft.setColor(patch.color);
+    if (patch.size !== undefined) elementDraft.setSize(patch.size);
+    if (patch.label !== undefined) elementDraft.setLabel(patch.label);
+  };
+  const elementValue = pickedValue ?? elementDraft.draft;
+
+  const elementsToolbar = (
+    <ElementToolbar
+      value={elementValue}
+      onColor={(color) => updateElementSetting({ color })}
+      onSize={(size) => updateElementSetting({ size })}
+      onLabel={(label) => updateElementSetting({ label })}
+      labelMode={pickedValue !== null ? "commit" : "change"}
+      scope={pickedInfo !== null ? `${elementById(pickedInfo.element.id)?.name ?? "Element"} in ${pickedInfo.where}` : "Neues Element"}
+      recentColors={[...elementDraft.picked, ...usedColors]}
+      suggestion={meanings[elementValue.color]}
+    >
+      {pickedInfo !== null && (
+        <>
+          <ToolSeparator />
+          {pickedInfo.sameCount > 1 && (
+            <ToolButton
+              label={`Alle ${pickedInfo.sameCount} gleichen Elemente mitändern`}
+              pressed={elementAll}
+              onClick={() => setElementAll((all) => !all)}
+            >
+              Alle {pickedInfo.sameCount} gleichen
+            </ToolButton>
+          )}
+          <ToolButton label="Element entfernen" icon={Trash2} onClick={removePickedElement} />
+        </>
+      )}
+      <ToolSeparator />
+      <ToolButton
+        label="Katalog anzeigen"
+        icon={Shapes}
+        pressed={elementPanel.isOpen}
+        disabled={!elementPanel.available}
+        onClick={elementPanel.toggle}
+      >
+        Katalog
+      </ToolButton>
+    </ElementToolbar>
   );
 
   /**
@@ -774,7 +851,7 @@ export const TableEditor = ({
     const element = index < 0 ? null : elementAt(data, { row, col, index });
     if (element === null) return false;
     setPickedElement({ row, col, index, id: element.id, color: element.color });
-    if (!elementPanel.isOpen) elementPanel.open();
+    showElements();
     return true;
   }
 
@@ -881,7 +958,7 @@ export const TableEditor = ({
     merge: doMerge,
     unmerge: doUnmerge,
     insertImage: openImagePicker,
-    insertElement: elementPanel.open,
+    insertElement: showElements,
     toggle: toggleKey,
     format: applyFormat,
     sort: doSort,
@@ -905,9 +982,9 @@ export const TableEditor = ({
       onFontSizeStep={stepFontSize}
       onSuperscript={() => applyVertAlign("superscript")}
       onSubscript={() => applyVertAlign("subscript")}
-      elementsOpen={elementPanel.isOpen}
-      elementsAvailable={elementPanel.available}
-      onToggleElements={elementPanel.toggle}
+      tab={tab}
+      onTabChange={changeTab}
+      elementsToolbar={elementsToolbar}
       onInsertRowAbove={insertRowAbove}
       onInsertRowBelow={insertRowBelow}
       onInsertColLeft={insertColLeft}

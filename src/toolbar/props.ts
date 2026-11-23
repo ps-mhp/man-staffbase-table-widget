@@ -11,11 +11,13 @@
  * limitations under the License.
  */
 
+import type { ReactNode } from "react";
+
 import { CellFormat, TextAlign, VerticalAlign } from "../table-model";
 import { ClearScope } from "../clear-format";
 
 /** The toolbar's tabs, in the order they appear. */
-export type TabId = "font" | "align" | "cells" | "images" | "data";
+export type TabId = "font" | "align" | "cells" | "images" | "data" | "elements";
 
 /**
  * Alles, was an Zellen und Markierung hängt. Einstellungen der ganzen Tabelle
@@ -40,11 +42,11 @@ export interface TableToolbarProps {
   onFontSizeStep: (delta: number) => void;
   onSuperscript: () => void;
   onSubscript: () => void;
-  /** Ob die Leiste „Elemente“ offen ist. */
-  elementsOpen: boolean;
-  /** Ob es einen Rahmen gibt, der die Leiste zeigen kann. */
-  elementsAvailable: boolean;
-  onToggleElements: () => void;
+  /** Der gewählte Reiter; der Editor hält ihn, weil ein Klick auf ein Element zu „Elemente“ wechselt. */
+  tab: TabId;
+  onTabChange: (tab: TabId) => void;
+  /** Die Werkzeugleiste des Reiters „Elemente“ (Farbe, Größe, Bedeutung). */
+  elementsToolbar: ReactNode;
   onInsertRowAbove: () => void;
   onInsertRowBelow: () => void;
   onInsertColLeft: () => void;
