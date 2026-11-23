@@ -193,7 +193,7 @@ describe("TableEditor", () => {
       expect(status).toHaveTextContent("3 Zeilen · 3 Spalten · Auswahl B2:B3");
 
       fireEvent.doubleClick(cellTd("Zeile 2, Spalte 2"));
-      expect(status).toHaveTextContent("Esc beendet die Eingabe");
+      expect(status).toHaveTextContent("Enter übernimmt · Esc verwirft · Alt+Enter neue Zeile");
     });
 
     it("setzt Kopfzeile und Zeilentitel fett wie auf der Seite", () => {

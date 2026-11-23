@@ -44,7 +44,11 @@ export const HELP_TOPICS: HelpTopic[] = [
       },
       {
         title: "Zellen bearbeiten",
-        text: "Doppelklick in eine Zelle startet die Eingabe; ein Klick auf eine andere Zelle oder Escape beendet sie. ⌘/Strg Z nimmt in der Zelle Getipptes zurück, außerhalb einen ganzen Schritt.",
+        text: "Wie in Excel: Tippen ersetzt den Inhalt der markierten Zelle, F2 oder Doppelklick bearbeitet ihn. Enter übernimmt und geht eine Zelle nach unten, Tab nach rechts (mit Umschalt zurück); Alt+Enter beginnt eine neue Zeile in der Zelle; Esc verwirft die Eingabe. ⌘/Strg Z nimmt in der Zelle Getipptes zurück, außerhalb einen ganzen Schritt.",
+      },
+      {
+        title: "Tastatur wie in Excel",
+        text: "Pfeiltasten wandern, mit Umschalt ziehen sie die Markierung auf, mit ⌘/Strg springen sie an den Rand. Pos1 an den Zeilenanfang, ⌘/Strg Pos1 nach A1. Entf oder ⌫ leert alle markierten Zellen. ⌘/Strg A markiert alles, Umschalt+Leertaste die Zeile, Strg+Leertaste die Spalte. ⌘/Strg B, I, U formatieren, ⌘/Strg D füllt nach unten, ⌘/Strg R nach rechts. Formatierungen und Farben aus der Werkzeugleiste und dem Kontextmenü wirken auf alle markierten Zellen; ein Rechtsklick in die Markierung lässt sie stehen.",
       },
       {
         title: "Markieren",
@@ -52,7 +56,7 @@ export const HELP_TOPICS: HelpTopic[] = [
       },
       {
         title: "Kopieren und Einfügen",
-        text: "⌘/Strg C kopiert die markierten Zellen samt Formatierung, ⌘/Strg X schneidet sie aus (die Werte werden geleert). ⌘/Strg V fügt ab der markierten Zelle ein; ist die Markierung ein Vielfaches des Kopierten, wird es wiederholt. Aus Excel, Numbers oder Google Sheets kopierte Zellen gehen auch – dann bleibt die Formatierung der Zielzellen. Reicht das Eingefügte über den Rand, wächst die Tabelle.",
+        text: "⌘/Strg C kopiert die markierten Zellen samt Formatierung, ⌘/Strg X schneidet sie aus (die Werte werden geleert). ⌘/Strg V fügt ab der markierten Zelle ein – beim ersten Mal fragt der Browser, ob die Seite die Zwischenablage lesen darf; ist die Markierung ein Vielfaches des Kopierten, wird es wiederholt. Aus Excel, Numbers oder Google Sheets kopierte Zellen gehen auch – dann bleibt die Formatierung der Zielzellen. Reicht das Eingefügte über den Rand, wächst die Tabelle.",
       },
       {
         title: "Ausfüllen",

@@ -49,9 +49,9 @@ export interface GridHintState {
  * Zeilentitel.
  */
 export function gridHint({ editing, painterActive, filling = false, copied = false }: GridHintState): string {
-  if (editing) return "Esc beendet die Eingabe";
+  if (editing) return "Enter übernimmt · Esc verwirft · Alt+Enter neue Zeile";
   if (filling) return "Loslassen füllt die Zellen aus";
   if (painterActive) return "Format-Pinsel: Zielzellen markieren";
   if (copied) return "Kopiert · ⌘V fügt in die Markierung ein";
-  return "Zeile 1 und Spalte A sind Überschriften · Doppelklick bearbeitet eine Zelle";
+  return "Zeile 1 und Spalte A sind Überschriften · Tippen, F2 oder Doppelklick bearbeitet eine Zelle";
 }

@@ -44,6 +44,7 @@ import {
   mergeAt,
 } from "./table-model";
 import { updateCell, parsePastedText, pasteBlock } from "./grid-operations";
+import { Direction, GridKeyAction, cellArea, fillFromEdge, gridKeyAction, moveCell } from "./grid-keys";
 import { sanitizeRichText } from "./rich-text";
 import { formatToStyle, formatToCellStyle } from "./cell-style";
 import { TableToolbar } from "./table-toolbar";
@@ -66,6 +67,7 @@ import imageFitCss from "./styles/image-fit.scss";
 import imageNoFitCss from "./styles/image-no-fit.scss";
 import { ClearScope, clearFormatting } from "./clear-format";
 import {
+  CellBlock,
   applyFill,
   blockToHtml,
   blockToText,
@@ -297,8 +299,15 @@ export const TableEditor = ({
         row >= range.top && row <= range.bottom && col >= range.left && col <= range.right,
     );
 
+  /**
+   * Die bewegliche Ecke der Markierung (Umschalt+Pfeil, Ziehen); die andere
+   * ist der Anker. So wächst und schrumpft eine Markierung wie in Excel.
+   */
+  const extent = useRef<[number, number] | null>(null);
+
   /** Starts a new range — replacing the selection, or adding to it (Ctrl/Cmd). */
   const selectSingle = (row: number, col: number, additive = false): void => {
+    extent.current = [row, col];
     setAnchor([row, col]);
     const range: CellRange = { top: row, left: col, bottom: row, right: col };
     setRanges((prev) => (additive ? [...prev, range] : [range]));
@@ -306,6 +315,7 @@ export const TableEditor = ({
 
   /** Grows the range that is currently being drawn (shift-click / drag). */
   const extendTo = (row: number, col: number): void => {
+    extent.current = [row, col];
     const start = anchor ?? [row, col];
     const range = normalizeRange(start, [row, col]);
     setRanges((prev) => (prev.length > 0 ? [...prev.slice(0, -1), range] : [range]));
@@ -313,18 +323,21 @@ export const TableEditor = ({
 
   const selectRow = (row: number): void => {
     focusGrid();
+    extent.current = [row, colCount - 1];
     setAnchor([row, 0]);
     setRanges([{ top: row, left: 0, bottom: row, right: colCount - 1 }]);
   };
 
   const selectColumn = (col: number): void => {
     focusGrid();
+    extent.current = [rowCount - 1, col];
     setAnchor([0, col]);
     setRanges([{ top: 0, left: col, bottom: rowCount - 1, right: col }]);
   };
 
   const selectAll = (): void => {
     focusGrid();
+    extent.current = [rowCount - 1, colCount - 1];
     setAnchor([0, 0]);
     setRanges([{ top: 0, left: 0, bottom: rowCount - 1, right: colCount - 1 }]);
   };
@@ -344,6 +357,16 @@ export const TableEditor = ({
         event.preventDefault();
         leaveEdit();
       }
+      return;
+    }
+
+    // Rechtsklick (und jede andere Taste) lässt eine Markierung stehen, die
+    // die Zelle schon umfasst – wie in Excel wirkt das Kontextmenü dann auf
+    // alle markierten Zellen.
+    if (event.button !== 0) {
+      if (editing) setEditing(null);
+      if (!isSelected(row, col)) selectSingle(row, col);
+      focusGrid();
       return;
     }
 
@@ -374,10 +397,22 @@ export const TableEditor = ({
   };
 
   /** Double-click enters edit mode for the cell. */
-  const handleCellDoubleClick = (row: number, col: number): void => {
+  /** Der Inhalt der Zelle beim Start des Bearbeitens – Esc stellt ihn wieder her. */
+  const editOrigin = useRef<string | null>(null);
+
+  /**
+   * Beginnt das Bearbeiten. Mit `replaceWith` wie Tippen in Excel: der
+   * Inhalt wird durch das getippte Zeichen ersetzt.
+   */
+  const startEdit = (row: number, col: number, replaceWith?: string): void => {
+    const { value: current, onChange: change } = latest.current;
+    editOrigin.current = current.data[row]?.[col] ?? "";
+    if (replaceWith !== undefined) change({ ...current, data: updateCell(current.data, row, col, replaceWith) });
     setEditing([row, col]);
     activeCell.current = [row, col];
   };
+
+  const handleCellDoubleClick = (row: number, col: number): void => startEdit(row, col);
 
   const handleCellMouseUp = (): void => {
     isDragging.current = false;
@@ -440,7 +475,28 @@ export const TableEditor = ({
    */
   const leaveEdit = (): void => {
     setEditing(null);
+    editOrigin.current = null;
     rootRef.current?.focus();
+  };
+
+  /** Esc beim Bearbeiten: wie in Excel verwerfen, was seit dem Start getippt wurde. */
+  const cancelEdit = (): void => {
+    const cell = editing;
+    const origin = editOrigin.current;
+    if (cell !== null && origin !== null) {
+      const { value: current, onChange: change } = latest.current;
+      if ((current.data[cell[0]]?.[cell[1]] ?? "") !== origin) change({ ...current, data: updateCell(current.data, cell[0], cell[1], origin) });
+    }
+    leaveEdit();
+  };
+
+  /** Enter/Tab beim Bearbeiten: übernehmen und zur Nachbarzelle. */
+  const commitEdit = (dir: Direction): void => {
+    const cell = editing;
+    leaveEdit();
+    if (cell === null) return;
+    const [row, col] = moveCell(latest.current.value, cell, dir, false);
+    selectSingle(row, col);
   };
 
   /** Uploads a clipboard/paste image, publishes it, and inserts it. */
@@ -654,11 +710,189 @@ export const TableEditor = ({
       if (image) void uploadAndInsertImage(image, selection.top, selection.left);
       return;
     }
-    const result = pasteCells(value, selection, block);
-    onChange(result.model);
+    pasteBlockInto(block, selection);
+  };
+
+  /** Schreibt einen gelesenen Block in den jüngsten Stand und markiert das Eingefügte. */
+  const pasteBlockInto = (block: CellBlock, target: CellRange): void => {
+    const { value: current, onChange: change } = latest.current;
+    const result = pasteCells(current, target, block);
+    change(result.model);
+    extent.current = [result.range.bottom, result.range.right];
     setAnchor([result.range.top, result.range.left]);
     setRanges([result.range]);
   };
+
+  /** Meldung in der Statuszeile, wenn der Browser die Zwischenablage verweigert. */
+  const [clipboardError, setClipboardError] = useState<string | null>(null);
+
+  /**
+   * ⌘C / ⌘X über die Zwischenablage-API des Browsers. Das Gitter fängt die
+   * Taste selbst ab, statt auf das `copy`-Ereignis zu warten: im Studio
+   * kommt es nicht zuverlässig an (ohne Textauswahl, im fremden Dialog).
+   */
+  const writeSelectionToClipboard = async (cut: boolean): Promise<void> => {
+    const range = selection;
+    if (range === null) return;
+    const block = copyBlock(value, range);
+    const text = blockToText(block);
+    const html = blockToHtml(block);
+    try {
+      const clipboard = navigator.clipboard;
+      if (typeof ClipboardItem !== "undefined" && typeof clipboard?.write === "function") {
+        await clipboard.write([
+          new ClipboardItem({
+            "text/plain": new Blob([text], { type: "text/plain" }),
+            "text/html": new Blob([html], { type: "text/html" }),
+          }),
+        ]);
+      } else {
+        await clipboard.writeText(text);
+      }
+    } catch {
+      setClipboardError("Kopieren nicht möglich – der Browser erlaubt den Zugriff auf die Zwischenablage nicht.");
+      return;
+    }
+    setClipboardError(null);
+    if (cut) {
+      const { value: current, onChange: change } = latest.current;
+      change(clearCells(current, range));
+    } else {
+      setCopiedRange(range);
+    }
+  };
+
+  /** ⌘V über die Zwischenablage-API; der Browser fragt beim ersten Mal nach Erlaubnis. */
+  const pasteFromClipboard = async (): Promise<void> => {
+    const target = selection;
+    if (target === null) return;
+    try {
+      const clipboard = navigator.clipboard;
+      let html = "";
+      let text = "";
+      let image: File | null = null;
+      if (typeof clipboard?.read === "function") {
+        for (const item of await clipboard.read()) {
+          if (item.types.includes("text/html")) html = await (await item.getType("text/html")).text();
+          if (item.types.includes("text/plain")) text = await (await item.getType("text/plain")).text();
+          const imageType = item.types.find((type) => type.startsWith("image/"));
+          if (imageType !== undefined && image === null) {
+            const blob = await item.getType(imageType);
+            image = new File([blob], `Einfügen.${imageType.split("/")[1]}`, { type: imageType });
+          }
+        }
+      } else {
+        text = await clipboard.readText();
+      }
+      setClipboardError(null);
+      const block = readClipboard(html, text);
+      if (block !== null) pasteBlockInto(block, target);
+      else if (image !== null) void uploadAndInsertImage(image, target.top, target.left);
+    } catch {
+      setClipboardError("Einfügen nicht möglich – bitte den Zugriff auf die Zwischenablage im Browser erlauben.");
+    }
+  };
+
+  /** Leert die Inhalte aller markierten Zellen (Entf, ⌫); Formate bleiben. */
+  const clearSelectionContent = (): void => {
+    if (ranges.length === 0) return;
+    onChange(ranges.reduce((model, range) => clearCells(model, range), value));
+  };
+
+  /** ⌘D / ⌘R: die erste Zeile (Spalte) der Markierung nach unten (rechts) fortschreiben. */
+  const fillSelection = (dir: "down" | "right"): void => {
+    if (selection === null) return;
+    const plan = fillFromEdge(selection, dir);
+    if (plan === null) return;
+    onChange(applyFill(value, plan.source, plan.extension));
+  };
+
+  /** Bewegt die aktive Zelle oder, mit Umschalt, die bewegliche Ecke der Markierung. */
+  const moveSelection = (dir: Direction, extend: boolean, jump: boolean): void => {
+    const active = anchor ?? [0, 0];
+    if (!extend || anchor === null) {
+      const [row, col] = anchor === null ? [0, 0] : moveCell(value, active, dir, jump);
+      selectSingle(row, col);
+      return;
+    }
+    const corner = extent.current ?? active;
+    const next = moveCell(value, corner, dir, jump);
+    extent.current = next;
+    // Verbundene Zellen ganz einschließen.
+    const range = [active, next]
+      .map(([r, c]) => cellArea(value, r, c))
+      .reduce((a, b) => unionRange(a, b));
+    setRanges([range]);
+  };
+
+  /** Tasten im Gitter wie in Excel – nur, solange der Editor selbst den Fokus hat. */
+  const runGridKey = (action: GridKeyAction): void => {
+    const [row, col] = anchor ?? [0, 0];
+    switch (action.type) {
+      case "move":
+        moveSelection(action.dir, action.extend, action.jump);
+        return;
+      case "home":
+        selectSingle(action.toStart ? 0 : row, 0);
+        return;
+      case "clear":
+        clearSelectionContent();
+        return;
+      case "edit":
+        if (anchor !== null) startEdit(row, col);
+        return;
+      case "type":
+        if (anchor !== null) startEdit(row, col, sanitizeRichText(action.text.replace(/&/g, "&amp;").replace(/</g, "&lt;")));
+        return;
+      case "selectAll":
+        selectAll();
+        return;
+      case "selectRow":
+        selectRow(row);
+        return;
+      case "selectColumn":
+        selectColumn(col);
+        return;
+      case "format":
+        toggleKey(action.key);
+        return;
+      case "copy":
+      case "cut":
+        void writeSelectionToClipboard(action.type === "cut");
+        return;
+      case "paste":
+        void pasteFromClipboard();
+        return;
+      case "fill":
+        fillSelection(action.dir);
+        return;
+    }
+  };
+
+  const handleGridKeyDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {
+    if (event.target !== rootRef.current || editing !== null || event.defaultPrevented || event.nativeEvent.isComposing) return;
+    // Esc nimmt zuerst den Rand um Kopiertes weg; erst danach schließt der Rahmen.
+    if (event.key === "Escape") {
+      if (copiedRange !== null) {
+        event.preventDefault();
+        setCopiedRange(null);
+      }
+      return;
+    }
+    const action = gridKeyAction(event);
+    if (action === null) return;
+    // Ohne Markierung bleibt Tippen beim Browser; Pfeile beginnen bei A1.
+    if (anchor === null && action.type !== "move" && action.type !== "selectAll") return;
+    event.preventDefault();
+    runGridKey(action);
+  };
+
+  // Die aktive Zelle bleibt sichtbar, wenn die Tastatur sie aus dem Bild schiebt.
+  useEffect(() => {
+    if (anchor === null) return;
+    const cell = rootRef.current?.querySelector(`[aria-label="Zeile ${anchor[0] + 1}, Spalte ${anchor[1] + 1}"]`);
+    cell?.closest("td")?.scrollIntoView?.({ block: "nearest", inline: "nearest" });
+  }, [anchor]);
 
   // --- Elemente (Element Explorer) ---
 
@@ -1097,7 +1331,8 @@ export const TableEditor = ({
                       onInput={(next) => handleInput(rowIndex, colIndex, next)}
                       onPaste={(e) => handlePaste(e, rowIndex, colIndex)}
                       onStopEdit={() => setEditing((cur) => (cur && cur[0] === rowIndex && cur[1] === colIndex ? null : cur))}
-                      onEscape={leaveEdit}
+                      onEscape={cancelEdit}
+                      onCommit={commitEdit}
                     />
                   </CellDropZone>
                   {fillCorner !== null && fillCorner[0] === rowIndex && fillCorner[1] === colIndex && (
@@ -1128,6 +1363,7 @@ export const TableEditor = ({
       onCopy={(event) => copySelection(event, false)}
       onCut={(event) => copySelection(event, true)}
       onPaste={pasteIntoSelection}
+      onKeyDown={handleGridKeyDown}
     >
       {/* The editor carries its own stylesheet rather than writing to
           `document.head`: it is mounted into someone else's dialog and should
@@ -1159,7 +1395,7 @@ export const TableEditor = ({
           <StatusBar
             data-testid="table-editor-status"
             start={gridStatusText(rowCount, colCount, ranges, countWithoutMeaning(elements))}
-            end={gridHint({ editing: editing !== null, painterActive, filling: fillPreview !== null, copied: copiedRange !== null })}
+            end={clipboardError ?? gridHint({ editing: editing !== null, painterActive, filling: fillPreview !== null, copied: copiedRange !== null })}
           />
         </div>
       </ConfigWorkspace>

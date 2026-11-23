@@ -16,7 +16,7 @@ import { gridHint, gridStatusText } from "./grid-status";
 describe("gridHint – Zwischenablage und Ausfüllen", () => {
   it("nennt das Ausfüllen vor allem anderen außer dem Bearbeiten", () => {
     expect(gridHint({ editing: false, painterActive: true, filling: true })).toBe("Loslassen füllt die Zellen aus");
-    expect(gridHint({ editing: true, painterActive: false, filling: true })).toBe("Esc beendet die Eingabe");
+    expect(gridHint({ editing: true, painterActive: false, filling: true })).toBe("Enter übernimmt · Esc verwirft · Alt+Enter neue Zeile");
   });
 
   it("sagt, wie es nach dem Kopieren weitergeht", () => {
@@ -50,6 +50,6 @@ describe("gridHint", () => {
   it("passt den Hinweis an die Lage an", () => {
     expect(gridHint({ editing: false, painterActive: false })).toMatch(/^Zeile 1 und Spalte A sind Überschriften/);
     expect(gridHint({ editing: false, painterActive: true })).toBe("Format-Pinsel: Zielzellen markieren");
-    expect(gridHint({ editing: true, painterActive: true })).toBe("Esc beendet die Eingabe");
+    expect(gridHint({ editing: true, painterActive: true })).toBe("Enter übernimmt · Esc verwirft · Alt+Enter neue Zeile");
   });
 });

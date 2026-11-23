@@ -30,10 +30,15 @@ export interface EditableCellProps {
   onPaste: (event: React.ClipboardEvent<HTMLDivElement>) => void;
   onStopEdit: () => void;
   /**
-   * Escape beim Bearbeiten. Der Rahmen schließt auf Escape; hier heißt es nur
-   * „Zelle verlassen“ – deshalb nimmt die Zelle die Taste vorher weg.
+   * Escape beim Bearbeiten: wie in Excel die Eingabe verwerfen. Der Rahmen
+   * schließt auf Escape – deshalb nimmt die Zelle die Taste vorher weg.
    */
   onEscape: () => void;
+  /**
+   * Enter, Tab (mit Umschalt rückwärts): Eingabe übernehmen und zur
+   * Nachbarzelle wandern, wie in Excel. Ohne Angabe bleibt Enter beim Text.
+   */
+  onCommit?: (dir: "up" | "down" | "left" | "right") => void;
 }
 
 /** Puts the caret at the end of `el`, asked of the cell's own root (shadow DOM). */
@@ -112,6 +117,7 @@ export function EditableCell({
   onPaste,
   onStopEdit,
   onEscape,
+  onCommit,
 }: EditableCellProps): ReactElement {
   const ref = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -148,10 +154,26 @@ export function EditableCell({
   })();
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {
-    if (!editing || event.key !== "Escape" || event.nativeEvent.isComposing) return;
-    // Vor dem Rahmen: der ignoriert Ereignisse, die schon jemand behandelt hat.
-    event.preventDefault();
-    onEscape();
+    if (!editing || event.nativeEvent.isComposing) return;
+    if (event.key === "Escape") {
+      // Vor dem Rahmen: der ignoriert Ereignisse, die schon jemand behandelt hat.
+      event.preventDefault();
+      onEscape();
+      return;
+    }
+    if (event.key === "Enter" && event.altKey) {
+      // Alt+Enter: Zeilenumbruch in der Zelle, wie in Excel.
+      event.preventDefault();
+      if (typeof document.execCommand === "function") document.execCommand("insertLineBreak");
+      readBack();
+      return;
+    }
+    if (onCommit === undefined || event.metaKey || event.ctrlKey) return;
+    if (event.key === "Enter" || event.key === "Tab") {
+      event.preventDefault();
+      readBack();
+      onCommit(event.key === "Enter" ? (event.shiftKey ? "up" : "down") : event.shiftKey ? "left" : "right");
+    }
   };
 
   return (
