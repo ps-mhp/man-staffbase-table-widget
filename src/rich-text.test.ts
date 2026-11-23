@@ -159,3 +159,26 @@ describe("hasRichText", () => {
     expect(hasRichText("")).toBe(false);
   });
 });
+
+describe("sanitizeRichText – Elemente aus dem Explorer", () => {
+  const diesel = '<span data-man-el="kasten" style="color:#e40045" role="img" aria-label="Diesel" contenteditable="false"></span>';
+
+  it("behält ein gültiges Element unverändert", () => {
+    expect(sanitizeRichText(`TGL ${diesel}`)).toBe(`TGL ${diesel}`);
+  });
+
+  it("baut ein Element aus seinen Angaben neu, statt fremde Attribute mitzunehmen", () => {
+    expect(
+      sanitizeRichText('<span data-man-el="kasten" style="color:#E40045;background:url(x)" onclick="alert(1)" aria-label="Diesel" class="x">innen</span>'),
+    ).toBe(diesel);
+  });
+
+  it("verwirft Elemente mit unbekannter Form oder ohne gültige Farbe", () => {
+    expect(sanitizeRichText('a<span data-man-el="kreis" style="color:#e40045"></span>b')).toBe("ab");
+    expect(sanitizeRichText('a<span data-man-el="kasten" style="color:expression(1)"></span>b')).toBe("ab");
+  });
+
+  it("ignoriert Elemente beim Sortiertext", () => {
+    expect(richTextToPlain(`${diesel} Diesel`)).toBe(" Diesel");
+  });
+});

@@ -15,6 +15,7 @@ import { translateHtml } from "@shared/translation/client";
 import { TableModel, formatKey } from "./table-model";
 import { TableData } from "./table-json";
 import { richTextToPlain, sanitizeRichText } from "./rich-text";
+import { cellHasElement } from "./cell-element";
 
 /**
  * The wire format for the table's *own* translation request.
@@ -105,8 +106,9 @@ export function applyTranslatedCells(
     row.map((value, colIndex) => {
       const translated = cells.get(formatKey(rowIndex, colIndex));
       if (translated === undefined) return value;
-      const lostContent =
-        richTextToPlain(translated).trim() === "" && richTextToPlain(value).trim() !== "";
+      // Ein Element zählt als Inhalt, auch wenn es keinen Text hat.
+      const hasContent = (html: string): boolean => richTextToPlain(html).trim() !== "" || cellHasElement(html);
+      const lostContent = !hasContent(translated) && hasContent(value);
       return lostContent ? value : translated;
     }),
   );

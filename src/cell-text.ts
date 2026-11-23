@@ -13,9 +13,11 @@
 
 /**
  * Text of a stored cell without markup. Cells are sanitized on save: escaped text
- * plus `<sup>`, `<sub>` and `<img>` only. Shared by the PPT content export and the
- * table download; runs without DOM.
+ * plus `<sup>`, `<sub>`, `<img>` and catalog elements only. Shared by the PPT
+ * content export and the table download; runs without DOM.
  */
+
+import { ELEMENT_ATTRIBUTE, ELEMENT_FALLBACK_TEXT, ELEMENT_UNLABELED_ATTRIBUTE, elementById, labelFromAria } from "@man/config-ui/elements/catalog";
 
 const SUPERSCRIPT: Record<string, string> = {
   "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹",
@@ -46,6 +48,17 @@ const attribute = (tag: string, name: string): string | undefined => {
 const mapChars = (text: string, table: Record<string, string>) =>
   Array.from(text, (char) => table[char] ?? char).join("");
 
+/**
+ * Ein Element aus dem Explorer steht im Text für seine Bedeutung („Diesel“),
+ * ohne Bedeutung als „■“ – die Farbe trägt im Export nichts.
+ */
+function elementText(tag: string): string {
+  const id = attribute(tag, ELEMENT_ATTRIBUTE);
+  if (elementById(id) === undefined) return "";
+  const unlabeled = attribute(tag, ELEMENT_UNLABELED_ATTRIBUTE) !== undefined;
+  return labelFromAria(attribute(tag, "aria-label"), unlabeled) || ELEMENT_FALLBACK_TEXT;
+}
+
 /** Walks a stored cell; `image` decides what an `<img>` becomes. */
 export function cellText(cell: string, image: (src: string, alt: string) => string): string {
   let out = "";
@@ -59,7 +72,8 @@ export function cellText(cell: string, image: (src: string, alt: string) => stri
       else if (tag === "img") {
         const src = attribute(part, "src");
         if (src) out += ` ${image(src, attribute(part, "alt") ?? "")} `;
-      } else if (tag === "br") out += " ";
+      } else if (tag === "span" && !closing) out += elementText(part);
+      else if (tag === "br") out += " ";
       continue;
     }
     const text = decodeEntities(part);

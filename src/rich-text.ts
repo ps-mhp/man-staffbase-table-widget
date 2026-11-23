@@ -13,14 +13,19 @@
 
 /**
  * A cell value may contain a *very* limited amount of inline markup: single
- * characters can be super-/sub-scripted (e.g. `m<sup>2</sup>`), and an inline
+ * characters can be super-/sub-scripted (e.g. `m<sup>2</sup>`), an inline
  * image can be embedded (`<img>` with an `https:`/root-relative `src` and an
- * optional pixel width). Only `<sup>`, `<sub>` and safe `<img>` survive;
+ * optional pixel width), and an element from the Element Explorer can stand
+ * in the text like a character (`<span data-man-el>` with a catalog ID, a
+ * `#rrggbb` colour and a meaning, see `@man/config-ui/elements/catalog`).
+ * Only `<sup>`, `<sub>`, safe `<img>` and catalog elements survive;
  * everything else is treated as plain text. This module is the single trusted
  * place that turns arbitrary strings (author input, contenteditable
  * `innerHTML`, spreadsheet imports) into safe markup, so the widget can render
  * cells via `innerHTML` without any XSS risk.
  */
+
+import { ELEMENT_ATTRIBUTE, elementMarkup, readElement } from "@man/config-ui/elements/catalog";
 
 const ALLOWED_TAGS = new Set(["SUP", "SUB"]);
 /** Void/inline tags that map directly to a line break. */
@@ -101,6 +106,11 @@ const serializeChildren = (node: Node): string => {
         out += "<br>";
       } else if (el.tagName === "IMG") {
         out += serializeImage(el);
+      } else if (el.tagName === "SPAN" && el.hasAttribute(ELEMENT_ATTRIBUTE)) {
+        // Rebuilt from what it says, never copied: an unknown shape or an
+        // invalid colour leaves nothing behind.
+        const element = readElement(el);
+        out += element === null ? "" : elementMarkup(element);
       } else if (ALLOWED_TAGS.has(el.tagName)) {
         // Re-emitted bare: no class or other attribute survives.
         const tag = el.tagName.toLowerCase();
@@ -125,7 +135,8 @@ const serializeChildren = (node: Node): string => {
 
 /**
  * Sanitizes a cell string into safe inline markup: escapes all text and
- * keeps only `<sup>`/`<sub>` tags and safe `<img>` elements. Plain text (no
+ * keeps only `<sup>`/`<sub>` tags, safe `<img>` elements and catalog
+ * elements. Plain text (no
  * tags) is returned escaped and otherwise unchanged, so legacy string cells
  * are unaffected.
  */

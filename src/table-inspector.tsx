@@ -34,7 +34,7 @@ import { Input } from "@man/config-ui/primitives/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@man/config-ui/primitives/select";
 import { Switch } from "@man/config-ui/primitives/switch";
 
-import { richTextToPlain } from "./rich-text";
+import { cellToPlain } from "./cell-text";
 import { columnLetters } from "./selection";
 import { ExportMode, SortSpec, TableModel, setExportMode, setFitImages, setSort, setVisibleRows } from "./table-model";
 
@@ -66,7 +66,7 @@ const HINT = "text-[13px] text-muted-foreground";
 
 /** „B · Umsatz“: der Buchstabe findet die Spalte im Gitter, die Überschrift erklärt sie. */
 function columnLabel(header: string | undefined, col: number): string {
-  const text = richTextToPlain(header ?? "").trim();
+  const text = cellToPlain(header ?? "");
   return text === "" ? `Spalte ${columnLetters(col)}` : `${columnLetters(col)} · ${text}`;
 }
 

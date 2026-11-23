@@ -74,6 +74,12 @@ describe("applyTranslatedCells", () => {
     expect(next.sort).toBe(source.sort);
   });
 
+  it("keeps a cell holding only an element when the translation comes back empty", () => {
+    const element = '<span data-man-el="kasten" style="color:#e40045" role="img" aria-label="Diesel" contenteditable="false"></span>';
+    const next = applyTranslatedCells(model([["Diesel"], [element]]), new Map([["1,0", ""]]));
+    expect(next.data[1][0]).toBe(element);
+  });
+
   it("carries the image-fit option into the translated model", () => {
     const source = model([["", "Spalte 1"], ["Zeile 1", "Auto"]], { fitImages: false });
 

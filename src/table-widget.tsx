@@ -21,10 +21,12 @@ import {
 } from "./table-model";
 import { formatToStyle, formatToCellStyle } from "./cell-style";
 import { sanitizeRichText, richTextToPlain } from "./rich-text";
+import { cellToPlain } from "./cell-text";
 import { IMAGE_FIT_CLASS, IMAGE_NO_FIT_CLASS } from "./image-fit";
 import imageFitCss from "./styles/image-fit.scss";
 import imageNoFitCss from "./styles/image-no-fit.scss";
 import tableWidgetCss from "./styles/table-widget.scss";
+import { elementStylesheet } from "@man/config-ui/elements/element-css";
 import { useHotStyle } from "@shared/hot-style";
 import {
   clampRowSpan,
@@ -43,6 +45,9 @@ import { downloadFile, exportFileName } from "./download";
 export type TableWidgetProps = BlockAttributes & {
   tabledata?: string;
 };
+
+/** Elemente aus dem Element Explorer: Form aus dem Katalog, Farbe aus dem Text. */
+const ELEMENT_CSS = elementStylesheet();
 
 /**
  * Class names of `styles/table-widget.scss`. They are collected here so a
@@ -160,7 +165,8 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
 
   const rowTitle = (row: number): string => {
     const merge = model.merges.find((m) => m.col === 0 && row >= m.row && row < m.row + m.rowSpan);
-    return richTextToPlain(data[merge ? merge.row : row]?.[0] ?? "").trim();
+    // Mit der Bedeutung von Elementen: eine Zeile, die nur „■“ trägt, heißt „Diesel“.
+    return cellToPlain(data[merge ? merge.row : row]?.[0] ?? "");
   };
 
   const runExport = async (format: ExportFormat): Promise<void> => {
@@ -245,7 +251,7 @@ export const TableWidget = ({ tabledata }: TableWidgetProps): ReactElement => {
           rules are part of it in both states: the host page styles article
           images too, so "off" is an explicit rule rather than the absence of
           one. */}
-      <style>{`${hotTableWidgetCss}\n${model.fitImages ? hotImageFitCss : hotImageNoFitCss}`}</style>
+      <style>{`${hotTableWidgetCss}\n${model.fitImages ? hotImageFitCss : hotImageNoFitCss}\n${ELEMENT_CSS}`}</style>
       <table className="table-widget__table">
         <thead>
           <tr>
